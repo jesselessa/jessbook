@@ -1,9 +1,13 @@
+// CSS
 import "./App.css";
+
+// Pages
+import Login from "./pages/login/Login";
 
 function App() {
   return (
     <div className="App">
-      <h1>Hello world !</h1>
+      <Login />
     </div>
   );
 }
