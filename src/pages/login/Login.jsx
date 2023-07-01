@@ -5,7 +5,7 @@ export default function Login() {
     <div className="login">
       <div className="card">
         <div className="left">
-          <h1>Welcome on Jessbook !</h1>
+          <h1>Welcome to Jessbook !</h1>
           <p>
             Jessbook is a social media app that helps you stay connected with
             your family and friends.
@@ -17,9 +17,9 @@ export default function Login() {
         <div className="right">
           <h1>Login</h1>
           <form>
-            <input type="text" placeholder="Username" />
-            <input type="password" placeholder="Password" autoComplete="off" />
-            <button>Login</button>
+            <input type="text" placeholder="Username" required />
+            <input type="password" placeholder="Password" required />
+            <button>Sign in</button>
             <span>
               <a href="#" target="_blank">
                 Forgot password ?
