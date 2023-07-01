@@ -22,7 +22,7 @@ export default function Login() {
             <button>Login</button>
             <span>
               <a href="#" target="_blank">
-                Password forgotten ?
+                Forgot password ?
               </a>
             </span>
           </form>
