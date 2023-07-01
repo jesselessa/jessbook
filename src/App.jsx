@@ -1,4 +1,9 @@
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
 
 // Pages
@@ -27,10 +32,26 @@ function App() {
     );
   };
 
+  //* Protect routes for unauthenticated users
+  const currentUser = false;
+  const ProtectedRoute = ({ children }) => {
+    // children => any page or layout
+    if (!currentUser) {
+      return <Navigate to="/login" />;
+    }
+
+    return children;
+  };
+
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />,
+      element: (
+        // Everything written inside the below component will be checked by the ProtectedRoute function
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
       children: [
         { path: "/", element: <Home /> },
         { path: "/profile/:id", element: <Profile /> },
