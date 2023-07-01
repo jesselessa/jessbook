@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-
 import "./login.scss";
 
 export default function Login() {
@@ -24,11 +23,7 @@ export default function Login() {
             <input type="text" placeholder="Username" required />
             <input type="password" placeholder="Password" required />
             <button>Sign in</button>
-            <span>
-              <a href="#" target="_blank">
-                Forgot password ?
-              </a>
-            </span>
+            <span>Forgot password ?</span>
           </form>
         </div>
       </div>

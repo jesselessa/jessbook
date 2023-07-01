@@ -33,7 +33,7 @@ function App() {
   };
 
   //* Protect routes for unauthenticated users
-  const currentUser = false;
+  const currentUser = true; //! Set to false later
   const ProtectedRoute = ({ children }) => {
     // children => any page or layout
     if (!currentUser) {
