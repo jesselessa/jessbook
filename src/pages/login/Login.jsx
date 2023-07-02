@@ -23,7 +23,7 @@ export default function Login() {
             <input type="text" placeholder="Username" required />
             <input type="password" placeholder="Password" required />
             <button>Sign in</button>
-            <span>Forgot password ?</span>
+            <span>Forgot your password ?</span>
           </form>
         </div>
       </div>

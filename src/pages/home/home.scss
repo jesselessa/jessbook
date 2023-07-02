@@ -1,4 +1,5 @@
-.homepage {
-  min-height: 100vh;
-  max-width: 100%;
+.home {
+  // 70px = navbar height
+  min-height: calc(100vh - 70px);
+  border: 1px solid blue;
 }

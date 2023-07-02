@@ -46,11 +46,18 @@
       align-items: center;
       gap: 1rem;
 
-      img {
+      div {
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        object-fit: cover;
+        overflow: hidden;
+
+        img {
+          width: 32px;
+          height: 32px;
+          object-fit: cover;
+          object-position: center;
+        }
       }
 
       span {

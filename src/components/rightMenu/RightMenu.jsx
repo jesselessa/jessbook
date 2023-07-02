@@ -1,5 +1,5 @@
 import "./rightMenu.scss";
 
 export default function RightMenu() {
-  return <div>rightMenu</div>;
+  return <div className="rightMenu">rightMenu</div>;
 }

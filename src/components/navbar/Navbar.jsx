@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "./navbar.scss";
 // Images
-import john_doe from "../../assets/images/john_doe.jpg";
+import user from "../../assets/images/profile/john_doe.jpg";
 // Icons
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -16,14 +16,17 @@ export default function Navbar() {
   return (
     <div className="navbar" role="navigation">
       <div className="left">
+        {/* Logo */}
         <Link to="/">
           <span>jessbook</span>
         </Link>
 
+        {/* Main icons */}
         <HomeOutlinedIcon fontSize="large" />
         <DarkModeOutlinedIcon fontSize="large" />
         <GridViewOutlinedIcon fontSize="large" />
 
+        {/* Search bar */}
         <div className="searchBar">
           <SearchOutlinedIcon sx={{ fontSize: "30px" }} />
           <input type="search" placeholder="Search..." />
@@ -31,11 +34,16 @@ export default function Navbar() {
       </div>
 
       <div className="right">
+        {/* Other icons */}
         <PersonOutlinedIcon fontSize="large" />
         <EmailOutlinedIcon fontSize="large" />
         <NotificationsOutlinedIcon fontSize="large" />
+
+        {/* User */}
         <div className="user">
-          <img src={john_doe} alt="profile" />
+          <div>
+            <img src={user} alt="profile" />
+          </div>
           <span>John Doe</span>
         </div>
       </div>

@@ -7,28 +7,33 @@ import {
 import "./App.css";
 
 // Pages
-import Login from "./pages/login/Login";
-import Register from "./pages/register/Register";
-import Home from "./pages/home/Home";
-import Profile from "./pages/profile/Profile";
+import Login from "./pages/login/Login.jsx";
+import Register from "./pages/register/Register.jsx";
+import Home from "./pages/home/Home.jsx";
+import Profile from "./pages/profile/Profile.jsx";
 
 // Components
-import Navbar from "./components/navbar/Navbar";
-import LeftMenu from "./components/leftMenu/LeftMenu";
-import RightMenu from "./components/rightMenu/RightMenu";
+import Navbar from "./components/navbar/Navbar.jsx";
+import LeftMenu from "./components/leftMenu/LeftMenu.jsx";
+import RightMenu from "./components/rightMenu/RightMenu.jsx";
 
 function App() {
+  //* Create a Layout component for a conditional rendering with Outlet
   const Layout = () => {
     return (
-      <div>
+      <>
         <Navbar />
         <div style={{ display: "flex" }}>
           <LeftMenu />
-          {/* Outlet will render either Home, when the URL is /home, or Profile at /profile */}
-          <Outlet />
+
+          <div style={{ flex: 6 }}>
+            {/* Outlet will render either Home, when the URL is /home, or Profile at /profile */}
+            <Outlet />
+          </div>
+
           <RightMenu />
         </div>
-      </div>
+      </>
     );
   };
 
