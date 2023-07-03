@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import { DarkModeContext } from "../../context/darkModeContext.jsx";
+
 import { Link } from "react-router-dom";
 import "./navbar.scss";
 // Images
@@ -13,6 +16,8 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 
 export default function Navbar() {
+  const { toggle, darkMode } = useContext(DarkModeContext);
+
   return (
     <div className="navbar" role="navigation">
       <div className="left">
@@ -20,15 +25,16 @@ export default function Navbar() {
         <Link to="/">
           <span>jessbook</span>
         </Link>
-
         {/* Main icons */}
         <Link className="iconLink" to="/">
           <HomeOutlinedIcon sx={{ fontSize: "30px" }} />
         </Link>
-
-        <DarkModeOutlinedIcon fontSize="large" />
+        {darkMode ? (
+          <WbSunnyOutlinedIcon fontSize="large" onClick={toggle} />
+        ) : (
+          <DarkModeOutlinedIcon fontSize="large" onClick={toggle} />
+        )}
         <GridViewOutlinedIcon fontSize="large" />
-
         {/* Search bar */}
         <div className="searchBar">
           <SearchOutlinedIcon sx={{ fontSize: "30px" }} />

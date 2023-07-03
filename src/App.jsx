@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import { DarkModeContext } from "./context/darkModeContext";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -18,10 +20,12 @@ import LeftMenu from "./components/leftMenu/LeftMenu.jsx";
 import RightMenu from "./components/rightMenu/RightMenu.jsx";
 
 function App() {
+  const { darkMode } = useContext(DarkModeContext);
+
   //* Create a Layout component for a conditional rendering with Outlet
   const Layout = () => {
     return (
-      <div className="theme-light">
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
         <Navbar />
 
         <div style={{ display: "flex" }}>
