@@ -1,0 +1,7 @@
+.profile {
+  min-height: calc(100vh - 70px); // 70px = navbar height
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1rem;
+  border: 1px solid orange;
+}

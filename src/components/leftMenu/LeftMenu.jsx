@@ -1,7 +1,7 @@
 import "./leftMenu.scss";
 
 // Images
-import user from "../../assets/images/profile/john_doe.jpg";
+import user from "../../assets/images/users/john_doe.jpg";
 import friends from "../../assets/images/leftMenu/1.png";
 import groups from "../../assets/images/leftMenu/2.png";
 import marketPlace from "../../assets/images/leftMenu/3.png";
@@ -22,9 +22,7 @@ export default function LeftMenu() {
       {/* Main info */}
       <div className="mainInfo">
         <div className="user">
-          <div>
-            <img src={user} alt="profile" />
-          </div>
+          <img src={user} alt="profile" />
           <span>John Doe</span>
         </div>
         <div className="item">

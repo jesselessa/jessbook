@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "./navbar.scss";
 // Images
-import user from "../../assets/images/profile/john_doe.jpg";
+import user from "../../assets/images/users/john_doe.jpg";
 // Icons
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -22,7 +22,10 @@ export default function Navbar() {
         </Link>
 
         {/* Main icons */}
-        <HomeOutlinedIcon fontSize="large" />
+        <Link className="iconLink" to="/">
+          <HomeOutlinedIcon sx={{ fontSize: "30px" }} />
+        </Link>
+
         <DarkModeOutlinedIcon fontSize="large" />
         <GridViewOutlinedIcon fontSize="large" />
 
@@ -41,9 +44,9 @@ export default function Navbar() {
 
         {/* User */}
         <div className="user">
-          <div>
+          <Link to="/profile/:id">
             <img src={user} alt="profile" />
-          </div>
+          </Link>
           <span>John Doe</span>
         </div>
       </div>

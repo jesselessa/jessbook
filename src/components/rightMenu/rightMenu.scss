@@ -1,6 +1,186 @@
 .rightMenu {
-  flex: 3;
-  // 70px = navbar height
-  min-height: calc(100vh - 70px);
+  min-height: calc(100vh - 70px); // 70px = navbar height
+  width: 35vw;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1rem;
+  gap: 3rem;
   border: 1px solid green;
+
+  .suggestions {
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+    -webkit-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+    -moz-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+    padding: 1rem;
+    gap: 1rem;
+
+    h3 {
+      font-size: 1.6rem;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
+    .suggestion {
+      display: flex;
+      align-items: center;
+
+      .user {
+        width: 55%;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        word-break: break-word; // To prevent name text from overflowing div
+
+        img {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+        }
+
+        span {
+          font-size: 1.4rem;
+          font-weight: bold;
+          color: #333;
+        }
+      }
+
+      .buttons {
+        width: 45%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 1rem;
+
+        button {
+          letter-spacing: 0.1rem;
+          border: none;
+          border-radius: 0.3rem;
+          padding: 0.3rem 0.5rem;
+          cursor: pointer;
+
+          &:nth-child(1) {
+            color: white;
+            background-color: teal;
+          }
+
+          &:nth-child(2) {
+            background-color: #ffd670;
+          }
+        }
+      }
+    }
+  }
+
+  .activities {
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+    -webkit-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+    -moz-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+    padding: 1rem;
+    gap: 1rem;
+
+    h3 {
+      font-size: 1.6rem;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
+    .activity {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 100%;
+
+      .userInfo {
+        width: 75%;
+        max-width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        word-break: break-word; // To prevent name text from overflowing div
+
+        img {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+        }
+
+        p {
+          font-size: 1.3rem;
+          color: grey;
+
+          span {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #333;
+            max-width: 100%;
+          }
+        }
+      }
+
+      .time {
+        width: 25%;
+        font-size: 1.3rem;
+        text-align: right;
+        color: grey;
+      }
+    }
+  }
+
+  .online {
+    width: 100%;
+    box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+    -webkit-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+    -moz-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+    padding: 1rem;
+
+    h3 {
+      font-size: 1.6rem;
+      color: #333;
+      margin-bottom: 2rem;
+    }
+
+    .friends {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .user {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        word-break: break-word; // To prevent name text from overflowing div
+
+        .img-container {
+          position: relative;
+          img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
+          }
+
+          .status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: lime;
+            position: absolute;
+            top: 0;
+            left: 22px;
+          }
+        }
+
+        span {
+          font-size: 1.4rem;
+          font-weight: bold;
+          color: #333;
+        }
+      }
+    }
+  }
 }

@@ -1,21 +1,28 @@
 .navbar {
-  height: 70px;
+  min-height: 70px;
   max-width: 100%;
   background-color: #8bd1e3;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 
   .left {
     display: flex;
     align-items: center;
-    gap: 3rem;
+    gap: 2.5rem;
 
     span {
       font-size: 2rem;
       font-weight: bold;
       color: #08415c;
+    }
+
+    .iconLink {
+      color: black;
     }
 
     .searchBar {
@@ -25,6 +32,7 @@
       background-color: white;
       border-radius: 0.5rem;
       padding: 0.5rem;
+      margin-right: 1rem;
 
       input {
         border: none;
@@ -39,25 +47,17 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 3rem;
+    gap: 2.5rem;
 
     .user {
       display: flex;
       align-items: center;
       gap: 1rem;
 
-      div {
+      img {
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        overflow: hidden;
-
-        img {
-          width: 32px;
-          height: 32px;
-          object-fit: cover;
-          object-position: center;
-        }
       }
 
       span {

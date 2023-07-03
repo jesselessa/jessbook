@@ -23,11 +23,11 @@ function App() {
     return (
       <>
         <Navbar />
+
         <div style={{ display: "flex" }}>
           <LeftMenu />
 
-          <div style={{ flex: 6 }}>
-            {/* Outlet will render either Home, when the URL is /home, or Profile at /profile */}
+          <div style={{ width: "45vw", maxWidth: "100%" }}>
             <Outlet />
           </div>
 
