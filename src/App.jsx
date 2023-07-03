@@ -4,7 +4,7 @@ import {
   Outlet,
   Navigate,
 } from "react-router-dom";
-import "./App.css";
+import "./style.scss";
 
 // Pages
 import Login from "./pages/login/Login.jsx";
@@ -21,19 +21,19 @@ function App() {
   //* Create a Layout component for a conditional rendering with Outlet
   const Layout = () => {
     return (
-      <>
+      <div className="theme-light">
         <Navbar />
 
         <div style={{ display: "flex" }}>
           <LeftMenu />
 
-          <div style={{ width: "45vw", maxWidth: "100%" }}>
+          <div style={{ width: "45vw" }}>
             <Outlet />
           </div>
 
           <RightMenu />
         </div>
-      </>
+      </div>
     );
   };
 

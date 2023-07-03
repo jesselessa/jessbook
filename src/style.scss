@@ -1,0 +1,68 @@
+*,
+::before,
+::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+// Create dark/light mode variables
+$themes: (
+  light: (
+    iconColor: black,
+    navBg: #8bd1e3,
+    logo: #08415c,
+    textColor: #333,
+    textColorSoft: #555,
+    bg: white,
+    bgSoft: #f6f3f3,
+    border: #08415c,
+  ),
+  dark: (
+    iconColor: white,
+    navBg: black,
+    logo: white,
+    textColor: whitesmoke,
+    textColorSoft: lightgray,
+    bg: #222,
+    bgSoft: #333,
+    border: #444,
+  ),
+);
+
+// Create dark/light mode function
+@mixin themify($themes) {
+  @each $theme, $map in $themes {
+    .theme-#{$theme} & {
+      $theme-map: () !global;
+      @each $key, $submap in $map {
+        $value: map-get(map-get($themes, $theme), "#{$key}");
+        $theme-map: map-merge(
+          $theme-map,
+          (
+            $key: $value,
+          )
+        ) !global;
+      }
+      @content;
+      $theme-map: null !global;
+    }
+  }
+}
+
+@function themed($key) {
+  @return map-get($theme-map, $key);
+}
