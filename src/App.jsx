@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { DarkModeContext } from "./context/darkModeContext";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -7,6 +6,10 @@ import {
   Navigate,
 } from "react-router-dom";
 import "./style.scss";
+
+// Contexts
+import { DarkModeContext } from "./contexts/darkModeContext.jsx";
+import { AuthContext } from "./contexts/authContext.jsx";
 
 // Pages
 import Login from "./pages/login/Login.jsx";
@@ -20,6 +23,8 @@ import LeftMenu from "./components/leftMenu/LeftMenu.jsx";
 import RightMenu from "./components/rightMenu/RightMenu.jsx";
 
 function App() {
+  const {currentUser} = useContext(AuthContext);
+
   const { darkMode } = useContext(DarkModeContext);
 
   //* Create a Layout component for a conditional rendering with Outlet
@@ -42,7 +47,6 @@ function App() {
   };
 
   //* Protect routes for unauthenticated users
-  const currentUser = true; //! Set to false later
   const ProtectedRoute = ({ children }) => {
     // children => any page or layout
     if (!currentUser) {

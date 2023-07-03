@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { DarkModeContext } from "../../context/darkModeContext.jsx";
+import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
 
 import { Link } from "react-router-dom";
 import "./navbar.scss";
