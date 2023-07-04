@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
-
 import "./post.scss";
+
+// Component
+import Comments from "../comments/Comments.jsx";
 
 // Icons
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -50,6 +52,8 @@ export default function Post({ post }) {
           Share
         </div>
       </div>
+
+      <Comments />
     </div>
   );
 }

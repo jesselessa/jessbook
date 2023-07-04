@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { Link } from "react-router-dom";
 import "./leftMenu.scss";
 
 // Images
@@ -26,12 +27,14 @@ export default function LeftMenu() {
     <div className="leftMenu" role="navigation">
       {/* Main info */}
       <div className="mainInfo">
-        <div className="user">
-          <img src={currentUser.profilePic} alt="profile" />
-          <span>
-            {currentUser.firstName} {currentUser.lastName}
-          </span>
-        </div>
+        <Link to={`profile/${currentUser.id}`} style={{ display: "inherit" }}>
+          <div className="user">
+            <img src={currentUser.profilePic} alt="profile" />
+            <span>
+              {currentUser.firstName} {currentUser.lastName}
+            </span>
+          </div>
+        </Link>
         <div className="item">
           <img src={friends} alt="friends" />
           <span>Friends</span>
