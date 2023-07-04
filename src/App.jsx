@@ -24,7 +24,6 @@ import RightMenu from "./components/rightMenu/RightMenu.jsx";
 
 function App() {
   const {currentUser} = useContext(AuthContext);
-
   const { darkMode } = useContext(DarkModeContext);
 
   //* Create a Layout component for a conditional rendering with Outlet

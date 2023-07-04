@@ -4,11 +4,11 @@ export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || false
+    JSON.parse(localStorage.getItem("user")) || null
   );
 
   const login = () => {
-    // TODO : create login function
+    // TODO : Replace dummy data
     setCurrentUser({
       id: 1,
       firstName: "Jean",
