@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./navbar.scss";
 
 // Images
@@ -27,19 +27,30 @@ export default function Navbar() {
     <div className="navbar" role="navigation">
       <div className="left">
         {/* Logo */}
-        <Link to="/">
+        <NavLink to="/">
           <span>jessbook</span>
-        </Link>
+        </NavLink>
         {/* Main icons */}
-        <Link className="iconLink" to="/">
+        <NavLink to="/">
           <HomeOutlinedIcon sx={{ fontSize: "30px" }} />
-        </Link>
+        </NavLink>
         {darkMode ? (
-          <WbSunnyOutlinedIcon fontSize="large" onClick={toggle} />
+          <WbSunnyOutlinedIcon
+            className="themeBtn"
+            fontSize="large"
+            onClick={toggle}
+          />
         ) : (
-          <DarkModeOutlinedIcon fontSize="large" onClick={toggle} />
+          <DarkModeOutlinedIcon
+            className="themeBtn"
+            fontSize="large"
+            onClick={toggle}
+          />
         )}
-        <GridViewOutlinedIcon fontSize="large" />
+        <NavLink to="#">
+          <GridViewOutlinedIcon fontSize="large" />
+        </NavLink>
+
         {/* Search bar */}
         <div className="searchBar">
           <SearchOutlinedIcon sx={{ fontSize: "30px" }} />
@@ -49,21 +60,22 @@ export default function Navbar() {
 
       <div className="right">
         {/* Other icons */}
-        <PersonOutlinedIcon fontSize="large" />
-        <EmailOutlinedIcon fontSize="large" />
-        <NotificationsOutlinedIcon fontSize="large" />
+        <NavLink to={`/profile/${currentUser.id}`}>
+          {/* <Link to="/profile/:id"> */}
+          <PersonOutlinedIcon fontSize="large" />
+        </NavLink>
+        <NavLink to="#">
+          <EmailOutlinedIcon fontSize="large" />
+        </NavLink>
+        <NavLink to="#">
+          <NotificationsOutlinedIcon fontSize="large" />
+        </NavLink>
 
-        {/* User */}
-        <div className="user">
-          <Link to={`/profile/${currentUser.id}`}>
-            {/* <Link to="/profile/:id"> */}
-            <img src={currentUser.profilePic} alt="profile" />
-            {/* <img src={user} alt="profile" /> */}
-          </Link>
-          <span>
-            {currentUser.firstName} {currentUser.lastName}
-          </span>
-        </div>
+        <NavLink to="#">
+          <img src={currentUser.profilePic} alt="profile" />
+          {/* <img src={user} alt="profile" /> */}
+        </NavLink>
+        <span>Logout</span>
       </div>
     </div>
   );

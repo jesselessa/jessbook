@@ -19,14 +19,20 @@
       align-items: center;
       gap: 2.5rem;
 
+      a {
+        color: themed("iconColor");
+      }
+
       span {
         font-size: 2rem;
         font-weight: bold;
         color: themed("logo");
       }
 
-      .iconLink {
-        color: themed("iconColor");
+      .themeBtn {
+        &:hover {
+          cursor: pointer;
+        }
       }
 
       .searchBar {
@@ -59,24 +65,22 @@
       align-items: center;
       gap: 2.5rem;
 
-      .user {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
+      a {
+        color: themed("iconColor");
+      }
 
-        img {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          object-fit: cover;
-          object-position: center;
-        }
+      img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center;
+      }
 
-        span {
-          font-size: 1.5rem;
-          font-weight: bold;
-          color: themed("iconColor");
-        }
+      span {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: themed("iconColor");
       }
     }
   }

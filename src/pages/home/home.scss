@@ -5,11 +5,7 @@
     min-height: calc(100vh - 70px); // 70px = navbar height
     position: sticky;
     top: 70px;
-    // display: flex;
-    // flex-direction: column;
-    // align-items: center;
     background-color: themed("bgSoft");
     padding: 2rem 1rem;
-    border: 1px solid orange;
   }
 }

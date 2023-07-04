@@ -35,7 +35,7 @@ function App() {
         <div style={{ display: "flex" }}>
           <LeftMenu />
 
-          <div style={{ width: "45vw" }}>
+          <div style={{ width: "50vw" }}>
             <Outlet />
           </div>
 
