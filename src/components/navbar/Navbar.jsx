@@ -1,9 +1,6 @@
 import { useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./navbar.scss";
-
-// Images
-// import user from "../../assets/images/users/john_doe.jpg";
 
 // Icons
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -22,18 +19,23 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 export default function Navbar() {
   const { darkMode, toggle } = useContext(DarkModeContext);
   const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate("/login");
+  };
 
   return (
     <div className="navbar" role="navigation">
       <div className="left">
         {/* Logo */}
-        <NavLink to="/">
+        <Link to="/">
           <span>jessbook</span>
-        </NavLink>
+        </Link>
         {/* Main icons */}
-        <NavLink to="/">
+        <Link to="/">
           <HomeOutlinedIcon sx={{ fontSize: "30px" }} />
-        </NavLink>
+        </Link>
         {darkMode ? (
           <WbSunnyOutlinedIcon
             className="themeBtn"
@@ -47,9 +49,9 @@ export default function Navbar() {
             onClick={toggle}
           />
         )}
-        <NavLink to="#">
+        <Link to="#">
           <GridViewOutlinedIcon fontSize="large" />
-        </NavLink>
+        </Link>
 
         {/* Search bar */}
         <div className="searchBar">
@@ -60,22 +62,20 @@ export default function Navbar() {
 
       <div className="right">
         {/* Other icons */}
-        <NavLink to={`/profile/${currentUser.id}`}>
-          {/* <Link to="/profile/:id"> */}
+        <Link to={`/profile/${currentUser.id}`}>
           <PersonOutlinedIcon fontSize="large" />
-        </NavLink>
-        <NavLink to="#">
+        </Link>
+        <Link to="#">
           <EmailOutlinedIcon fontSize="large" />
-        </NavLink>
-        <NavLink to="#">
+        </Link>
+        <Link to="#">
           <NotificationsOutlinedIcon fontSize="large" />
-        </NavLink>
+        </Link>
 
-        <NavLink to="#">
+        <Link to="#">
           <img src={currentUser.profilePic} alt="profile" />
-          {/* <img src={user} alt="profile" /> */}
-        </NavLink>
-        <span>Logout</span>
+        </Link>
+        <span onClick={handleLogout}>Logout</span>
       </div>
     </div>
   );

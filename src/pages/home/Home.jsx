@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="home">
       <Stories />
-      {/* <Posts /> */}
+      <Posts />
     </div>
   );
 }
