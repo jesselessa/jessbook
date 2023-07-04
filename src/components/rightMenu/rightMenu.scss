@@ -6,9 +6,9 @@
     width: 35vw;
     display: flex;
     flex-direction: column;
-    background-color: themed(bgSoft);
     position: sticky;
     top: 70px;
+    background-color: themed(bgSoft);
     padding: 2rem 1rem;
     gap: 3rem;
 
@@ -43,6 +43,8 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
           }
 
           span {
@@ -113,6 +115,8 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
           }
 
           p {

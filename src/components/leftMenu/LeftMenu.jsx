@@ -1,7 +1,8 @@
+import { useContext } from "react";
 import "./leftMenu.scss";
 
 // Images
-import user from "../../assets/images/users/john_doe.jpg";
+// import user from "../../assets/images/users/john_doe.jpg";
 import friends from "../../assets/images/leftMenu/1.png";
 import groups from "../../assets/images/leftMenu/2.png";
 import marketPlace from "../../assets/images/leftMenu/3.png";
@@ -16,14 +17,22 @@ import fundraiser from "../../assets/images/leftMenu/11.png";
 import tutorials from "../../assets/images/leftMenu/12.png";
 import courses from "../../assets/images/leftMenu/13.png";
 
+// Context
+import { AuthContext } from "../../contexts/authContext.jsx";
+
 export default function LeftMenu() {
+  const { currentUser } = useContext(AuthContext);
+
   return (
     <div className="leftMenu" role="navigation">
       {/* Main info */}
       <div className="mainInfo">
         <div className="user">
-          <img src={user} alt="profile" />
-          <span>John Doe</span>
+          <img src={currentUser.profilePic} alt="profile" />
+          {/* <img src={user} alt="profile" /> */}
+          <span>
+            {currentUser.firstName} {currentUser.lastName}
+          </span>
         </div>
         <div className="item">
           <img src={friends} alt="friends" />

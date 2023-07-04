@@ -1,7 +1,17 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import "./login.scss";
 
+// Context
+import { AuthContext } from "../../contexts/authContext";
+
 export default function Login() {
+  const { login } = useContext(AuthContext);
+
+  const handleLogin = () => {
+    login();
+  };
+
   return (
     <div className="login">
       <div className="card">
@@ -22,7 +32,7 @@ export default function Login() {
           <form>
             <input type="text" placeholder="Username" required />
             <input type="password" placeholder="Password" required />
-            <button>Sign in</button>
+            <button onClick={handleLogin}>Sign in</button>
             <span>Forgot your password ?</span>
           </form>
         </div>
