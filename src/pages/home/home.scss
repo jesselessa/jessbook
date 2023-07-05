@@ -2,10 +2,11 @@
 
 .home {
   @include themify($themes) {
+    width: 50vw;
     min-height: calc(100vh - 70px); // 70px = navbar height
     position: sticky;
     top: 70px;
     background-color: themed("bgSoft");
-    padding: 2rem 1rem;
+    padding: 2rem 1rem 2rem 2rem;
   }
 }

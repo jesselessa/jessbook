@@ -23,7 +23,8 @@ import LeftMenu from "./components/leftMenu/LeftMenu.jsx";
 import RightMenu from "./components/rightMenu/RightMenu.jsx";
 
 function App() {
-  const {currentUser} = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
+
   const { darkMode } = useContext(DarkModeContext);
 
   //* Create a Layout component for a conditional rendering with Outlet
@@ -34,11 +35,7 @@ function App() {
 
         <div style={{ display: "flex" }}>
           <LeftMenu />
-
-          <div style={{ width: "50vw" }}>
-            <Outlet />
-          </div>
-
+          <Outlet />
           <RightMenu />
         </div>
       </div>

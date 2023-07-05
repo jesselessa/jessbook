@@ -2,7 +2,7 @@
 
 .leftMenu {
   @include themify($themes) {
-    width: 20vw;
+    width: 18vw;
     min-height: calc(100vh - 70px); // 70px = navbar height
     position: sticky;
     top: 70px;

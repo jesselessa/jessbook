@@ -48,7 +48,9 @@ export default function Comments() {
         <div className="comment">
           <img src={comment.profilePic} alt="user" />
           <div className="info">
-            <h3>{comment.firstName} {comment.lastName}</h3>
+            <h3>
+              {comment.firstName} {comment.lastName}
+            </h3>
             <p>{comment.desc}</p>
           </div>
           <span className="time">1 hour ago</span>

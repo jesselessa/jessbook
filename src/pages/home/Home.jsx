@@ -1,4 +1,6 @@
 import "./home.scss";
+
+// Components
 import Posts from "../../components/posts/Posts.jsx";
 import Stories from "../../components/stories/Stories.jsx";
 

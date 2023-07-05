@@ -1,5 +1,7 @@
-import Post from "../post/Post";
 import "./posts.scss";
+
+// Component
+import Post from "../post/Post";
 
 export default function Posts() {
   // TODO : Replace by data fetched by API
