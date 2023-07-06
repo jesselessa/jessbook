@@ -1,8 +1,7 @@
 import "./rightMenu.scss";
-import user from "../../assets/images/users/jane_doe.jpg";
 
 export default function RightMenu() {
-  // TODO : Replace with data fetched from API
+  //* PROJECT ENHANCEMENTS - Fetch data from real API
   const latestActivities = [
     {
       id: 1,
@@ -18,10 +17,10 @@ export default function RightMenu() {
     {
       id: 2,
       user: {
-        firstName: "Jane",
-        lastName: "Doe",
+        firstName: "Clark",
+        lastName: "Kent",
         profilePic:
-          "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+          "https://images.pexels.com/photos/6333652/pexels-photo-6333652.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
       },
       desc: "liked a post",
       time: "1 min ago",
@@ -29,10 +28,10 @@ export default function RightMenu() {
     {
       id: 3,
       user: {
-        firstName: "Jane",
-        lastName: "Doe",
+        firstName: "Mickey",
+        lastName: "Mouse",
         profilePic:
-          "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+          "https://images.pexels.com/photos/11748915/pexels-photo-11748915.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
       },
       desc: "liked a comment",
       time: "1 min ago",
@@ -40,10 +39,10 @@ export default function RightMenu() {
     {
       id: 4,
       user: {
-        firstName: "Jane",
-        lastName: "Doe",
+        firstName: "Cinderella",
+        lastName: "Princess",
         profilePic:
-          "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+          "https://images.pexels.com/photos/1520760/pexels-photo-1520760.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
       },
       desc: "posted",
       time: "1 min ago",
@@ -55,31 +54,36 @@ export default function RightMenu() {
       id: 1,
       firstName: "Jane",
       lastName: "Doe",
-      img: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      profilePic:
+        "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     },
     {
       id: 2,
-      firstName: "Jane",
-      lastName: "Doe",
-      img: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      firstName: "Clark",
+      lastName: "Key",
+      profilePic:
+        "https://images.pexels.com/photos/6333652/pexels-photo-6333652.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     },
     {
       id: 3,
-      firstName: "Jane",
-      lastName: "Doe",
-      img: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      firstName: "Mickey",
+      lastName: "Mouse",
+      profilePic:
+        "https://images.pexels.com/photos/11748915/pexels-photo-11748915.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
     },
     {
       id: 4,
-      firstName: "Jane",
-      lastName: "Doe",
-      img: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      firstName: "Cinderella",
+      lastName: "Princess",
+      profilePic:
+        "https://images.pexels.com/photos/1520760/pexels-photo-1520760.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     },
     {
       id: 5,
-      firstName: "Jane",
-      lastName: "Doe",
-      img: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      firstName: "Simba",
+      lastName: "Lion",
+      profilePic:
+        "https://images.pexels.com/photos/5792673/pexels-photo-5792673.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     },
   ];
 
@@ -91,8 +95,11 @@ export default function RightMenu() {
 
         <div className="suggestion">
           <div className="user">
-            <img src={user} alt="user" />
-            <span>Jane Doe</span>
+            <img
+              src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              alt="user"
+            />
+            <span>James Bond</span>
           </div>
 
           <div className="buttons">
@@ -103,8 +110,11 @@ export default function RightMenu() {
 
         <div className="suggestion">
           <div className="user">
-            <img src={user} alt="user" />
-            <span>Jane Doe</span>
+            <img
+              src="https://images.pexels.com/photos/1102341/pexels-photo-1102341.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              alt="user"
+            />
+            <span>Sailor Moon</span>
           </div>
 
           <div className="buttons">
@@ -142,7 +152,7 @@ export default function RightMenu() {
           {onlineUsers.map((user) => (
             <div className="user" key={user.id}>
               <div className="img-container">
-                <img src={user.img} alt="user" />
+                <img src={user.profilePic} alt="user" />
                 <div className="status"></div>
               </div>
               <span>

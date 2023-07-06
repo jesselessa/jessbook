@@ -29,9 +29,9 @@ export default function Comments() {
     },
   ];
 
+  // TODO : Complete the below function
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO : To complete
   };
 
   return (

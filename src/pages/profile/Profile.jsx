@@ -1,17 +1,18 @@
 import { useContext } from "react";
 import "./profile.scss";
 
-// Component
-import Posts from "../../components/posts/Posts";
+// Components
+import Publish from "../../components/publish/Publish.jsx";
+import Posts from "../../components/posts/Posts.jsx";
 
 // Icons
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import PlaceIcon from "@mui/icons-material/Place";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import PlaceIcon from "@mui/icons-material/Place";
 
 // Context
-import { AuthContext } from "../../contexts/authContext";
+import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Profile() {
   const { currentUser } = useContext(AuthContext);
@@ -21,12 +22,12 @@ export default function Profile() {
       <div className="profileContainer">
         <div className="images">
           <img
-            src="https://images.pexels.com/photos/13440765/pexels-photo-13440765.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            src="https://images.pexels.com/photos/1271619/pexels-photo-1271619.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
             alt="cover"
             className="cover"
           />
           <img
-            src="https://images.pexels.com/photos/14028501/pexels-photo-14028501.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load"
+            src={currentUser.profilePic}
             alt="profile"
             className="profilePic"
           />
@@ -57,6 +58,9 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      <Publish />
+
       <Posts />
     </div>
   );

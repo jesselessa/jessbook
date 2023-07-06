@@ -80,11 +80,12 @@
           border-bottom: 0.1rem solid #8bd1e3;
           outline-color: #8bd1e3;
           margin-bottom: 2rem;
+          &::placeholder {
+            color: #08415c;
+          }
         }
 
-        input::placeholder {
-          color: #08415c;
-        }
+        
 
         button {
           height: 3.3rem;

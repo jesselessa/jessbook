@@ -78,10 +78,9 @@
           padding-left: 0.5rem;
           outline-color: #8bd1e3;
           margin-bottom: 2rem;
-        }
-
-        input::placeholder {
-          color: #08415c;
+          &::placeholder {
+            color: #08415c;
+          }
         }
 
         button {

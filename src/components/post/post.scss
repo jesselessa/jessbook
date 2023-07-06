@@ -2,7 +2,6 @@
 
 .post {
   @include themify($themes) {
-    color: themed("textColor");
     background-color: themed("bg");
     box-shadow: 0 0 2.5rem -1rem rgba(0, 0, 0, 0.38);
     -webkit-box-shadow: 0 0px 2.5rem -1rem rgba(0, 0, 0, 0.38);
@@ -33,11 +32,13 @@
           gap: 0.5rem;
 
           .name {
+            color: themed("textColor");
             font-size: 1.7rem;
             font-weight: bold;
           }
 
           .date {
+            color: themed("textColorSoft");
             font-size: 1.4rem;
           }
         }
@@ -46,6 +47,7 @@
 
     .content {
       p {
+        color: themed("textColor");
         font-size: 1.6rem;
         padding: 1rem;
       }
@@ -63,6 +65,7 @@
       justify-content: space-around;
       align-items: center;
       padding: 1rem;
+      color: themed("textColorSoft");
 
       .item {
         display: flex;

@@ -7,31 +7,38 @@ import { AuthContext } from "../../contexts/authContext";
 export default function Stories() {
   const { currentUser } = useContext(AuthContext);
 
-  // TODO : Replace data by the one fetched from API
   const stories = [
     {
       id: 1,
-      firstName: "Jane",
-      lastName: "Doe",
-      img: "https://images.pexels.com/photos/14554020/pexels-photo-14554020.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      user: {
+        firstName: "Jane",
+        lastName: "Doe",
+      },
+      img: "https://images.pexels.com/photos/1186116/pexels-photo-1186116.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     },
     {
       id: 2,
-      firstName: "Jane",
-      lastName: "Doe",
-      img: "https://images.pexels.com/photos/14554020/pexels-photo-14554020.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      user: {
+        firstName: "Clark",
+        lastName: "Kent",
+      },
+      img: "https://images.pexels.com/photos/13713020/pexels-photo-13713020.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     },
     {
       id: 3,
-      firstName: "Jane",
-      lastName: "Doe",
+      user: {
+        firstName: "Mickey",
+        lastName: "Mouse",
+      },
       img: "https://images.pexels.com/photos/14554020/pexels-photo-14554020.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     },
     {
       id: 4,
-      firstName: "Jane",
-      lastName: "Doe",
-      img: "https://images.pexels.com/photos/14554020/pexels-photo-14554020.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      user: {
+        firstName: "Cinderella",
+        lastName: "Princess",
+      },
+      img: "https://images.pexels.com/photos/14344896/pexels-photo-14344896.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     },
   ];
 
@@ -50,7 +57,7 @@ export default function Stories() {
         <div className="story" key={story.id}>
           <img src={story.img} alt="story" />
           <span>
-            {story.firstName} {story.lastName}
+            {story.user.firstName} {story.user.lastName}
           </span>
         </div>
       ))}

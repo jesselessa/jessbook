@@ -6,7 +6,6 @@
   box-sizing: border-box;
 }
 
-
 html {
   font-size: 62.5%;
 }
@@ -25,21 +24,23 @@ $themes: (
     iconColor: black,
     navBg: #8bd1e3,
     logo: #08415c,
-    textColor: #333,
-    textColorSoft: #555,
     bg: white,
     bgSoft: #f6f3f3,
+    textColor: #333,
+    textColorSoft: #555,
     border: #08415c,
+    hr: #8bd1e3,
   ),
   dark: (
     iconColor: white,
     navBg: black,
     logo: white,
-    textColor: whitesmoke,
-    textColorSoft: lightgray,
     bg: #222,
     bgSoft: #333,
+    textColor: whitesmoke,
+    textColorSoft: lightgray,
     border: #444,
+    hr: #444,
   ),
 );
 
@@ -66,3 +67,5 @@ $themes: (
 @function themed($key) {
   @return map-get($theme-map, $key);
 }
+
+// Media queries

@@ -8,7 +8,7 @@ import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+// import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 
@@ -49,9 +49,6 @@ export default function Navbar() {
             onClick={toggle}
           />
         )}
-        <Link to="#">
-          <GridViewOutlinedIcon fontSize="large" />
-        </Link>
 
         {/* Search bar */}
         <div className="searchBar">
@@ -62,8 +59,11 @@ export default function Navbar() {
 
       <div className="right">
         {/* Other icons */}
-        <Link to={`/profile/${currentUser.id}`}>
+        {/* <Link to={`/profile/${currentUser.id}`}>
           <PersonOutlinedIcon fontSize="large" />
+        </Link> */}
+        <Link to="#">
+          <GridViewOutlinedIcon fontSize="large" />
         </Link>
         <Link to="#">
           <EmailOutlinedIcon fontSize="large" />
@@ -72,7 +72,7 @@ export default function Navbar() {
           <NotificationsOutlinedIcon fontSize="large" />
         </Link>
 
-        <Link to="#">
+        <Link to={`/profile/${currentUser.id}`}>
           <img src={currentUser.profilePic} alt="profile" />
         </Link>
         <span onClick={handleLogout}>Logout</span>

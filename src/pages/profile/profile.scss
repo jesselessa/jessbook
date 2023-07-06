@@ -2,7 +2,7 @@
 
 .profile {
   @include themify($themes) {
-    width: 50vw;
+    width: 48vw;
     min-height: calc(100vh - 70px); // 70px = navbar height
     position: sticky;
     top: 70px;
@@ -58,14 +58,10 @@
           display: flex;
           justify-content: space-between;
 
-          // a {
-          //   color: themed("textColor");
-          // }
-
           .friends {
             display: flex;
             align-items: center;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             gap: 1rem;
           }
 
@@ -94,22 +90,25 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 1.4rem;
-            z-index: 100;
+            font-size: 1.5rem;
           }
 
           button {
+            width: 100px;
+            height: 40px;
+            letter-spacing: 0.1rem;
             position: absolute;
             top: 180px;
             color: white;
+            color: teal;
+            font-weight: bold;
             background-color: teal;
+            background-color: #ffd670;
             font-size: 1.6rem;
-            letter-spacing: 0.1rem;
             border: none;
-            border-radius: 0.3rem;
+            border-radius: 0.5rem;
             padding: 0.5rem 0.8rem;
             cursor: pointer;
-            z-index: 100;
           }
         }
       }

@@ -24,7 +24,6 @@ import RightMenu from "./components/rightMenu/RightMenu.jsx";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
-
   const { darkMode } = useContext(DarkModeContext);
 
   //* Create a Layout component for a conditional rendering with Outlet
@@ -56,7 +55,7 @@ function App() {
     {
       path: "/",
       element: (
-        // Everything written inside the below component will be checked by the ProtectedRoute function
+        // Everything written inside ProtectedRoute ill be checked by the same name function
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>

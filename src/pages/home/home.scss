@@ -2,7 +2,7 @@
 
 .home {
   @include themify($themes) {
-    width: 50vw;
+    width: 48vw;
     min-height: calc(100vh - 70px); // 70px = navbar height
     position: sticky;
     top: 70px;

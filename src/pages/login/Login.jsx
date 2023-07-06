@@ -8,7 +8,6 @@ import { AuthContext } from "../../contexts/authContext";
 export default function Login() {
   const { login } = useContext(AuthContext);
 
-
   const handleLogin = () => {
     login();
   };

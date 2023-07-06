@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./post.scss";
 
@@ -12,7 +13,9 @@ import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 
 export default function Post({ post }) {
-  //TEMPORARY
+  const [commentsOpen, setCommentsOpen] = useState(false);
+
+  // TODO : Remove later Like btn feature
   const liked = false;
 
   return (
@@ -43,7 +46,7 @@ export default function Post({ post }) {
           {liked ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
           32 Likes
         </div>
-        <div className="item">
+        <div className="item" onClick={() => setCommentsOpen(!commentsOpen)}>
           <TextsmsOutlinedIcon />
           16 Comments
         </div>
@@ -53,7 +56,7 @@ export default function Post({ post }) {
         </div>
       </div>
 
-      <Comments />
+      {commentsOpen && <Comments />}
     </div>
   );
 }

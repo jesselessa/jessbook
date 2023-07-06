@@ -1,5 +1,6 @@
 .stories {
   display: flex;
+  justify-content: space-between;
   height: 200px;
   gap: 1rem;
   margin-bottom: 2rem;
@@ -26,7 +27,7 @@
       color: white;
       font-size: 1.3rem;
       font-weight: bold;
-      padding: 0 0.5rem;
+      padding: 0.1rem;
       word-break: break-word; // To prevent name text from overflowing div
     }
     .add {
@@ -50,7 +51,7 @@
       position: absolute;
       left: 0;
       right: 0;
-      bottom: 50px;
+      bottom: 55px;
       margin: auto;
       width: 30px;
       height: 30px;
