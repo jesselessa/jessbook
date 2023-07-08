@@ -8,51 +8,12 @@
 
   .card {
     width: 70%;
-    min-height: 600px;
+    min-height: 650px;
     display: flex;
-    flex-direction: row-reverse;
     border-radius: 1rem;
     overflow: hidden;
 
     .left {
-      width: 50%;
-      display: flex;
-      flex-direction: column;
-      color: white;
-      background: linear-gradient(rgba(2, 81, 81, 0.7), rgba(2, 81, 81, 0.7)),
-        url("../../assets/images/auth/family.jpg") no-repeat center/cover;
-      padding: 1rem 1.5rem;
-
-      h1 {
-        font-size: 4.5rem;
-        text-align: center;
-        margin-bottom: 5rem;
-      }
-
-      p {
-        font-size: 2rem;
-        line-height: 1.6;
-        margin-bottom: 3rem;
-      }
-
-      span {
-        font-size: 1.7rem;
-        margin-bottom: 1rem;
-      }
-
-      button {
-        height: 3.3rem;
-        width: 50%;
-        font-size: 1.6rem;
-        font-weight: bold;
-        color: #08415c;
-        border: none;
-        border-radius: 0.3rem;
-        cursor: pointer;
-      }
-    }
-
-    .right {
       width: 50%;
       display: flex;
       flex-direction: column;
@@ -61,32 +22,48 @@
       padding: 1rem;
 
       h1 {
-        font-size: 4.5rem;
+        font-size: 4rem;
         color: teal;
       }
 
       form {
-        width: 80%;
+        width: 90%;
         display: flex;
         flex-direction: column;
         margin: auto;
+        gap: 0.5rem;
 
-        input {
-          font-size: 1.6rem;
-          width: 100%;
-          height: 3rem;
-          padding-left: 0.5rem;
-          border: none;
-          border-bottom: 0.1rem solid #8bd1e3;
-          outline-color: #8bd1e3;
-          margin-bottom: 2rem;
-          &::placeholder {
-            color: #08415c;
+        .inputGroup {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+
+          input {
+            flex: 1;
+            font-size: 1.6rem;
+            height: 3rem;
+            padding-left: 0.5rem;
+            border: none;
+            border-bottom: 0.1rem solid #8bd1e3;
+            outline-color: #8bd1e3;
+            &::placeholder {
+              color: #08415c;
+            }
           }
+
+          // .icon {
+          //   display: none;
+          // }
         }
-
-        
-
+        .errorMsg {
+          margin-top: 0.7rem;
+          color: #f75252;
+          font-size: 1.3rem;
+          font-weight: 400;
+          margin-bottom: 1rem;
+          // display: none;
+        }
         button {
           height: 3.3rem;
           background-color: #ffd670;
@@ -99,10 +76,45 @@
           margin-bottom: 1rem;
           cursor: pointer;
         }
+      }
+    }
+
+    .right {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      color: white;
+      background: linear-gradient(rgba(2, 81, 81, 0.7), rgba(2, 81, 81, 0.7)),
+        url("../../assets/images/auth/family.jpg") no-repeat center/cover;
+      padding: 1rem 1.5rem;
+
+      h1 {
+        font-size: 4rem;
+        text-align: center;
+      }
+
+      .container {
+        margin: auto;
+        p {
+          font-size: 2rem;
+          line-height: 1.6;
+          margin-bottom: 3rem;
+        }
 
         span {
-          font-size: 1.5rem;
-          text-align: center;
+          font-size: 1.7rem;
+        }
+
+        button {
+          width: 50%;
+          height: 3.3rem;
+          font-size: 1.6rem;
+          font-weight: bold;
+          color: #08415c;
+          border: none;
+          border-radius: 0.3rem;
+          margin-left: 1rem;
+          cursor: pointer;
         }
       }
     }

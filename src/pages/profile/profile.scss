@@ -54,6 +54,10 @@
         border-bottom-left-radius: 1rem;
         border-bottom-right-radius: 1rem;
 
+        a {
+          color: themed("textColorSoft");
+        }
+
         .friends-contact {
           display: flex;
           justify-content: space-between;

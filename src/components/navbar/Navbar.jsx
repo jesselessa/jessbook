@@ -21,7 +21,9 @@ export default function Navbar() {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // TODO - Replace below function by data fetched from API
   const handleLogout = () => {
+    localStorage.removeItem("user");
     navigate("/login");
   };
 

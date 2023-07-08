@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { Link } from "react-router-dom";
 import "./profile.scss";
 
 // Components
@@ -35,13 +36,21 @@ export default function Profile() {
 
         <div className="userInfo">
           <div className="friends-contact">
-            <div className="friends">
-              <PeopleAltOutlinedIcon fontSize="large" />
-              <span>441 Friends</span>
-            </div>
+            <Link to="#">
+              <div className="friends">
+                <PeopleAltOutlinedIcon fontSize="large" />
+                <span>441 Friends</span>
+              </div>
+            </Link>
+
             <div className="contact">
-              <EmailOutlinedIcon fontSize="large" />
-              <MoreVertIcon fontSize="large" />
+              <Link to="#">
+                <EmailOutlinedIcon fontSize="large" />
+              </Link>
+
+              <Link to="#">
+                <MoreVertIcon fontSize="large" />
+              </Link>
             </div>
           </div>
           <div className="name">
