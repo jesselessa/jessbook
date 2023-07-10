@@ -16,7 +16,7 @@ export default function Register() {
   const [pswdConfirm, setPswdConfirm] = useState("");
   // const [error, setError] = useState(false); //TODO - Uncomment later
 
-  const error = false; //TODO - Delete later
+  const error = true; //TODO - Delete later
 
   const handleForm = (e) => {
     e.prevent.Default();
@@ -56,9 +56,11 @@ export default function Register() {
                 />
               )}
             </div>
-            <span className="errorMsg">
-              Enter a name between 2 and 35&nbsp;characters.
-            </span>
+            {error && (
+              <span className="errorMsg">
+                Enter a name between 2 and 35&nbsp;characters.
+              </span>
+            )}
 
             <div className="inputGroup">
               <input
@@ -88,9 +90,11 @@ export default function Register() {
                 />
               )}
             </div>
-            <span className="errorMsg">
-              Enter a name between 2 and 35&nbsp;characters.
-            </span>
+            {error && (
+              <span className="errorMsg">
+                Enter a name between 2 and 35&nbsp;characters.
+              </span>
+            )}
 
             <div className="inputGroup">
               <input
@@ -120,7 +124,7 @@ export default function Register() {
                 />
               )}
             </div>
-            <span className="errorMsg">Enter a valid email.</span>
+            {error && <span className="errorMsg">Enter a valid email.</span>}
 
             <div className="inputGroup">
               <input
@@ -150,10 +154,12 @@ export default function Register() {
                 />
               )}
             </div>
-            <span className="errorMsg">
-              Your password must contain at least 6&nbsp;characters, including 1
-              number and 1&nbsp;symbol.
-            </span>
+            {error && (
+              <span className="errorMsg">
+                Your password must contain at least 6&nbsp;characters, including
+                1 number and 1&nbsp;symbol.
+              </span>
+            )}
 
             <div className="inputGroup">
               <input
@@ -183,8 +189,9 @@ export default function Register() {
                 />
               )}
             </div>
-            <span className="errorMsg">The password does not match.</span>
-
+            {error && (
+              <span className="errorMsg">The password does not match.</span>
+            )}
             <button onClick={handleForm}>Sign up</button>
           </form>
         </div>

@@ -2,10 +2,6 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./login.scss";
 
-// Icons
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircle";
-import ErrorRoundedIcon from "@mui/icons-material/Error";
-
 // Context
 import { AuthContext } from "../../contexts/authContext";
 
@@ -47,53 +43,26 @@ export default function Login() {
               <span className="errorMsg">Invalid email or password.</span>
             )}
 
-            <div className="inputGroup">
-              <input
-                type="email"
-                placeholder="Email"
-                maxLength={64}
-                autoComplete="off"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              {error ? (
-                <ErrorRoundedIcon
-                  className="icon"
-                  sx={{ fontSize: "30px", color: "#f75252" }}
-                />
-              ) : (
-                <CheckCircleRoundedIcon
-                  className="icon"
-                  sx={{ fontSize: "30px", color: "#00e676" }}
-                />
-              )}
-            </div>
+            <input
+              type="email"
+              placeholder="Email"
+              maxLength={64}
+              autoComplete="off"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-            <div className="inputGroup">
-              <input
-                type="password"
-                id="password"
-                placeholder="Password"
-                maxLength={64}
-                autoComplete="off"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-
-              {error ? (
-                <ErrorRoundedIcon
-                  className="icon"
-                  sx={{ fontSize: "30px", color: "#f75252" }}
-                />
-              ) : (
-                <CheckCircleRoundedIcon
-                  className="icon"
-                  sx={{ fontSize: "30px", color: "#00e676" }}
-                />
-              )}
-            </div>
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              maxLength={64}
+              autoComplete="off"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
             <button onClick={handleLogin}>Sign in</button>
 

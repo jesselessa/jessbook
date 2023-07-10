@@ -3,6 +3,7 @@ import { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
+  // children = props.chidren
   const [currentUser, setCurrentUser] = useState(
     JSON.parse(localStorage.getItem("user")) || null
   );
@@ -15,6 +16,7 @@ export const AuthContextProvider = ({ children }) => {
       lastName: "Doe",
       profilePic:
         "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+      isLogged: true,
     });
   };
 

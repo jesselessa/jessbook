@@ -7,6 +7,7 @@ import { AuthContext } from "../../contexts/authContext";
 export default function Stories() {
   const { currentUser } = useContext(AuthContext);
 
+  // !TODO - Replace with data fetched from API
   const stories = [
     {
       id: 1,
