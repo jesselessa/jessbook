@@ -8,9 +8,10 @@ import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-// import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import MenuIcon from "@mui/icons-material/Menu";
 
 // Contexts
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
@@ -32,7 +33,11 @@ export default function Navbar() {
       <div className="left">
         {/* Logo */}
         <Link to="/">
-          <span>jessbook</span>
+          <span className="logo">jessbook</span>
+        </Link>
+        {/* Logo tablet and mobile */}
+        <Link to="/">
+          <span className="logoMob">j</span>
         </Link>
         {/* Main icons */}
         <Link to="/">
@@ -61,9 +66,6 @@ export default function Navbar() {
 
       <div className="right">
         {/* Other icons */}
-        {/* <Link to={`/profile/${currentUser.id}`}>
-          <PersonOutlinedIcon fontSize="large" />
-        </Link> */}
         <Link to="#">
           <GridViewOutlinedIcon fontSize="large" />
         </Link>
@@ -78,6 +80,20 @@ export default function Navbar() {
           <img src={currentUser.profilePic} alt="profile" />
         </Link>
         <span onClick={handleLogout}>Logout</span>
+      </div>
+
+      {/* Burger menu */}
+      <div className="rightMob">
+        <Link to={`/profile/${currentUser.id}`}>
+          <PersonOutlinedIcon className="iconMob" fontSize="large" />
+        </Link>
+        <Link to="#">
+          <EmailOutlinedIcon className="iconMob" fontSize="large" />
+        </Link>
+        <Link to="#">
+          <NotificationsOutlinedIcon className="iconMob" fontSize="large" />
+        </Link>
+        <MenuIcon className="iconMob burger" fontSize="large" />
       </div>
     </div>
   );

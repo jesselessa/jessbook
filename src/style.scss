@@ -69,3 +69,26 @@ $themes: (
 }
 
 // Media queries
+@mixin medium {
+  @media (max-width: 1300px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: 900px) {
+    @content;
+  }
+}
+
+@mixin small {
+  @media (max-width: 600px) {
+    @content;
+  }
+}
+
+@mixin xsmall {
+  @media (max-width: 550px) {
+    @content;
+  }
+}

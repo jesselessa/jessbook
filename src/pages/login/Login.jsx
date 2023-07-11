@@ -38,6 +38,7 @@ export default function Login() {
 
         <div className="right">
           <h1>Login</h1>
+          
           <form>
             {error && (
               <span className="errorMsg">Invalid email or password.</span>

@@ -2,7 +2,7 @@
 
 .rightMenu {
   @include themify($themes) {
-    width: 32vw;
+    width: 30vw;
     min-height: calc(100vh - 70px); // 70px = navbar height
     display: flex;
     flex-direction: column;
@@ -11,6 +11,10 @@
     background-color: themed(bgSoft);
     padding: 2rem 1rem;
     gap: 3rem;
+
+    @include medium {
+      display: none;
+    }
 
     .suggestions {
       display: flex;

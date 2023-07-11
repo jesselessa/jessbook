@@ -14,19 +14,47 @@
     top: 0;
     z-index: 100;
 
+    @include small {
+      padding: 1rem;
+    }
+
     .left {
       display: flex;
+      justify-content: space-between;
       align-items: center;
       gap: 2.5rem;
 
+      @include small {
+        gap: 1.5rem;
+      }
+
       a {
         color: themed("iconColor");
+        &:nth-child(1) {
+          @include small {
+            display: none;
+          }
+        }
       }
 
       span {
         font-size: 2rem;
         font-weight: bold;
         color: themed("logo");
+      }
+
+      .logo {
+        @include small {
+          display: none;
+        }
+      }
+
+      .logoMob {
+        display: none;
+
+        @include small {
+          display: block;
+        }
       }
 
       .themeBtn {
@@ -36,6 +64,7 @@
       }
 
       .searchBar {
+        flex: 1;
         display: flex;
         align-items: center;
         gap: 1rem;
@@ -46,7 +75,7 @@
         margin-right: 1rem;
 
         input {
-          width: 300px;
+          flex: 1;
           color: themed("textColor");
           font-size: 1.6rem;
           background-color: transparent;
@@ -54,6 +83,10 @@
           outline: none;
           &::placeholder {
             color: themed("textColor");
+          }
+
+          @include tablet {
+            display: none;
           }
         }
       }
@@ -64,6 +97,10 @@
       justify-content: flex-end;
       align-items: center;
       gap: 2.5rem;
+
+      @include medium {
+        display: none;
+      }
 
       a {
         color: themed("iconColor");
@@ -81,6 +118,26 @@
         font-size: 1.5rem;
         font-weight: bold;
         color: themed("iconColor");
+        cursor: pointer;
+      }
+    }
+
+    .rightMob {
+      display: none;
+      gap: 2rem;
+
+      @include medium {
+        display: flex;
+      }
+      @include small {
+        gap: 1.5rem;
+      }
+
+      a {
+        color: themed("iconColor");
+      }
+
+      .burger {
         cursor: pointer;
       }
     }
