@@ -97,7 +97,7 @@
             }
 
             span {
-              @include xsmall {
+              @media (max-width: 550px) {
                 display: none;
               }
             }
@@ -164,7 +164,7 @@
             @include small {
               top: 115px;
               height: 30px;
-              font-size: 1.5rem;
+              font-size: 1.4rem;
               padding: 0;
             }
           }

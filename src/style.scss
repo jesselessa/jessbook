@@ -86,9 +86,3 @@ $themes: (
     @content;
   }
 }
-
-@mixin xsmall {
-  @media (max-width: 550px) {
-    @content;
-  }
-}

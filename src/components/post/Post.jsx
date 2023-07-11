@@ -44,11 +44,11 @@ export default function Post({ post }) {
       <div className="interactions">
         <div className="item">
           {liked ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
-          32 Likes
+          32 <span>Likes</span>
         </div>
         <div className="item" onClick={() => setCommentsOpen(!commentsOpen)}>
           <TextsmsOutlinedIcon />
-          16 Comments
+          16 <span>Comments</span>
         </div>
         <div className="item">
           <ShareOutlinedIcon />
