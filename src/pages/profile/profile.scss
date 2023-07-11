@@ -127,6 +127,7 @@
 
             @include small {
               top: 60px;
+              font-size: 2rem;
             }
           }
 
@@ -138,7 +139,8 @@
             gap: 0.5rem;
             font-size: 1.5rem;
             @include small {
-              top: 100px;
+              top: 90px;
+              font-size: 1.4rem;
             }
           }
 
@@ -158,6 +160,13 @@
             border-radius: 0.5rem;
             padding: 0.5rem 0.8rem;
             cursor: pointer;
+
+            @include small {
+              top: 115px;
+              height: 30px;
+              font-size: 1.5rem;
+              padding: 0;
+            }
           }
         }
       }

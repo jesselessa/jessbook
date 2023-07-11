@@ -88,9 +88,6 @@ export default function Navbar() {
           <PersonOutlinedIcon className="iconMob" fontSize="large" />
         </Link>
         <Link to="#">
-          <EmailOutlinedIcon className="iconMob" fontSize="large" />
-        </Link>
-        <Link to="#">
           <NotificationsOutlinedIcon className="iconMob" fontSize="large" />
         </Link>
         <MenuIcon className="iconMob burger" fontSize="large" />
