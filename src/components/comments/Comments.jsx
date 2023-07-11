@@ -37,8 +37,10 @@ export default function Comments() {
   return (
     <div className="comments">
       <form>
-        <img src={currentUser.profilePic} alt="user" />
-        <input type="text" placeholder="Write a comment..." />
+        <div className="img-container">
+          <img src={currentUser.profilePic} alt="user" />
+        </div>
+          <input type="text" placeholder="Write a comment..." />
         <button type="submit" onClick={handleSubmit}>
           Send
         </button>
@@ -46,7 +48,9 @@ export default function Comments() {
 
       {comments.map((comment) => (
         <div className="comment">
-          <img src={comment.profilePic} alt="user" />
+          <div className="img-container">
+            <img src={comment.profilePic} alt="user" />
+          </div>
           <div className="info">
             <h3>
               {comment.firstName} {comment.lastName}
