@@ -10,20 +10,18 @@
     top: 70px;
     background-color: themed(bgSoft);
     padding: 2rem 1rem;
-    gap: 3rem;
+    gap: 2rem;
 
-    @include medium {
-      display: none;
-    }
+    // @include medium {
+    //   display: none;
+    // }
 
-    .suggestions {
-      display: flex;
-      flex-direction: column;
+    .birthdays {
       background-color: themed(bg);
       box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
       -webkit-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
       -moz-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      padding: 1.5rem 1rem;
+      padding: 1rem;
       gap: 1rem;
 
       h3 {
@@ -32,54 +30,17 @@
         margin-bottom: 1rem;
       }
 
-      .suggestion {
+      .birthday {
         display: flex;
-        justify-content: space-between;
         align-items: center;
         gap: 1rem;
 
-        .user {
-          width: 50%;
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          word-break: break-word; // To prevent name text from overflowing div
-
-          img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            object-position: center;
-          }
+        p {
+          font-size: 1.4rem;
 
           span {
-            font-size: 1.4rem;
             font-weight: bold;
             color: themed("textColor");
-          }
-        }
-
-        .buttons {
-          width: 50%;
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
-          gap: 1rem;
-
-          button {
-            letter-spacing: 0.1rem;
-            border: none;
-            border-radius: 0.3rem;
-            padding: 0.5rem 0.8rem;
-            cursor: pointer;
-            &:nth-child(1) {
-              color: white;
-              background-color: teal;
-            }
-            &:nth-child(2) {
-              background-color: #ffd670;
-            }
           }
         }
       }
@@ -114,14 +75,17 @@
           gap: 1rem;
           word-break: break-word; // To prevent name text from overflowing div
 
-          img {
+          .img-container {
             width: 32px;
             height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            object-position: center;
+            img {
+              width: 32px;
+              height: 32px;
+              border-radius: 50%;
+              object-fit: cover;
+              object-position: center;
+            }
           }
-
           p {
             font-size: 1.3rem;
             color: themed("textColorSoft");
@@ -169,7 +133,8 @@
 
           .img-container {
             position: relative;
-
+            width: 32px;
+            height: 32px;
             img {
               width: 32px;
               height: 32px;

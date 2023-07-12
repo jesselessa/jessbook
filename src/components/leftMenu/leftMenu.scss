@@ -10,9 +10,9 @@
     color: themed("logo");
     padding: 2rem 1rem;
 
-    @include tablet {
-      display: none;
-    }
+    // @include tablet {
+    //   display: none;
+    // }
 
     a {
       color: themed("logo");
@@ -29,12 +29,17 @@
         gap: 1rem;
         word-break: break-word; // To prevent name text from overflowing div
 
-        img {
+        .img-container {
           width: 30px;
           height: 30px;
-          border-radius: 50%;
-          object-fit: cover;
-          object-position: center;
+
+          img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
+          }
         }
 
         span {

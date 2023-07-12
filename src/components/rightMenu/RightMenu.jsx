@@ -1,7 +1,10 @@
 import "./rightMenu.scss";
 
+// Image
+import gift from "../../assets/images/gift.png";
+
 export default function RightMenu() {
-  //* PROJECT ENHANCEMENTS - Fetch data from real API
+  //TODO - Project enhancements : fetch data from real API
   const latestActivities = [
     {
       id: 1,
@@ -89,38 +92,15 @@ export default function RightMenu() {
 
   return (
     <div className="rightMenu">
-      {/* Friends suggestions */}
-      <div className="suggestions">
-        <h3>Suggestions For You</h3>
+      {/* Birthdays */}
+      <div className="birthdays">
+        <h3>Birthdays</h3>
 
-        <div className="suggestion">
-          <div className="user">
-            <img
-              src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-              alt="user"
-            />
-            <span>James Bond</span>
-          </div>
-
-          <div className="buttons">
-            <button>Follow</button>
-            <button>Dismiss</button>
-          </div>
-        </div>
-
-        <div className="suggestion">
-          <div className="user">
-            <img
-              src="https://images.pexels.com/photos/1102341/pexels-photo-1102341.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-              alt="user"
-            />
-            <span>Sailor Moon</span>
-          </div>
-
-          <div className="buttons">
-            <button>Follow</button>
-            <button>Dismiss</button>
-          </div>
+        <div className="birthday">
+          <img src={gift} alt="gift" />
+          <p>
+            It's <span>Jane Doe</span>'s birthday today.
+          </p>
         </div>
       </div>
 
@@ -131,7 +111,9 @@ export default function RightMenu() {
         {latestActivities.map((activity) => (
           <div className="activity" key={activity.id}>
             <div className="userInfo">
-              <img src={activity.user.profilePic} alt="user" />
+              <div className="img-container">
+                <img src={activity.user.profilePic} alt="user" />
+              </div>
               <p>
                 <span>
                   {activity.user.firstName} {activity.user.lastName}

@@ -9,10 +9,10 @@
     background-color: themed("bgSoft");
     padding: 0 1rem 2rem 2rem;
 
-    @include medium {
-      width: 80vw;
-      padding: 0 2rem 2rem 2rem;
-    }
+    // @include medium {
+    //   width: 80vw;
+    // }
+
     @include tablet {
       width: 100vw;
     }
@@ -38,22 +38,28 @@
           object-position: center;
         }
 
-        .profilePic {
+        .img-container {
           width: 180px;
           height: 180px;
-          border-radius: 50%;
-          object-fit: cover;
           position: absolute;
           left: 0;
           right: 0;
-          top: 180px;
+          top: 190px; // 280px (cover height) - 90px (1/2 picture height)
           margin: auto;
           z-index: 100;
 
-          @include small {
-            width: 120px;
-            height: 120px;
-            top: 120px;
+          .profilePic {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
+
+            @include small {
+              width: 120px;
+              height: 120px;
+              top: 120px;
+            }
           }
         }
       }

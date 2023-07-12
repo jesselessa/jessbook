@@ -16,16 +16,21 @@
       align-items: center;
       gap: 1rem;
 
-      img {
+      .img-container {
         width: 50px;
         height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-        object-position: center;
+        img {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          object-fit: cover;
+          object-position: center;
+        }
       }
 
       input {
-        flex : 1;
+        width: calc(100% - 150px); // 100px = button + 50px = image
+        width: 100%;
         height: 50px;
         color: themed("textColor");
         background-color: themed("bgSoft");
@@ -44,12 +49,20 @@
     hr {
       border-top: 0.1rem solid themed("hr");
       margin: 2rem 0;
+
+      @include small {
+        display: none;
+      }
     }
 
     .bottom {
       display: flex;
       align-items: center;
       justify-content: space-between;
+
+      @include small {
+        display: none;
+      }
 
       .left {
         display: flex;

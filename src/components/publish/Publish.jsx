@@ -20,7 +20,9 @@ export default function Publish() {
   return (
     <div className="publish">
       <div className="top">
-        <img src={currentUser.profilePic} alt="" />
+        <div className="img-container">
+          <img src={currentUser.profilePic} alt="" />
+        </div>
         <input
           type="text"
           placeholder={`What's up, ${currentUser.firstName} ?`}
