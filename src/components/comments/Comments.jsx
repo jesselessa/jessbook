@@ -40,7 +40,7 @@ export default function Comments() {
         <div className="img-container">
           <img src={currentUser.profilePic} alt="user" />
         </div>
-          <input type="text" placeholder="Write a comment..." />
+        <input type="text" placeholder="Write a comment..." />
         <button type="submit" onClick={handleSubmit}>
           Send
         </button>

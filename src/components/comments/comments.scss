@@ -31,8 +31,7 @@
       }
       input {
         height: 40px;
-        width: calc(100% - 106px); // 100px = button + 40px = image
-        // width: 100%;
+        width: calc(100% - 140px); // 100px (button) + 40px (image)
         font-size: 1.6rem;
         padding: 1rem;
         border: 0.1rem solid themed("color");
@@ -40,7 +39,8 @@
         outline: none;
 
         @include small {
-          width: 100%;
+          width: calc(100% - 40px); // 40px = image
+          padding: 0.5rem;
         }
       }
 

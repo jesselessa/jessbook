@@ -27,11 +27,11 @@
       gap: 2.5rem;
 
       @include tablet {
-        gap: 2rem;
+        // gap: 2rem;
       }
 
       @include small {
-        gap: 1.5rem;
+        // gap: 1.5rem;
       }
 
       a {
@@ -44,7 +44,7 @@
       }
 
       span {
-        font-size: 2rem;
+        font-size: 2.2rem;
         font-weight: bold;
         color: themed("logo");
       }
@@ -82,7 +82,7 @@
         border: 0.2rem solid themed("border");
         border-radius: 0.5rem;
         padding: 0.5rem;
-        margin-right: 1rem;
+        margin-right: 2.5rem;
 
         input {
           flex: 1;
@@ -134,14 +134,15 @@
 
     .rightMob {
       display: none;
-      gap: 2rem;
+      // gap: 2rem;
 
       @include medium {
         display: flex;
+        gap: 2.5rem;
       }
 
       @include small {
-        gap: 1.5rem;
+        // gap: 1.5rem;
         margin-right: 1.5rem;
       }
 

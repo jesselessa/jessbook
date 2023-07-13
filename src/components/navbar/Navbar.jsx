@@ -41,7 +41,10 @@ export default function Navbar() {
         </Link>
         {/* Main icons */}
         <Link to="/">
-          <HomeOutlinedIcon sx={{ fontSize: "30px" }} />
+          <HomeOutlinedIcon
+            fontSize="large"
+            // sx={{ fontSize: "30px" }}
+          />
         </Link>
         {darkMode ? (
           <WbSunnyOutlinedIcon
