@@ -10,9 +10,9 @@
     color: themed("logo");
     padding: 2rem 1rem;
 
-    // @include tablet {
-    //   display: none;
-    // }
+    @include tablet {
+      display: none;
+    }
 
     a {
       color: themed("logo");

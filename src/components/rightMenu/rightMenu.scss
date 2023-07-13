@@ -12,9 +12,9 @@
     padding: 2rem 1rem;
     gap: 2rem;
 
-    // @include medium {
-    //   display: none;
-    // }
+    @include medium {
+      display: none;
+    }
 
     .birthdays {
       background-color: themed(bg);
@@ -37,6 +37,7 @@
 
         p {
           font-size: 1.4rem;
+          color: themed("textColorSoft");
 
           span {
             font-weight: bold;
@@ -78,6 +79,8 @@
           .img-container {
             width: 32px;
             height: 32px;
+            align-self: flex-start;
+
             img {
               width: 32px;
               height: 32px;
@@ -86,6 +89,7 @@
               object-position: center;
             }
           }
+
           p {
             font-size: 1.3rem;
             color: themed("textColorSoft");
@@ -103,6 +107,7 @@
           width: 30%;
           font-size: 1.3rem;
           color: themed("textColorSoft");
+          align-self: flex-start;
         }
       }
     }

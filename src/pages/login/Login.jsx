@@ -38,7 +38,7 @@ export default function Login() {
 
         <div className="right">
           <h1>Login</h1>
-          
+
           <form>
             {error && (
               <span className="errorMsg">Invalid email or password.</span>
@@ -49,7 +49,7 @@ export default function Login() {
               placeholder="Email"
               maxLength={64}
               autoComplete="off"
-              required
+              // required // TODO - Uncomment later
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -60,7 +60,7 @@ export default function Login() {
               placeholder="Password"
               maxLength={64}
               autoComplete="off"
-              required
+              // required // TODO - Uncomment later
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

@@ -9,9 +9,10 @@
     background-color: themed("bgSoft");
     padding: 0 1rem 2rem 2rem;
 
-    // @include medium {
-    //   width: 80vw;
-    // }
+    @include medium {
+      width: 80vw;
+      padding: 2rem;
+    }
 
     @include tablet {
       width: 100vw;
