@@ -45,9 +45,15 @@
           position: absolute;
           left: 0;
           right: 0;
-          top: 190px; // 280px (cover height) - 90px (1/2 picture height)
+          top: 190px; // 280px (cover height) - 90px (1/2 div height)
           margin: auto;
           z-index: 100;
+
+          @include small {
+            width: 120px; // 187px (cover height) - 60px (1/2 div height)
+            height: 120px;
+            top: 127px;
+          }
 
           .profilePic {
             width: 180px;
@@ -59,7 +65,6 @@
             @include small {
               width: 120px;
               height: 120px;
-              top: 120px;
             }
           }
         }
@@ -134,7 +139,7 @@
 
             @include small {
               top: 60px;
-              font-size: 2rem;
+              font-size: 1.8rem;
             }
           }
 

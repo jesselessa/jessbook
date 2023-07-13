@@ -26,12 +26,8 @@
       align-items: center;
       gap: 2.5rem;
 
-      @include tablet {
-        // gap: 2rem;
-      }
-
-      @include small {
-        // gap: 1.5rem;
+      @include xsmall {
+        gap: 1.5rem;
       }
 
       a {
@@ -84,6 +80,10 @@
         padding: 0.5rem;
         margin-right: 2.5rem;
 
+        @include xsmall {
+          margin-right: 1.5rem;
+        }
+
         input {
           flex: 1;
           color: themed("textColor");
@@ -134,7 +134,6 @@
 
     .rightMob {
       display: none;
-      // gap: 2rem;
 
       @include medium {
         display: flex;
@@ -142,8 +141,11 @@
       }
 
       @include small {
-        // gap: 1.5rem;
-        margin-right: 1.5rem;
+        margin-right: 1.5rem; // Space between notif and burger icons
+      }
+
+      @include xsmall {
+        gap: 1.5rem;
       }
 
       a {
