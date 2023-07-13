@@ -4,92 +4,6 @@ import "./rightMenu.scss";
 import gift from "../../assets/images/gift.png";
 
 export default function RightMenu() {
-  //TODO - Project enhancements : fetch data from real API
-  const latestActivities = [
-    {
-      id: 1,
-      user: {
-        firstName: "Jane",
-        lastName: "Doe",
-        profilePic:
-          "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      },
-      desc: "changed their cover picture",
-      time: "1 min ago",
-    },
-    {
-      id: 2,
-      user: {
-        firstName: "Clark",
-        lastName: "Kent",
-        profilePic:
-          "https://images.pexels.com/photos/6333652/pexels-photo-6333652.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      },
-      desc: "liked a post",
-      time: "1 min ago",
-    },
-    {
-      id: 3,
-      user: {
-        firstName: "Mickey",
-        lastName: "Mouse",
-        profilePic:
-          "https://images.pexels.com/photos/11748915/pexels-photo-11748915.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-      },
-      desc: "liked a comment",
-      time: "1 min ago",
-    },
-    {
-      id: 4,
-      user: {
-        firstName: "Cinderella",
-        lastName: "Princess",
-        profilePic:
-          "https://images.pexels.com/photos/1520760/pexels-photo-1520760.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      },
-      desc: "posted",
-      time: "1 min ago",
-    },
-  ];
-
-  const onlineUsers = [
-    {
-      id: 1,
-      firstName: "Jane",
-      lastName: "Doe",
-      profilePic:
-        "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    },
-    {
-      id: 2,
-      firstName: "Clark",
-      lastName: "Key",
-      profilePic:
-        "https://images.pexels.com/photos/6333652/pexels-photo-6333652.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    },
-    {
-      id: 3,
-      firstName: "Mickey",
-      lastName: "Mouse",
-      profilePic:
-        "https://images.pexels.com/photos/11748915/pexels-photo-11748915.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-    },
-    {
-      id: 4,
-      firstName: "Cinderella",
-      lastName: "Princess",
-      profilePic:
-        "https://images.pexels.com/photos/1520760/pexels-photo-1520760.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    },
-    {
-      id: 5,
-      firstName: "Simba",
-      lastName: "Lion",
-      profilePic:
-        "https://images.pexels.com/photos/5792673/pexels-photo-5792673.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    },
-  ];
-
   return (
     <div className="rightMenu">
       {/* Birthdays */}
@@ -108,22 +22,65 @@ export default function RightMenu() {
       <div className="activities">
         <h3>Latest activities</h3>
 
-        {latestActivities.map((activity) => (
-          <div className="activity" key={activity.id}>
-            <div className="userInfo">
-              <div className="img-container">
-                <img src={activity.user.profilePic} alt="user" />
-              </div>
-              <p>
-                <span>
-                  {activity.user.firstName} {activity.user.lastName}
-                </span>{" "}
-                {activity.desc}
-              </p>
+        <div className="activity">
+          <div className="userInfo">
+            <div className="img-container">
+              <img
+                src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                alt="user"
+              />
             </div>
-            <span className="time">{activity.time}</span>
+            <p>
+              <span>Jane Doe</span> changed their profile picture
+            </p>
           </div>
-        ))}
+          <span className="time">1min ago</span>
+        </div>
+
+        <div className="activity">
+          <div className="userInfo">
+            <div className="img-container">
+              <img
+                src="https://images.pexels.com/photos/6333652/pexels-photo-6333652.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                alt="user"
+              />
+            </div>
+            <p>
+              <span>Clark Kent</span> liked a post
+            </p>
+          </div>
+          <span className="time">1 min ago</span>
+        </div>
+
+        <div className="activity">
+          <div className="userInfo">
+            <div className="img-container">
+              <img
+                src="https://images.pexels.com/photos/11748915/pexels-photo-11748915.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
+                alt="user"
+              />
+            </div>
+            <p>
+              <span>Mickey Mouse</span> liked a comment
+            </p>
+          </div>
+          <span className="time">1 min ago</span>
+        </div>
+
+        <div className="activity">
+          <div className="userInfo">
+            <div className="img-container">
+              <img
+                src="https://images.pexels.com/photos/1520760/pexels-photo-1520760.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                alt="user"
+              />
+            </div>
+            <p>
+              <span>Cinderella Princess</span> posted
+            </p>
+          </div>
+          <span className="time">1 min ago</span>
+        </div>
       </div>
 
       {/* Online friends*/}
@@ -131,17 +88,60 @@ export default function RightMenu() {
         <h3>Online friends</h3>
 
         <div className="friends">
-          {onlineUsers.map((user) => (
-            <div className="user" key={user.id}>
-              <div className="img-container">
-                <img src={user.profilePic} alt="user" />
-                <div className="status"></div>
-              </div>
-              <span>
-                {user.firstName} {user.lastName}
-              </span>
+          <div className="user">
+            <div className="img-container">
+              <img
+                src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                alt="user"
+              />
+              <div className="status-dot"></div>
             </div>
-          ))}
+            <span>Jane Doe</span>
+          </div>
+
+          <div className="user">
+            <div className="img-container">
+              <img
+                src="https://images.pexels.com/photos/6333652/pexels-photo-6333652.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                alt="user"
+              />
+              <div className="status-dot"></div>
+            </div>
+            <span>Clark Kent</span>
+          </div>
+
+          <div className="user">
+            <div className="img-container">
+              <img
+                src="https://images.pexels.com/photos/11748915/pexels-photo-11748915.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
+                alt="user"
+              />
+              <div className="status-dot"></div>
+            </div>
+            <span>Mickey Mouse</span>
+          </div>
+
+          <div className="user">
+            <div className="img-container">
+              <img
+                src="https://images.pexels.com/photos/1520760/pexels-photo-1520760.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                alt="user"
+              />
+              <div className="status-dot"></div>
+            </div>
+            <span>Cinderella Princess</span>
+          </div>
+
+          <div className="user">
+            <div className="img-container">
+              <img
+                src="https://images.pexels.com/photos/5792673/pexels-photo-5792673.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                alt="user"
+              />
+              <div className="status-dot"></div>
+            </div>
+            <span>Simba Lion</span>
+          </div>
         </div>
       </div>
     </div>

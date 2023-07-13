@@ -54,8 +54,8 @@
       box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
       -webkit-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
       -moz-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      padding: 1rem;
-      gap: 1.5rem 1rem;
+      gap: 1rem;
+      padding: 1.5rem 1rem;
 
       h3 {
         font-size: 1.6rem;
@@ -140,6 +140,7 @@
             position: relative;
             width: 32px;
             height: 32px;
+
             img {
               width: 32px;
               height: 32px;
@@ -148,7 +149,7 @@
               object-position: center;
             }
 
-            .status {
+            .status-dot {
               width: 12px;
               height: 12px;
               border-radius: 50%;
