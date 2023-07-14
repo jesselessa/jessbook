@@ -18,6 +18,10 @@
       width: 100vw;
     }
 
+    @include xsmall {
+      padding: 1rem;
+    }
+
     .profileContainer {
       display: flex;
       flex-direction: column;

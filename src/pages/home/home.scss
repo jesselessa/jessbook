@@ -17,5 +17,9 @@
     @include tablet {
       width: 100vw;
     }
+    
+    @include xsmall {
+      padding: 1rem;
+    }
   }
 }

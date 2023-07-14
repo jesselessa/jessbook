@@ -28,25 +28,49 @@
         }
       }
 
-      input {
+      .inputGroup {
         width: calc(100% - 50px); // 50px (image)
-        width: 100%;
-        height: 50px;
-        color: themed("textColor");
-        background-color: themed("bgSoft");
-        font-size: 1.6rem;
-        border: none;
-        border-radius: 1rem;
-        padding: 1rem;
-        outline: none;
-
-        &::placeholder {
-          color: themed("textColor");
-          font-size: 1.6rem;
-        }
+        display: flex;
+        align-items: center;
+        position: relative;
 
         @include small {
-          padding: 0.5rem;
+        }
+
+        input {
+          width: 100%;
+          height: 50px;
+          color: themed("textColor");
+          background-color: themed("bgSoft");
+          font-size: 1.6rem;
+          border: none;
+          border-radius: 1rem;
+          padding: 1rem;
+          outline: none;
+
+          &::placeholder {
+            color: themed("textColor");
+            font-size: 1.6rem;
+          }
+
+          @include small {
+            padding: 0.5rem 3rem 0.5rem 0.5rem;
+          }
+
+          @include xsmall {
+            font-size: 1.5rem;
+          }
+        }
+
+        .send {
+          display: none;
+          position: absolute;
+          right: 5px;
+          cursor: pointer;
+
+          @include small {
+            display: block;
+          }
         }
       }
     }
@@ -73,6 +97,10 @@
         display: flex;
         align-items: center;
         gap: 2rem;
+
+        #file {
+          display: none;
+        }
 
         .item {
           display: flex;

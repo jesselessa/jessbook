@@ -27,7 +27,7 @@ export default function LeftMenu() {
     <div className="leftMenu" role="navigation">
       {/* Main info */}
       <div className="mainInfo">
-        <Link to={`profile/${currentUser.id}`} style={{ display: "inherit" }}>
+        <Link to={`profile/${currentUser.id}`}>
           <div className="user">
             <div className="img-container">
               <img src={currentUser.profilePic} alt="profile" />

@@ -7,9 +7,7 @@ export const DarkModeContextProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("darkMode")) || false
   );
 
-  const toggleTheme = () => {
-    setDarkMode(!darkMode);
-  };
+  const toggleTheme = () => setDarkMode(!darkMode);
 
   const value = { darkMode, toggleTheme };
 

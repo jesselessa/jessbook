@@ -29,18 +29,43 @@
           object-position: center;
         }
       }
-      input {
-        height: 40px;
+      .inputGroup {
+        display: flex;
+        align-items: center;
+        position: relative;
         width: calc(100% - 140px); // 100px (button) + 40px (image)
-        font-size: 1.6rem;
-        padding: 1rem;
-        border: 0.1rem solid themed("color");
-        border-radius: 0.5rem;
-        outline: none;
 
         @include small {
           width: calc(100% - 40px); // 40px = image
-          padding: 0.5rem;
+        }
+
+        input {
+          height: 40px;
+          width: 100%;
+          font-size: 1.6rem;
+          padding: 1rem;
+          border: 0.1rem solid themed("color");
+          border-radius: 0.5rem;
+          outline: none;
+
+          @include small {
+            padding: 0.5rem 3rem 0.5rem 0.5rem;
+          }
+
+          @include xsmall {
+            font-size: 1.5rem;
+          }
+        }
+
+        .send {
+          display: none;
+          position: absolute;
+          right: 5px;
+          cursor: pointer;
+
+          @include small {
+            display: block;
+          }
         }
       }
 

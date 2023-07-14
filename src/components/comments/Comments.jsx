@@ -1,8 +1,11 @@
 import { useContext } from "react";
 import "./comments.scss";
 
-// Context
-import { AuthContext } from "../../contexts/authContext";
+// Contexts
+import { AuthContext } from "../../contexts/authContext.jsx";
+
+// Icon
+import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
 export default function Comments() {
   const { currentUser } = useContext(AuthContext);
@@ -40,7 +43,16 @@ export default function Comments() {
         <div className="img-container">
           <img src={currentUser.profilePic} alt="user" />
         </div>
-        <input type="text" placeholder="Write a comment..." />
+
+        <div className="inputGroup">
+          <input type="text" placeholder="Write a comment..." />
+          <SendOutlinedIcon
+            className="send"
+            sx={{ fontSize: "24px", color: "#333" }}
+            onClick={handleSubmit}
+          />
+        </div>
+
         <button type="submit" onClick={handleSubmit}>
           Send
         </button>
