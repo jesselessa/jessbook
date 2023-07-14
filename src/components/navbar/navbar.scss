@@ -58,7 +58,6 @@
           display: block;
           position: absolute;
           left: 15px;
-          // top: 10px;
           bottom: 25px;
         }
       }
@@ -80,6 +79,11 @@
         padding: 0.5rem;
         margin-right: 2.5rem;
 
+        @include small {
+          margin-right: 2.5rem;
+          justify-content: center;
+        }
+
         @include xsmall {
           margin-right: 1.5rem;
         }
@@ -91,6 +95,7 @@
           background-color: transparent;
           border: none;
           outline: none;
+
           &::placeholder {
             color: themed("textColor");
           }
@@ -166,22 +171,22 @@
         top: 71px;
         right: 0;
         padding: 2rem 1rem;
-        width: 30vh;
-        height: 100vh;
+        width: 30vw;
+        height: auto;
         background-color: themed("bg");
         font-size: 1.6rem;
         font-weight: bold;
         color: themed("logo");
         z-index: 200;
 
+        @include small {
+          width: 100vw;
+        }
+
         .item {
           display: flex;
           align-items: center;
           gap: 1rem;
-
-          // span {
-          //   font-size: 2.2rem;
-          // }
         }
 
         hr {

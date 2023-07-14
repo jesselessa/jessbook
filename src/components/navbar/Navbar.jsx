@@ -50,13 +50,13 @@ export default function Navbar() {
         </Link>
         {/* Main icons */}
         <Link to="/">
-          <HomeOutlinedIcon sx={{ fontSize: "30px" }} />
+          <HomeOutlinedIcon sx={{ fontSize: "30px" }}  />
         </Link>
         {darkMode ? (
           <WbSunnyOutlinedIcon
-            className="themeBtn"
             fontSize="large"
             onClick={toggleTheme}
+            className="themeBtn"
           />
         ) : (
           <DarkModeOutlinedIcon
@@ -84,7 +84,6 @@ export default function Navbar() {
         <Link to="#">
           <NotificationsOutlinedIcon fontSize="large" />
         </Link>
-
         <Link to={`/profile/${currentUser.id}`}>
           <img src={currentUser.profilePic} alt="profile" />
         </Link>
