@@ -7,16 +7,18 @@ export const DarkModeContextProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("darkMode")) || false
   );
 
-  const toggle = () => {
+  const toggleTheme = () => {
     setDarkMode(!darkMode);
   };
+
+  const value = { darkMode, toggleTheme };
 
   useEffect(() => {
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
   return (
-    <DarkModeContext.Provider value={{ darkMode, toggle }}>
+    <DarkModeContext.Provider value={value}>
       {children}
     </DarkModeContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./navbar.scss";
 
@@ -12,20 +12,29 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 
 // Contexts
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
 import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Navbar() {
-  const { darkMode, toggle } = useContext(DarkModeContext);
+  const { darkMode, toggleTheme } = useContext(DarkModeContext);
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [burgerClicked, setBurgerClicked] = useState(false);
 
   // TODO - Replace below function by data fetched from API
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/login");
+  };
+
+  const toggleMenu = () => {
+    setBurgerClicked(!burgerClicked);
   };
 
   return (
@@ -47,13 +56,13 @@ export default function Navbar() {
           <WbSunnyOutlinedIcon
             className="themeBtn"
             fontSize="large"
-            onClick={toggle}
+            onClick={toggleTheme}
           />
         ) : (
           <DarkModeOutlinedIcon
             className="themeBtn"
             fontSize="large"
-            onClick={toggle}
+            onClick={toggleTheme}
           />
         )}
 
@@ -90,7 +99,58 @@ export default function Navbar() {
         <Link to="#">
           <NotificationsOutlinedIcon className="iconMob" fontSize="large" />
         </Link>
-        <MenuIcon className="iconMob burger" fontSize="large" />
+        {burgerClicked ? (
+          <CloseOutlinedIcon
+            className="iconMob burger"
+            fontSize="large"
+            onClick={toggleMenu}
+          />
+        ) : (
+          <MenuIcon
+            className="iconMob burger"
+            fontSize="large"
+            onClick={toggleMenu}
+          />
+        )}
+
+        {/* Burger menu list*/}
+        {burgerClicked && (
+          <div className="burgerList">
+            <Link to="#">
+              <div className="item">
+                <EmailOutlinedIcon fontSize="large" />
+                <span>Messages</span>
+              </div>
+            </Link>
+
+            <hr />
+
+            <Link to="#">
+              <div className="item">
+                <GroupOutlinedIcon fontSize="large" />
+                <span>Friends</span>
+              </div>
+            </Link>
+
+            <hr />
+
+            <Link to="#">
+              <div className="item">
+                <AddCircleOutlineOutlinedIcon fontSize="large" />
+                <span>Show More</span>
+              </div>
+            </Link>
+
+            <hr />
+
+            <Link onClick={handleLogout}>
+              <div className="item">
+                <LogoutOutlinedIcon fontSize="large" />
+                <span>Logout</span>
+              </div>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

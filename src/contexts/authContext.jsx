@@ -20,13 +20,11 @@ export const AuthContextProvider = ({ children }) => {
     });
   };
 
+  const value = { currentUser, setCurrentUser, login }; //TODO - Chek later if to delete setCurrentUser
+
   useEffect(() => {
     localStorage.setItem("user", JSON.stringify(currentUser)); // Cannot store objects is LS, it has to be a string
   }, [currentUser]);
 
-  return (
-    <AuthContext.Provider value={{ currentUser, login }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

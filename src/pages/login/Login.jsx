@@ -15,7 +15,9 @@ export default function Login() {
 
   const error = true; //TODO - Delete later
 
-  const handleLogin = () => {
+  const handleLogin = (e) => {
+    e.preventDefault();
+
     login();
   };
 
