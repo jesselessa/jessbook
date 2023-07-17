@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./login.scss";
 
@@ -12,8 +12,17 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // const [error, setError] = useState(false); //TODO - Uncomment later
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const error = true; //TODO - Delete later
+
+  useEffect(() => {
+    window.addEventListener("resize", changeWindowWidth);
+  }, [windowWidth]);
+
+  const changeWindowWidth = () => {
+    setWindowWidth(window.innerWidth);
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -25,7 +34,7 @@ export default function Login() {
     <div className="login">
       <div className="card">
         <div className="left">
-          <h1>Welcome to Jessbook !</h1>
+          <h1>Welcome to Jessbook</h1>
           <div className="container">
             <p>
               Jessbook is a social media app that helps you stay connected with
@@ -39,7 +48,11 @@ export default function Login() {
         </div>
 
         <div className="right">
-          <h1>Login</h1>
+          {windowWidth <= 1150 ? (
+            <h1 className="titleMob">Welcome&nbsp;to Jessbook</h1>
+          ) : (
+            <h1>Login</h1>
+          )}
 
           <form>
             {error && (
@@ -70,6 +83,15 @@ export default function Login() {
             <button onClick={handleLogin}>Sign in</button>
 
             <span>Forgot your password ?</span>
+
+            {windowWidth <= 1150 && (
+              <button
+                className="registerBtn"
+                onClick={() => navigate("/register")}
+              >
+                Register
+              </button>
+            )}
           </form>
         </div>
       </div>

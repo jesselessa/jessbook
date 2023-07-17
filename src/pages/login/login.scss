@@ -1,3 +1,5 @@
+@import "../../style.scss";
+
 .login {
   height: 100vh;
   max-width: 100%;
@@ -5,10 +7,18 @@
   justify-content: center;
   align-items: center;
   background-color: #8bd1e3;
+  padding: 1rem;
+
+  @include medium {
+    background: linear-gradient(rgba(2, 81, 81, 0.7), rgba(2, 81, 81, 0.7)),
+      url("../../assets/images/auth/friends.jpg") no-repeat center/cover;
+  }
 
   .card {
-    width: 70%;
-    min-height: 650px;
+    min-width: 300px;
+    max-width: 1000px;
+    min-height: 600px;
+    max-height: 650px;
     display: flex;
     border-radius: 1rem;
     overflow: hidden;
@@ -21,6 +31,10 @@
       background: linear-gradient(rgba(2, 81, 81, 0.7), rgba(2, 81, 81, 0.7)),
         url("../../assets/images/auth/friends.jpg") no-repeat center/cover;
       padding: 1rem 1.5rem;
+
+      @include medium {
+        display: none;
+      }
 
       h1 {
         font-size: 4rem;
@@ -63,9 +77,21 @@
       background-color: white;
       padding: 1rem 1.5rem;
 
+      @include medium {
+        width: 100%;
+      }
+
       h1 {
         font-size: 4rem;
         color: teal;
+
+        @include xsmall {
+          font-size: 3.5rem;
+        }
+      }
+
+      .titleMob {
+        text-align: center;
       }
 
       form {
@@ -85,11 +111,17 @@
             color: #08415c;
           }
         }
+
+        .registerBtn {
+          background-color: teal;
+          color: white;
+          font-weight: normal;
+          margin-top: 5rem;
+        }
       }
 
       .errorMsg {
         color: #f75252;
-        font-size: 16px;
         font-weight: 400;
         margin-bottom: 1rem;
         // display: none; //TODO - Uncomment later

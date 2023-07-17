@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./register.scss";
 
@@ -15,8 +15,17 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [pswdConfirm, setPswdConfirm] = useState("");
   // const [error, setError] = useState(false); //TODO - Uncomment later
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const error = true; //TODO - Delete later
+
+  useEffect(() => {
+    window.addEventListener("resize", changeWindowWidth);
+  }, [windowWidth]);
+
+  const changeWindowWidth = () => {
+    setWindowWidth(window.innerWidth);
+  };
 
   const handleForm = (e) => {
     e.prevent.Default();
@@ -193,6 +202,12 @@ export default function Register() {
               <span className="errorMsg">The password does not match.</span>
             )}
             <button onClick={handleForm}>Sign up</button>
+            {windowWidth <= 1150 && (
+              <p className="loginMsg">
+                Have an account ?{" "}
+                <span onClick={() => navigate("/login")}>Login</span>
+              </p>
+            )}
           </form>
         </div>
 

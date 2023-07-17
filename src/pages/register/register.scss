@@ -1,3 +1,5 @@
+@import "../../style.scss";
+
 .register {
   height: 100vh;
   max-width: 100%;
@@ -5,10 +7,18 @@
   justify-content: center;
   align-items: center;
   background-color: #8bd1e3;
+  padding: 1rem;
+
+  @include medium {
+    background: linear-gradient(rgba(2, 81, 81, 0.7), rgba(2, 81, 81, 0.7)),
+      url("../../assets/images/auth/family.jpg") no-repeat center/cover;
+  }
 
   .card {
-    width: 70%;
-    min-height: 650px;
+    min-width: 300px;
+    max-width: 1000px;
+    min-height: 600px;
+    max-height: 650px;
     display: flex;
     border-radius: 1rem;
     overflow: hidden;
@@ -21,9 +31,20 @@
       background-color: white;
       padding: 1rem;
 
+      @include medium {
+        width: 100%;
+      }
+      @include xsmall {
+        padding: 1rem 0.5rem;
+      }
+
       h1 {
         font-size: 4rem;
         color: teal;
+
+        @include xsmall {
+          font-size: 3.5rem;
+        }
       }
 
       form {
@@ -39,16 +60,27 @@
           gap: 1rem;
           margin-top: 2rem;
 
+          @include medium {
+            margin-top: 1rem;
+          }
+
+          @include xsmall {
+            gap: 0.5rem;
+          }
+
           input {
             flex: 1;
             font-size: 1.6rem;
             height: 3rem;
-            padding-left: 0.5rem;
             border: none;
             border-bottom: 0.1rem solid #8bd1e3;
             outline: none;
             &::placeholder {
               color: #08415c;
+            }
+
+            @include xsmall {
+              font-size: 1.5rem;
             }
           }
 
@@ -56,6 +88,7 @@
           //   display: none;
           // }
         }
+
         .errorMsg {
           margin-top: 0.7rem;
           color: #f75252;
@@ -63,6 +96,7 @@
           font-weight: 400;
           // display: none; //TODO - Uncomment later
         }
+
         button {
           height: 3.3rem;
           background-color: #ffd670;
@@ -74,6 +108,23 @@
           border-radius: 0.3rem;
           margin-top: 2rem;
           cursor: pointer;
+
+          @include medium {
+            margin: 2rem 0;
+          }
+
+          @include xsmall {
+            margin: 1.5rem 0;
+          }
+        }
+
+        .loginMsg {
+          font-size: 1.6rem;
+
+          span {
+            font-weight: bold;
+            color: teal;
+          }
         }
       }
     }
@@ -87,6 +138,10 @@
         url("../../assets/images/auth/family.jpg") no-repeat center/cover;
       padding: 1rem 1.5rem;
 
+      @include medium {
+        display: none;
+      }
+
       h1 {
         font-size: 4rem;
         text-align: center;
@@ -94,6 +149,7 @@
 
       .container {
         margin: auto;
+
         p {
           font-size: 2rem;
           line-height: 1.6;
