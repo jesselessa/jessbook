@@ -35,12 +35,12 @@ export default function Post({ post }) {
           </div>
         </div>
 
-        <MoreHorizIcon />
+        <MoreHorizIcon className="moreBtn" />
       </div>
 
       <div className="content">
         <p>{post.desc}</p>
-        <img src={post.img} alt="" />
+        <img src={post.img} alt="post pic" /> //TODO - Display only if pic
       </div>
 
       <div className="interactions">
@@ -48,10 +48,12 @@ export default function Post({ post }) {
           {liked ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
           32 <span>Likes</span>
         </div>
+
         <div className="item" onClick={() => setCommentsOpen(!commentsOpen)}>
           <TextsmsOutlinedIcon />
           16 <span>Comments</span>
         </div>
+
         <div className="item">
           <ShareOutlinedIcon />
           Share
