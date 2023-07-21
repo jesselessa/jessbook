@@ -41,7 +41,6 @@ export default function Register() {
               <input
                 type="text"
                 placeholder="First name"
-                maxLength={35}
                 autoComplete="off"
                 required
                 value={firstName}
@@ -75,7 +74,6 @@ export default function Register() {
               <input
                 type="text"
                 placeholder="Last name"
-                maxLength={35}
                 autoComplete="off"
                 required
                 value={lastName}
@@ -109,7 +107,6 @@ export default function Register() {
               <input
                 type="email"
                 placeholder="Email"
-                maxLength={64}
                 autoComplete="off"
                 required
                 value={email}

@@ -62,7 +62,6 @@ export default function Login() {
             <input
               type="email"
               placeholder="Email"
-              maxLength={64}
               autoComplete="off"
               // required // TODO - Uncomment later
               value={email}
@@ -73,7 +72,6 @@ export default function Login() {
               type="password"
               id="password"
               placeholder="Password"
-              maxLength={64}
               autoComplete="off"
               // required // TODO - Uncomment later
               value={password}

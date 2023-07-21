@@ -39,8 +39,9 @@ export default function Post({ post }) {
       </div>
 
       <div className="content">
+        {/* //TODO- Check later if no pic */}
         <p>{post.desc}</p>
-        <img src={post.img} alt="post pic" /> //TODO - Display only if pic
+        <img src={post.img} alt="post pic" />
       </div>
 
       <div className="interactions">
