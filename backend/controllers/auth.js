@@ -1,5 +1,6 @@
 import { db } from "../utils/connect.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export const register = (req, res) => {
   const { firstName, lastName, email, password } = req.body;
@@ -11,7 +12,7 @@ export const register = (req, res) => {
     if (err) return res.status(500).json({ error: err });
 
     if (data.length)
-      return res.status(409).json({ message: "User already exists !" });
+      return res.status(409).json({ message: "User already exists." });
 
     //* If not, create new user
     // Hash password
@@ -26,15 +27,49 @@ export const register = (req, res) => {
     db.query(q, [values], (err, _data) => {
       if (err) return res.status(500).json({ error: err });
 
-      return res.status(200).json({ message: "New user created !" });
+      return res.status(200).json({ message: "New user created." });
     });
   });
 };
 
 export const login = (req, res) => {
-  //TODO
+  //TODO - Reset password function
+  //* First, check user's mail
+  const q = "SELECT * FROM users WHERE email = ?";
+
+  db.query(q, [req.body.email], (err, data) => {
+    if (err) return res.status(500).json({ error: err });
+
+    if (data.length === 0)
+      return res.status(404).json({ message: "User not found." });
+
+    //* If mail OK, check password
+    const checkPswd = bcrypt.compareSync(req.body.password, data[0].password); // data[0] because SELECT * query returns an array => if user found by email, will return an array with one entry
+
+    if (!checkPswd)
+      return res.status(400).json({ error: "Invalid email or password." });
+
+    //* Create secret key and "jwt" token
+    const secretKey = process.env.REACT_APP_SECRET;
+
+    const token = jwt.sign({ id: data[0].id }, secretKey);
+
+    //* Create cookie
+    const { password, ...others } = data[0]; // Distinguish "password" property from others
+
+    return res
+      .cookie("accessToken", token, { httpOnly: true }) // Random JS script can't access our cookie
+      .status(200)
+      .json(others); // Return user info except password
+  });
 };
 
-export const logout = (req, res) => {
-  //TODO
+export const logout = (_req, res) => {
+  return res
+    .clearCookie("accessToken", {
+      secure: true,
+      sameSite: "none", // Because API and React app port numbers are not the same
+    })
+    .status(200)
+    .json({ message: "User logged out." });
 };

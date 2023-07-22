@@ -1,5 +1,7 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import authRoute from "./routes/auth.js"; //! Must not forget extension otherwise error message
 import usersRoute from "./routes/users.js";
@@ -14,7 +16,9 @@ const app = express();
 const PORT = process.env.REACT_APP_PORT || 5000;
 
 // Middlewares
-app.use(express.json()); // To be able to send any JSON to API
+app.use(express.json()); 
+app.use(cors());
+app.use(cookieParser()) 
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);

@@ -8,7 +8,6 @@ import ErrorRoundedIcon from "@mui/icons-material/Error";
 
 export default function Register() {
   const navigate = useNavigate();
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
