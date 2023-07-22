@@ -12,6 +12,10 @@ export const getAllUsers = (_req, res) => {
   });
 };
 
+export const getUser = (req, res) => {
+  //TODO
+};
+
 // export const getUser = (req, res) => {
 //   const q = "SELECT FROM users WHERE id=?"; // Value hidden for security reasons
 //   const userId = req.params.id;

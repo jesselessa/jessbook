@@ -14,7 +14,7 @@ const app = express();
 const PORT = process.env.REACT_APP_PORT || 5000;
 
 // Middlewares
-app.use(express.json());
+app.use(express.json()); // To be able to send any JSON to API
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
