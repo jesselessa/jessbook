@@ -6,6 +6,8 @@ import {
   Navigate,
 } from "react-router-dom";
 import "./style.scss";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 // Contexts
 import { DarkModeContext } from "./contexts/darkModeContext.jsx";
@@ -73,11 +75,16 @@ function App() {
       path: "/register",
       element: <Register />,
     },
+    {
+      path: "*",
+      element: <Navigate to="/login" />,
+    },
   ]);
 
   return (
     <div className="App">
       <RouterProvider router={router} />
+      <ToastContainer />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./login.scss";
+import { toast } from "react-toastify";
 
 // Context
 import { AuthContext } from "../../contexts/authContext";

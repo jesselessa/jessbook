@@ -16,9 +16,13 @@ const app = express();
 const PORT = process.env.REACT_APP_PORT || 5000;
 
 // Middlewares
-app.use(express.json()); 
-app.use(cors());
-app.use(cookieParser()) 
+app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // 5173 = Vite (CRA alternative)
+  })
+);
+app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
