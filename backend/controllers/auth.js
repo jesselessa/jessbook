@@ -39,8 +39,7 @@ export const login = (req, res) => {
   db.query(q, [req.body.email], (error, data) => {
     if (error) return res.status(500).json(error);
 
-    if (data.length === 0)
-      return res.status(404).json("Invalid email or password.");
+    if (data.length === 0) return res.status(404).json("User not found.");
 
     //* If mail OK, check password
     const checkPswd = bcrypt.compareSync(req.body.password, data[0].password); // data[0] because SELECT * query returns an array => if user found by email, will return an array with one entry

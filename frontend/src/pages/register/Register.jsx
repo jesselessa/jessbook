@@ -15,15 +15,14 @@ export default function Register() {
     password: "",
     pswdConfirm: "",
   });
-
   const [validationErrors, setValidationErrors] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     pswdConfirm: "",
-    apiError: "", // To handle API errors
   });
+  const [error, setError] = useState(null); // To handle API errors
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -101,7 +100,7 @@ export default function Register() {
     // If errors during validation, update state and return
     if (Object.keys(inputsErrorMsg).length > 0) {
       setValidationErrors(inputsErrorMsg);
-      toast.error("Something went wrong. Check your information.");
+      toast.error("Registration failed. Check your information.");
       return;
     }
 
@@ -117,20 +116,7 @@ export default function Register() {
 
       navigate("/login");
     } catch (error) {
-      console.log(error);
-
-      // Handle error from API, if any
-      if (error.response?.data) {
-        setValidationErrors((prev) => ({
-          ...prev,
-          apiError: error.response.data,
-        }));
-      } else {
-        setValidationErrors((prev) => ({
-          ...prev,
-          apiError: "An unknown error occurred.",
-        }));
-      }
+      setError(error.response.data);
     }
   };
 
@@ -214,10 +200,8 @@ export default function Register() {
               <span className="errorMsg">{validationErrors.pswdConfirm}</span>
             )}
 
-            {/* API Error */}
-            {validationErrors.apiError && (
-              <span className="errorMsg api">{validationErrors.apiError}</span>
-            )}
+            {/* API error */}
+            {error && <span className="errorMsg api">{error}</span>}
 
             {/* Submit button */}
             <button type="submit">Sign up</button>
