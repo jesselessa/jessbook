@@ -8,6 +8,7 @@ import {
 import "./style.scss";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Contexts
 import { DarkModeContext } from "./contexts/darkModeContext.jsx";
@@ -28,18 +29,22 @@ function App() {
   const { currentUser } = useContext(AuthContext);
   const { darkMode } = useContext(DarkModeContext);
 
+  const queryClient = new QueryClient();
+
   //* Create a Layout component for a conditional rendering with Outlet
   const Layout = () => {
     return (
-      <div className={`theme-${darkMode ? "dark" : "light"}`}>
-        <Navbar />
+      <QueryClientProvider client={queryClient}>
+        <div className={`theme-${darkMode ? "dark" : "light"}`}>
+          <Navbar />
 
-        <div style={{ display: "flex" }}>
-          <LeftMenu />
-          <Outlet />
-          <RightMenu />
+          <div style={{ display: "flex" }}>
+            <LeftMenu />
+            <Outlet />
+            <RightMenu />
+          </div>
         </div>
-      </div>
+      </QueryClientProvider>
     );
   };
 
