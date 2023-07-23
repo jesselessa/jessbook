@@ -1,23 +1,20 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./register.scss";
-
-// Icons
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircle";
-import ErrorRoundedIcon from "@mui/icons-material/Error";
+import axios from "axios";
 
 export default function Register() {
-  const navigate = useNavigate();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [pswdConfirm, setPswdConfirm] = useState("");
-  // const [error, setError] = useState(false); //TODO - Uncomment later
+  const [inputsValues, setInputsValues] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    pswdConfirm: "",
+  });
+  const [error, setError] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  const error = true; //TODO - Delete later
-
+  // Check window object width when loading Login page
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
   }, [windowWidth]);
@@ -26,8 +23,48 @@ export default function Register() {
     setWindowWidth(window.innerWidth);
   };
 
-  const handleForm = (e) => {
-    e.prevent.Default();
+  const handleChange = (e) => {
+    // Match input value with its "name" attribute
+    setInputsValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  // Email format regex
+  const isEmailValid = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Password regex : at least 6 characters including 1 number and 1 symbol
+  const isPasswordValid = (password) => {
+    const passwordRegex =
+      /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}$/;
+    return passwordRegex.test(password);
+  };
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+
+    const { firstName, lastName, email, password, pswdConfirm } = inputsValues;
+
+    // Form validation
+    if (firstName.length < 2 || firstName.length > 35) {
+      setError(true);
+    }
+    if (lastName.length < 2 || lastName.length > 35) {
+      setError(true);
+    }
+    if (!isEmailValid(email)) {
+      setError(true);
+    }
+    if (!isPasswordValid(password) || password !== pswdConfirm) {
+      setError(true);
+    }
+
+    try {
+      await axios.post(`http://localhost:8000/api/auth/register`, inputsValues);
+    } catch (err) {
+      setError(true);
+    }
   };
 
   return (
@@ -35,173 +72,62 @@ export default function Register() {
       <div className="card">
         <div className="left">
           <h1>Register</h1>
-          <form onSubmit={handleForm}>
-            <div className="inputGroup">
-              <input
-                type="text"
-                placeholder="First name"
-                autoComplete="off"
-                required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-              {error ? (
-                <ErrorRoundedIcon
-                  className="icon"
-                  sx={{
-                    fontSize: "30px",
-                    color: "#f75252",
-                  }}
-                />
-              ) : (
-                <CheckCircleRoundedIcon
-                  className="icon"
-                  sx={{
-                    fontSize: "30px",
-                    color: "#00e676",
-                  }}
-                />
-              )}
-            </div>
-            {error && (
-              <span className="errorMsg">
-                Enter a name between 2 and 35&nbsp;characters.
-              </span>
-            )}
+          <form>
+            {/* First Name */}
+            <input
+              type="text"
+              name="firstName"
+              placeholder="First name"
+              minLength={2}
+              autoComplete="off"
+              required
+              onChange={handleChange}
+            />
+            {/* Last Name */}
+            <input
+              type="text"
+              name="lastName"
+              placeholder="Last name"
+              minLength={1}
+              autoComplete="off"
+              required
+              onChange={handleChange}
+            />
+            {/* Email */}
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              autoComplete="off"
+              required
+              onChange={handleChange}
+            />
+            {/* Password */}
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              autoComplete="off"
+              required
+              onChange={handleChange}
+            />
+            {/* Confirm Password */}
+            <input
+              type="password"
+              name="pswdConfirm"
+              placeholder="Confirm password"
+              autoComplete="off"
+              required
+              onChange={handleChange}
+            />
 
-            <div className="inputGroup">
-              <input
-                type="text"
-                placeholder="Last name"
-                autoComplete="off"
-                required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-              {error ? (
-                <ErrorRoundedIcon
-                  className="icon"
-                  sx={{
-                    fontSize: "30px",
-                    color: "#f75252",
-                  }}
-                />
-              ) : (
-                <CheckCircleRoundedIcon
-                  className="icon"
-                  sx={{
-                    fontSize: "30px",
-                    color: "#00e676",
-                  }}
-                />
-              )}
-            </div>
-            {error && (
-              <span className="errorMsg">
-                Enter a name between 2 and 35&nbsp;characters.
-              </span>
-            )}
-
-            <div className="inputGroup">
-              <input
-                type="email"
-                placeholder="Email"
-                autoComplete="off"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              {error ? (
-                <ErrorRoundedIcon
-                  className="icon"
-                  sx={{
-                    fontSize: "30px",
-                    color: "#f75252",
-                  }}
-                />
-              ) : (
-                <CheckCircleRoundedIcon
-                  className="icon"
-                  sx={{
-                    fontSize: "30px",
-                    color: "#00e676",
-                  }}
-                />
-              )}
-            </div>
-            {error && <span className="errorMsg">Enter a valid email.</span>}
-
-            <div className="inputGroup">
-              <input
-                type="password"
-                placeholder="Password"
-                maxLength={64}
-                autoComplete="off"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              {error ? (
-                <ErrorRoundedIcon
-                  className="icon"
-                  sx={{
-                    fontSize: "30px",
-                    color: "#f75252",
-                  }}
-                />
-              ) : (
-                <CheckCircleRoundedIcon
-                  className="icon"
-                  sx={{
-                    fontSize: "30px",
-                    color: "#00e676",
-                  }}
-                />
-              )}
-            </div>
-            {error && (
-              <span className="errorMsg">
-                Your password must contain at least 6&nbsp;characters, including
-                1 number and 1&nbsp;symbol.
-              </span>
-            )}
-
-            <div className="inputGroup">
-              <input
-                type="password"
-                placeholder="Confirm password"
-                maxLength={64}
-                autoComplete="off"
-                required
-                value={pswdConfirm}
-                onChange={(e) => setPswdConfirm(e.target.value)}
-              />
-              {error ? (
-                <ErrorRoundedIcon
-                  className="icon"
-                  sx={{
-                    fontSize: "30px",
-                    color: "#f75252",
-                  }}
-                />
-              ) : (
-                <CheckCircleRoundedIcon
-                  className="icon"
-                  sx={{
-                    fontSize: "30px",
-                    color: "#00e676",
-                  }}
-                />
-              )}
-            </div>
-            {error && (
-              <span className="errorMsg">The password does not match.</span>
-            )}
-            <button onClick={handleForm}>Sign up</button>
+            <button onClick={handleClick}>Sign up</button>
             {windowWidth <= 1150 && (
               <p className="loginMsg">
                 Have an account ?{" "}
-                <span onClick={() => navigate("/login")}>Login</span>
+                <Link to="/login">
+                  <span>Login</span>
+                </Link>
               </p>
             )}
           </form>
@@ -218,7 +144,9 @@ export default function Register() {
 
             <span>Have an account ?</span>
 
-            <button onClick={() => navigate("/login")}>Login</button>
+            <Link to="/login">
+              <button>Login</button>
+            </Link>
           </div>
         </div>
       </div>

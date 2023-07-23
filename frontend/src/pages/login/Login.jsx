@@ -35,6 +35,7 @@ export default function Login() {
       <div className="card">
         <div className="left">
           <h1>Welcome to Jessbook</h1>
+
           <div className="container">
             <p>
               Jessbook is a social media app that helps you stay connected with

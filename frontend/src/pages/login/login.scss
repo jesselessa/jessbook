@@ -1,7 +1,7 @@
 @import "../../style.scss";
 
 .login {
-  height: 100vh;
+  min-height: 100vh;
   max-width: 100%;
   display: flex;
   justify-content: center;
@@ -79,6 +79,10 @@
 
       @include medium {
         width: 100%;
+      }
+
+      @include xsmall {
+        padding: 1rem 0.5rem;
       }
 
       h1 {

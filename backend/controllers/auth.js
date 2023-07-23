@@ -49,12 +49,16 @@ export const login = (req, res) => {
     if (!checkPswd)
       return res.status(400).json({ error: "Invalid email or password." });
 
-    //* Create secret key and "jwt" token
+    //* Generate token with jsonwebtoken
     const secretKey = process.env.REACT_APP_SECRET;
 
-    const token = jwt.sign({ id: data[0].id }, secretKey);
+    const token = jwt.sign(
+      { id: data[0].id },
+      secretKey
+      // { expiresIn: "30d" }
+    );
 
-    //* Create cookie
+    //* Store token in cookie and send it in response in case of successful login
     const { password, ...others } = data[0]; // Distinguish "password" property from others
 
     return res
