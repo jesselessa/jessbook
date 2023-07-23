@@ -52,7 +52,7 @@ export default function Register() {
   };
 
   //* Clear error messages
-  const clearErrorMsg = () => {
+  const clearErrors = () => {
     setValidationErrors({
       firstName: "",
       lastName: "",
@@ -68,20 +68,20 @@ export default function Register() {
     e.preventDefault();
 
     // 1 - Handle form validation and error messages
-    const inputsErrorMsg = {};
+    const inputsErrors = {};
     // Name
     if (
       inputsValues.firstName.length < 2 ||
       inputsValues.firstName.length > 35
     ) {
-      inputsErrorMsg.firstName = "Enter a name between 2 and 35 characters.";
+      inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
     }
     if (inputsValues.lastName.length < 2 || inputsValues.lastName.length > 35) {
-      inputsErrorMsg.lastName = "Enter a name between 2 and 35 characters.";
+      inputsErrors.lastName = "Enter a name between 2 and 35 characters.";
     }
     // Email with regex
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputsValues.email)) {
-      inputsErrorMsg.email = "Enter a valid email.";
+      inputsErrors.email = "Enter a valid email.";
     }
     // Password with regex
     if (
@@ -89,17 +89,17 @@ export default function Register() {
         inputsValues.password
       )
     ) {
-      inputsErrorMsg.password =
+      inputsErrors.password =
         "Password must contain at least 6 characters including at least 1 number and 1 symbol.";
     }
     // Confirmation password
     if (inputsValues.password !== inputsValues.pswdConfirm) {
-      inputsErrorMsg.pswdConfirm = "Password does not match.";
+      inputsErrors.pswdConfirm = "Password does not match.";
     }
 
     // If errors during validation, update state and return
-    if (Object.keys(inputsErrorMsg).length > 0) {
-      setValidationErrors(inputsErrorMsg);
+    if (Object.keys(inputsErrors).length > 0) {
+      setValidationErrors(inputsErrors);
       toast.error("Registration failed. Check your information.");
       return;
     }
@@ -109,14 +109,14 @@ export default function Register() {
       await axios.post(`http://localhost:8000/api/auth/register`, inputsValues);
 
       toast.success("Successful registration !");
-
-      clearErrorMsg();
-
+      clearErrors();
       clearForm();
 
       navigate("/login");
     } catch (error) {
       setError(error.response.data);
+      toast.error("Unauthozized access.")
+
     }
   };
 

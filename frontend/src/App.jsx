@@ -84,7 +84,8 @@ function App() {
   return (
     <div className="App">
       <RouterProvider router={router} />
-      <ToastContainer />
+      <ToastContainer draggable={false} />
+      {/* draggable = false => to remove error message from browser : "Unable to preventDefault inside passive event listener invocation"  */}
     </div>
   );
 }

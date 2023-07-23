@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./login.scss";
 import { toast } from "react-toastify";
 
@@ -8,15 +8,17 @@ import { AuthContext } from "../../contexts/authContext";
 
 export default function Login() {
   const { login } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  // const [error, setError] = useState(false); //TODO - Uncomment later
+  const [inputsValues, setInputsValues] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  const error = true; //TODO - Delete later
-
+  //* Check window object width when loading page (for responsive)
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
   }, [windowWidth]);
@@ -25,10 +27,36 @@ export default function Login() {
     setWindowWidth(window.innerWidth);
   };
 
-  const handleLogin = (e) => {
+  //* Handle inputs
+  const handleChange = (e) => {
+    setInputsValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  //* Clear form
+  const clearForm = () => {
+    setInputsValues({
+      email: "",
+      password: "",
+    });
+  };
+
+  //* Login function
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    login();
+    try {
+      await login(inputsValues);
+
+      toast.success("Successful login !");
+
+      clearForm();
+
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      setError(error.response.data);
+      toast.error("Access denied. Log in first.");
+    }
   };
 
   return (
@@ -45,7 +73,9 @@ export default function Login() {
 
             <span>Don't have any account ?</span>
 
-            <button onClick={() => navigate("/register")}>Register</button>
+            <Link to="/register">
+              <button type="submit">Register</button>
+            </Link>
           </div>
         </div>
 
@@ -56,41 +86,38 @@ export default function Login() {
             <h1>Login</h1>
           )}
 
-          <form>
-            {error && (
-              <span className="errorMsg">Invalid email or password.</span>
-            )}
+          <form onSubmit={handleSubmit}>
+            {error && <span className="errorMsg">{error}</span>}
 
             <input
               type="email"
+              name="email"
+              id="email"
               placeholder="Email"
-              autoComplete="off"
-              // required // TODO - Uncomment later
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              required
+              value={inputsValues.email}
+              onChange={handleChange}
             />
 
             <input
               type="password"
+              name="password"
               id="password"
               placeholder="Password"
               autoComplete="off"
-              // required // TODO - Uncomment later
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              required
+              value={inputsValues.password}
+              onChange={handleChange}
             />
 
-            <button onClick={handleLogin}>Sign in</button>
+            <button type="submit">Sign in</button>
 
-            <span>Forgot your password ?</span>
+            {/* <span>Forgot your password ?</span> */}
 
             {windowWidth <= 1150 && (
-              <button
-                className="registerBtn"
-                onClick={() => navigate("/register")}
-              >
-                Register
-              </button>
+              <Link to="/register">
+                <button className="registerBtn">Register</button>
+              </Link>
             )}
           </form>
         </div>

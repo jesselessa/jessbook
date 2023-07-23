@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import axios from "axios";
 
 export const AuthContext = createContext();
 
@@ -8,22 +9,20 @@ export const AuthContextProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("user")) || null
   );
 
-  const login = () => {
-    // TODO : Replace dummy data
-    setCurrentUser({
-      id: 1,
-      firstName: "John",
-      lastName: "Doe",
-      profilePic:
-        "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      isLogged: true,
-    });
+  const login = async (inputsValues) => {
+    const res = await axios.post(
+      `http://localhost:8000/api/auth/login`,
+      inputsValues,
+      { withCredentials: true } // Because we use cookies
+    );
+
+    setCurrentUser(res.data); // User data fetched from API
   };
 
-  const value = { currentUser, setCurrentUser, login }; //TODO - Chek later if to delete setCurrentUser
+  const value = { currentUser, login };
 
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(currentUser)); // Cannot store objects is LS, it has to be a string
+    localStorage.setItem("user", JSON.stringify(currentUser)); // Cannot store objects is localStorage, it has to be a string
   }, [currentUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

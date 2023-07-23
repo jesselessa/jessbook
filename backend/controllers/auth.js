@@ -39,13 +39,13 @@ export const login = (req, res) => {
   db.query(q, [req.body.email], (error, data) => {
     if (error) return res.status(500).json(error);
 
-    if (data.length === 0) return res.status(404).json("User not found.");
+    if (data.length === 0)
+      return res.status(404).json("Invalid email or password");
 
     //* If mail OK, check password
     const checkPswd = bcrypt.compareSync(req.body.password, data[0].password); // data[0] because SELECT * query returns an array => if user found by email, will return an array with one entry
 
-    if (!checkPswd)
-      return res.status(400).json({ error: "Invalid email or password." });
+    if (!checkPswd) return res.status(400).json("Invalid email or password.");
 
     //* Generate token with jsonwebtoken
     const secretKey = process.env.REACT_APP_SECRET;
@@ -57,6 +57,7 @@ export const login = (req, res) => {
     );
 
     //* Store token in cookie and send it in response in case of successful login
+
     const { password, ...others } = data[0]; // Distinguish "password" property from others
 
     res

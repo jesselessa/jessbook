@@ -110,17 +110,28 @@
           height: 3rem;
           padding: 0 3rem 0 0.5rem;
           outline-color: #8bd1e3;
-          margin-bottom: 2rem;
           &::placeholder {
             color: #08415c;
           }
+        }
+
+        #email {
+          margin-bottom: 2rem;
+        }
+
+        #password {
+          margin-bottom: 3rem;
         }
 
         .registerBtn {
           background-color: teal;
           color: white;
           font-weight: normal;
-          margin-top: 5rem;
+          margin-top: 4rem;
+
+          @include medium {
+            width: 100%;
+          }
         }
       }
 

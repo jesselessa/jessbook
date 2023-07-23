@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import "./post.scss";
 
@@ -12,23 +12,33 @@ import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 
+// Context
+import { AuthContext } from "../../contexts/authContext.jsx";
+
 export default function Post({ post }) {
+  const { currentUser } = useContext(AuthContext);
+
   const [commentsOpen, setCommentsOpen] = useState(false);
 
   // TODO : Remove later Like btn feature
   const liked = false;
+
+  //TODO- Check later for post photo if no pic */}
 
   return (
     <div className="post">
       <div className="user">
         <div className="userInfo">
           <div className="img-container">
-            <img src={post.profilePic} alt="user" />
+            <img src={currentUser.profilePic} alt="user" />
           </div>
           <div className="details">
-            <Link to={`/profile/${post.userId}`} style={{ color: "inherit" }}>
+            <Link
+              to={`/profile/${currentUser.id}`}
+              style={{ color: "inherit" }}
+            >
               <span className="name">
-                {post.firstName} {post.lastName}
+                {currentUser.firstName} {currentUser.lastName}
               </span>
             </Link>
             <span className="date">1 min ago</span>
@@ -39,7 +49,6 @@ export default function Post({ post }) {
       </div>
 
       <div className="content">
-        {/* //TODO- Check later if no pic */}
         <p>{post.desc}</p>
         <img src={post.img} alt="post pic" />
       </div>

@@ -23,11 +23,7 @@ export default function Profile() {
       <div className="profileContainer">
         <div className="images">
           {/* <div className="img-container"> */}
-          <img
-            src="https://images.pexels.com/photos/1271619/pexels-photo-1271619.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-            alt="cover"
-            className="cover"
-          />
+          <img src={currentUser.coverPic} alt="cover" className="cover" />
           {/* </div> */}
 
           <div className="img-container">

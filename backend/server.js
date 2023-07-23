@@ -16,6 +16,10 @@ const app = express();
 const PORT = process.env.REACT_APP_PORT || 5000;
 
 // Middlewares
+app.use((_req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", true);
+  next();
+});
 app.use(express.json());
 app.use(
   cors({
