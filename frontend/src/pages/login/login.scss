@@ -116,7 +116,7 @@
         }
 
         #email {
-          margin-bottom: 2rem;
+          margin: 1rem 0 2rem 0;
         }
 
         #password {
@@ -138,8 +138,6 @@
       .errorMsg {
         color: #f75252;
         font-weight: 400;
-        margin-bottom: 1rem;
-        // display: none; //TODO - Uncomment later
       }
 
       button {

@@ -15,11 +15,10 @@ export default function Login() {
     email: "",
     password: "",
   });
-  const [errorMsg, setErrorMsg] = useState(null);
+  const [error, setError] = useState("");
 
+  // Check window object width when loading page (for responsive)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-  //* Check window object width when loading page (for responsive)
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
   }, [windowWidth]);
@@ -28,12 +27,12 @@ export default function Login() {
     setWindowWidth(window.innerWidth);
   };
 
-  //* Handle inputs
+  // Handle inputs
   const handleChange = (e) => {
     setInputsValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  //* Clear form
+  // Clear form
   const clearForm = () => {
     setInputsValues({
       email: "",
@@ -49,21 +48,14 @@ export default function Login() {
       await login(inputsValues);
 
       toast.success("Successful login !");
-      setErrorMsg("");
+      setError("");
       clearForm();
 
       navigate("/");
     } catch (error) {
-      // Handle error messages from API
+      // Handle errors from API
       console.log(error);
-      if (
-        error?.response?.status == "404" ||
-        error?.response?.status == "400"
-      ) {
-        setErrorMsg("Invalid email or password.");
-      } else {
-        setErrorMsg("An unknown error occurred.");
-      }
+      setError(error.response?.data || "An unknown error occured.");
     }
   };
 
@@ -95,7 +87,8 @@ export default function Login() {
           )}
 
           <form onSubmit={handleSubmit}>
-            {errorMsg && <span className="errorMsg">{errorMsg}</span>}
+            {/* Handle error from API */}
+            {error && <span className="errorMsg">{error}</span>}
 
             <input
               type="email"

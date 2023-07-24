@@ -15,7 +15,7 @@ export default function Register() {
     password: "",
     pswdConfirm: "",
   });
-  // To handle errors from form
+  // Handle errors from form
   const [validationErrors, setValidationErrors] = useState({
     firstName: "",
     lastName: "",
@@ -24,13 +24,10 @@ export default function Register() {
     pswdConfirm: "",
   });
   // To handle errors from API
-  const [error, setError] = useState({
-    apiError: "",
-  });
+  const [error, setError] = useState("");
 
+  // Check window object width when loading page (for responsive)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-  //* Check window object width when loading page (for responsive)
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
     return () => {
@@ -42,12 +39,12 @@ export default function Register() {
     setWindowWidth(window.innerWidth);
   };
 
-  //* Handle inputs
+  // Handle inputs
   const handleChange = (e) => {
     setInputsValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  //* Clear form
+  // Clear form
   const clearForm = () => {
     setInputsValues({
       firstName: "",
@@ -58,7 +55,7 @@ export default function Register() {
     });
   };
 
-  //* Clear errors list
+  // Clear errors
   const clearErrors = () => {
     setValidationErrors({
       firstName: "",
@@ -67,12 +64,10 @@ export default function Register() {
       password: "",
       pswdConfirm: "",
     });
-    setError({
-      apiError: "",
-    });
+    setError("");
   };
 
-  //* Registration function
+  // Registration function
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -89,8 +84,11 @@ export default function Register() {
       inputsErrors.lastName = "Enter a name between 2 and 35 characters.";
     }
     // Email with regex
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputsValues.email)) {
-      inputsErrors.email = "Enter a valid email.";
+    if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputsValues.email) ||
+      inputsValues.email.length > 64
+    ) {
+      inputsErrors.email = "Enter a valid email not exceeding 64 characters.";
     }
     // Password with regex
     if (
@@ -123,10 +121,7 @@ export default function Register() {
 
       navigate("/login");
     } catch (error) {
-      setError((prev) => ({
-        ...prev,
-        apiError: error.response?.data || "An unknown error occurred.",
-      }));
+      setError(error.response?.data || "An unknown error occurred.");
     }
   };
 
@@ -142,7 +137,7 @@ export default function Register() {
               name="firstName"
               placeholder="First name"
               minLength={2}
-              maxLength={35}
+              // maxLength={35}
               autoComplete="off"
               required
               value={inputsValues.firstName}
@@ -157,8 +152,8 @@ export default function Register() {
               type="text"
               name="lastName"
               placeholder="Last name"
-              minLength={2}
-              maxLength={35}
+              minLength={1}
+              // maxLength={35}
               autoComplete="off"
               required
               value={inputsValues.lastName}
@@ -211,9 +206,7 @@ export default function Register() {
             )}
 
             {/* API Error */}
-            {error.apiError && (
-              <span className="errorMsg api">{error.apiError}</span>
-            )}
+            {error && <span className="errorMsg api">{error}</span>}
 
             {/* Submit button */}
             <button type="submit">Sign up</button>

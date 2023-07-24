@@ -9,25 +9,17 @@ export const AuthContextProvider = ({ children }) => {
   );
 
   const login = async (inputsValues) => {
-    await makeRequest.post(`http://localhost:8000/auth/login`, inputsValues);
-
-    setCurrentUser(res.data); // User data fetched from API
+    const response = await makeRequest.post(
+      `http://localhost:8000/auth/login`,
+      inputsValues
+    );
+    setCurrentUser(response.data); // User data fetched from API
   };
-
-  // const login = async (inputsValues) => {
-  //   const res = await axios.post(
-  //     `http://localhost:8000/auth/login`,
-  //     inputsValues,
-  //     { withCredentials: true } 
-  //   );
-
-  //   setCurrentUser(res.data); // User data fetched from API
-  // };
 
   const value = { currentUser, login };
 
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(currentUser)); // Cannot store objects is localStorage, it has to be a string
+    localStorage.setItem("user", JSON.stringify(currentUser)); // Cannot store objects in localStorage, it has to be a string
   }, [currentUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
