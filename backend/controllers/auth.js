@@ -9,7 +9,9 @@ export const register = (req, res) => {
   const q = "SELECT * FROM users WHERE email = ?";
 
   db.query(q, [email], (error, data) => {
-    if (error) return res.status(500).json(error);
+    if (error) {
+      return res.status(500).json("An unknown error occured.");
+    }
 
     if (data.length) return res.status(409).json("User already exists.");
 
@@ -24,7 +26,10 @@ export const register = (req, res) => {
     const values = [firstName, lastName, email, hashedPswd];
 
     db.query(q, [values], (error, _data) => {
-      if (error) return res.status(500).json(error);
+      if (error) {
+        console.log(error);
+        return res.status(500).json("An unknown error occured.");
+      }
 
       return res.status(200).json("New user created.");
     });
@@ -32,12 +37,11 @@ export const register = (req, res) => {
 };
 
 export const login = (req, res) => {
-  //TODO - Reset password function
   //* First, check user's mail
   const q = "SELECT * FROM users WHERE email = ?";
 
   db.query(q, [req.body.email], (error, data) => {
-    if (error) return res.status(500).json(error);
+    if (error) return res.status(500).json("An unknown error occured.");
 
     if (data.length === 0)
       return res.status(404).json("Invalid email or password");

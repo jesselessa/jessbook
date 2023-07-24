@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import authRoute from "./routes/auth.js"; //! Must not forget extension otherwise error message
+import authRoute from "./routes/auth.js"; //! Error if no file extension
 import usersRoute from "./routes/users.js";
 import postsRoute from "./routes/posts.js";
 import commentsRoute from "./routes/comments.js";
@@ -13,7 +13,7 @@ import storiesRoute from "./routes/stories.js";
 
 // Create server with Express
 const app = express();
-const PORT = process.env.REACT_APP_PORT || 5000;
+const PORT = process.env.REACT_APP_PORT || 8000;
 
 // Middlewares
 app.use((_req, res, next) => {
@@ -28,13 +28,13 @@ app.use(
 );
 app.use(cookieParser());
 
-app.use("/api/auth", authRoute);
-app.use("/api/users", usersRoute);
-app.use("/api/posts", postsRoute);
-app.use("/api/comments", commentsRoute);
-app.use("/api/likes", likesRoute);
-app.use("/api/relationships", relationshipsRoute);
-app.use("/api/stories", storiesRoute);
+app.use("/auth", authRoute);
+app.use("/users", usersRoute);
+app.use("/posts", postsRoute);
+app.use("/comments", commentsRoute);
+app.use("/likes", likesRoute);
+app.use("/relationships", relationshipsRoute);
+app.use("/stories", storiesRoute);
 
 // Start server
 app.listen(PORT, () => {

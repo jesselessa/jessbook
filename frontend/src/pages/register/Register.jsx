@@ -15,6 +15,7 @@ export default function Register() {
     password: "",
     pswdConfirm: "",
   });
+  // To handle errors from form
   const [validationErrors, setValidationErrors] = useState({
     firstName: "",
     lastName: "",
@@ -22,13 +23,19 @@ export default function Register() {
     password: "",
     pswdConfirm: "",
   });
-  const [error, setError] = useState(null); // To handle API errors
+  // To handle errors from API
+  const [error, setError] = useState({
+    apiError: "",
+  });
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   //* Check window object width when loading page (for responsive)
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
+    return () => {
+      window.removeEventListener("resize", changeWindowWidth);
+    };
   }, [windowWidth]);
 
   const changeWindowWidth = () => {
@@ -51,7 +58,7 @@ export default function Register() {
     });
   };
 
-  //* Clear error messages
+  //* Clear errors list
   const clearErrors = () => {
     setValidationErrors({
       firstName: "",
@@ -59,6 +66,8 @@ export default function Register() {
       email: "",
       password: "",
       pswdConfirm: "",
+    });
+    setError({
       apiError: "",
     });
   };
@@ -106,17 +115,18 @@ export default function Register() {
 
     // 2 - If successful validation, continue process and call API
     try {
-      await axios.post(`http://localhost:8000/api/auth/register`, inputsValues);
+      await axios.post(`http://localhost:8000/auth/register`, inputsValues);
 
-      toast.success("Successful registration !");
+      toast.success("Successful registration!");
       clearErrors();
       clearForm();
 
       navigate("/login");
     } catch (error) {
-      setError(error.response.data);
-      toast.error("Unauthozized access.")
-
+      setError((prev) => ({
+        ...prev,
+        apiError: error.response?.data || "An unknown error occurred.",
+      }));
     }
   };
 
@@ -200,8 +210,10 @@ export default function Register() {
               <span className="errorMsg">{validationErrors.pswdConfirm}</span>
             )}
 
-            {/* API error */}
-            {error && <span className="errorMsg api">{error}</span>}
+            {/* API Error */}
+            {error.apiError && (
+              <span className="errorMsg api">{error.apiError}</span>
+            )}
 
             {/* Submit button */}
             <button type="submit">Sign up</button>

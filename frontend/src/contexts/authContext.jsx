@@ -1,7 +1,6 @@
 import { createContext, useState, useEffect } from "react";
-import axios from "axios";
-
 export const AuthContext = createContext();
+import { makeRequest } from "../utils/axios.jsx";
 
 export const AuthContextProvider = ({ children }) => {
   // children = props.chidren
@@ -10,14 +9,20 @@ export const AuthContextProvider = ({ children }) => {
   );
 
   const login = async (inputsValues) => {
-    const res = await axios.post(
-      `http://localhost:8000/api/auth/login`,
-      inputsValues,
-      { withCredentials: true } // Because we use cookies
-    );
+    await makeRequest.post(`http://localhost:8000/auth/login`, inputsValues);
 
     setCurrentUser(res.data); // User data fetched from API
   };
+
+  // const login = async (inputsValues) => {
+  //   const res = await axios.post(
+  //     `http://localhost:8000/auth/login`,
+  //     inputsValues,
+  //     { withCredentials: true } 
+  //   );
+
+  //   setCurrentUser(res.data); // User data fetched from API
+  // };
 
   const value = { currentUser, login };
 

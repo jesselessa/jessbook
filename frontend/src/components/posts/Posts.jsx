@@ -3,13 +3,11 @@ import { makeRequest } from "../../utils/axios.jsx";
 import "./posts.scss";
 
 // Component
-import Post from "../post/Post";
+import Post from "../post/Post.jsx";
 
 export default function Posts() {
   const { isLoading, error, data } = useQuery(["posts"], () =>
-    makeRequest.get(`/posts?userId=${userId}`).then((res) => {
-      return res.data;
-    })
+    makeRequest.get(`/posts`).then((res) => res.data)
   );
 
   return (

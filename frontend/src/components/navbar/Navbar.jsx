@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./navbar.scss";
+import { makeRequest } from "../../utils/axios";
 
 // Icons
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -27,9 +28,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [burgerClicked, setBurgerClicked] = useState(false);
 
-  // TODO - Replace below function by data fetched from API
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    makeRequest.post("/auth/logout"); 
     navigate("/login");
   };
 
@@ -50,7 +50,7 @@ export default function Navbar() {
         </Link>
         {/* Main icons */}
         <Link to="/">
-          <HomeOutlinedIcon sx={{ fontSize: "30px" }}  />
+          <HomeOutlinedIcon sx={{ fontSize: "30px" }} />
         </Link>
         {darkMode ? (
           <WbSunnyOutlinedIcon
@@ -142,12 +142,10 @@ export default function Navbar() {
 
             <hr />
 
-            <Link onClick={handleLogout}>
-              <div className="item">
-                <LogoutOutlinedIcon fontSize="large" />
-                <span>Logout</span>
-              </div>
-            </Link>
+            <div className="item" onClick={handleLogout}>
+              <LogoutOutlinedIcon fontSize="large" />
+              <span>Logout</span>
+            </div>
           </div>
         )}
       </div>

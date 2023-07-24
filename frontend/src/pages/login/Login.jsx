@@ -15,7 +15,8 @@ export default function Login() {
     email: "",
     password: "",
   });
-  const [error, setError] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   //* Check window object width when loading page (for responsive)
@@ -48,14 +49,21 @@ export default function Login() {
       await login(inputsValues);
 
       toast.success("Successful login !");
-
+      setErrorMsg("");
       clearForm();
 
       navigate("/");
     } catch (error) {
+      // Handle error messages from API
       console.log(error);
-      setError(error.response.data);
-      toast.error("Access denied. Log in first.");
+      if (
+        error?.response?.status == "404" ||
+        error?.response?.status == "400"
+      ) {
+        setErrorMsg("Invalid email or password.");
+      } else {
+        setErrorMsg("An unknown error occurred.");
+      }
     }
   };
 
@@ -87,7 +95,7 @@ export default function Login() {
           )}
 
           <form onSubmit={handleSubmit}>
-            {error && <span className="errorMsg">{error}</span>}
+            {errorMsg && <span className="errorMsg">{errorMsg}</span>}
 
             <input
               type="email"
@@ -116,7 +124,9 @@ export default function Login() {
 
             {windowWidth <= 1150 && (
               <Link to="/register">
-                <button className="registerBtn">Register</button>
+                <button type="submit" className="registerBtn">
+                  Register
+                </button>
               </Link>
             )}
           </form>
