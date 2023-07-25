@@ -1,5 +1,8 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
+// import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+// import { makeRequest } from "../../utils/axios.jsx";
+import { useParams } from "react-router-dom";
 import "./profile.scss";
 
 // Components
@@ -17,6 +20,8 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Profile() {
   const { currentUser } = useContext(AuthContext);
+
+  const userId = useParams();
 
   return (
     <div className="profile">
