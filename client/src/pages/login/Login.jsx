@@ -41,7 +41,7 @@ export default function Login() {
   };
 
   //* Login function
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
@@ -86,7 +86,7 @@ export default function Login() {
             <h1>Login</h1>
           )}
 
-          <form onSubmit={handleSubmit}>
+          <form>
             {/* Handle error from API */}
             {error && <span className="errorMsg">{error}</span>}
 
@@ -95,6 +95,7 @@ export default function Login() {
               name="email"
               id="email"
               placeholder="Email"
+              autoComplete="off"
               required
               value={inputsValues.email}
               onChange={handleChange}
@@ -111,7 +112,7 @@ export default function Login() {
               onChange={handleChange}
             />
 
-            <button type="submit">Sign in</button>
+            <button onClick={handleLogin}>Sign in</button>
 
             {/* <span>Forgot your password ?</span> */}
 

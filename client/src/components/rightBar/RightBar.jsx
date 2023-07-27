@@ -1,11 +1,11 @@
-import "./rightMenu.scss";
+import "./rightBar.scss";
 
 // Image
 import gift from "../../assets/images/gift.png";
 
-export default function RightMenu() {
+export default function RightBar() {
   return (
-    <div className="rightMenu">
+    <div className="rightBar">
       {/* Birthdays */}
       <div className="birthdays">
         <h3>Birthdays</h3>

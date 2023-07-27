@@ -16,11 +16,10 @@ export const AuthContextProvider = ({ children }) => {
     setCurrentUser(response.data); // User data fetched from API
   };
 
-  const value = { currentUser, login };
-
   useEffect(() => {
     localStorage.setItem("user", JSON.stringify(currentUser)); // Cannot store objects in localStorage, it has to be a string
   }, [currentUser]);
 
+  const value = { currentUser, login };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

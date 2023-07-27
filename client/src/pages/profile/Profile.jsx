@@ -27,9 +27,7 @@ export default function Profile() {
     <div className="profile">
       <div className="profileContainer">
         <div className="images">
-          {/* <div className="img-container"> */}
           <img src={currentUser.coverPic} alt="cover" className="cover" />
-          {/* </div> */}
 
           <div className="img-container">
             <img

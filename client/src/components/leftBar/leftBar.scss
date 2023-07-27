@@ -1,6 +1,6 @@
 @import "../../style.scss";
 
-.leftMenu {
+.leftBar {
   @include themify($themes) {
     width: 20vw;
     min-height: calc(100vh - 70px); // 70px = navbar height

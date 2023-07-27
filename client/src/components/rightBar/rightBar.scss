@@ -1,6 +1,6 @@
 @import "../../style.scss";
 
-.rightMenu {
+.rightBar {
   @include themify($themes) {
     width: 30vw;
     min-height: calc(100vh - 70px); // 70px = navbar height

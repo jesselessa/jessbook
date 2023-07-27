@@ -8,3 +8,8 @@ export const db = mysql.createConnection({
   password: process.env.REACT_APP_DB_PSWD,
   database: "social",
 });
+
+db.connect(function (error) {
+  if (error) throw error;
+  console.log("Server connected to database");
+});

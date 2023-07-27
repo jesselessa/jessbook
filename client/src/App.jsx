@@ -22,8 +22,8 @@ import Profile from "./pages/profile/Profile.jsx";
 
 // Components
 import Navbar from "./components/navbar/Navbar.jsx";
-import LeftMenu from "./components/leftMenu/LeftMenu.jsx";
-import RightMenu from "./components/rightMenu/RightMenu.jsx";
+import LeftBar from "./components/leftBar/LeftBar.jsx";
+import RightBar from "./components/rightBar/RightBar.jsx";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -31,7 +31,7 @@ function App() {
 
   const queryClient = new QueryClient();
 
-  //* Create a Layout component for a conditional rendering with Outlet
+  //* Create a Layout including an Outlet component with modular content
   const Layout = () => {
     return (
       <QueryClientProvider client={queryClient}>
@@ -39,9 +39,9 @@ function App() {
           <Navbar />
 
           <div style={{ display: "flex" }}>
-            <LeftMenu />
+            <LeftBar />
             <Outlet />
-            <RightMenu />
+            <RightBar />
           </div>
         </div>
       </QueryClientProvider>
@@ -50,7 +50,7 @@ function App() {
 
   //* Protect routes for unauthenticated users
   const ProtectedRoute = ({ children }) => {
-    // children => any page or layout
+    // children = any page or layout
     if (!currentUser) {
       return <Navigate to="/login" />;
     }
@@ -62,7 +62,6 @@ function App() {
     {
       path: "/",
       element: (
-        // Everything written inside ProtectedRoute ill be checked by the same name function
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>

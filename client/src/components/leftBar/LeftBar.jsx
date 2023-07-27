@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
-import "./leftMenu.scss";
+import "./leftBar.scss";
 
 // Images
 import friends from "../../assets/images/leftMenu/1.png";
@@ -24,7 +24,7 @@ export default function LeftMenu() {
   const { currentUser } = useContext(AuthContext);
 
   return (
-    <div className="leftMenu" role="navigation">
+    <div className="leftBar" role="navigation">
       {/* Main info */}
       <div className="mainInfo">
         <Link to={`profile/${currentUser.id}`}>

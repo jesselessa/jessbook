@@ -13,7 +13,6 @@ import storiesRoute from "./routes/stories.js";
 
 // Create server with Express
 const app = express();
-const PORT = process.env.REACT_APP_PORT || 8000;
 
 // Middlewares
 app.use((_req, res, next) => {
@@ -37,6 +36,7 @@ app.use("/relationships", relationshipsRoute);
 app.use("/stories", storiesRoute);
 
 // Start server
+const PORT = process.env.REACT_APP_PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
 });
