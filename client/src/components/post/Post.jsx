@@ -17,7 +17,7 @@ export default function Post({ post }) {
   const [commentsOpen, setCommentsOpen] = useState(false);
 
   // TODO : Remove later Like btn feature
-  const liked = false;
+  const liked = true;
 
   return (
     <div className="post">
@@ -47,7 +47,11 @@ export default function Post({ post }) {
 
       <div className="interactions">
         <div className="item">
-          {liked ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
+          {liked ? (
+            <FavoriteOutlinedIcon sx={{ color: "red" }} />
+          ) : (
+            <FavoriteBorderOutlinedIcon />
+          )}
           32 <span>Likes</span>
         </div>
 
