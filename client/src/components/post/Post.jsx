@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./post.scss";
+import moment from "moment";
 
 // Component
 import Comments from "../comments/Comments.jsx";
@@ -31,7 +32,7 @@ export default function Post({ post }) {
                 {post.firstName} {post.lastName}
               </span>
             </Link>
-            <span className="date">{post.creationDate}</span>
+            <span className="date">{moment(post.creationDate).fromNow()}</span>
           </div>
         </div>
 
@@ -39,9 +40,9 @@ export default function Post({ post }) {
       </div>
 
       <div className="content">
-        {/* //TODO- Check later if no pic */}
+        {/* Des */}
         <p>{post.desc}</p>
-        <img src={post.img} alt="post pic" />
+        <img src={`/uploads/${post.img}`} alt="post pic" />
       </div>
 
       <div className="interactions">
