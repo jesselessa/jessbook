@@ -59,7 +59,7 @@ export default function Comments() {
       </form>
 
       {comments.map((comment) => (
-        <div className="comment">
+        <div className="comment" key={comment.id}>
           <div className="img-container">
             <img src={comment.profilePic} alt="user" />
           </div>

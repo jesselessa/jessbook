@@ -31,7 +31,7 @@ export default function Post({ post }) {
                 {post.firstName} {post.lastName}
               </span>
             </Link>
-            <span className="date">1 min ago</span>
+            <span className="date">{post.creationDate}</span>
           </div>
         </div>
 

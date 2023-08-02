@@ -6,8 +6,6 @@ import "./posts.scss";
 import Post from "../post/Post.jsx";
 
 export default function Posts() {
-  // const userId = useParams();
-
   const { isLoading, error, data } = useQuery(["posts"], () =>
     makeRequest.get(`/posts`).then((res) => res.data)
   );
@@ -15,7 +13,7 @@ export default function Posts() {
   return (
     <div className="posts">
       {error
-        ? "An error occured."
+        ? "Something went wrong."
         : isLoading
         ? "Loading..."
         : data.map((post) => <Post post={post} key={post.id} />)}

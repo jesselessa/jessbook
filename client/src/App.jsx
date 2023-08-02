@@ -1,10 +1,5 @@
 import { useContext } from "react";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Outlet,
-  Navigate,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import "./style.scss";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
@@ -52,7 +47,7 @@ function App() {
   const ProtectedRoute = ({ children }) => {
     // children = any page or layout
     if (!currentUser) {
-      return <Navigate to="/login" />;
+      return <Login />;
     }
 
     return children;
@@ -81,7 +76,7 @@ function App() {
     },
     {
       path: "*",
-      element: <Navigate to="/login" />,
+      element: <Login />,
     },
   ]);
 

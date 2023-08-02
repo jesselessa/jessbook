@@ -3,25 +3,19 @@ import jwt from "jsonwebtoken";
 import moment from "moment";
 
 export const getPosts = (req, res) => {
-  const userId = req.query.userId;
   const token = req.cookies.accessToken;
   if (!token) return res.status(401).json("User not logged in.");
 
   jwt.verify(token, process.env.REACT_APP_SECRET, (error, userInfo) => {
     if (error) return res.status(403).json("Invalid token.");
 
-    console.log(userId);
-
-    const q =
-      userId !== "undefined"
-        ? `SELECT p.*, u.id AS userId, firstName, lastName, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) WHERE p.userId = ? ORDER BY p.creationDate DESC`
-        : `SELECT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId)
-    LEFT JOIN relationships AS r ON (p.userId = r.followedUserId) WHERE r.followerUserId= ? OR p.userId =?
-    ORDER BY p.creationDate DESC`;
+    const q = `SELECT p.*, u.id AS userId, firstName, lastName, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) 
+    LEFT JOIN relationships AS r ON (p.userId = r.followedUserId) WHERE r.followerUserId = ? OR p.userId = ?
+    ORDER by p.creationDate DESC
+    `;
     // DESC = most recent posts shown first
 
-    const values =
-      userId !== "undefined" ? [userId] : [userInfo.id, userInfo.id];
+    const values = [userInfo.id, userInfo.id];
 
     db.query(q, values, (error, data) => {
       if (error) return res.status(500).json(error);
@@ -39,10 +33,12 @@ export const addPost = (req, res) => {
 
     const q =
       "INSERT INTO posts(`desc`, `img`, `creationDate`, `userId`) VALUES (?)";
+
     const values = [
       req.body.desc,
       req.body.img,
-      moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"), // Tranform date in MySQL format
+      moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+      // To tranform date in MySQL format
       userInfo.id,
     ];
 
@@ -60,9 +56,39 @@ export const updatePost = (req, res) => {
   jwt.verify(token, process.env.REACT_APP_SECRET, (error, userInfo) => {
     if (error) return res.status(403).json("Invalid token.");
 
-    const q = "UPDATE posts SET `desc` = ? WHERE `id` = ? AND `userId` = ?";
+    const postId = req.params.id; // Post ID to update
+    const userId = userInfo.id; // User ID from token
 
-    db.query(q, [req.body.desc, req.params.id, userInfo.id], (error, _data) => {
+    const { desc, img } = req.body;
+
+    if (desc === undefined && img === undefined) {
+      return res.status(400).json("No valid fields to update.");
+    }
+
+    const updateFields = [];
+    const values = [];
+
+    if (desc !== undefined) {
+      updateFields.push("`desc` = ?");
+      values.push(desc);
+    }
+
+    if (img !== undefined) {
+      updateFields.push("`img` = ?");
+      values.push(img);
+    }
+
+    const updateFieldsString = updateFields.join(", ");
+
+    const q = `
+      UPDATE posts 
+      SET ${updateFieldsString} 
+      WHERE id = ? AND userId = ?
+    `;
+
+    values.push(postId, userId);
+
+    db.query(q, values, (error, _data) => {
       if (error) return res.status(500).json(error);
       return res.status(200).json("Post updated.");
     });
