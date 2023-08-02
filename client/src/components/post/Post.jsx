@@ -62,7 +62,7 @@ export default function Post({ post }) {
         </div>
       </div>
 
-      {commentsOpen && <Comments />}
+      {commentsOpen && <Comments postId={post.id} />}
     </div>
   );
 }
