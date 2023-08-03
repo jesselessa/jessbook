@@ -38,9 +38,9 @@ const storage = multer.diskStorage({
     callback(null, Date.now() + name);
   },
 });
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage }).single("file");
 
-app.post("/uploads", upload.single("file"), (req, res) => {
+app.post("/uploads", upload, (req, res) => {
   const file = req.file;
   res.status(200).json(file.filename);
 });
