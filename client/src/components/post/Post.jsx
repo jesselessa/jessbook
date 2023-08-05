@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./post.scss";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
@@ -19,10 +19,25 @@ import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import { AuthContext } from "../../contexts/authContext";
 
 export default function Post({ post }) {
+  const { currentUser } = useContext(AuthContext);
+  const [comments, setComments] = useState([]); // To fetch posts number
   const [commentsOpen, setCommentsOpen] = useState(false);
 
-  const { currentUser } = useContext(AuthContext);
+  // Fetch post comments
+  useEffect(() => {
+    fetchPostComments();
+  }, []);
 
+  const fetchPostComments = async () => {
+    makeRequest
+      .get(`/comments?postId=${post.id}`)
+      .then((res) => {
+        setComments(res.data);
+      })
+      .catch((error) => console.log("Error fetching post comments:", error));
+  };
+
+  // Likes feature
   const { isLoading, error, data } = useQuery(["likes", post.id], () =>
     makeRequest.get(`/likes?postId=${post.id}`).then((res) => {
       return res.data;
@@ -43,6 +58,8 @@ export default function Post({ post }) {
       },
     }
   );
+
+  //TODO - updateMutation
 
   // const deleteMutation = useMutation(
   //   (postId) => {
@@ -93,19 +110,21 @@ export default function Post({ post }) {
 
       <div className="interactions">
         <div className="item">
-          {isLoading ? (
+          {error ? (
+            "Something went wrong."
+          ) : isLoading ? (
             "Loading..."
           ) : data.includes(currentUser.id) ? (
             <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLike} />
           ) : (
             <FavoriteBorderOutlinedIcon onClick={handleLike} />
           )}
-          {data?.length} <span>Likes</span>
+          {data?.length > 0 && data.length} <span>Likes</span>
         </div>
 
         <div className="item" onClick={() => setCommentsOpen(!commentsOpen)}>
           <TextsmsOutlinedIcon />
-          16 <span>Comments</span>
+          {comments.length > 0 && comments.length} <span>Comments</span>
         </div>
 
         <div className="item">

@@ -55,6 +55,9 @@
 
       .moreBtn {
         color: themed("textColorSoft");
+        &:hover {
+          cursor: pointer;
+        }
       }
     }
 

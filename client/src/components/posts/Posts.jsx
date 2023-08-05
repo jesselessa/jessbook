@@ -5,10 +5,11 @@ import "./posts.scss";
 // Component
 import Post from "../post/Post.jsx";
 
-export default function Posts() {
+export default function Posts({ userId }) {
   const { isLoading, error, data } = useQuery(["posts"], () =>
-    makeRequest.get(`/posts`).then((res) => res.data)
+    makeRequest.get(`/posts?userId=${userId}`).then((res) => res.data)
   );
+  console.log(data);
 
   return (
     <div className="posts">
@@ -16,7 +17,7 @@ export default function Posts() {
         ? "Something went wrong."
         : isLoading
         ? "Loading..."
-        : data.map((post) => <Post post={post} key={post.id} />)}
+        : data.map((post) => <Post key={post.id} post={post} />)}
     </div>
   );
 }
