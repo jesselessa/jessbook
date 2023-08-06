@@ -14,7 +14,7 @@ import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 // Images
 import Image from "../../assets/images/publish/image.png";
 import Map from "../../assets/images/publish/map.png";
-import Friend from "../../assets/images/publish/map.png";
+import Friend from "../../assets/images/publish/friend.png";
 
 export default function Publish() {
   const { currentUser } = useContext(AuthContext);
@@ -22,7 +22,9 @@ export default function Publish() {
 
   const [desc, setDesc] = useState("");
   const [file, setFile] = useState(null);
+  const [error, setError] = useState({ isError: false, message: "" });
 
+  // Handle image upload
   const upload = async () => {
     try {
       const formData = new FormData(); // Because we can't send file directly to API
@@ -35,11 +37,10 @@ export default function Publish() {
     }
   };
 
-  const queryClient = useQueryClient(); // To automatically update posts
+  const queryClient = useQueryClient();
 
   const mutation = useMutation(
     (newPost) => {
-      // newPost = file + desc
       return makeRequest.post("/posts", newPost);
     },
     {
@@ -53,12 +54,22 @@ export default function Publish() {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    let imgUrl = "";
-    if (file) imgUrl = await upload();
+    if (desc.trim() === "") {
+      // .trim() = to delete spaces at the beginning and at the end of a string
+      setError({
+        isError: true,
+        message: "You can't edit a post without a description.",
+      });
+    } else {
+      setError({ isError: false, message: "" });
 
-    mutation.mutate({ desc, img: imgUrl }); // If success URL sent to db (posts table)
-    setDesc("");
-    setFile(null);
+      let imgUrl = "";
+      if (file) imgUrl = await upload();
+
+      mutation.mutate({ desc, img: imgUrl }); // If success URL sent to db (posts table)
+      setDesc("");
+      setFile(null);
+    }
   };
 
   return (
@@ -91,6 +102,7 @@ export default function Publish() {
               />
             )}
           </div>
+          {error.isError && <span className="errorMsg">{error.message}</span>}
         </div>
         <div className="right">
           {file && (

@@ -39,9 +39,7 @@ export default function Post({ post }) {
 
   // Likes feature
   const { isLoading, error, data } = useQuery(["likes", post.id], () =>
-    makeRequest.get(`/likes?postId=${post.id}`).then((res) => {
-      return res.data;
-    })
+    makeRequest.get(`/likes?postId=${post.id}`).then((res) => res.data)
   );
 
   const queryClient = useQueryClient();
@@ -59,33 +57,32 @@ export default function Post({ post }) {
     }
   );
 
-  //TODO - updateMutation
-
-  // const deleteMutation = useMutation(
-  //   (postId) => {
-  //     return makeRequest.delete(`/posts/${postId}`);
-  //   },
-  //   {
-  //     onSuccess: () => {
-  //       // Invalidate and refetch
-  //       queryClient.invalidateQueries(["posts"]);
-  //     },
-  //   }
-  // );
+  const deleteMutation = useMutation(
+    (postId) => {
+      return makeRequest.delete(`/posts/${postId}`);
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["posts"]);
+      },
+    }
+  );
 
   const handleLike = () => {
     mutation.mutate(data.includes(currentUser.id));
   };
 
-  // const handleDelete = () => {
-  //   deleteMutation.mutate(post.id);
-  // };
+  const handleDelete = () => {
+    deleteMutation.mutate(post.id);
+  };
 
   return (
     <div className="post">
       <div className="user">
         <div className="userInfo">
           <div className="img-container">
+            {/* To replace */}
             <img src={post.profilePic} alt="user" />
             {/* <img src={`/uploads/${post.profilePic}`} alt="user" /> */}
           </div>
@@ -98,12 +95,11 @@ export default function Post({ post }) {
             <span className="date">{moment(post.creationDate).fromNow()}</span>
           </div>
         </div>
-
+        {/* To complete  */}
         <MoreHorizIcon className="moreBtn" />
       </div>
 
       <div className="content">
-        {/* Des */}
         <p>{post.desc}</p>
         <img src={`/uploads/${post.img}`} alt="post" />
       </div>

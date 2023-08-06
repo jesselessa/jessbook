@@ -5,15 +5,15 @@ export const getAllUsers = (_req, res) => {
   const q = "SELECT * FROM users";
 
   db.query(q, (error, data) => {
-    if (error) {
-      return res.status(500).json(error);
-    }
+    if (error) return res.status(500).json(error);
+
     return res.status(200).json(data);
   });
 };
 
 export const getUser = (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.params.id;
+
   const q = "SELECT * FROM users WHERE id = ?";
 
   db.query(q, [userId], (error, data) => {
@@ -24,7 +24,7 @@ export const getUser = (req, res) => {
 };
 
 export const updateUser = (req, res) => {
-  //TODO - Check fn
+  //TODO - Check query if update of only a piece of info
   const token = req.cookies.accessToken;
   if (!token) return res.status(401).json("User not logged in.");
 
@@ -47,7 +47,8 @@ export const updateUser = (req, res) => {
 
       (error, data) => {
         if (error) res.status(500).json(error);
-        if (data.affectedRows > 0) return res.json("Info updated.");
+        if (data.affectedRows > 0)
+          return res.json("User's information updated.");
         return res
           .status(403)
           .json("User can only can only update his own information.");

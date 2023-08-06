@@ -19,6 +19,7 @@
 
       .left {
         display: flex;
+        align-items: center;
         flex: 1;
         gap: 1rem;
       }
@@ -91,6 +92,11 @@
             display: block;
           }
         }
+      }
+
+      .errorMsg {
+        color: themed("errorMsg");
+        font-size: 1.2rem;
       }
     }
 

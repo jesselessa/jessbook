@@ -12,8 +12,6 @@ export const getPosts = (req, res) => {
     // userInfo = info returned when logging in
     if (error) return res.status(403).json("Invalid token.");
 
-    console.log(userId);
-
     const q =
       userId !== "undefined"
         ? `SELECT p.*, u.id AS userId, firstName, lastName, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) WHERE p.userId = ? ORDER BY p.creationDate DESC`

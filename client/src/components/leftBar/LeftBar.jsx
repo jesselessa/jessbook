@@ -30,7 +30,10 @@ export default function LeftMenu() {
         <Link to={`profile/${currentUser.id}`}>
           <div className="user">
             <div className="img-container">
-              <img src={currentUser.profilePic} alt="profile" />
+              <img 
+              src={currentUser.profilePic} 
+              // src={`/uploads/$currentUser.profilePic`}
+              alt="profile" />
             </div>
             <span>
               {currentUser.firstName} {currentUser.lastName}

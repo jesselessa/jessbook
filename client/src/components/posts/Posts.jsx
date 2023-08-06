@@ -9,7 +9,6 @@ export default function Posts({ userId }) {
   const { isLoading, error, data } = useQuery(["posts"], () =>
     makeRequest.get(`/posts?userId=${userId}`).then((res) => res.data)
   );
-  console.log(data);
 
   return (
     <div className="posts">
