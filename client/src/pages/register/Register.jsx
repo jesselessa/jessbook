@@ -140,7 +140,7 @@ export default function Register() {
               // maxLength={35}
               autoComplete="off"
               required
-              value={inputsValues.firstName}
+              value={inputsValues.firstName.trim()}
               onChange={handleChange}
             />
             {validationErrors.firstName && (
@@ -156,7 +156,7 @@ export default function Register() {
               // maxLength={35}
               autoComplete="off"
               required
-              value={inputsValues.lastName}
+              value={inputsValues.lastName.trim()}
               onChange={handleChange}
             />
             {validationErrors.lastName && (
@@ -170,7 +170,7 @@ export default function Register() {
               placeholder="Email"
               autoComplete="off"
               required
-              value={inputsValues.email}
+              value={inputsValues.email.trim()}
               onChange={handleChange}
             />
             {validationErrors.email && (
@@ -184,7 +184,7 @@ export default function Register() {
               placeholder="Password"
               autoComplete="off"
               required
-              value={inputsValues.password}
+              value={inputsValues.password.trim()}
               onChange={handleChange}
             />
             {validationErrors.password && (
@@ -198,7 +198,7 @@ export default function Register() {
               placeholder="Confirm password"
               autoComplete="off"
               required
-              value={inputsValues.pswdConfirm}
+              value={inputsValues.pswdConfirm.trim()}
               onChange={handleChange}
             />
             {validationErrors.pswdConfirm && (

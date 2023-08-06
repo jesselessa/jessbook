@@ -12,9 +12,9 @@ import { makeRequest } from "../../utils/axios.jsx";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
 // Images
-import Image from "../../assets/images/publish/image.png";
-import Map from "../../assets/images/publish/map.png";
-import Friend from "../../assets/images/publish/friend.png";
+import image from "../../assets/images/publish/image.png";
+import map from "../../assets/images/publish/map.png";
+import friend from "../../assets/images/publish/friend.png";
 
 export default function Publish() {
   const { currentUser } = useContext(AuthContext);
@@ -123,7 +123,7 @@ export default function Publish() {
 
       <div className="bottom">
         <div className="left">
-          {/* Input image */}
+          {/* Input image - value linked with state "file" doesn't work with file input except if value equals "" or "null" */}
           <input
             type="file"
             id="file"
@@ -131,17 +131,17 @@ export default function Publish() {
           />
           <label htmlFor="file">
             <div className="item">
-              <img src={Image} alt="" />
+              <img src={image} alt="image icon" />
               <span>Add Image</span>
             </div>
           </label>
 
           <div className="item">
-            <img src={Map} alt="" />
+            <img src={map} alt="map icon" />
             <span>Add Place</span>
           </div>
           <div className="item">
-            <img src={Friend} alt="" />
+            <img src={friend} alt="friend icon" />
             <span>Tag Friends</span>
           </div>
         </div>
