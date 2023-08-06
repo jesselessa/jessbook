@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./post.scss";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios";
@@ -22,6 +22,9 @@ export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
   const [comments, setComments] = useState([]); // To fetch posts number
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   // Fetch post comments
   useEffect(() => {
@@ -37,7 +40,7 @@ export default function Post({ post }) {
       .catch((error) => console.log("Error fetching post comments:", error));
   };
 
-  // Likes feature
+  // Like/unlike  post
   const { isLoading, error, data } = useQuery(["likes", post.id], () =>
     makeRequest.get(`/likes?postId=${post.id}`).then((res) => res.data)
   );
@@ -57,6 +60,23 @@ export default function Post({ post }) {
     }
   );
 
+  const handleLike = () => {
+    mutation.mutate(data.includes(currentUser.id));
+  };
+
+  // Update and delete post
+  const updateMutation = useMutation(
+    (postId) => {
+      return makeRequest.put(`/posts/${postId}`);
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["posts"]);
+      },
+    }
+  );
+
   const deleteMutation = useMutation(
     (postId) => {
       return makeRequest.delete(`/posts/${postId}`);
@@ -69,16 +89,25 @@ export default function Post({ post }) {
     }
   );
 
-  const handleLike = () => {
-    mutation.mutate(data.includes(currentUser.id));
+  const handleUpdate = async () => {
+    try {
+      await updateMutation.mutateAsync(post.id);
+    } catch (error) {
+      console.error("Error updating post:", error);
+      // navigate(`/update/${post.id}`);
+    }
   };
 
-  const handleDelete = () => {
-    deleteMutation.mutate(post.id);
+  const handleDelete = async () => {
+    try {
+      await deleteMutation.mutateAsync(post.id);
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
   };
 
   return (
-    <div className="post">
+    <div className="post" key={post.id}>
       <div className="user">
         <div className="userInfo">
           <div className="img-container">
@@ -95,8 +124,18 @@ export default function Post({ post }) {
             <span className="date">{moment(post.creationDate).fromNow()}</span>
           </div>
         </div>
-        {/* To complete  */}
-        <MoreHorizIcon className="moreBtn" />
+        <div className="buttons">
+          <MoreHorizIcon
+            className="moreBtn"
+            onClick={() => setMenuOpen(!menuOpen)}
+          />
+          {menuOpen && post.userId === currentUser.id && (
+            <div className="editBtns">
+              <button onClick={handleUpdate}>Update</button>
+              <button onClick={handleDelete}>Delete</button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="content">

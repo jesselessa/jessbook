@@ -56,12 +56,12 @@ export default function RightBar() {
           <div className="userInfo">
             <div className="img-container">
               <img
-                src="https://images.pexels.com/photos/11748915/pexels-photo-11748915.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
+                src="https://images.pexels.com/photos/2269872/pexels-photo-2269872.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 alt="user"
               />
             </div>
             <p>
-              <span>Mickey Mouse</span> liked a comment
+              <span>Jack Bauer</span> liked a comment
             </p>
           </div>
           <span className="time">1 min ago</span>
@@ -71,7 +71,7 @@ export default function RightBar() {
           <div className="userInfo">
             <div className="img-container">
               <img
-                src="https://images.pexels.com/photos/1520760/pexels-photo-1520760.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                src="https://images.pexels.com/photos/1858175/pexels-photo-1858175.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 alt="user"
               />
             </div>
@@ -113,18 +113,18 @@ export default function RightBar() {
           <div className="user">
             <div className="img-container">
               <img
-                src="https://images.pexels.com/photos/11748915/pexels-photo-11748915.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
+                src="https://images.pexels.com/photos/2269872/pexels-photo-2269872.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 alt="user"
               />
               <div className="status-dot"></div>
             </div>
-            <span>Mickey Mouse</span>
+            <span>Jack Bauer</span>
           </div>
 
           <div className="user">
             <div className="img-container">
               <img
-                src="https://images.pexels.com/photos/1520760/pexels-photo-1520760.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                src="https://images.pexels.com/photos/1858175/pexels-photo-1858175.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 alt="user"
               />
               <div className="status-dot"></div>

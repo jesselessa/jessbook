@@ -1,8 +1,14 @@
 import express from "express";
-import {} from "../controllers/relationships.js";
+import {
+  getRelationships,
+  addRelationship,
+  deleteRelationship,
+} from "../controllers/relationships.js";
 
 const router = express.Router();
 
-router.get("",);
+router.get("/", getRelationships);
+router.post("/", addRelationship);
+router.delete("/", deleteRelationship);
 
 export default router;

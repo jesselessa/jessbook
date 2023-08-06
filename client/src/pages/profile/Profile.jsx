@@ -19,12 +19,12 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Profile() {
   const { currentUser } = useContext(AuthContext);
+
   const userId = useParams();
 
   const { isLoading, error, data } = useQuery(["user"], () => {
     makeRequest.get(`/users/${userId}`).then((res) => res.data);
   });
-  console.log(data);
 
   const { isLoading: rIsLoading, data: relationshipsData } = useQuery(
     ["relationships"],
@@ -70,7 +70,7 @@ export default function Profile() {
               <div className="img-container">
                 <img
                   src={data.profilePic}
-                  // src={`/uploads/${data.Pic}`}
+                  // src={`/uploads/${data.profilePic}`}
                   alt="profile"
                   className="profilePic"
                 />

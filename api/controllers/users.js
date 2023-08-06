@@ -18,8 +18,9 @@ export const getUser = (req, res) => {
 
   db.query(q, [userId], (error, data) => {
     if (error) return res.status(500).json(error);
-    const { password, ...others } = data[0];
-    return res.json(others);
+    // const { password, ...others } = data[0];
+    // return res.json(others);
+    return res.json(data[0]);
   });
 };
 

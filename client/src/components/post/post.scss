@@ -53,10 +53,23 @@
         }
       }
 
-      .moreBtn {
-        color: themed("textColorSoft");
-        &:hover {
-          cursor: pointer;
+      .buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem;
+
+        .moreBtn {
+          color: themed("textColorSoft");
+          &:hover {
+            cursor: pointer;
+          }
+        }
+
+        .editBtns {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
         }
       }
     }
