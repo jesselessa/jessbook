@@ -3,24 +3,21 @@ import { Link } from "react-router-dom";
 import "./leftBar.scss";
 
 // Images
-import friends from "../../assets/images/leftMenu/1.png";
-import groups from "../../assets/images/leftMenu/2.png";
-import marketPlace from "../../assets/images/leftMenu/3.png";
-import watch from "../../assets/images/leftMenu/4.png";
-import memories from "../../assets/images/leftMenu/5.png";
-import events from "../../assets/images/leftMenu/6.png";
-import gaming from "../../assets/images/leftMenu/7.png";
-import gallery from "../../assets/images/leftMenu/8.png";
-import videos from "../../assets/images/leftMenu/9.png";
-import messages from "../../assets/images/leftMenu/10.png";
-import fundraiser from "../../assets/images/leftMenu/11.png";
-import tutorials from "../../assets/images/leftMenu/12.png";
-import courses from "../../assets/images/leftMenu/13.png";
+import friends from "../../assets/images/leftBar/friends.png";
+import video from "../../assets/images/leftBar/video.png";
+import groups from "../../assets/images/leftBar/group.png";
+import marketPlace from "../../assets/images/leftBar/market.png";
+import news from "../../assets/images/leftBar/news.png";
+import events from "../../assets/images/leftBar/events.png";
+import gaming from "../../assets/images/leftBar/gaming.png";
+import messages from "../../assets/images/leftBar/messages.png";
+import fundraiser from "../../assets/images/leftBar/fundraiser.png";
+import tutorials from "../../assets/images/leftBar/tutorials.png";
 
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-export default function LeftMenu() {
+export default function LeftBar() {
   const { currentUser } = useContext(AuthContext);
 
   return (
@@ -30,10 +27,11 @@ export default function LeftMenu() {
         <Link to={`profile/${currentUser.id}`}>
           <div className="user">
             <div className="img-container">
-              <img 
-              src={currentUser.profilePic} 
-              // src={`/uploads/$currentUser.profilePic`}
-              alt="profile" />
+              <img
+                src={currentUser.profilePic}
+                // src={`/uploads/$currentUser.profilePic`}
+                alt="profile"
+              />
             </div>
             <span>
               {currentUser.firstName} {currentUser.lastName}
@@ -46,23 +44,23 @@ export default function LeftMenu() {
         </div>
 
         <div className="item">
+          <img src={video} alt="video" />
+          <span>Video</span>
+        </div>
+
+        <div className="item">
           <img src={groups} alt="groups" />
           <span>Groups</span>
         </div>
 
         <div className="item">
-          <img src={marketPlace} alt="marketplace" />
-          <span>Market Place</span>
+          <img src={news} alt="memories" />
+          <span>News</span>
         </div>
 
         <div className="item">
-          <img src={watch} alt="watch" />
-          <span>Watch</span>
-        </div>
-
-        <div className="item">
-          <img src={memories} alt="memories" />
-          <span>Memories</span>
+          <img src={messages} alt="messages" />
+          <span>Messages</span>
         </div>
       </div>
 
@@ -83,18 +81,8 @@ export default function LeftMenu() {
         </div>
 
         <div className="item">
-          <img src={gallery} alt="gallery" />
-          <span>Gallery</span>
-        </div>
-
-        <div className="item">
-          <img src={videos} alt="videos" />
-          <span>Videos</span>
-        </div>
-
-        <div className="item">
-          <img src={messages} alt="messages" />
-          <span>Messages</span>
+          <img src={marketPlace} alt="marketplace" />
+          <span>Market Place</span>
         </div>
       </div>
 
@@ -112,11 +100,6 @@ export default function LeftMenu() {
         <div className="item">
           <img src={tutorials} alt="tutorials" />
           <span>Tutorials</span>
-        </div>
-
-        <div className="item">
-          <img src={courses} alt="courses" />
-          <span>Courses</span>
         </div>
       </div>
     </div>

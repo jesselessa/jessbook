@@ -1,12 +1,12 @@
 import { useContext, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { makeRequest } from "../../utils/axios.jsx";
 import "./publish.scss";
 
 // Contexts
 import { AuthContext } from "../../contexts/authContext.jsx";
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../utils/axios.jsx";
 
 // Component
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
@@ -14,7 +14,7 @@ import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 // Images
 import image from "../../assets/images/publish/image.png";
 import map from "../../assets/images/publish/map.png";
-import friend from "../../assets/images/publish/friend.png";
+import friends from "../../assets/images/publish/friends.png";
 
 export default function Publish() {
   const { currentUser } = useContext(AuthContext);
@@ -141,7 +141,7 @@ export default function Publish() {
             <span>Add Place</span>
           </div>
           <div className="item">
-            <img src={friend} alt="friend icon" />
+            <img src={friends} alt="friends icon" />
             <span>Tag Friends</span>
           </div>
         </div>

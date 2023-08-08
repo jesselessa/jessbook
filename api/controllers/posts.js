@@ -12,6 +12,8 @@ export const getPosts = (req, res) => {
     // userInfo = info returned when logging in
     if (error) return res.status(403).json("Invalid token.");
 
+    console.log(userId);
+
     const q =
       userId !== "undefined"
         ? `SELECT p.*, u.id AS userId, firstName, lastName, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) WHERE p.userId = ? ORDER BY p.creationDate DESC`
@@ -62,41 +64,44 @@ export const updatePost = (req, res) => {
   jwt.verify(token, process.env.REACT_APP_SECRET, (error, userInfo) => {
     if (error) return res.status(403).json("Invalid token.");
 
-    const postId = req.params.id; // Post ID to update
+    const postId = req.params.postId; // Post ID to update
     const userId = userInfo.id; // User ID from token
 
     const { desc, img } = req.body;
 
-    if (desc === undefined && img === undefined) {
-      return res.status(400).json("No valid fields to update.");
-    }
+    // if (desc === undefined && img === undefined) {
+    //   return res.status(400).json("No valid fields to update.");
+    // }
 
     const updateFields = [];
     const values = [];
 
     if (desc !== undefined) {
       updateFields.push("`desc` = ?");
-      values.push(desc);
+      // values.push(desc);
     }
 
     if (img !== undefined) {
       updateFields.push("`img` = ?");
-      values.push(img);
+      // values.push(img);
     }
 
     const updateFieldsString = updateFields.join(", ");
 
     const q = `
-      UPDATE posts 
-      SET ${updateFieldsString} 
+      UPDATE posts
+      SET ${updateFieldsString}
       WHERE id = ? AND userId = ?
     `;
 
     values.push(postId, userId);
 
-    db.query(q, values, (error, _data) => {
+    db.query(q, values, (error, data) => {
       if (error) return res.status(500).json(error);
-      return res.status(200).json("Post updated.");
+      if (data.affectedRows > 0) {
+        return res.status(200).json("Post updated.");
+      }
+      return res.status(403).json("User can only update their post.");
     });
   });
 };
@@ -110,10 +115,10 @@ export const deletePost = (req, res) => {
 
     const q = "DELETE FROM posts WHERE `id`= ? AND `userId` = ?";
 
-    db.query(q, [req.params.id, userInfo.id], (error, data) => {
+    db.query(q, [req.params.postId, userInfo.id], (error, data) => {
       if (error) return res.status(500).json(error);
       if (data.affectedRows > 0) return res.status(200).json("Post deleted.");
-      return res.status(403).json("Only owner can delete a post.");
+      return res.status(403).json("User can only delete their post.");
     });
   });
 };

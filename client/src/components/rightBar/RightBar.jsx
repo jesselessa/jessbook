@@ -1,7 +1,7 @@
 import "./rightBar.scss";
 
 // Image
-import gift from "../../assets/images/gift.png";
+import gift from "../../assets/images/rightBar/gift.png";
 
 export default function RightBar() {
   return (

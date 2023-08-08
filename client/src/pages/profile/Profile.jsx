@@ -14,17 +14,21 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlaceIcon from "@mui/icons-material/Place";
 
+// Images
+import coverPic from "../../assets/images/profile/defaultCover.jpg";
+import profilePic from "../../assets/images/profile/defaultProfile.jpg";
+
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Profile() {
   const { currentUser } = useContext(AuthContext);
 
-  const userId = useParams();
+  const { userId } = useParams();
 
-  const { isLoading, error, data } = useQuery(["user"], () => {
-    makeRequest.get(`/users/${userId}`).then((res) => res.data);
-  });
+  const { isLoading, error, data } = useQuery(["user"], () =>
+    makeRequest.get(`/users/${userId}`).then((res) => res.data)
+  );
 
   const { isLoading: rIsLoading, data: relationshipsData } = useQuery(
     ["relationships"],
@@ -64,12 +68,16 @@ export default function Profile() {
         <>
           <div className="profileContainer">
             <div className="images">
-              <img src={data.coverPic} alt="cover" className="cover" />
+              <img
+                src={data?.coverPic ? data.coverPic : { coverPic }}
+                alt="cover"
+                className="cover"
+              />
               {/* <img src={`/uploads/${data.coverPic}`} alt="cover" className="cover" /> */}
 
               <div className="img-container">
                 <img
-                  src={data.profilePic}
+                  src={data?.profilePic ? data.profilePic : { profilePic }}
                   // src={`/uploads/${data.profilePic}`}
                   alt="profile"
                   className="profilePic"
@@ -107,17 +115,17 @@ export default function Profile() {
                   <span>{data?.country ? data.country : "Non renseigné"}</span>
                 </div>
 
-                {error ? (
-                  "Something went wrong."
-                ) : rIsLoading ? (
-                  "Loading..."
-                ) : (
-                  <button onClick={handleFollow}>
-                    {relationshipsData.includes(currentUser.id)
-                      ? "Following"
-                      : "Follow"}
-                  </button>
-                )}
+                {error
+                  ? "Something went wrong."
+                  : rIsLoading
+                  ? "Loading..."
+                  : userId === currentUser.id && (
+                      <button onClick={handleFollow}>
+                        {relationshipsData.includes(currentUser.id)
+                          ? "Following"
+                          : "Follow"}
+                      </button>
+                    )}
               </div>
             </div>
           </div>

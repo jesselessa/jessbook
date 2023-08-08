@@ -9,6 +9,8 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 // Icon
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+// Image
+import profilePic from "../../assets/images/profile/defaultProfile.jpg";
 
 export default function Comments({ postId }) {
   const { currentUser } = useContext(AuthContext);
@@ -45,7 +47,12 @@ export default function Comments({ postId }) {
     <div className="comments">
       <form>
         <div className="img-container">
-          <img src={currentUser.profilePic} alt="user" />
+          <img
+            src={
+              currentUser.profilePic ? currentUser.profilePic : { profilePic }
+            }
+            alt="user"
+          />
           {/* <img src={`/uploads/${currentUser.profilePic}`} alt="user" /> */}
         </div>
 

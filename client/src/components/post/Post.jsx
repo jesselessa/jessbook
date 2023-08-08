@@ -24,8 +24,6 @@ export default function Post({ post }) {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const navigate = useNavigate();
-
   // Fetch post comments
   useEffect(() => {
     fetchPostComments();
@@ -66,9 +64,7 @@ export default function Post({ post }) {
 
   // Update and delete post
   const updateMutation = useMutation(
-    (postId) => {
-      return makeRequest.put(`/posts/${postId}`);
-    },
+    (postId) => makeRequest.put(`/posts/${postId}`),
     {
       onSuccess: () => {
         // Invalidate and refetch
@@ -78,9 +74,7 @@ export default function Post({ post }) {
   );
 
   const deleteMutation = useMutation(
-    (postId) => {
-      return makeRequest.delete(`/posts/${postId}`);
-    },
+    (postId) => makeRequest.delete(`/posts/${postId}`),
     {
       onSuccess: () => {
         // Invalidate and refetch
@@ -107,12 +101,19 @@ export default function Post({ post }) {
   };
 
   return (
-    <div className="post" key={post.id}>
+    <div className="post">
       <div className="user">
         <div className="userInfo">
           <div className="img-container">
-            {/* To replace */}
-            <img src={post.profilePic} alt="user" />
+            {/* Change later with image upload */}
+            <img
+              src={
+                post?.profilePic
+                  ? post.profilePic
+                  : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              }
+              alt="user"
+            />
             {/* <img src={`/uploads/${post.profilePic}`} alt="user" /> */}
           </div>
           <div className="details">
