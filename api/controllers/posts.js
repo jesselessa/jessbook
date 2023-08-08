@@ -69,21 +69,21 @@ export const updatePost = (req, res) => {
 
     const { desc, img } = req.body;
 
-    // if (desc === undefined && img === undefined) {
-    //   return res.status(400).json("No valid fields to update.");
-    // }
+    if (desc === undefined && img === undefined) {
+      return res.status(400).json("No valid fields to update.");
+    }
 
     const updateFields = [];
     const values = [];
 
     if (desc !== undefined) {
       updateFields.push("`desc` = ?");
-      // values.push(desc);
+      values.push(desc);
     }
 
     if (img !== undefined) {
       updateFields.push("`img` = ?");
-      // values.push(img);
+      values.push(img);
     }
 
     const updateFieldsString = updateFields.join(", ");

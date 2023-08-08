@@ -29,7 +29,7 @@ export default function Navbar() {
   const [burgerClicked, setBurgerClicked] = useState(false);
 
   const handleLogout = () => {
-    makeRequest.post("/auth/logout"); 
+    makeRequest.post("/auth/logout");
     navigate("/login");
   };
 

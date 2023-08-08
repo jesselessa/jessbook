@@ -21,8 +21,9 @@ export const register = (req, res) => {
 
     // Store new user in database
     const q =
-      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`) VALUES (?)";
-    const values = [firstName, lastName, email, hashedPswd];
+      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `role`) VALUES (?)";
+
+    const values = [firstName, lastName, email, hashedPswd, "user"];
 
     db.query(q, [values], (error, _data) => {
       if (error) {
@@ -58,13 +59,15 @@ export const login = (req, res) => {
       // { expiresIn: "30d" }
     );
 
+    console.log(token.id);
+
     //* Store token in cookie and send it in response in case of successful login
-    const { password, ...others } = data[0]; // Distinguish "password" property from others
+    const { password, ...others } = data[0];
 
     res
       .cookie("accessToken", token, { httpOnly: true }) // Random JS script can't access our cookie
       .status(200)
-      .json(others); // Return user info except password
+      .json(others);
   });
 };
 
