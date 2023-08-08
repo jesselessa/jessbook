@@ -53,13 +53,21 @@ export const login = (req, res) => {
     //* Generate token with jsonwebtoken
     const secretKey = process.env.REACT_APP_SECRET;
 
-    const token = jwt.sign(
-      { id: data[0].id },
-      secretKey
-      // { expiresIn: "30d" }
-    );
+    let token;
 
-    console.log(token.id);
+    if (data[0].role === "admin") {
+      token = jwt.sign(
+        { id: data[0].id, role: "admin" },
+        secretKey
+        // { expiresIn: "30d" }
+      );
+    } else {
+      token = jwt.sign(
+        { id: data[0].id, role: "user" },
+        secretKey
+        // { expiresIn: "30d" }
+      );
+    }
 
     //* Store token in cookie and send it in response in case of successful login
     const { password, ...others } = data[0];

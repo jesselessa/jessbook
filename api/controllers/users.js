@@ -7,23 +7,11 @@ export const getAllUsers = (req, res) => {
   if (!token) {
     return res.status(401).json("User not logged in.");
   }
+  const q = "SELECT * FROM users";
 
-  jwt.verify(token, process.env.REACT_APP_SECRET, (error, userInfo) => {
-    if (error) {
-      return res.status(403).json("Invalid token.");
-    }
-
-    // Check if user's email matches admin's ID
-    if (userInfo.email !== process.env.REACT_APP_ADMIN_ID) {
-      return res.status(403).json("Access denied.");
-    }
-
-    const q = "SELECT * FROM users";
-
-    db.query(q, (error, data) => {
-      if (error) return res.status(500).json(error);
-      return res.status(200).json(data);
-    });
+  db.query(q, (error, data) => {
+    if (error) return res.status(500).json(error);
+    return res.status(200).json(data);
   });
 };
 
@@ -39,6 +27,8 @@ export const getUser = (req, res) => {
     if (error) {
       return res.status(403).json("Invalid token.");
     }
+
+    console.log("User Info:", userInfo);
 
     // Check if user's email matches admin's ID
     if (userInfo.email !== process.env.REACT_APP_ADMIN_ID) {

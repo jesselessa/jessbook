@@ -9,6 +9,7 @@ export const isAdmin = (req, res, next) => {
 
   jwt.verify(token, process.env.REACT_APP_SECRET, (error, userInfo) => {
     if (error) {
+      console.log(error);
       return res.status(403).json("Invalid token.");
     }
 
