@@ -1,12 +1,7 @@
 import { db } from "../utils/connect.js";
 import jwt from "jsonwebtoken";
 
-export const getAllUsers = (req, res) => {
-  const token = req.cookies.accessToken;
-
-  if (!token) {
-    return res.status(401).json("User not logged in.");
-  }
+export const getAllUsers = (_req, res) => {
   const q = "SELECT * FROM users";
 
   db.query(q, (error, data) => {
@@ -17,42 +12,24 @@ export const getAllUsers = (req, res) => {
 
 export const getUser = (req, res) => {
   const userId = req.params.userId;
-  const token = req.cookies.accessToken;
 
-  if (!token) {
-    return res.status(401).json("User not logged in.");
-  }
+  const q = "SELECT * FROM users WHERE id = ?";
 
-  jwt.verify(token, process.env.REACT_APP_SECRET, (error, userInfo) => {
-    if (error) {
-      return res.status(403).json("Invalid token.");
-    }
+  db.query(q, [userId], (error, data) => {
+    if (error) return res.status(500).json(error);
 
-    console.log("User Info:", userInfo);
+    // All info except password
+    const user = {
+      id: data[0]?.id,
+      firstName: data[0]?.firstName,
+      lastName: data[0]?.lastName,
+      email: data[0]?.email,
+      profilePic: data[0]?.profilePic,
+      coverPic: data[0]?.coverPic,
+      country: data[0]?.country,
+    };
 
-    // Check if user's email matches admin's ID
-    if (userInfo.email !== process.env.REACT_APP_ADMIN_ID) {
-      return res.status(403).json("Access denied.");
-    }
-
-    const q = "SELECT * FROM users WHERE id = ?";
-
-    db.query(q, [userId], (error, data) => {
-      if (error) return res.status(500).json(error);
-
-      // All info except password
-      const user = {
-        id: data[0].id,
-        firstName: data[0].firstName,
-        lastName: data[0].lastName,
-        email: data[0].email,
-        profilePic: data[0].profilePic,
-        coverPic: data[0].coverPic,
-        country: data[0].country,
-      };
-
-      return res.status(200).json(user);
-    });
+    return res.status(200).json(user);
   });
 };
 

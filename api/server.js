@@ -2,8 +2,10 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import multer from "multer";
+// Multer configuration
+import { upload } from "./middlewares/upload.js";
 
+// Routes
 import authRoute from "./routes/auth.js"; //! Error if no file extension
 import usersRoute from "./routes/users.js";
 import postsRoute from "./routes/posts.js";
@@ -28,23 +30,6 @@ app.use(
 );
 app.use(cookieParser());
 
-// Multer configuration
-const storage = multer.diskStorage({
-  destination: function (_req, _file, callback) {
-    callback(null, "../client/uploads");
-  },
-  filename: function (_req, file, callback) {
-    const name = file.originalname.split(" ").join("_");
-    callback(null, Date.now() + name);
-  },
-});
-const upload = multer({ storage: storage }).single("file");
-
-app.post("/uploads", upload, (req, res) => {
-  const file = req.file;
-  res.status(200).json(file.filename);
-});
-
 app.use("/auth", authRoute);
 app.use("/users", usersRoute);
 app.use("/posts", postsRoute);
@@ -52,6 +37,12 @@ app.use("/comments", commentsRoute);
 app.use("/likes", likesRoute);
 app.use("/relationships", relationshipsRoute);
 app.use("/stories", storiesRoute);
+
+// Multer 
+app.post("/uploads", upload, (req, res) => {
+  const file = req.file;
+  res.status(200).json(file.filename);
+});
 
 // Start server
 const PORT = process.env.REACT_APP_PORT || 8000;

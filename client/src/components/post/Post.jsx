@@ -104,18 +104,21 @@ export default function Post({ post }) {
     <div className="post">
       <div className="user">
         <div className="userInfo">
-          <div className="img-container">
-            {/* Change later with image upload */}
-            <img
-              src={
-                post?.profilePic
-                  ? post.profilePic
-                  : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-              }
-              alt="user"
-            />
-            {/* <img src={`/uploads/${post.profilePic}`} alt="user" /> */}
-          </div>
+          <Link to={`/profile/${post.userId}`}>
+            <div className="img-container">
+              {/* Change later with image upload */}
+              <img
+                src={
+                  post?.profilePic
+                    ? post.profilePic
+                    : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                }
+                alt="user"
+              />
+              {/* <img src={`/uploads/${post.profilePic}`} alt="user" /> */}
+            </div>
+          </Link>
+
           <div className="details">
             <Link to={`/profile/${post.userId}`} style={{ color: "inherit" }}>
               <span className="name">
