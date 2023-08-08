@@ -38,36 +38,33 @@ export const addComment = (req, res) => {
 
 export const updateComment = (req, res) => {
   const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json("User not logged in.");
+
+  if (!token) {
+    return res.status(401).json("User not logged in.");
+  }
 
   jwt.verify(token, process.env.REACT_APP_SECRET, (error, userInfo) => {
-    if (error) return res.status(403).json("Invalid token.");
+    if (error) {
+      return res.status(403).json("Invalid token.");
+    }
 
-    const commentId = req.params.id; // Comment ID to update
-    const userId = userInfo.id; // User ID from token
+    const commentId = req.params.id;
+    const userId = userInfo.id;
 
-    if (req.body.desc === undefined) {
+    const { desc } = req.body;
+
+    if (desc === undefined) {
       return res.status(400).json("No valid fields to update.");
     }
 
-    const updateFields = [];
-    const values = [];
-    if (desc !== undefined) {
-      updateFields.push("`desc` = ?");
-      values.push(desc);
-    }
-    const updateFieldsString = updateFields.join(", ");
+    const q = "UPDATE posts SET `desc` = ? WHERE id = ? AND userId = ?";
 
-    const q = `
-        UPDATE posts 
-        SET ${updateFieldsString} 
-        WHERE id = ? AND userId = ?
-      `;
-
-    values.push(commentId, userId);
+    const values = [desc, commentId, userId];
 
     db.query(q, values, (error, _data) => {
-      if (error) return res.status(500).json(error);
+      if (error) {
+        return res.status(500).json(error);
+      }
       return res.status(200).json("Comment updated.");
     });
   });
