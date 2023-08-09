@@ -18,9 +18,7 @@ export default function Comments({ postId }) {
   const [desc, setDesc] = useState("");
 
   const { isLoading, error, data } = useQuery(["comments"], () =>
-    makeRequest.get(`/comments?postId=${postId}`).then((res) => {
-      return res.data;
-    })
+    makeRequest.get(`/comments?postId=${postId}`).then((res) => res.data)
   );
 
   const queryClient = useQueryClient();

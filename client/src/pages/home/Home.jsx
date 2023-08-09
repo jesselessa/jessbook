@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom";
 import "./home.scss";
 
 // Components
@@ -6,11 +7,13 @@ import Posts from "../../components/posts/Posts.jsx";
 import Publish from "../../components/publish/Publish.jsx";
 
 export default function Home() {
+  const { userId } = useParams();
+
   return (
     <div className="home">
       <Stories />
       <Publish />
-      <Posts />
+      <Posts userId={userId} />
     </div>
   );
 }

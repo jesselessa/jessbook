@@ -1,5 +1,4 @@
 import { db } from "../utils/connect.js";
-import jwt from "jsonwebtoken";
 
 export const getAllUsers = (_req, res) => {
   const q = "SELECT * FROM users";
@@ -34,62 +33,53 @@ export const getUser = (req, res) => {
 };
 
 export const updateUser = (req, res) => {
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json("User not logged in.");
+  const userId = req.userInfo.id; // User ID from token
 
-  jwt.verify(token, process.env.REACT_APP_SECRET, (error, userInfo) => {
-    if (error) return res.status(403).json("Invalid token.");
+  const updateFields = [];
+  const values = [];
 
-    const userId = userInfo.id; // User ID from token
+  if (req.body.firstName !== undefined) {
+    updateFields.push("`firstName` = ?");
+    values.push(req.body.firstName);
+  }
 
-    const updateFields = [];
-    const values = [];
+  if (req.body.lastName !== undefined) {
+    updateFields.push("`lastName` = ?");
+    values.push(req.body.lastName);
+  }
 
-    if (req.body.firstName !== undefined) {
-      updateFields.push("`firstName` = ?");
-      values.push(req.body.firstName);
-    }
+  if (req.body.profilePic !== undefined) {
+    updateFields.push("`profilePic` = ?");
+    values.push(req.body.profilePic);
+  }
 
-    if (req.body.lastName !== undefined) {
-      updateFields.push("`lastName` = ?");
-      values.push(req.body.lastName);
-    }
+  if (req.body.coverPic !== undefined) {
+    updateFields.push("`coverPic` = ?");
+    values.push(req.body.coverPic);
+  }
 
-    if (req.body.profilePic !== undefined) {
-      updateFields.push("`profilePic` = ?");
-      values.push(req.body.profilePic);
-    }
+  if (req.body.country !== undefined) {
+    updateFields.push("`country` = ?");
+    values.push(req.body.country);
+  }
 
-    if (req.body.coverPic !== undefined) {
-      updateFields.push("`coverPic` = ?");
-      values.push(req.body.coverPic);
-    }
+  if (updateFields.length === 0) {
+    return res.status(400).json("No valid fields to update.");
+  }
 
-    if (req.body.country !== undefined) {
-      updateFields.push("`country` = ?");
-      values.push(req.body.country);
-    }
+  values.push(userId);
 
-    if (updateFields.length === 0) {
-      return res.status(400).json("No valid fields to update.");
-    }
-
-    values.push(userId);
-
-    const q = `
+  const q = `
       UPDATE users
       SET ${updateFields.join(", ")}
       WHERE id = ?
     `;
 
-    db.query(q, values, (error, data) => {
-      if (error) return res.status(500).json(error);
-      if (data.affectedRows > 0) {
-        return res.status(200).json("User's information updated.");
-      }
-      return res
-        .status(403)
-        .json("User can only update their own information.");
-    });
+  db.query(q, values, (error, data) => {
+    if (error) return res.status(500).json(error);
+    if (data.affectedRows > 0) {
+      return res.status(200).json("User's information updated.");
+    }
+    return res.status(403).json("User can only update their own information.");
   });
 };

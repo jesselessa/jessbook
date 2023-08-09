@@ -5,12 +5,14 @@ import {
   updatePost,
   deletePost,
 } from "../controllers/posts.js";
+import { isAdmin } from "../middlewares/isAdmin.js";
+import { authenticateUser } from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
-router.get("/", getPosts);
-router.post("/", addPost);
-router.put("/:postId", updatePost);
-router.delete("/:postId", deletePost);
+router.get("/", isAdmin, authenticateUser, getPosts);
+router.post("/", authenticateUser, addPost);
+router.put("/:postId", authenticateUser, updatePost);
+router.delete("/:postId", authenticateUser, deletePost);
 
 export default router;
