@@ -17,7 +17,7 @@ export default function Comments({ postId }) {
 
   const [desc, setDesc] = useState("");
 
-  const { isLoading, error, data } = useQuery(["comments"], () =>
+  const { isLoading, error, data } = useQuery(["comments", postId], () =>
     makeRequest.get(`/comments?postId=${postId}`).then((res) => res.data)
   );
 
@@ -45,12 +45,7 @@ export default function Comments({ postId }) {
     <div className="comments">
       <form>
         <div className="img-container">
-          <img
-            src={
-              currentUser.profilePic ? currentUser.profilePic : { profilePic }
-            }
-            alt="user"
-          />
+          <img src={currentUser.profilePic || profilePic} alt="user" />
           {/* <img src={`/uploads/${currentUser.profilePic}`} alt="user" /> */}
         </div>
 

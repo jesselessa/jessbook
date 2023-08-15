@@ -12,6 +12,7 @@ import events from "../../assets/images/leftBar/events.png";
 import gaming from "../../assets/images/leftBar/gaming.png";
 import messages from "../../assets/images/leftBar/messages.png";
 import fundraiser from "../../assets/images/leftBar/fundraiser.png";
+import flag from "../../assets/images/leftBar/flag.png";
 import tutorials from "../../assets/images/leftBar/tutorials.png";
 
 // Context
@@ -76,8 +77,8 @@ export default function LeftBar() {
         </div>
 
         <div className="item">
-          <img src={gaming} alt="gaming" />
-          <span>Gaming</span>
+          <img src={flag} alt="gaming" />
+          <span>Pages</span>
         </div>
 
         <div className="item">
@@ -91,6 +92,11 @@ export default function LeftBar() {
       {/* Other categories */}
       <div className="others">
         <h3>Others</h3>
+
+        <div className="item">
+          <img src={gaming} alt="gaming" />
+          <span>Gaming</span>
+        </div>
 
         <div className="item">
           <img src={fundraiser} alt="fundraiser" />

@@ -14,15 +14,22 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 // Context
 import { AuthContext } from "../../contexts/authContext";
+
+// Image
+import profilePic from "../../assets/images/profile/defaultProfile.jpg";
 
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
   const [comments, setComments] = useState([]); // To fetch posts number
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   // Fetch post comments
   useEffect(() => {
@@ -38,7 +45,7 @@ export default function Post({ post }) {
       .catch((error) => console.log("Error fetching post comments:", error));
   };
 
-  // Like/unlike  post
+  // Like/unlike post
   const { isLoading, error, data } = useQuery(["likes", post.id], () =>
     makeRequest.get(`/likes?postId=${post.id}`).then((res) => res.data)
   );
@@ -135,8 +142,16 @@ export default function Post({ post }) {
           />
           {menuOpen && post.userId === currentUser.id && (
             <div className="editBtns">
-              <button onClick={handleUpdate}>Update</button>
-              <button onClick={handleDelete}>Delete</button>
+              <EditOutlinedIcon
+                className="editBtn"
+                fontSize="large"
+                onClick={handleUpdate}
+              />
+              <DeleteOutlineOutlinedIcon
+                className="editBtn"
+                fontSize="large"
+                onClick={handleDelete}
+              />
             </div>
           )}
         </div>

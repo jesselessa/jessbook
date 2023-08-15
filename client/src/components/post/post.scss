@@ -70,6 +70,13 @@
           display: flex;
           flex-direction: column;
           gap: 0.5rem;
+
+          .editBtn {
+            color: themed("textColorSoft");
+            &:hover {
+              cursor: pointer;
+            }
+          }
         }
       }
     }

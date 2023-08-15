@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./style.scss";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
@@ -26,66 +26,31 @@ function App() {
 
   const queryClient = new QueryClient();
 
-  //* Create a Layout including an Outlet component with modular content
-  const Layout = () => {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <div className={`theme-${darkMode ? "dark" : "light"}`}>
+  return (
+    <QueryClientProvider client={queryClient}>
+      <div className={`App theme-${darkMode ? "dark" : "light"}`}>
+        <Router>
           <Navbar />
 
           <div style={{ display: "flex" }}>
             <LeftBar />
-            <Outlet />
+
+            <Routes>
+              <Route path="/" element={currentUser ? <Home /> : <Login />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/profile/:id" element={<Profile />} />
+              <Route path="*" element={<Login />} />
+            </Routes>
+
             <RightBar />
           </div>
-        </div>
-      </QueryClientProvider>
-    );
-  };
+        </Router>
 
-  //* Protect routes for unauthenticated users
-  const ProtectedRoute = ({ children }) => {
-    // children = any page or layout
-    if (!currentUser) {
-      return <Login />;
-    }
-
-    return children;
-  };
-
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: (
-        <ProtectedRoute>
-          <Layout />
-        </ProtectedRoute>
-      ),
-      children: [
-        { path: "/", element: <Home /> },
-        { path: "/profile/:id", element: <Profile /> },
-      ],
-    },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/register",
-      element: <Register />,
-    },
-    {
-      path: "*",
-      element: <Login />,
-    },
-  ]);
-
-  return (
-    <div className="App">
-      <RouterProvider router={router} />
-      <ToastContainer draggable={false} />
-      {/* draggable = false => to remove error message from browser : "Unable to preventDefault inside passive event listener invocation"  */}
-    </div>
+        <ToastContainer autoclose={3000} draggable={false} />
+        {/* draggable = false => to remove error message from browser : "Unable to preventDefault inside passive event listener invocation"  */}
+      </div>
+    </QueryClientProvider>
   );
 }
 

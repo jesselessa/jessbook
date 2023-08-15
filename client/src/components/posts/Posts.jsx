@@ -6,7 +6,7 @@ import "./posts.scss";
 import Post from "../post/Post.jsx";
 
 export default function Posts({ userId }) {
-  const { isLoading, error, data } = useQuery(["posts"], () =>
+  const { isLoading, error, data } = useQuery(["posts", userId], () =>
     makeRequest.get(`/posts?userId=${userId}`).then((res) => res.data)
   );
 

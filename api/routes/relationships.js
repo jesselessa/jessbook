@@ -4,11 +4,12 @@ import {
   addRelationship,
   deleteRelationship,
 } from "../controllers/relationships.js";
+import { authenticateUser } from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
 router.get("/", getRelationships);
-router.post("/", addRelationship);
-router.delete("/", deleteRelationship);
+router.post("/", authenticateUser, addRelationship);
+router.delete("/", authenticateUser, deleteRelationship);
 
 export default router;

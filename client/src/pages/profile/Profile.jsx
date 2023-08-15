@@ -14,10 +14,6 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlaceIcon from "@mui/icons-material/Place";
 
-// Images
-import coverPic from "../../assets/images/profile/defaultCover.jpg";
-import profilePic from "../../assets/images/profile/defaultProfile.jpg";
-
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
@@ -26,12 +22,14 @@ export default function Profile() {
 
   const { userId } = useParams();
 
-  const { isLoading, error, data } = useQuery(["user"], () =>
+  // User
+  const { isLoading, error, data } = useQuery(["user", userId], () =>
     makeRequest.get(`/users/${userId}`).then((res) => res.data)
   );
 
+  // Relationships
   const { isLoading: rIsLoading, data: relationshipsData } = useQuery(
-    ["relationships"],
+    ["relationships" + userId],
     () =>
       makeRequest
         .get(`/relationships?followedUserId=${userId}`)
@@ -69,7 +67,11 @@ export default function Profile() {
           <div className="profileContainer">
             <div className="images">
               <img
-                src={data?.coverPic ? data.coverPic : { coverPic }}
+                src={
+                  data.coverPic
+                    ? data.coverPic
+                    : "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                }
                 alt="cover"
                 className="cover"
               />
@@ -77,7 +79,11 @@ export default function Profile() {
 
               <div className="img-container">
                 <img
-                  src={data?.profilePic ? data.profilePic : { profilePic }}
+                  src={
+                    data.profilePic
+                      ? data.profilePic
+                      : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  }
                   // src={`/uploads/${data.profilePic}`}
                   alt="profile"
                   className="profilePic"
@@ -107,12 +113,12 @@ export default function Profile() {
               </div>
               <div className="name">
                 <h2>
-                  {data.firstName} {data.lastName}
+                  {data?.firstName} {data?.lastName}
                 </h2>
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{data?.country ? data.country : "Non renseigné"}</span>
+                  <span>{data?.country ? data?.country : "Non renseigné"}</span>
                 </div>
 
                 {error
@@ -132,7 +138,7 @@ export default function Profile() {
 
           <Publish />
 
-          <Posts userId={userId} />
+          <Posts />
         </>
       )}
     </div>
