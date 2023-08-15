@@ -1,24 +1,26 @@
 import { useContext } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import "./style.scss";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Outlet,
+} from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-// Contexts
-import { DarkModeContext } from "./contexts/darkModeContext.jsx";
-import { AuthContext } from "./contexts/authContext.jsx";
-
-// Pages
-import Login from "./pages/login/Login.jsx";
-import Register from "./pages/register/Register.jsx";
-import Home from "./pages/home/Home.jsx";
-import Profile from "./pages/profile/Profile.jsx";
 
 // Components
 import Navbar from "./components/navbar/Navbar.jsx";
 import LeftBar from "./components/leftBar/LeftBar.jsx";
 import RightBar from "./components/rightBar/RightBar.jsx";
+import Home from "./pages/home/Home.jsx";
+import Profile from "./pages/profile/Profile.jsx";
+import Login from "./pages/login/Login.jsx";
+import Register from "./pages/register/Register.jsx";
+
+// Contexts
+import { AuthContext } from "./contexts/authContext.jsx";
+import { DarkModeContext } from "./contexts/darkModeContext.jsx";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -26,31 +28,40 @@ function App() {
 
   const queryClient = new QueryClient();
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <div className={`App theme-${darkMode ? "dark" : "light"}`}>
-        <Router>
+  const Layout = () => {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <div className={`theme-${darkMode ? "dark" : "light"}`}>
           <Navbar />
-
           <div style={{ display: "flex" }}>
             <LeftBar />
-
-            <Routes>
-              <Route path="/" element={currentUser ? <Home /> : <Login />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/profile/:id" element={<Profile />} />
-              <Route path="*" element={<Login />} />
-            </Routes>
-
+            <Outlet />
             <RightBar />
           </div>
-        </Router>
+        </div>
+      </QueryClientProvider>
+    );
+  };
 
-        <ToastContainer autoclose={3000} draggable={false} />
-        {/* draggable = false => to remove error message from browser : "Unable to preventDefault inside passive event listener invocation"  */}
+  return (
+    <Router>
+      <div className="App">
+        <Routes>
+          {currentUser ? (
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="profile/:id" element={<Profile />} />
+            </Route>
+          ) : (
+            <Route path="/login" element={<Login />} />
+          )}
+          <Route path="/login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="*" element={<Login />} />
+        </Routes>
       </div>
-    </QueryClientProvider>
+      <ToastContainer autoclose={3000} draggable={false} />
+    </Router>
   );
 }
 
