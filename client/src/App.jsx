@@ -1,15 +1,10 @@
 import { useContext } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Outlet,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Components
+// Components and pages
 import Navbar from "./components/navbar/Navbar.jsx";
 import LeftBar from "./components/leftBar/LeftBar.jsx";
 import RightBar from "./components/rightBar/RightBar.jsx";
@@ -43,25 +38,52 @@ function App() {
     );
   };
 
+  const ProtectedRoute = ({ children }) => {
+    if (!currentUser) {
+      return <Login />;
+    }
+
+    return children;
+  };
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          path: "/",
+          element: <Home />,
+        },
+        {
+          path: "/profile/:id",
+          element: <Profile />,
+        },
+      ],
+    },
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: "/register",
+      element: <Register />,
+    },
+    {
+      path: "*",
+      element: <Login />,
+    },
+  ]);
+
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          {currentUser ? (
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="profile/:id" element={<Profile />} />
-            </Route>
-          ) : (
-            <Route path="/login" element={<Login />} />
-          )}
-          <Route path="/login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-          <Route path="*" element={<Login />} />
-        </Routes>
-      </div>
+    <div>
+      <RouterProvider router={router} />
       <ToastContainer autoclose={3000} draggable={false} />
-    </Router>
+    </div>
   );
 }
 

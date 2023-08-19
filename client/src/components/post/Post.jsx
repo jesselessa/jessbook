@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./post.scss";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios";
@@ -20,16 +20,11 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 // Context
 import { AuthContext } from "../../contexts/authContext";
 
-// Image
-import profilePic from "../../assets/images/profile/defaultProfile.jpg";
-
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
   const [comments, setComments] = useState([]); // To fetch posts number
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const navigate = useNavigate();
 
   // Fetch post comments
   useEffect(() => {
@@ -37,7 +32,7 @@ export default function Post({ post }) {
   }, []);
 
   const fetchPostComments = async () => {
-    makeRequest
+    await makeRequest
       .get(`/comments?postId=${post.id}`)
       .then((res) => {
         setComments(res.data);
@@ -90,18 +85,18 @@ export default function Post({ post }) {
     }
   );
 
-  const handleUpdate = async () => {
+  const handleUpdate = () => {
     try {
-      await updateMutation.mutateAsync(post.id);
+      updateMutation.mutate(post.id);
     } catch (error) {
       console.error("Error updating post:", error);
       // navigate(`/update/${post.id}`);
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     try {
-      await deleteMutation.mutateAsync(post.id);
+      deleteMutation.mutate(post.id);
     } catch (error) {
       console.error("Error deleting post:", error);
     }
@@ -116,9 +111,8 @@ export default function Post({ post }) {
               {/* Change later with image upload */}
               <img
                 src={
-                  post?.profilePic
-                    ? post.profilePic
-                    : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  post.profilePic ||
+                  "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 }
                 alt="user"
               />
