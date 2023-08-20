@@ -21,9 +21,9 @@ export const register = (req, res) => {
 
     // Store new user in database
     const q =
-      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `role`) VALUES (?)";
+      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`) VALUES (?)";
 
-    const values = [firstName, lastName, email, hashedPswd, "user"];
+    const values = [firstName, lastName, email, hashedPswd];
 
     db.query(q, [values], (error, _data) => {
       if (error) {
