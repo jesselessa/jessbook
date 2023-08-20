@@ -10,7 +10,7 @@ import { authenticateUser } from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
-router.get("/", isAdmin, getComments);
+router.get("/", getComments);
 router.post("/", authenticateUser, addComment);
 router.put("/:id", authenticateUser, updateComment);
 router.delete("/:id", authenticateUser, deleteComment);

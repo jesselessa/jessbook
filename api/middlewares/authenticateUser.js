@@ -6,7 +6,9 @@ export const authenticateUser = (req, res, next) => {
 
   jwt.verify(token, process.env.REACT_APP_SECRET, (error, userInfo) => {
     if (error) return res.status(403).json("Invalid token.");
-    req.userInfo = userInfo; // Store user information in the request object
+    
+    // Store user information in the request object
+    req.userInfo = userInfo; 
     next();
   });
 };

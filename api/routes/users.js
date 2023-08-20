@@ -1,11 +1,8 @@
 import express from "express";
-import { getAllUsers, getUser, updateUser } from "../controllers/users.js";
-import { isAdmin } from "../middlewares/isAdmin.js";
+import { getUser, updateUser } from "../controllers/users.js";
 import { authenticateUser } from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
-
-router.get("/", isAdmin, getAllUsers);
 
 router.get("/:userId", getUser);
 

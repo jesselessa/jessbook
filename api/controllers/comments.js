@@ -1,4 +1,5 @@
 import { db } from "../utils/connect.js";
+import moment from "moment";
 
 export const getComments = (req, res) => {
   const postId = req.query.postId;
@@ -16,7 +17,7 @@ export const getComments = (req, res) => {
 export const addComment = (req, res) => {
   const q =
     "INSERT INTO comments(`desc`, `creationDate`, `userId`, `postId`) VALUES (?)";
-    
+
   const values = [
     req.body.desc,
     moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),

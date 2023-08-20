@@ -95,7 +95,6 @@ export default function Login() {
               name="email"
               id="email"
               placeholder="Email"
-              autoComplete="off"
               required
               value={inputsValues.email.trim()}
               onChange={handleChange}

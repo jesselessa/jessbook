@@ -23,13 +23,13 @@ export default function Profile() {
   const { userId } = useParams();
 
   // User
-  const { isLoading, error, data } = useQuery(["user", userId], () =>
+  const { isLoading, error, data } = useQuery(["user"], () =>
     makeRequest.get(`/users/${userId}`).then((res) => res.data)
   );
 
   // Relationships
   const { isLoading: rIsLoading, data: relationshipsData } = useQuery(
-    ["relationships" + userId],
+    ["relationships"],
     () =>
       makeRequest
         .get(`/relationships?followedUserId=${userId}`)
@@ -68,9 +68,8 @@ export default function Profile() {
             <div className="images">
               <img
                 src={
-                  data.coverPic
-                    ? data.coverPic
-                    : "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  data?.coverPic ||
+                  "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 }
                 alt="cover"
                 className="cover"
@@ -80,9 +79,8 @@ export default function Profile() {
               <div className="img-container">
                 <img
                   src={
-                    data.profilePic
-                      ? data.profilePic
-                      : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                    data?.profilePic ||
+                    "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   }
                   // src={`/uploads/${data.profilePic}`}
                   alt="profile"
@@ -118,7 +116,7 @@ export default function Profile() {
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{data?.country ? data?.country : "Non renseigné"}</span>
+                  <span>{data?.country || "Non renseigné"}</span>
                 </div>
 
                 {error
@@ -138,7 +136,7 @@ export default function Profile() {
 
           <Publish />
 
-          <Posts />
+          <Posts userId={userId} />
         </>
       )}
     </div>

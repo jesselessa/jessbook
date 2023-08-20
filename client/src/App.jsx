@@ -80,10 +80,10 @@ function App() {
   ]);
 
   return (
-    <div>
+    <>
       <RouterProvider router={router} />
       <ToastContainer autoclose={3000} draggable={false} />
-    </div>
+    </>
   );
 }
 

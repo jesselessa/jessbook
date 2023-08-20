@@ -7,7 +7,6 @@ import "./publish.scss";
 import { AuthContext } from "../../contexts/authContext.jsx";
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
 
-
 // Component
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
@@ -29,8 +28,8 @@ export default function Publish() {
     try {
       const formData = new FormData(); // Because we can't send file directly to API
       formData.append("file", file);
-      const res = await makeRequest.post("/uploads", formData); // If everything OK, gonna return a URL
-      console.log(res.data);
+
+      const res = await makeRequest.post("/uploads", formData);
       return res.data;
     } catch (error) {
       console.log(error);
@@ -111,10 +110,9 @@ export default function Publish() {
                 className="file"
                 alt="post pic"
                 src={URL.createObjectURL(file)}
+                // This creates a fake URL so we can show our image
               />
             </div>
-
-            // This creates a fake URL so we can show our image
           )}
         </div>
       </div>
