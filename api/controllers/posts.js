@@ -3,6 +3,7 @@ import moment from "moment";
 
 export const getPosts = (req, res) => {
   const userId = req.query.userId;
+  const loggedInUserId = req.userInfo.id;
 
   const q =
     userId !== "undefined"
@@ -13,7 +14,7 @@ export const getPosts = (req, res) => {
   // DESC = most recent posts shown first
 
   const values =
-    userId !== "undefined" ? [userId] : [req.userInfo.id, req.userInfo.id];
+    userId !== "undefined" ? [userId] : [loggedInUserId, loggedInUserId];
 
   db.query(q, values, (error, data) => {
     if (error) return res.status(500).json(error);
@@ -22,6 +23,8 @@ export const getPosts = (req, res) => {
 };
 
 export const addPost = (req, res) => {
+  const loggedInUserId = req.userInfo.id;
+
   const q =
     "INSERT INTO posts(`desc`, `img`, `creationDate`, `userId`) VALUES (?)";
 
@@ -30,7 +33,7 @@ export const addPost = (req, res) => {
     req.body.img,
     moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
     // To tranform date in MySQL format
-    req.userInfo.id,
+    loggedInUserId,
   ];
 
   db.query(q, [values], (error, _data) => {
@@ -40,9 +43,9 @@ export const addPost = (req, res) => {
 };
 
 export const updatePost = (req, res) => {
-  const postId = req.params.postId; // Post ID to update
-  const userId = req.userInfo.id; // User ID from token
-
+  const postId = req.params.postId;
+  const loggedInUserId = req.userInfo.id;
+  
   const { desc, img } = req.body;
 
   if (desc === undefined && img === undefined) {
@@ -70,7 +73,7 @@ export const updatePost = (req, res) => {
       WHERE id = ? AND userId = ?
     `;
 
-  values.push(postId, userId);
+  values.push(postId, loggedInUserId);
 
   db.query(q, values, (error, data) => {
     if (error) return res.status(500).json(error);
@@ -82,9 +85,11 @@ export const updatePost = (req, res) => {
 };
 
 export const deletePost = (req, res) => {
+  const loggedInUserId = req.userInfo.id;
+
   const q = "DELETE FROM posts WHERE `id`= ? AND `userId` = ?";
 
-  db.query(q, [req.params.postId, req.userInfo.id], (error, data) => {
+  db.query(q, [req.params.postId, loggedInUserId], (error, data) => {
     if (error) return res.status(500).json(error);
     if (data.affectedRows > 0) return res.status(200).json("Post deleted.");
     return res.status(403).json("User can only delete their post.");

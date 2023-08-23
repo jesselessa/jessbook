@@ -16,7 +16,7 @@ export default function Posts({ userId }) {
         ? "Something went wrong."
         : isLoading
         ? "Loading..."
-        : data.map((post) => <Post key={post.id} post={post} />)}
+        : data.map((post) => <Post post={post} key={post.id} />)}
     </div>
   );
 }

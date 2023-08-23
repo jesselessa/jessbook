@@ -15,13 +15,15 @@ export const getComments = (req, res) => {
 };
 
 export const addComment = (req, res) => {
+  const loggedInUserId = req.userInfo.id;
+
   const q =
     "INSERT INTO comments(`desc`, `creationDate`, `userId`, `postId`) VALUES (?)";
 
   const values = [
     req.body.desc,
     moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-    req.userInfo.id,
+    loggedInUserId,
     req.body.postId,
   ];
 
@@ -33,7 +35,7 @@ export const addComment = (req, res) => {
 
 export const updateComment = (req, res) => {
   const commentId = req.params.id;
-  const userId = req.userInfo.id;
+  const loggedInUserId = req.userInfo.id;
   const { desc } = req.body;
 
   if (desc === undefined)
@@ -41,7 +43,7 @@ export const updateComment = (req, res) => {
 
   const q = "UPDATE posts SET `desc` = ? WHERE id = ? AND userId = ?";
 
-  const values = [desc, commentId, userId];
+  const values = [desc, commentId, loggedInUserId];
 
   db.query(q, values, (error, _data) => {
     if (error) return res.status(500).json(error);
@@ -50,10 +52,12 @@ export const updateComment = (req, res) => {
 };
 
 export const deleteComment = (req, res) => {
+  const loggedInUserId = req.userInfo.id;
+
   const commentId = req.params.id;
   const q = "DELETE FROM comments WHERE `id` = ? AND `userId` = ?";
 
-  db.query(q, [commentId, req.userInfo.id], (error, data) => {
+  db.query(q, [commentId, loggedInUserId], (error, data) => {
     if (error) return res.status(500).json(error);
     if (data.affectedRows > 0) return res.json("Comment deleted.");
     return res.status(403).json("Only owner can delete their comment.");

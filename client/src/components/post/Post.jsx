@@ -22,14 +22,14 @@ import { AuthContext } from "../../contexts/authContext";
 
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
-  const [comments, setComments] = useState([]); // To fetch posts number
+  const [comments, setComments] = useState([]); 
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Fetch post comments
   useEffect(() => {
     fetchPostComments();
-  }, []);
+  }, [comments]);
 
   const fetchPostComments = async () => {
     await makeRequest

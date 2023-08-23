@@ -9,6 +9,7 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 // Icon
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+
 // Image
 import profilePic from "../../assets/images/profile/defaultProfile.jpg";
 

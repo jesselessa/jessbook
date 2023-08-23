@@ -1,6 +1,6 @@
 @import "../../style.scss";
 
-.profile {
+.profileData {
   @include themify($themes) {
     width: 50vw;
     min-height: calc(100vh - 70px); // 70px = navbar height

@@ -12,10 +12,12 @@ export const getRelationships = (req, res) => {
 };
 
 export const addRelationship = (req, res) => {
+  const loggedInUserId = req.userInfo.id;
+
   const q =
     "INSERT INTO relationships (`followerUserId`,`followedUserId`) VALUES (?)";
 
-  const values = [req.userInfo.id, req.body.userId];
+  const values = [loggedInUserId, req.body.userId];
 
   db.query(q, [values], (error, _data) => {
     if (error) return res.status(500).json(error);
@@ -24,10 +26,12 @@ export const addRelationship = (req, res) => {
 };
 
 export const deleteRelationship = (req, res) => {
+  const loggedInUserId = req.userInfo.id;
+
   const q =
     "DELETE FROM relationships WHERE `followerUserId` = ? AND `followedUserId` = ?";
 
-  db.query(q, [req.userInfo.id, req.query.userId], (error, _data) => {
+  db.query(q, [loggedInUserId, req.query.userId], (error, _data) => {
     if (error) return res.status(500).json(error);
     return res.status(200).json("Unfollow");
   });

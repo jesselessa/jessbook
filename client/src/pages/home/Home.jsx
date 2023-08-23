@@ -1,16 +1,30 @@
-import "./home.scss";
+import { useContext } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Components
-import Stories from "../../components/stories/Stories.jsx";
-import Posts from "../../components/posts/Posts.jsx";
-import Publish from "../../components/publish/Publish.jsx";
+// Components and pages
+import Navbar from "../../components/navbar/Navbar.jsx";
+import LeftBar from "../../components/leftBar/LeftBar.jsx";
+import RightBar from "../../components/rightBar/RightBar.jsx";
+import Timeline from "../../components/timeline/Timeline.jsx";
+
+// Context
+import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
 
 export default function Home() {
+  const { darkMode } = useContext(DarkModeContext);
+
+  const queryClient = new QueryClient();
+
   return (
-    <div className="home">
-      <Stories />
-      <Publish />
-      <Posts />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        <Navbar />
+        <div style={{ display: "flex" }}>
+          <LeftBar />
+          <Timeline />
+          <RightBar />
+        </div>
+      </div>
+    </QueryClientProvider>
   );
 }

@@ -5,7 +5,6 @@ import {
   updateComment,
   deleteComment,
 } from "../controllers/comments.js";
-import { isAdmin } from "../middlewares/isAdmin.js";
 import { authenticateUser } from "../middlewares/authenticateUser.js";
 
 const router = express.Router();

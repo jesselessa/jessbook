@@ -10,8 +10,10 @@ export const getLikes = (req, res) => {
 };
 
 export const addLike = (req, res) => {
+  const loggedInUserId = req.userInfo.id;
+
   const q = "INSERT INTO likes (`userId`,`postId`) VALUES (?)";
-  const values = [req.userInfo.id, req.body.postId];
+  const values = [loggedInUserId, req.body.postId];
 
   db.query(q, [values], (error, _data) => {
     if (error) return res.status(500).json(error);
@@ -20,9 +22,11 @@ export const addLike = (req, res) => {
 };
 
 export const deleteLike = (req, res) => {
+  const loggedInUserId = req.userInfo.id;
+
   const q = "DELETE FROM likes WHERE `userId` = ? AND `postId` = ?";
 
-  db.query(q, [req.userInfo.id, req.query.postId], (error, _data) => {
+  db.query(q, [loggedInUserId, req.query.postId], (error, _data) => {
     if (error) return res.status(500).json(error);
     return res.status(200).json("Post unliked.");
   });
