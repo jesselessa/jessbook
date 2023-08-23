@@ -1,5 +1,7 @@
 import { useContext } from "react";
 import "./stories.scss";
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "../../utils/axios.jsx";
 
 // Context
 import { AuthContext } from "../../contexts/authContext";
@@ -7,7 +9,7 @@ import { AuthContext } from "../../contexts/authContext";
 export default function Stories() {
   const { currentUser } = useContext(AuthContext);
 
-  // !TODO - Replace with data fetched from API
+  //TODO - Replace with data fetched from API
   const stories = [
     {
       id: 1,
@@ -51,13 +53,23 @@ export default function Stories() {
     },
   ];
 
+  //TODO - Uncomment and add story using React Query mutations and use upload function
+  // const { isLoading, error, data } = useQuery(["stories"], () =>
+  //   makeRequest.get("/stories").then((res) => {
+  //     return res.data;
+  //   })
+  // );
+
   return (
     <div className="stories">
       {/* User's story */}
       <div className="wrapper">
-        <div className="userStory">
+        <div className="story">
           <img src={currentUser.profilePic} alt="user" />
-          <span>{currentUser.name}</span>
+          {/* <img src={`/uploads/${currentUser.profilePic}`} alt="user" /> */}
+          <span>
+            {currentUser.firstName} {currentUser.lastName}
+          </span>
           <div className="add">Create a story</div>
           <button>+</button>
         </div>
@@ -71,6 +83,17 @@ export default function Stories() {
             </span>
           </div>
         ))}
+        {/* React Query */}
+        {/* {error
+          ? "Something went wrong."
+          : isLoading
+          ? "Loading..."
+          : data.map((story) => (
+              <div className="story" key={story.id}>
+                <img src={story.img} alt="story" />
+                <span>{story.name}</span>
+              </div>
+            ))} */}
       </div>
     </div>
   );
