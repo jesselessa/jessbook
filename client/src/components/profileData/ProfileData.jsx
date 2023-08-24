@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import "./profileData.scss";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
@@ -7,6 +7,7 @@ import { makeRequest } from "../../utils/axios";
 // Components
 import Publish from "../../components/publish/Publish.jsx";
 import Posts from "../../components/posts/Posts.jsx";
+import Update from "../../components/update/Update.jsx";
 
 // Icons
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
@@ -18,13 +19,20 @@ import PlaceIcon from "@mui/icons-material/Place";
 import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function ProfileData() {
+  const [openUpdate, setOpenUpdate] = useState(false);
+
   const { currentUser } = useContext(AuthContext);
 
   const { userId } = useParams();
 
   // User
-  const { isLoading, error, data } = useQuery(["user"], () =>
-    makeRequest.get(`/users/${userId}`).then((res) => res.data)
+  const { isLoading, error, data } = useQuery(
+    ["user"],
+    () =>
+      makeRequest.get(`/users/${userId}`).then((res) => {
+        return res.data;
+      })
+    // makeRequest.get(`/users/${userId}`).then((res) => res.data)
   );
 
   // Relationships
@@ -59,12 +67,12 @@ export default function ProfileData() {
   return (
     <div className="profileData">
       {error ? (
-        "Something went wrong"
+        "Something went wrong."
       ) : isLoading ? (
         "Loading..."
       ) : (
         <>
-          <div className="profileContainer">
+          <div className="wrapper">
             <div className="images">
               <img
                 src={
@@ -74,7 +82,7 @@ export default function ProfileData() {
                 alt="cover"
                 className="cover"
               />
-              {/* <img src={`/uploads/${data.coverPic}`} alt="cover" className="cover" /> */}
+              {/* <img src={`/uploads/${data.coverPic}`|| "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} alt="cover" className="cover" /> */}
 
               <div className="img-container">
                 <img
@@ -82,7 +90,7 @@ export default function ProfileData() {
                     data?.profilePic ||
                     "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   }
-                  // src={`/uploads/${data.profilePic}`}
+                  // src={`/uploads/${data.profilePic}` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"}
                   alt="profile"
                   className="profilePic"
                 />
@@ -119,17 +127,19 @@ export default function ProfileData() {
                   <span>{data?.country || "Non renseigné"}</span>
                 </div>
 
-                {error
-                  ? "Something went wrong."
-                  : rIsLoading
-                  ? "Loading..."
-                  : userId === currentUser.id && (
-                      <button onClick={handleFollow}>
-                        {relationshipsData.includes(currentUser.id)
-                          ? "Following"
-                          : "Follow"}
-                      </button>
-                    )}
+                {error ? (
+                  "Something went wrong."
+                ) : rIsLoading ? (
+                  "Loading..."
+                ) : userId === currentUser.id ? (
+                  <button onClick={() => setOpenUpdate(true)}>Update</button>
+                ) : (
+                  <button onClick={handleFollow}>
+                    {relationshipsData.includes(currentUser.id)
+                      ? "Following"
+                      : "Follow"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -139,6 +149,8 @@ export default function ProfileData() {
           <Posts userId={userId} />
         </>
       )}
+
+      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={data} />}
     </div>
   );
 }

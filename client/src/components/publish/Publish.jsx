@@ -76,8 +76,14 @@ export default function Publish() {
       <div className="top">
         <div className="left">
           <div className="img-container">
-            <img src={currentUser.profilePic} alt="user" />
-            {/* <img src={`/uploads/${currentUser.profilePic}`} alt="user" /> */}
+            <img
+              src={
+                currentUser.profilePic ||
+                "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              }
+              alt="user"
+            />
+            {/* <img src={`/uploads/${currentUser.profilePic}` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} alt="user" /> */}
           </div>
 
           <div className="inputGroup">

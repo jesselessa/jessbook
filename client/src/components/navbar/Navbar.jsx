@@ -25,8 +25,10 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 export default function Navbar() {
   const { darkMode, toggleTheme } = useContext(DarkModeContext);
   const { currentUser } = useContext(AuthContext);
-  const navigate = useNavigate();
+
   const [burgerClicked, setBurgerClicked] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     makeRequest.post("/auth/logout");
@@ -85,7 +87,14 @@ export default function Navbar() {
           <NotificationsOutlinedIcon fontSize="large" />
         </Link>
         <Link to={`/profile/${currentUser.id}`}>
-          <img src={currentUser.profilePic} alt="profile" />
+          <img
+            src={
+              currentUser.profilePic ||
+              "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            }
+            alt="profile"
+          />
+          {/* <img src={`/uploads/${currentUser.profilePic}` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} alt="profile" /> */}
         </Link>
         <span onClick={handleLogout}>Logout</span>
       </div>

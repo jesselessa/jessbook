@@ -7,21 +7,9 @@ export const getStories = (req, res) => {
   const q = `SELECT s.*, name FROM stories AS s JOIN users AS u ON (u.id = s.userId)
     LEFT JOIN relationships AS r ON (s.userId = r.followedUserId AND r.followerUserId= ?) LIMIT 5`;
 
-  // All info except password
-  // const user = {
-  //     id: data[0]?.id,
-  //     firstName: data[0]?.firstName,
-  //     lastName: data[0]?.lastName,
-  //     email: data[0]?.email,
-  //     profilePic: data[0]?.profilePic,
-  //     coverPic: data[0]?.coverPic,
-  //     country: data[0]?.country,
-  //   };
-
   db.query(q, [loggedInUserId], (error, data) => {
     if (error) return res.status(500).json(error);
     return res.status(200).json(data);
-    // return res.status(200).json(user);
   });
 };
 
