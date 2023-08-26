@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
-import "./profileData.scss";
 import { Link, useParams } from "react-router-dom";
+import "./profileData.scss";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios";
 
@@ -79,7 +79,7 @@ export default function ProfileData() {
         "Loading..."
       ) : (
         <>
-          <div className="wrapper">
+          <div className="profileContainer">
             <div className="images">
               <img
                 src={

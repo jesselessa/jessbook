@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import "./leftBar.scss";
+import { useNavigate } from "react-router-dom";
 
 // Images
 import friends from "../../assets/images/leftBar/friends.png";
@@ -20,18 +21,23 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 export default function LeftBar() {
   const { currentUser } = useContext(AuthContext);
 
+  const navigate = useNavigate();
+
   return (
     <div className="leftBar" role="navigation">
       {/* Main info */}
       <div className="mainInfo">
-        <div className="user">
+        <div
+          className="user"
+          onClick={() => navigate(`/profile/${currentUser.id}`)}
+        >
           <div className="img-container">
             <img
               src={
                 currentUser.profilePic ||
                 "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
               }
-              // src={`/uploads/$currentUser.profilePic`}
+              // src={`/uploads/$currentUser.profilePic` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"}
               alt="profile"
             />
           </div>

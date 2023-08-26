@@ -86,16 +86,20 @@ export default function Navbar() {
         <Link to="#">
           <NotificationsOutlinedIcon fontSize="large" />
         </Link>
-        <Link to={`/profile/${currentUser.id}`}>
-          <img
-            src={
-              currentUser.profilePic ||
-              "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-            }
-            // src={`/uploads/$currentUser.profilePic`}
-            alt="profile"
-          />
-        </Link>
+        {/* <Link to={`/profile/${currentUser.id}`}> */}
+        <img
+          src={
+            currentUser.profilePic ||
+            "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+          }
+          // src={
+          //   `/uploads/$currentUser.profilePic` ||
+          //   "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+          // }
+          alt="profile"
+          onClick={() => navigate(`/profile/${currentUser.id}`)}
+        />
+        {/* </Link> */}
         <span onClick={handleLogout}>Logout</span>
       </div>
 

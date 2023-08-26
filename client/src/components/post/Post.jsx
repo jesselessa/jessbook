@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import "./post.scss";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { makeRequest } from "../../utils/axios";
+import { makeRequest } from "../../utils/axios.jsx";
 import moment from "moment";
 
 // Component
@@ -32,7 +32,7 @@ export default function Post({ post }) {
   }, [comments]);
 
   const fetchPostComments = async () => {
-    await makeRequest
+    return await makeRequest
       .get(`/comments?postId=${post.id}`)
       .then((res) => {
         setComments(res.data);
