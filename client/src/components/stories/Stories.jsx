@@ -53,16 +53,22 @@ export default function Stories() {
     },
   ];
 
-  //TODO - Uncomment and add story using React Query mutations and use upload function
-  // const { isLoading, error, data } = useQuery(["stories"], () =>
-  //   makeRequest.get("/stories").then((res) => {
-  //     return res.data;
-  //   })
-  // );
+  //TODO - Uncomment and complete with add/delete story functions, using React Query mutations and upload function
+  // Fetch stories
+  // const fetchStories = async () => {
+  //   return await makeRequest
+  //     .get("/stories")
+  //     .then((res) => {
+  //       return res.data;
+  //     })
+  //     .catch((error) => console.log(error));
+  // };
+
+  // const { isLoading, error, data } = useQuery(["stories"], fetchStories);
 
   return (
     <div className="stories">
-      {/* User's story */}
+      {/* Add story */}
       <div className="wrapper">
         <div className="story">
           <img
@@ -80,7 +86,7 @@ export default function Stories() {
           <button>+</button>
         </div>
 
-        {/* User's friends' stories */}
+        {/* Friends' stories */}
         {stories.map((story) => (
           <div className="story" key={story.id}>
             <img src={story.img} alt="story" />
@@ -89,6 +95,7 @@ export default function Stories() {
             </span>
           </div>
         ))}
+
         {/* React Query */}
         {/* {error
           ? "Something went wrong."
@@ -97,7 +104,7 @@ export default function Stories() {
           : data.map((story) => (
               <div className="story" key={story.id}>
                 <img src={story.img} alt="story" />
-                <span>{story.name}</span>
+                <span>{story.firstName} {story.lastName}</span>
               </div>
             ))} */}
       </div>

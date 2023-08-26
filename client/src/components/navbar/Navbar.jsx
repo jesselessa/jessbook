@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import "./navbar.scss";
-import { makeRequest } from "../../utils/axios";
+import { Link, useNavigate } from "react-router-dom";
+import { makeRequest } from "../../utils/axios.jsx";
 
 // Icons
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -92,9 +92,9 @@ export default function Navbar() {
               currentUser.profilePic ||
               "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
             }
+            // src={`/uploads/$currentUser.profilePic`}
             alt="profile"
           />
-          {/* <img src={`/uploads/${currentUser.profilePic}` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} alt="profile" /> */}
         </Link>
         <span onClick={handleLogout}>Logout</span>
       </div>

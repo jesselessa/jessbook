@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import "./login.scss";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 // Context

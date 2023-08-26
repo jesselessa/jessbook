@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
+import "./publish.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.jsx";
-import "./publish.scss";
 
 // Contexts
 import { AuthContext } from "../../contexts/authContext.jsx";

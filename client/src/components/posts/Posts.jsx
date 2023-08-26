@@ -1,14 +1,21 @@
+import "./posts.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.jsx";
-import "./posts.scss";
 
 // Component
 import Post from "../post/Post.jsx";
 
 export default function Posts({ userId }) {
-  const { isLoading, error, data } = useQuery(["posts", userId], () =>
-    makeRequest.get(`/posts?userId=${userId}`).then((res) => res.data)
-  );
+  const getPosts = async () => {
+    return await makeRequest
+      .get(`/posts?userId=${userId}`)
+      .then((res) => res.data)
+      .catch((error) => console.log(error));
+  };
+
+  const { isLoading, error, data } = useQuery(["posts"], getPosts);
+
+  console.log("Posts:", data);
 
   return (
     <div className="posts">

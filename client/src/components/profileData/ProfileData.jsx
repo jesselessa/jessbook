@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
-import { Link, useParams } from "react-router-dom";
 import "./profileData.scss";
+import { Link, useParams } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios";
 
@@ -25,24 +25,31 @@ export default function ProfileData() {
 
   const { userId } = useParams();
 
-  // User
-  const { isLoading, error, data } = useQuery(
-    ["user"],
-    () =>
-      makeRequest.get(`/users/${userId}`).then((res) => {
-        return res.data;
-      })
-    // makeRequest.get(`/users/${userId}`).then((res) => res.data)
-  );
+  // Fetch user's info
+  const fetchUserData = async () => {
+    return await makeRequest
+      .get(`/users/${userId}`)
+      .then((res) => res.data)
+      .catch((error) => console.log(error));
+  };
+  const { isLoading, data, error } = useQuery(["user"], fetchUserData);
 
-  // Relationships
+  console.log("User info:", data);
+
+  // Fetch user's relationships
+  const fetchRelationships = async () => {
+    return await makeRequest
+      .get(`/relationships?followedUserId=${userId}`)
+      .then((res) => res.data)
+      .catch((error) => console.log(error));
+  };
+
   const { isLoading: rIsLoading, data: relationshipsData } = useQuery(
     ["relationships"],
-    () =>
-      makeRequest
-        .get(`/relationships?followedUserId=${userId}`)
-        .then((res) => res.data)
+    fetchRelationships
   );
+
+  console.log("Relationships:", relationshipsData);
 
   const queryClient = useQueryClient();
 
@@ -76,21 +83,27 @@ export default function ProfileData() {
             <div className="images">
               <img
                 src={
-                  data?.coverPic ||
+                  data.coverPic ||
                   "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 }
+                // src={
+                //   `uploads/${data.coverPic}` ||
+                //   "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                // }
                 alt="cover"
                 className="cover"
               />
-              {/* <img src={`/uploads/${data.coverPic}`|| "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} alt="cover" className="cover" /> */}
 
               <div className="img-container">
                 <img
                   src={
-                    data?.profilePic ||
+                    data.profilePic ||
                     "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   }
-                  // src={`/uploads/${data.profilePic}` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"}
+                  // src={
+                  //   `/uploads/${data.profilePic}` ||
+                  //   "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  // }
                   alt="profile"
                   className="profilePic"
                 />
@@ -119,12 +132,12 @@ export default function ProfileData() {
               </div>
               <div className="name">
                 <h2>
-                  {data?.firstName} {data?.lastName}
+                  {data.firstName} {data.lastName}
                 </h2>
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{data?.country || "Non renseigné"}</span>
+                  <span>{data.country || "Non renseigné"}</span>
                 </div>
 
                 {error ? (

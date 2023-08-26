@@ -10,17 +10,20 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 // Icon
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
-// Image
-import profilePic from "../../assets/images/profile/defaultProfile.jpg";
-
 export default function Comments({ postId }) {
   const { currentUser } = useContext(AuthContext);
 
   const [desc, setDesc] = useState("");
 
-  const { isLoading, error, data } = useQuery(["comments", postId], () =>
-    makeRequest.get(`/comments?postId=${postId}`).then((res) => res.data)
-  );
+  // Fetch post comments
+  const fetchPostComments = async () => {
+    return await makeRequest
+      .get(`/comments?postId=${postId}`)
+      .then((res) => res.data)
+      .catch((error) => console.log(error));
+  };
+
+  const { isLoading, error, data } = useQuery(["comments"], fetchPostComments);
 
   const queryClient = useQueryClient();
 
@@ -46,8 +49,14 @@ export default function Comments({ postId }) {
     <div className="comments">
       <form>
         <div className="img-container">
-          <img src={currentUser.profilePic || profilePic} alt="user" />
-          {/* <img src={`/uploads/${currentUser.profilePic}`} alt="user" /> */}
+          <img
+            src={
+              currentUser.profilePic ||
+              "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            }
+            // src={`/uploads/${currentUser.profilePic }` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"}
+            alt="user"
+          />
         </div>
 
         <div className="inputGroup">
@@ -74,8 +83,15 @@ export default function Comments({ postId }) {
         : data.map((comment) => (
             <div className="comment" key={comment.id}>
               <div className="img-container">
-                <img src={comment.profilePic} alt="user" />
-                {/* <img src={`/uploads/${comment.profilePic}`} alt="user" /> */}
+                <img
+                  src={
+                    comment.profilePic ||
+                    "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  }
+                  alt="user"
+                />
+                {/* <img src={`/uploads/${comment.profilePic}` ||
+                    "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} alt="user" /> */}
               </div>
               <div className="info">
                 <h3>

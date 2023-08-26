@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
 import "./post.scss";
+import { Link } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios";
 import moment from "moment";
@@ -22,7 +22,7 @@ import { AuthContext } from "../../contexts/authContext";
 
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
-  const [comments, setComments] = useState([]); 
+  const [comments, setComments] = useState([]);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -40,9 +40,17 @@ export default function Post({ post }) {
       .catch((error) => console.log("Error fetching post comments:", error));
   };
 
-  // Like/unlike post
-  const { isLoading, error, data } = useQuery(["likes", post.id], () =>
-    makeRequest.get(`/likes?postId=${post.id}`).then((res) => res.data)
+  // Fetch post likes
+  const fetchPostLikes = async () => {
+    return await makeRequest
+      .get(`/likes?postId=${post.id}`)
+      .then((res) => res.data)
+      .catch((error) => console.log(error));
+  };
+
+  const { isLoading, error, data } = useQuery(
+    ["likes", post.id],
+    fetchPostLikes
   );
 
   const queryClient = useQueryClient();
@@ -60,7 +68,7 @@ export default function Post({ post }) {
     }
   );
 
-  const handleLike = () => {
+  const handleLikes = () => {
     mutation.mutate(data.includes(currentUser.id));
   };
 
@@ -163,9 +171,9 @@ export default function Post({ post }) {
           ) : isLoading ? (
             "Loading..."
           ) : data.includes(currentUser.id) ? (
-            <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLike} />
+            <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLikes} />
           ) : (
-            <FavoriteBorderOutlinedIcon onClick={handleLike} />
+            <FavoriteBorderOutlinedIcon onClick={handleLikes} />
           )}
           {data?.length > 0 && data.length} <span>Likes</span>
         </div>

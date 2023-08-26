@@ -8,18 +8,10 @@ export const getUser = (req, res) => {
   db.query(q, [userId], (error, data) => {
     if (error) return res.status(500).json(error);
 
-    // All info except password
-    const user = {
-      id: data[0]?.id,
-      firstName: data[0]?.firstName,
-      lastName: data[0]?.lastName,
-      email: data[0]?.email,
-      profilePic: data[0]?.profilePic,
-      coverPic: data[0]?.coverPic,
-      country: data[0]?.country,
-    };
+    // All user info except password
+    const { password, ...others } = data[0];
 
-    return res.status(200).json(user);
+    return res.status(200).json(others);
   });
 };
 
@@ -37,6 +29,16 @@ export const updateUser = (req, res) => {
   if (req.body.lastName !== undefined) {
     updateFields.push("`lastName` = ?");
     values.push(req.body.lastName);
+  }
+
+  if (req.body.email !== undefined) {
+    updateFields.push("`email` = ?");
+    values.push(req.body.email);
+  }
+
+  if (req.body.password !== undefined) {
+    updateFields.push("`password` = ?");
+    values.push(req.body.password);
   }
 
   if (req.body.profilePic !== undefined) {
@@ -68,9 +70,11 @@ export const updateUser = (req, res) => {
 
   db.query(q, values, (error, data) => {
     if (error) return res.status(500).json(error);
+
     if (data.affectedRows > 0) {
       return res.status(200).json("User's information updated.");
     }
+
     return res.status(403).json("User can only update their own information.");
   });
 };

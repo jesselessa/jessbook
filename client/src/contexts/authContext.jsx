@@ -9,11 +9,11 @@ export const AuthContextProvider = ({ children }) => {
   );
 
   const login = async (inputsValues) => {
-    const response = await makeRequest.post(
+    const res = await makeRequest.post(
       `http://localhost:8000/auth/login`,
       inputsValues
     );
-    setCurrentUser(response.data); // User data fetched from API
+    setCurrentUser(res.data); // User data fetched from API
   };
 
   useEffect(() => {
