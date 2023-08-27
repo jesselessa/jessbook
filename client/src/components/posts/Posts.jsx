@@ -13,7 +13,7 @@ export default function Posts({ userId }) {
       .catch((error) => console.log(error));
   };
 
-  const { isLoading, error, data } = useQuery(["posts"], getPosts);
+  const { isLoading, error, data } = useQuery(["posts", userId], getPosts);
 
   console.log("Posts:", data);
 

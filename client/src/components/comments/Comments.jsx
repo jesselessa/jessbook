@@ -23,7 +23,10 @@ export default function Comments({ postId }) {
       .catch((error) => console.log(error));
   };
 
-  const { isLoading, error, data } = useQuery(["comments"], fetchPostComments);
+  const { isLoading, error, data } = useQuery(
+    ["comments", postId],
+    fetchPostComments
+  );
 
   const queryClient = useQueryClient();
 

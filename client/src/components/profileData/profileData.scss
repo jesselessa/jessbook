@@ -22,7 +22,7 @@
       padding: 1rem;
     }
 
-    .wrapper {
+    .profileContainer {
       display: flex;
       flex-direction: column;
       margin-bottom: 2rem;
@@ -149,7 +149,7 @@
 
           .location {
             position: absolute;
-            top: 140px;
+            top: 145px;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -161,7 +161,7 @@
           }
 
           button {
-            width: 100px;
+            width: 120px;
             height: 40px;
             letter-spacing: 0.1rem;
             position: absolute;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import "./register.scss";
 import { Link, useNavigate } from "react-router-dom";
+import "./register.scss";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

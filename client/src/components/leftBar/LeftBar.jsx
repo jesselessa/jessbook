@@ -23,14 +23,16 @@ export default function LeftBar() {
 
   const navigate = useNavigate();
 
+  const navigateAndScrollTop = () => {
+    navigate(`/profile/${currentUser.id}`);
+    window.scrollTo(0, 0);
+  };
+
   return (
     <div className="leftBar" role="navigation">
       {/* Main info */}
       <div className="mainInfo">
-        <div
-          className="user"
-          onClick={() => navigate(`/profile/${currentUser.id}`)}
-        >
+        <div className="user" onClick={navigateAndScrollTop}>
           <div className="img-container">
             <img
               src={
@@ -45,6 +47,7 @@ export default function LeftBar() {
             {currentUser.firstName} {currentUser.lastName}
           </span>
         </div>
+
         <div className="item">
           <img src={friends} alt="friends" />
           <span>Friends</span>

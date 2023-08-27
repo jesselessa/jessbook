@@ -20,6 +20,6 @@ export const AuthContextProvider = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(currentUser)); // Cannot store objects in localStorage, it has to be a string
   }, [currentUser]);
 
-  const value = { currentUser, login };
+  const value = { currentUser, setCurrentUser, login };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from "react";
-import "./login.scss";
 import { Link, useNavigate } from "react-router-dom";
+import "./login.scss";
 import { toast } from "react-toastify";
 
 // Context
@@ -95,7 +95,6 @@ export default function Login() {
               name="email"
               id="email"
               placeholder="Email"
-              autoComplete="off"
               required
               value={inputsValues.email.trim()}
               onChange={handleChange}

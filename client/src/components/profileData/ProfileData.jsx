@@ -32,7 +32,8 @@ export default function ProfileData() {
       .then((res) => res.data)
       .catch((error) => console.log(error));
   };
-  const { isLoading, data, error } = useQuery(["user"], fetchUserData);
+
+  const { isLoading, data, error } = useQuery(["user", userId], fetchUserData);
 
   console.log("User info:", data);
 
@@ -45,7 +46,7 @@ export default function ProfileData() {
   };
 
   const { isLoading: rIsLoading, data: relationshipsData } = useQuery(
-    ["relationships"],
+    ["relationships", userId],
     fetchRelationships
   );
 
@@ -157,7 +158,7 @@ export default function ProfileData() {
             </div>
           </div>
 
-          <Publish />
+          {<Publish />}
 
           <Posts userId={userId} />
         </>

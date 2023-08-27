@@ -79,9 +79,6 @@ export default function Stories() {
             alt="user"
           />
           {/* <img src={`/uploads/${currentUser.profilePic}` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} alt="user" /> */}
-          <span>
-            {currentUser.firstName} {currentUser.lastName}
-          </span>
           <div className="add">Create a story</div>
           <button>+</button>
         </div>
@@ -104,7 +101,7 @@ export default function Stories() {
           : data.map((story) => (
               <div className="story" key={story.id}>
                 <img src={story.img} alt="story" />
-                <span>{story.firstName} {story.lastName}</span>
+                 <span>{story.firstName} {story.lastName}</span>
               </div>
             ))} */}
       </div>

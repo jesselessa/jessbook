@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import "./post.scss";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.jsx";
 import moment from "moment";
@@ -25,6 +25,13 @@ export default function Post({ post }) {
   const [comments, setComments] = useState([]);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const navigateAndScrollTop = () => {
+    navigate(`/profile/${post.userId}`);
+    window.scrollTo(0, 0);
+  };
 
   // Fetch post comments
   useEffect(() => {
@@ -114,26 +121,22 @@ export default function Post({ post }) {
     <div className="post">
       <div className="user">
         <div className="userInfo">
-          <Link to={`/profile/${post.userId}`}>
-            <div className="img-container">
-              {/* Change later with image upload */}
-              <img
-                src={
-                  post.profilePic ||
-                  "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                }
-                alt="user"
-              />
-              {/* <img src={`/uploads/${post.profilePic}`} alt="user" /> */}
-            </div>
-          </Link>
+          <div className="img-container" onClick={navigateAndScrollTop}>
+            <img
+              src={
+                post.profilePic ||
+                "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              }
+              alt="user"
+            />
+            {/* <img src={`/uploads/${post.profilePic}` ||
+                  "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} alt="user" /> */}
+          </div>
 
           <div className="details">
-            <Link to={`/profile/${post.userId}`} style={{ color: "inherit" }}>
-              <span className="name">
-                {post.firstName} {post.lastName}
-              </span>
-            </Link>
+            <span className="name" onClick={navigateAndScrollTop}>
+              {post.firstName} {post.lastName}
+            </span>
             <span className="date">{moment(post.creationDate).fromNow()}</span>
           </div>
         </div>

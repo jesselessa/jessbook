@@ -29,6 +29,10 @@
         gap: 1rem;
         word-break: break-word; // To prevent name text from overflowing div
 
+        &:hover {
+          cursor: pointer;
+        }
+
         .img-container {
           width: 30px;
           height: 30px;
@@ -52,9 +56,6 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        &:hover {
-          cursor: pointer;
-        }
 
         img {
           width: 28px;
@@ -82,9 +83,6 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        &:hover {
-          cursor: pointer;
-        }
 
         img {
           width: 28px;
@@ -113,9 +111,6 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        &:hover {
-          cursor: pointer;
-        }
 
         img {
           width: 28px;
