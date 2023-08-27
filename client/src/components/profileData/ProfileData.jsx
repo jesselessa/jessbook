@@ -24,6 +24,9 @@ export default function ProfileData() {
   const { currentUser } = useContext(AuthContext);
 
   const { userId } = useParams();
+  // console.log("Profile ID:", typeof userId);
+  // console.log("CurrentUser's ID:", typeof currentUser.id);
+
 
   // Fetch user's info
   const fetchUserData = async () => {
@@ -145,7 +148,7 @@ export default function ProfileData() {
                   "Something went wrong."
                 ) : rIsLoading ? (
                   "Loading..."
-                ) : userId === currentUser.id ? (
+                ) : userId == currentUser.id ? (
                   <button onClick={() => setOpenUpdate(true)}>Update</button>
                 ) : (
                   <button onClick={handleFollow}>
@@ -158,7 +161,7 @@ export default function ProfileData() {
             </div>
           </div>
 
-          {<Publish />}
+          {userId == currentUser.id && <Publish />}
 
           <Posts userId={userId} />
         </>
