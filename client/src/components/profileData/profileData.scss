@@ -44,38 +44,38 @@
         }
 
         .img-container {
-          width: 180px;
-          height: 180px;
+          width: 170px;
+          height: 170px;
           position: absolute;
           left: 0;
           right: 0;
-          top: 190px; // 280px (cover height) - 90px (1/2 div height)
+          top: 195px; // 280px (cover height) - 85px (1/2 div height)
           margin: auto;
           z-index: 100;
 
           @include small {
-            width: 120px; // 187px (cover height) - 60px (1/2 div height)
-            height: 120px;
-            top: 127px;
+            width: 110px;
+            height: 110px;
+            top: 132px; // 187px (cover height) - 55px (1/2 div height)
           }
 
           .profilePic {
-            width: 180px;
-            height: 180px;
+            width: 170px;
+            height: 170px;
             border-radius: 50%;
             object-fit: cover;
             object-position: center;
 
             @include small {
-              width: 120px;
-              height: 120px;
+              width: 110px;
+              height: 110px;
             }
           }
         }
       }
 
       .userInfo {
-        height: 230px;
+        height: 250px;
         display: flex;
         flex-direction: column;
         position: relative;
@@ -89,7 +89,7 @@
         border-bottom-right-radius: 1rem;
 
         @include small {
-          height: 153px;
+          height: 173px;
           padding: 0.5rem;
         }
 
@@ -149,14 +149,15 @@
 
           .location {
             position: absolute;
-            top: 145px;
+            top: 150px;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
+
             @include small {
-              top: 90px;
-              font-size: 1.4rem;
+              top: 95px;
+              font-size: 1.5rem;
             }
           }
 
@@ -165,7 +166,7 @@
             height: 40px;
             letter-spacing: 0.1rem;
             position: absolute;
-            top: 180px;
+            top: 190px;
             color: white;
             color: teal;
             font-weight: bold;
@@ -178,7 +179,7 @@
             cursor: pointer;
 
             @include small {
-              top: 115px;
+              top: 125px;
               height: 30px;
               font-size: 1.4rem;
               padding: 0;

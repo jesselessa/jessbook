@@ -11,7 +11,7 @@ export default function Update({ setOpenUpdate, user }) {
   const [profile, setProfile] = useState(null);
   const [texts, setTexts] = useState({
     firstName: user.firstName,
-    lastName: user.firstName,
+    lastName: user.lastName,
     email: user.email,
     password: user.password,
     country: user.country,
@@ -19,6 +19,7 @@ export default function Update({ setOpenUpdate, user }) {
 
   const upload = async (file) => {
     console.log(file);
+    
     try {
       const formData = new FormData();
       formData.append("file", file);

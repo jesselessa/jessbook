@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import "./profileData.scss";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { makeRequest } from "../../utils/axios";
+import { makeRequest } from "../../utils/axios.jsx";
 
 // Components
 import Publish from "../../components/publish/Publish.jsx";
@@ -24,9 +24,6 @@ export default function ProfileData() {
   const { currentUser } = useContext(AuthContext);
 
   const { userId } = useParams();
-  // console.log("Profile ID:", typeof userId);
-  // console.log("CurrentUser's ID:", typeof currentUser.id);
-
 
   // Fetch user's info
   const fetchUserData = async () => {
@@ -37,8 +34,6 @@ export default function ProfileData() {
   };
 
   const { isLoading, data, error } = useQuery(["user", userId], fetchUserData);
-
-  console.log("User info:", data);
 
   // Fetch user's relationships
   const fetchRelationships = async () => {
