@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "./profileData.scss";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.jsx";
@@ -44,11 +44,9 @@ export default function ProfileData() {
   };
 
   const { isLoading: rIsLoading, data: relationshipsData } = useQuery(
-    ["relationships", userId],
+    ["relationships"],
     fetchRelationships
   );
-
-  console.log("Relationships:", relationshipsData);
 
   const queryClient = useQueryClient();
 
@@ -111,22 +109,16 @@ export default function ProfileData() {
 
             <div className="userInfo">
               <div className="friends-contact">
-                <Link to="#">
-                  <div className="friends">
-                    <PeopleAltOutlinedIcon fontSize="large" />
-                    {/* Change later with data fetched from API */}
-                    <span>441 Friends</span>
-                  </div>
-                </Link>
+                <div className="friends">
+                  <PeopleAltOutlinedIcon fontSize="large" />
+                  {/* Change later with data fetched from API */}
+                  <span>441 Friends</span>
+                </div>
 
                 <div className="contact">
-                  <Link to="#">
-                    <EmailOutlinedIcon fontSize="large" />
-                  </Link>
+                  <EmailOutlinedIcon fontSize="large" />
 
-                  <Link to="#">
-                    <MoreVertIcon fontSize="large" />
-                  </Link>
+                  <MoreVertIcon fontSize="large" />
                 </div>
               </div>
               <div className="name">

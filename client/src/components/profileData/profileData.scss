@@ -6,6 +6,7 @@
     min-height: calc(100vh - 70px); // 70px = navbar height
     position: sticky;
     top: 70px;
+    color: themed("textColor");
     background-color: themed("bgSoft");
     padding: 0 1rem 2rem 2rem;
 
@@ -162,7 +163,7 @@
           }
 
           button {
-            width: 120px;
+            width: 125px;
             height: 40px;
             letter-spacing: 0.1rem;
             position: absolute;

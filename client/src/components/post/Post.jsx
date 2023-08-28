@@ -25,6 +25,7 @@ export default function Post({ post }) {
   const [comments, setComments] = useState([]);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [postImg, setPostImg] = useState(false);
 
   const navigate = useNavigate();
 
@@ -70,7 +71,7 @@ export default function Post({ post }) {
     {
       onSuccess: () => {
         // Invalidate and refetch
-        queryClient.invalidateQueries(["likes"]);
+        queryClient.invalidateQueries(["likes", post.id]);
       },
     }
   );
@@ -164,7 +165,7 @@ export default function Post({ post }) {
 
       <div className="content">
         <p>{post.desc}</p>
-        <img src={`/uploads/${post.img}`} alt="post" />
+        {post.img && <img src={`/uploads/${post.img}`} alt="post" />}
       </div>
 
       <div className="interactions">

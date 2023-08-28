@@ -45,7 +45,7 @@ export const addPost = (req, res) => {
 export const updatePost = (req, res) => {
   const postId = req.params.postId;
   const loggedInUserId = req.userInfo.id;
-  
+
   const { desc, img } = req.body;
 
   if (desc === undefined && img === undefined) {

@@ -14,7 +14,6 @@ import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import image from "../../assets/images/publish/image.png";
 import map from "../../assets/images/publish/map.png";
 import friends from "../../assets/images/publish/friends.png";
-import { useParams } from "react-router-dom";
 
 export default function Publish() {
   const { currentUser } = useContext(AuthContext);

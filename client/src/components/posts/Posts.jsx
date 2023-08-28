@@ -15,8 +15,6 @@ export default function Posts({ userId }) {
 
   const { isLoading, error, data } = useQuery(["posts", userId], getPosts);
 
-  console.log("Posts:", data);
-
   return (
     <div className="posts">
       {error

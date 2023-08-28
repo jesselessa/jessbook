@@ -54,7 +54,7 @@ export default function Stories() {
   ];
 
   //TODO - Uncomment and complete with add/delete story functions, using React Query mutations and upload function
-  // Fetch stories
+    // Fetch stories
   // const fetchStories = async () => {
   //   return await makeRequest
   //     .get("/stories")
