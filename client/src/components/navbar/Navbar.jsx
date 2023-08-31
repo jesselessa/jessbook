@@ -93,13 +93,10 @@ export default function Navbar() {
         </Link>
         <img
           src={
-            currentUser.profilePic ||
-            "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            currentUser.profilePic
+              ? `/uploads/${currentUser.profilePic}`
+              : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
           }
-          // src={
-          //   `/uploads/$currentUser.profilePic` ||
-          //   "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-          // }
           onClick={navigateAndScrollTop}
           alt="profile"
         />

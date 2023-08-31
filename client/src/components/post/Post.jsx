@@ -25,7 +25,6 @@ export default function Post({ post }) {
   const [comments, setComments] = useState([]);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [postImg, setPostImg] = useState(false);
 
   const navigate = useNavigate();
 
@@ -104,9 +103,10 @@ export default function Post({ post }) {
   const handleUpdate = () => {
     try {
       updateMutation.mutate(post.id);
+      // navigate(`/update/${post.id}`);
+      // window.scrollTo(0, 0);
     } catch (error) {
       console.error("Error updating post:", error);
-      // navigate(`/update/${post.id}`);
     }
   };
 
@@ -125,13 +125,12 @@ export default function Post({ post }) {
           <div className="img-container" onClick={navigateAndScrollTop}>
             <img
               src={
-                post.profilePic ||
-                "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                post.profilePic
+                  ? `/uploads/${post.profilePic}`
+                  : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
               }
               alt="user"
             />
-            {/* <img src={`/uploads/${post.profilePic}` ||
-                  "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} alt="user" /> */}
           </div>
 
           <div className="details">

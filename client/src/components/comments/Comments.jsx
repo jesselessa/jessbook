@@ -54,14 +54,12 @@ export default function Comments({ postId }) {
         <div className="img-container">
           <img
             src={
-              currentUser.profilePic ||
-              "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              currentUser.profilePic
+                ? `/uploads/${currentUser.profilePic}`
+                : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
             }
             alt="user"
           />
-          {/* <img src={`/uploads/${currentUser.profilePic}` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} 
-          alt="user" 
-          /> */}
         </div>
 
         <div className="inputGroup">
@@ -90,10 +88,10 @@ export default function Comments({ postId }) {
               <div className="img-container">
                 <img
                   src={
-                    comment.profilePic ||
-                    "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                    comment.profilePic
+                      ? `/uploads/${comment.profilePic}`
+                      : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   }
-                  // src={`/uploads/${comment.profilePic}` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"}
                   alt="user"
                 />
               </div>

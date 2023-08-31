@@ -1,7 +1,8 @@
 import { useState } from "react";
+import "./update.scss";
 import { makeRequest } from "../../utils/axios.jsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import "./update.scss";
+import { toast } from "react-toastify";
 
 // Icon
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -9,7 +10,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 export default function Update({ setOpenUpdate, user }) {
   const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [texts, setTexts] = useState({
+  const [fields, setFields] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
@@ -18,12 +19,13 @@ export default function Update({ setOpenUpdate, user }) {
   });
 
   const upload = async (file) => {
-    console.log(file);
-    
+    console.log("File:", file);
+
     try {
       const formData = new FormData();
       formData.append("file", file);
       const res = await makeRequest.post("/uploads", formData);
+      console.log("Res.data:", res.data);
       return res.data;
     } catch (error) {
       console.log(error);
@@ -31,7 +33,7 @@ export default function Update({ setOpenUpdate, user }) {
   };
 
   const handleChange = (e) => {
-    setTexts((prev) => ({ ...prev, [e.target.name]: [e.target.value] }));
+    setFields((prev) => ({ ...prev, [e.target.name]: [e.target.value] }));
   };
 
   const queryClient = useQueryClient();
@@ -57,11 +59,13 @@ export default function Update({ setOpenUpdate, user }) {
     coverUrl = cover ? await upload(cover) : user.coverPic;
     profileUrl = profile ? await upload(profile) : user.profilePic;
 
-    mutation.mutate({ ...texts, coverPic: coverUrl, profilePic: profileUrl });
+    mutation.mutate({ ...fields, coverPic: coverUrl, profilePic: profileUrl });
 
     setOpenUpdate(false);
     setCover(null);
     setProfile(null);
+
+    toast.success("Profile updated.");
   };
 
   return (
@@ -73,14 +77,16 @@ export default function Update({ setOpenUpdate, user }) {
             <label htmlFor="cover">
               <span>Cover Picture</span>
               <div className="imgContainer">
-                <img
-                  src={
-                    cover
-                      ? URL.createObjectURL(cover)
-                      : "/uploads/" + user.coverPic
-                  }
-                  alt="cover"
-                />
+                {cover && (
+                  <img
+                    src={
+                      cover
+                        ? URL.createObjectURL(cover)
+                        : `/uploads/${user.coverPic}`
+                    }
+                    alt="cover"
+                  />
+                )}
                 <CloudUploadIcon className="icon" />
               </div>
             </label>
@@ -93,14 +99,17 @@ export default function Update({ setOpenUpdate, user }) {
             <label htmlFor="profile">
               <span>Profile Picture</span>
               <div className="imgContainer">
-                <img
-                  src={
-                    profile
-                      ? URL.createObjectURL(profile)
-                      : "/uploads/" + user.profilePic
-                  }
-                  alt=""
-                />
+                {profile && (
+                  <img
+                    src={
+                      profile
+                        ? URL.createObjectURL(profile)
+                        : `/uploads/${user.profilePic}`
+                    }
+                    alt="profile"
+                  />
+                )}
+
                 <CloudUploadIcon className="icon" />
               </div>
             </label>
@@ -114,36 +123,36 @@ export default function Update({ setOpenUpdate, user }) {
           <label>Email</label>
           <input
             type="text"
-            value={texts.email}
+            value={fields.email}
             name="email"
             onChange={handleChange}
           />
           <label>Password</label>
           <input
             type="text"
-            value={texts.password}
+            value={fields.password}
             name="password"
             onChange={handleChange}
           />
           <label>First name</label>
           <input
             type="text"
-            value={texts.firstName}
+            value={fields.firstName}
             name="firstName"
             onChange={handleChange}
           />
           <label>Last name</label>
           <input
             type="text"
-            value={texts.lastName}
+            value={fields.lastName}
             name="lastName"
             onChange={handleChange}
           />
           <label>City</label>
           <input
             type="text"
-            name="ountry"
-            value={texts.country}
+            name="country"
+            value={fields.country}
             onChange={handleChange}
           />
           <button onClick={handleClick}>Update</button>

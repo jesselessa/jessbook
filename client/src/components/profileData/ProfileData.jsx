@@ -80,29 +80,23 @@ export default function ProfileData() {
             <div className="images">
               <img
                 src={
-                  data.coverPic ||
-                  "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  data.coverPic
+                    ? `/uploads/${data.coverPic}`
+                    : "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 }
-                // src={
-                //   `uploads/${data.coverPic}` ||
-                //   "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                // }
-                alt="cover"
                 className="cover"
+                alt="cover"
               />
 
               <div className="img-container">
                 <img
                   src={
-                    data.profilePic ||
-                    "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                    data.profilePic
+                      ? `/uploads/${data.profilePic}`
+                      : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   }
-                  // src={
-                  //   `/uploads/${data.profilePic}` ||
-                  //   "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                  // }
-                  alt="profile"
                   className="profilePic"
+                  alt="profile"
                 />
               </div>
             </div>

@@ -54,7 +54,7 @@ export default function Stories() {
   ];
 
   //TODO - Uncomment and complete with add/delete story functions, using React Query mutations and upload function
-    // Fetch stories
+  // Fetch stories
   // const fetchStories = async () => {
   //   return await makeRequest
   //     .get("/stories")
@@ -71,14 +71,21 @@ export default function Stories() {
       {/* Add story */}
       <div className="wrapper">
         <div className="story">
-          <img
+          {/* <img
             src={
               currentUser.profilePic ||
               "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
             }
             alt="user"
+          /> */}
+          <img
+            src={
+              currentUser.profilePic
+                ? `/uploads/${currentUser.profilePic}`
+                : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            }
+            alt="user"
           />
-          {/* <img src={`/uploads/${currentUser.profilePic}` || "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"} alt="user" /> */}
           <div className="add">Create a story</div>
           <button>+</button>
         </div>
