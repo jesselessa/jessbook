@@ -41,7 +41,8 @@ export default function Update({ setOpenUpdate, user }) {
   };
 
   const handleChange = (e) => {
-    setFields((prev) => ({ ...prev, [e.target.name]: [e.target.value] }));
+    const { name, value } = e.target;
+    setFields((prevFields) => ({ ...prevFields, [name]: value }));
   };
 
   const queryClient = useQueryClient();
@@ -66,15 +67,28 @@ export default function Update({ setOpenUpdate, user }) {
     coverUrl = cover ? await upload(cover) : user.coverPic;
     profileUrl = profile ? await upload(profile) : user.profilePic;
 
-    mutation.mutate({ ...fields, coverPic: coverUrl, profilePic: profileUrl });
+    // Check if any of the fields are modified
+    const isAnyFieldModified = Object.keys(fields).some(
+      (field) => fields[field] !== user[field]
+    );
+    
+    // If no fields or images modified, show message
+    if (!isAnyFieldModified && !cover && !profile) {
+      toast.info("No changes detected.");
+      return;
+    }
 
-    // Update localStorage with new user data
+    // Create a copy of the user object with updated values
     const updatedUser = {
       ...user,
       ...fields,
       coverPic: coverUrl,
       profilePic: profileUrl,
     };
+
+    mutation.mutate(updatedUser);
+
+    // Update localStorage with new user data
     setCurrentUser(updatedUser);
 
     setOpenUpdate(false);
@@ -175,7 +189,7 @@ export default function Update({ setOpenUpdate, user }) {
           <button onClick={handleClick}>Update</button>
         </form>
         <button className="close" onClick={() => setOpenUpdate(false)}>
-          Close
+          X
         </button>
       </div>
     </div>
