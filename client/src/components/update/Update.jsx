@@ -17,8 +17,8 @@ export default function Update({ setOpenUpdate, user }) {
   const [fields, setFields] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
-    email: user.email,
-    password: user.password,
+    // email: user.email,
+    // password: user.password,
     country: user.country,
   });
 
@@ -81,7 +81,7 @@ export default function Update({ setOpenUpdate, user }) {
     setCover(null);
     setProfile(null);
 
-    toast.success("User data updated.");
+    toast.success("Profile updated.");
     navigate(`/profile/${currentUser.id}`);
   };
 
@@ -137,20 +137,20 @@ export default function Update({ setOpenUpdate, user }) {
               onChange={(e) => setProfile(e.target.files[0])}
             />
           </div>
-          <label>Email</label>
+          {/* <label>Email</label>
           <input
             type="text"
             value={fields.email}
             name="email"
             onChange={handleChange}
-          />
-          <label>Password</label>
+          /> */}
+          {/* <label>Password</label>
           <input
             type="text"
             value={fields.password}
             name="password"
             onChange={handleChange}
-          />
+          /> */}
           <label>First name</label>
           <input
             type="text"

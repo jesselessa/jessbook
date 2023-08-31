@@ -88,3 +88,4 @@ export const logout = (_req, res) => {
     .status(200)
     .json("User logged out.");
 };
+

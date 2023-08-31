@@ -15,6 +15,7 @@ export default function Register() {
     password: "",
     pswdConfirm: "",
   });
+  
   // Handle errors from form
   const [validationErrors, setValidationErrors] = useState({
     firstName: "",

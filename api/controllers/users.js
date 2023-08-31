@@ -1,4 +1,5 @@
 import { db } from "../utils/connect.js";
+import bcrypt from "bcryptjs";
 
 export const getUser = (req, res) => {
   const userId = req.params.userId;
@@ -31,15 +32,19 @@ export const updateUser = (req, res) => {
     values.push(req.body.lastName);
   }
 
-  if (req.body.email !== undefined) {
-    updateFields.push("`email` = ?");
-    values.push(req.body.email);
-  }
+  // if (req.body.email !== undefined) {
+  //   updateFields.push("`email` = ?");
+  //   values.push(req.body.email);
+  // }
 
-  if (req.body.password !== undefined) {
-    updateFields.push("`password` = ?");
-    values.push(req.body.password);
-  }
+  // if (req.body.password !== undefined) {
+  //   // Hash the password before updating
+  //   const salt = bcrypt.genSaltSync(10);
+  //   const hashedPassword = bcrypt.hashSync(req.body.password, salt);
+
+  //   updateFields.push("`password` = ?");
+  //   values.push(hashedPassword);
+  // }
 
   if (req.body.profilePic !== undefined) {
     updateFields.push("`profilePic` = ?");
