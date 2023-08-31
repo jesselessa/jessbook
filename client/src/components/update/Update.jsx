@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import "./update.scss";
+import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../utils/axios.jsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
 // Icon
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+
+// Contexts
+import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Update({ setOpenUpdate, user }) {
   const [cover, setCover] = useState(null);
@@ -17,6 +21,10 @@ export default function Update({ setOpenUpdate, user }) {
     password: user.password,
     country: user.country,
   });
+
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
+
+  const navigate = useNavigate();
 
   const upload = async (file) => {
     console.log("File:", file);
@@ -53,7 +61,6 @@ export default function Update({ setOpenUpdate, user }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    //TODO - Find a better way to get image URL
     let coverUrl;
     let profileUrl;
     coverUrl = cover ? await upload(cover) : user.coverPic;
@@ -61,11 +68,21 @@ export default function Update({ setOpenUpdate, user }) {
 
     mutation.mutate({ ...fields, coverPic: coverUrl, profilePic: profileUrl });
 
+    // Update localStorage with new user data
+    const updatedUser = {
+      ...user,
+      ...fields,
+      coverPic: coverUrl,
+      profilePic: profileUrl,
+    };
+    setCurrentUser(updatedUser);
+
     setOpenUpdate(false);
     setCover(null);
     setProfile(null);
 
-    toast.success("Profile updated.");
+    toast.success("User data updated.");
+    navigate(`/profile/${currentUser.id}`);
   };
 
   return (
