@@ -49,7 +49,7 @@ export default function RightBar() {
               <span>Clark Kent</span> liked a post
             </p>
           </div>
-          <span className="time">1 min ago</span>
+          <span className="time">15 min ago</span>
         </div>
 
         <div className="activity">
@@ -64,7 +64,7 @@ export default function RightBar() {
               <span>Jack Bauer</span> liked a comment
             </p>
           </div>
-          <span className="time">1 min ago</span>
+          <span className="time">24 min ago</span>
         </div>
 
         <div className="activity">
@@ -76,10 +76,10 @@ export default function RightBar() {
               />
             </div>
             <p>
-              <span>Cinderella Princess</span> posted
+              <span>Cindy Rella</span> posted
             </p>
           </div>
-          <span className="time">1 min ago</span>
+          <span className="time">1 hour ago</span>
         </div>
       </div>
 

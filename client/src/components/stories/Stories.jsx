@@ -38,8 +38,8 @@ export default function Stories() {
     {
       id: 4,
       user: {
-        firstName: "Cinderella",
-        lastName: "Princess",
+        firstName: "Cindy",
+        lastName: "Rella",
       },
       img: "https://images.pexels.com/photos/14344896/pexels-photo-14344896.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     },
