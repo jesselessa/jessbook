@@ -122,7 +122,7 @@ export default function ProfileData() {
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{data.country || "Non renseigné"}</span>
+                  <span>{data.city || "Non renseigné"}</span>
                 </div>
 
                 {error ? (

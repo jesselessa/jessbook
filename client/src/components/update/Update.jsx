@@ -19,7 +19,7 @@ export default function Update({ setOpenUpdate, user }) {
     lastName: user.lastName,
     // email: user.email,
     // password: user.password,
-    country: user.country,
+    city: user.city,
   });
 
   const { currentUser, setCurrentUser } = useContext(AuthContext);
@@ -184,8 +184,8 @@ export default function Update({ setOpenUpdate, user }) {
           <label>City</label>
           <input
             type="text"
-            name="country"
-            value={fields.country}
+            name="city"
+            value={fields.city}
             onChange={handleChange}
             autoComplete="off"
           />

@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import "./stories.scss";
-import { useQuery } from "@tanstack/react-query";
-import { makeRequest } from "../../utils/axios.jsx";
+// import { useQuery } from "@tanstack/react-query";
+// import { makeRequest } from "../../utils/axios.jsx";
 
 // Context
 import { AuthContext } from "../../contexts/authContext";
