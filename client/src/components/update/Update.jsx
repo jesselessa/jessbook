@@ -71,7 +71,7 @@ export default function Update({ setOpenUpdate, user }) {
     const isAnyFieldModified = Object.keys(fields).some(
       (field) => fields[field] !== user[field]
     );
-    
+
     // If no fields or images modified, show message
     if (!isAnyFieldModified && !cover && !profile) {
       toast.info("No changes detected.");
@@ -171,6 +171,7 @@ export default function Update({ setOpenUpdate, user }) {
             value={fields.firstName}
             name="firstName"
             onChange={handleChange}
+            autoComplete="off"
           />
           <label>Last name</label>
           <input
@@ -178,6 +179,7 @@ export default function Update({ setOpenUpdate, user }) {
             value={fields.lastName}
             name="lastName"
             onChange={handleChange}
+            autoComplete="off"
           />
           <label>City</label>
           <input
@@ -185,6 +187,7 @@ export default function Update({ setOpenUpdate, user }) {
             name="country"
             value={fields.country}
             onChange={handleChange}
+            autoComplete="off"
           />
           <button onClick={handleClick}>Update</button>
         </form>

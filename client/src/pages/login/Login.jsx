@@ -98,6 +98,7 @@ export default function Login() {
               required
               value={inputsValues.email.trim()}
               onChange={handleChange}
+              autoComplete="off"
             />
 
             <input
@@ -105,10 +106,10 @@ export default function Login() {
               name="password"
               id="password"
               placeholder="Password"
-              autoComplete="off"
               required
               value={inputsValues.password.trim()}
               onChange={handleChange}
+              autoComplete="off"
             />
 
             <button onClick={handleLogin}>Sign in</button>

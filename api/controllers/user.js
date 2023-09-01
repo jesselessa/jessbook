@@ -1,5 +1,5 @@
 import { db } from "../utils/connect.js";
-import bcrypt from "bcryptjs";
+// import bcrypt from "bcryptjs";
 
 export const getUser = (req, res) => {
   const userId = req.params.userId;
@@ -56,9 +56,9 @@ export const updateUser = (req, res) => {
     values.push(req.body.coverPic);
   }
 
-  if (req.body.country !== undefined) {
-    updateFields.push("`country` = ?");
-    values.push(req.body.country);
+  if (req.body.city !== undefined) {
+    updateFields.push("`city` = ?");
+    values.push(req.body.city);
   }
 
   if (updateFields.length === 0) {
