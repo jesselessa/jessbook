@@ -7,7 +7,7 @@ import { makeRequest } from "../../utils/axios.jsx";
 // Components
 import Publish from "../../components/publish/Publish.jsx";
 import Posts from "../../components/posts/Posts.jsx";
-import Update from "../../components/update/Update.jsx";
+import UpdateProfile from "../../components/update/UpdateProfile.jsx";
 
 // Icons
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
@@ -148,7 +148,9 @@ export default function ProfileData() {
         </>
       )}
 
-      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={data} />}
+      {openUpdate && (
+        <UpdateProfile setOpenUpdate={setOpenUpdate} user={data} />
+      )}
     </div>
   );
 }

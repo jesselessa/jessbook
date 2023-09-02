@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import "./update.scss";
+import "./updateProfile.scss";
 import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../utils/axios.jsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 // Contexts
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-export default function Update({ setOpenUpdate, user }) {
+export default function UpdateProfile({ setOpenUpdate, user }) {
   const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
   const [fields, setFields] = useState({
@@ -32,8 +32,8 @@ export default function Update({ setOpenUpdate, user }) {
     try {
       const formData = new FormData();
       formData.append("file", file);
+
       const res = await makeRequest.post("/uploads", formData);
-      console.log("Res.data:", res.data);
       return res.data;
     } catch (error) {
       console.log(error);

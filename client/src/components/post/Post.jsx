@@ -56,7 +56,7 @@ export default function Post({ post }) {
   };
 
   const { isLoading, error, data } = useQuery(
-    ["likes", post.id],
+    ["likes", post.id], 
     fetchPostLikes
   );
 
