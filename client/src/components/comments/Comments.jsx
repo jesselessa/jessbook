@@ -4,16 +4,20 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.jsx";
 import moment from "moment";
 
-// Contexts
+// Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-// Icon
+// Icons
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 export default function Comments({ postId }) {
   const { currentUser } = useContext(AuthContext);
 
   const [desc, setDesc] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Fetch post comments
   const fetchPostComments = async () => {
@@ -46,6 +50,48 @@ export default function Comments({ postId }) {
     e.preventDefault();
     mutation.mutate({ desc, postId });
     setDesc("");
+  };
+
+  // Update and delete comment
+  const updateMutation = useMutation(
+    (postId) => makeRequest.put(`/comments/${postId}`),
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["comments"]);
+      },
+    }
+  );
+
+  const deleteMutation = useMutation(
+    (postId) => makeRequest.delete(`/comments/${postId}`),
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["comments"]);
+      },
+    }
+  );
+
+  const handleUpdate = (comment) => {
+    try {
+      updateMutation.mutate({
+        id: comment.id,
+        desc: desc, // Updated comment text
+      });
+      // navigate(`/update/${comment.id}`);
+      // window.scrollTo(0, 0);
+    } catch (error) {
+      console.error("Error updating comment:", error);
+    }
+  };
+
+  const handleDelete = (comment) => {
+    try {
+      deleteMutation.mutate(comment.id);
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
   };
 
   return (
@@ -101,9 +147,31 @@ export default function Comments({ postId }) {
                 </h3>
                 <p>{comment.desc}</p>
               </div>
-              <span className="time">
-                {moment(comment.creationDate).fromNow()}
-              </span>
+              <div className="buttons-time">
+                <div className="buttons">
+                  <MoreHorizIcon
+                    className="moreBtn"
+                    onClick={() => setMenuOpen(!menuOpen)}
+                  />
+                  {menuOpen && currentUser.id === comment.userId && (
+                    <div className="editBtns">
+                      <EditOutlinedIcon
+                        className="editBtn"
+                        fontSize="large"
+                        onClick={() => handleUpdate(comment)}
+                      />
+                      <DeleteOutlineOutlinedIcon
+                        className="editBtn"
+                        fontSize="large"
+                        onClick={() => handleDelete(comment)}
+                      />
+                    </div>
+                  )}
+                </div>
+                <span className="time">
+                  {moment(comment.creationDate).fromNow()}
+                </span>
+              </div>
             </div>
           ))}
     </div>

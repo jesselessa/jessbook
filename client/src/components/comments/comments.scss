@@ -111,10 +111,46 @@
           font-size: 1.5rem;
         }
       }
-      .time {
-        width: 100px;
+      .buttons-time {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        width: 120px;
         font-size: 1.3rem;
         color: themed("textColorSoft");
+
+        .buttons {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 0.5rem;
+          margin-bottom: 2rem;
+
+          .moreBtn {
+            color: themed("textColorSoft");
+            &:hover {
+              cursor: pointer;
+            }
+          }
+
+          .editBtns {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+
+            .editBtn {
+              color: themed("textColorSoft");
+              &:hover {
+                cursor: pointer;
+              }
+            }
+          }
+        }
+
+        .time {
+          text-align: right;
+        }
       }
     }
   }

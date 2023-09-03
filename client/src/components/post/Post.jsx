@@ -22,6 +22,7 @@ import { AuthContext } from "../../contexts/authContext";
 
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
+
   const [comments, setComments] = useState([]);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -56,7 +57,7 @@ export default function Post({ post }) {
   };
 
   const { isLoading, error, data } = useQuery(
-    ["likes", post.id], 
+    ["likes", post.id],
     fetchPostLikes
   );
 
@@ -145,7 +146,7 @@ export default function Post({ post }) {
             className="moreBtn"
             onClick={() => setMenuOpen(!menuOpen)}
           />
-          {menuOpen && post.userId === currentUser.id && (
+          {menuOpen && currentUser.id === post.userId && (
             <div className="editBtns">
               <EditOutlinedIcon
                 className="editBtn"
