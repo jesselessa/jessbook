@@ -142,11 +142,13 @@ export default function Post({ post }) {
           </div>
         </div>
         <div className="buttons">
-          <MoreHorizIcon
-            className="moreBtn"
-            onClick={() => setMenuOpen(!menuOpen)}
-          />
-          {menuOpen && currentUser.id === post.userId && (
+          {currentUser.id === post.userId && (
+            <MoreHorizIcon
+              className="moreBtn"
+              onClick={() => setMenuOpen(!menuOpen)}
+            />
+          )}
+          {menuOpen && (
             <div className="editBtns">
               <EditOutlinedIcon
                 className="editBtn"

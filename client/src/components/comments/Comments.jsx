@@ -148,7 +148,7 @@ export default function Comments({ postId }) {
                 <p>{comment.desc}</p>
               </div>
               <div className="buttons-time">
-                <div className="buttons">
+                {/* <div className="buttons">
                   <MoreHorizIcon
                     className="moreBtn"
                     onClick={() => setMenuOpen(!menuOpen)}
@@ -167,7 +167,30 @@ export default function Comments({ postId }) {
                       />
                     </div>
                   )}
+                </div> */}
+                <div className="buttons">
+                  {currentUser.id === comment.userId && (
+                    <MoreHorizIcon
+                      className="moreBtn"
+                      onClick={() => setMenuOpen(!menuOpen)}
+                    />
+                  )}
+                  {menuOpen && (
+                    <div className="editBtns">
+                      <EditOutlinedIcon
+                        className="editBtn"
+                        fontSize="large"
+                        onClick={() => handleUpdate(comment)}
+                      />
+                      <DeleteOutlineOutlinedIcon
+                        className="editBtn"
+                        fontSize="large"
+                        onClick={() => handleDelete(comment)}
+                      />
+                    </div>
+                  )}
                 </div>
+
                 <span className="time">
                   {moment(comment.creationDate).fromNow()}
                 </span>
