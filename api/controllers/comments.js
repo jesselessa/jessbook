@@ -41,7 +41,7 @@ export const updateComment = (req, res) => {
   if (desc === undefined)
     return res.status(400).json("No valid fields to update.");
 
-  const q = "UPDATE posts SET `desc` = ? WHERE id = ? AND userId = ?";
+  const q = "UPDATE comments SET `desc` = ? WHERE id = ? AND userId = ?";
 
   const values = [desc, commentId, loggedInUserId];
 

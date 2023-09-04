@@ -48,7 +48,7 @@ export default function Comments({ postId }) {
     {
       onSuccess: () => {
         // Invalidate and refetch
-        queryClient.invalidateQueries(["comments"]);
+        queryClient.invalidateQueries(["comments", postId]);
       },
     }
   );
@@ -56,8 +56,8 @@ export default function Comments({ postId }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    // const trimmedDesc = desc.trim(); // To delete useless spaces
-    mutation.mutate({ desc, postId });
+    const trimmedDesc = desc.trim(); // To delete useless spaces
+    mutation.mutate({ desc: trimmedDesc, postId });
     setDesc(""); // Reset field after sending
   };
 

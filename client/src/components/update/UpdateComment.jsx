@@ -20,7 +20,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
         // Invalidate and refetch
         queryClient.invalidateQueries(["comments"]);
 
-        setOpenUpdate(false);
+        setOpenUpdate(false); // To close form
         toast.success("Comment updated.");
       },
     }

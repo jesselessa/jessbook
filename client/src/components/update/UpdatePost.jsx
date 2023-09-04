@@ -34,7 +34,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
         // Invalidate and refetch
         queryClient.invalidateQueries(["posts"]);
 
-        setOpenUpdate(false);
+        setOpenUpdate(false); // To close form
         toast.success("Post updated.");
       },
     }
