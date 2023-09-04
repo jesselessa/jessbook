@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.jsx";
 import moment from "moment";
+import { toast } from "react-toastify";
 
-// Component
+// Components
 import Comments from "../comments/Comments.jsx";
+import UpdatePost from "../update/UpdatePost.jsx";
 
 // Icons
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -24,8 +26,9 @@ export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
 
   const [comments, setComments] = useState([]);
-  const [commentsOpen, setCommentsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -34,7 +37,7 @@ export default function Post({ post }) {
     window.scrollTo(0, 0);
   };
 
-  // Fetch post comments
+  // Get comments
   useEffect(() => {
     fetchPostComments();
   }, [comments]);
@@ -45,10 +48,12 @@ export default function Post({ post }) {
       .then((res) => {
         setComments(res.data);
       })
-      .catch((error) => console.log("Error fetching post comments:", error));
+      .catch((error) =>
+        console.log("Error fetching comments from Post.jsx:", error)
+      );
   };
 
-  // Fetch post likes
+  // Handle likes
   const fetchPostLikes = async () => {
     return await makeRequest
       .get(`/likes?postId=${post.id}`)
@@ -81,15 +86,10 @@ export default function Post({ post }) {
   };
 
   // Update and delete post
-  const updateMutation = useMutation(
-    (postId) => makeRequest.put(`/posts/${postId}`),
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["posts"]);
-      },
-    }
-  );
+  const handleUpdate = () => {
+    setOpenUpdate(true);
+    setMenuOpen(false);
+  };
 
   const deleteMutation = useMutation(
     (postId) => makeRequest.delete(`/posts/${postId}`),
@@ -97,19 +97,11 @@ export default function Post({ post }) {
       onSuccess: () => {
         // Invalidate and refetch
         queryClient.invalidateQueries(["posts"]);
+        setMenuOpen(false);
+        toast.success("Post deleted.");
       },
     }
   );
-
-  const handleUpdate = () => {
-    try {
-      updateMutation.mutate(post.id);
-      // navigate(`/update/${post.id}`);
-      // window.scrollTo(0, 0);
-    } catch (error) {
-      console.error("Error updating post:", error);
-    }
-  };
 
   const handleDelete = () => {
     try {
@@ -141,28 +133,29 @@ export default function Post({ post }) {
             <span className="date">{moment(post.creationDate).fromNow()}</span>
           </div>
         </div>
-        <div className="buttons">
-          {currentUser.id === post.userId && (
+
+        {currentUser.id === post.userId && (
+          <div className="buttons">
             <MoreHorizIcon
               className="moreBtn"
               onClick={() => setMenuOpen(!menuOpen)}
             />
-          )}
-          {menuOpen && (
-            <div className="editBtns">
-              <EditOutlinedIcon
-                className="editBtn"
-                fontSize="large"
-                onClick={handleUpdate}
-              />
-              <DeleteOutlineOutlinedIcon
-                className="editBtn"
-                fontSize="large"
-                onClick={handleDelete}
-              />
-            </div>
-          )}
-        </div>
+            {menuOpen && currentUser.id === post.userId && (
+              <div className="editBtns">
+                <EditOutlinedIcon
+                  className="editBtn"
+                  fontSize="large"
+                  onClick={handleUpdate}
+                />
+                <DeleteOutlineOutlinedIcon
+                  className="editBtn"
+                  fontSize="large"
+                  onClick={handleDelete}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="content">
@@ -196,6 +189,8 @@ export default function Post({ post }) {
       </div>
 
       {commentsOpen && <Comments postId={post.id} />}
+
+      {openUpdate && <UpdatePost setOpenUpdate={setOpenUpdate} post={post} />}
     </div>
   );
 }

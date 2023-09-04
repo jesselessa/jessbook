@@ -33,7 +33,7 @@ export default function ProfileData() {
       .catch((error) => console.log(error));
   };
 
-  const { isLoading, data, error } = useQuery(["user", userId], fetchUserData);
+  const { isLoading, error, data } = useQuery(["user", userId], fetchUserData);
 
   // Fetch user's relationships
   const fetchRelationships = async () => {

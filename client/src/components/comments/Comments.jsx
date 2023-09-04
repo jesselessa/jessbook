@@ -7,6 +7,9 @@ import moment from "moment";
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
+// Component
+import UpdateComment from "../update/UpdateComment.jsx";
+
 // Icons
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -18,13 +21,17 @@ export default function Comments({ postId }) {
 
   const [desc, setDesc] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [selectedComment, setSelectedComment] = useState(null);
 
   // Fetch post comments
   const fetchPostComments = async () => {
     return await makeRequest
       .get(`/comments?postId=${postId}`)
       .then((res) => res.data)
-      .catch((error) => console.log(error));
+      .catch((error) =>
+        console.log("Error fetching comments from Comments.jsx:", error)
+      );
   };
 
   const { isLoading, error, data } = useQuery(
@@ -48,23 +55,21 @@ export default function Comments({ postId }) {
 
   const handleClick = async (e) => {
     e.preventDefault();
+
+    // const trimmedDesc = desc.trim(); // To delete useless spaces
     mutation.mutate({ desc, postId });
-    setDesc("");
+    setDesc(""); // Reset field after sending
   };
 
   // Update and delete comment
-  const updateMutation = useMutation(
-    (postId) => makeRequest.put(`/comments/${postId}`),
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["comments"]);
-      },
-    }
-  );
+  const handleUpdate = (comment) => {
+    setSelectedComment(comment); // To store selectedComment
+    setOpenUpdate(true);
+    setMenuOpen(false);
+  };
 
   const deleteMutation = useMutation(
-    (postId) => makeRequest.delete(`/comments/${postId}`),
+    (commentId) => makeRequest.delete(`/comments/${commentId}`),
     {
       onSuccess: () => {
         // Invalidate and refetch
@@ -72,25 +77,12 @@ export default function Comments({ postId }) {
       },
     }
   );
-
-  const handleUpdate = (comment) => {
-    try {
-      updateMutation.mutate({
-        id: comment.id,
-        desc: desc, // Updated comment text
-      });
-      // navigate(`/update/${comment.id}`);
-      // window.scrollTo(0, 0);
-    } catch (error) {
-      console.error("Error updating comment:", error);
-    }
-  };
 
   const handleDelete = (comment) => {
     try {
       deleteMutation.mutate(comment.id);
     } catch (error) {
-      console.error("Error deleting post:", error);
+      console.error("Error deleting comment:", error);
     }
   };
 
@@ -148,26 +140,6 @@ export default function Comments({ postId }) {
                 <p>{comment.desc}</p>
               </div>
               <div className="buttons-time">
-                {/* <div className="buttons">
-                  <MoreHorizIcon
-                    className="moreBtn"
-                    onClick={() => setMenuOpen(!menuOpen)}
-                  />
-                  {menuOpen && currentUser.id === comment.userId && (
-                    <div className="editBtns">
-                      <EditOutlinedIcon
-                        className="editBtn"
-                        fontSize="large"
-                        onClick={() => handleUpdate(comment)}
-                      />
-                      <DeleteOutlineOutlinedIcon
-                        className="editBtn"
-                        fontSize="large"
-                        onClick={() => handleDelete(comment)}
-                      />
-                    </div>
-                  )}
-                </div> */}
                 <div className="buttons">
                   {currentUser.id === comment.userId && (
                     <MoreHorizIcon
@@ -175,6 +147,7 @@ export default function Comments({ postId }) {
                       onClick={() => setMenuOpen(!menuOpen)}
                     />
                   )}
+
                   {menuOpen && (
                     <div className="editBtns">
                       <EditOutlinedIcon
@@ -197,6 +170,13 @@ export default function Comments({ postId }) {
               </div>
             </div>
           ))}
+
+      {openUpdate && selectedComment && (
+        <UpdateComment
+          setOpenUpdate={setOpenUpdate}
+          comment={selectedComment}
+        />
+      )}
     </div>
   );
 }

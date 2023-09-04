@@ -11,7 +11,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 // Contexts
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-export default function UpdateProfile({ setOpenUpdate, user }) {
+export default function UpdateProfile({ user, setOpenUpdate }) {
   const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
   const [fields, setFields] = useState({
@@ -103,10 +103,12 @@ export default function UpdateProfile({ setOpenUpdate, user }) {
     <div className="update">
       <div className="wrapper">
         <h1>Update Your Profile</h1>
+
         <form>
           <div className="files">
             <label htmlFor="cover">
               <span>Cover Picture</span>
+
               <div className="imgContainer">
                 {cover && (
                   <img
@@ -121,12 +123,14 @@ export default function UpdateProfile({ setOpenUpdate, user }) {
                 <CloudUploadIcon className="icon" />
               </div>
             </label>
+
             <input
               type="file"
               id="cover"
               style={{ display: "none" }}
               onChange={(e) => setCover(e.target.files[0])}
             />
+
             <label htmlFor="profile">
               <span>Profile Picture</span>
               <div className="imgContainer">
@@ -144,6 +148,7 @@ export default function UpdateProfile({ setOpenUpdate, user }) {
                 <CloudUploadIcon className="icon" />
               </div>
             </label>
+
             <input
               type="file"
               id="profile"
@@ -151,46 +156,53 @@ export default function UpdateProfile({ setOpenUpdate, user }) {
               onChange={(e) => setProfile(e.target.files[0])}
             />
           </div>
+
           {/* <label>Email</label>
           <input
             type="text"
-            value={fields.email}
+            value={fields.email.trim()}
             name="email"
             onChange={handleChange}
           /> */}
+
           {/* <label>Password</label>
           <input
             type="text"
-            value={fields.password}
+            value={fields.password.trim()}
             name="password"
             onChange={handleChange}
           /> */}
+
           <label>First name</label>
           <input
             type="text"
-            value={fields.firstName}
+            value={fields.firstName.trim()}
             name="firstName"
             onChange={handleChange}
             autoComplete="off"
           />
+
           <label>Last name</label>
           <input
             type="text"
-            value={fields.lastName}
+            value={fields.lastName.trim()}
             name="lastName"
             onChange={handleChange}
             autoComplete="off"
           />
+
           <label>City</label>
           <input
             type="text"
             name="city"
-            value={fields.city}
+            value={fields.city.trim()}
             onChange={handleChange}
             autoComplete="off"
           />
+
           <button onClick={handleClick}>Update</button>
         </form>
+
         <button className="close" onClick={() => setOpenUpdate(false)}>
           X
         </button>

@@ -1,34 +1,19 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import "./updatePost.scss";
-import { useNavigate } from "react-router-dom";
-import { makeRequest } from "../../utils/axios.jsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { makeRequest } from "../../utils/axios.jsx";
 import { toast } from "react-toastify";
 
-// Icon
+// Icons
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
-// Contexts
-import { AuthContext } from "../../contexts/authContext.jsx";
+export default function UpdatePost({ post, setOpenUpdate }) {
+  const [desc, setDesc] = useState(post.desc);
+  const [image, setImage] = useState(null);
 
-export default function UpdatePost({ setOpenUpdate, post }) {
-  const [cover, setCover] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [fields, setFields] = useState({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    // email: user.email,
-    // password: user.password,
-    city: user.city,
-  });
+  const queryClient = useQueryClient();
 
-  const { currentUser, setCurrentUser } = useContext(AuthContext);
-
-  const navigate = useNavigate();
-
-  const upload = async (file) => {
-    console.log("File:", file);
-
+  const uploadImage = async (file) => {
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -40,21 +25,17 @@ export default function UpdatePost({ setOpenUpdate, post }) {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFields((prevFields) => ({ ...prevFields, [name]: value }));
-  };
-
-  const queryClient = useQueryClient();
-
   const mutation = useMutation(
-    (user) => {
-      return makeRequest.put("/users", user);
+    (updatedPost) => {
+      return makeRequest.put(`/posts/${post.id}`, updatedPost);
     },
     {
       onSuccess: () => {
         // Invalidate and refetch
-        queryClient.invalidateQueries(["user"]);
+        queryClient.invalidateQueries(["posts"]);
+
+        setOpenUpdate(false);
+        toast.success("Post updated.");
       },
     }
   );
@@ -62,135 +43,64 @@ export default function UpdatePost({ setOpenUpdate, post }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    let coverUrl;
-    let profileUrl;
-    coverUrl = cover ? await upload(cover) : user.coverPic;
-    profileUrl = profile ? await upload(profile) : user.profilePic;
-
-    // Check if any of the fields are modified
-    const isAnyFieldModified = Object.keys(fields).some(
-      (field) => fields[field] !== user[field]
-    );
-
-    // If no fields or images modified, show message
-    if (!isAnyFieldModified && !cover && !profile) {
+    // Check if post has been modified
+    if (desc.trim() === post.desc.trim() && !image) {
       toast.info("No changes detected.");
       return;
     }
 
-    // Create a copy of the user object with updated values
-    const updatedUser = {
-      ...user,
-      ...fields,
-      coverPic: coverUrl,
-      profilePic: profileUrl,
+    // Check if post has a description
+    if (!desc.trim()) {
+      toast.error("You must add a description to your post.");
+      return;
+    }
+
+    const updatedPost = {
+      ...post,
+      desc: desc,
     };
 
-    mutation.mutate(updatedUser);
+    if (image) {
+      const imageUrl = await uploadImage(image);
+      updatedPost.img = imageUrl;
+    }
 
-    // Update localStorage with new user data
-    setCurrentUser(updatedUser);
-
-    setOpenUpdate(false);
-    setCover(null);
-    setProfile(null);
-
-    toast.success("Profile updated.");
-    navigate(`/profile/${currentUser.id}`);
+    mutation.mutate(updatedPost);
   };
 
   return (
-    <div className="update">
+    <div className="updatePost">
       <div className="wrapper">
-        <h1>Update Your Profile</h1>
+        <h1>Update Your Post</h1>
+
         <form>
           <div className="files">
-            <label htmlFor="cover">
-              <span>Cover Picture</span>
+            <label htmlFor="image">
+              <span>Choose an image</span>
               <div className="imgContainer">
-                {cover && (
-                  <img
-                    src={
-                      cover
-                        ? URL.createObjectURL(cover)
-                        : `/uploads/${user.coverPic}`
-                    }
-                    alt="cover"
-                  />
+                {image && (
+                  <img src={URL.createObjectURL(image)} alt="post-image" />
                 )}
                 <CloudUploadIcon className="icon" />
               </div>
             </label>
             <input
               type="file"
-              id="cover"
+              id="image"
               style={{ display: "none" }}
-              onChange={(e) => setCover(e.target.files[0])}
-            />
-            <label htmlFor="profile">
-              <span>Profile Picture</span>
-              <div className="imgContainer">
-                {profile && (
-                  <img
-                    src={
-                      profile
-                        ? URL.createObjectURL(profile)
-                        : `/uploads/${user.profilePic}`
-                    }
-                    alt="profile"
-                  />
-                )}
-
-                <CloudUploadIcon className="icon" />
-              </div>
-            </label>
-            <input
-              type="file"
-              id="profile"
-              style={{ display: "none" }}
-              onChange={(e) => setProfile(e.target.files[0])}
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files[0])}
             />
           </div>
-          {/* <label>Email</label>
-          <input
-            type="text"
-            value={fields.email}
-            name="email"
-            onChange={handleChange}
-          /> */}
-          {/* <label>Password</label>
-          <input
-            type="text"
-            value={fields.password}
-            name="password"
-            onChange={handleChange}
-          /> */}
-          <label>First name</label>
-          <input
-            type="text"
-            value={fields.firstName}
-            name="firstName"
-            onChange={handleChange}
-            autoComplete="off"
-          />
-          <label>Last name</label>
-          <input
-            type="text"
-            value={fields.lastName}
-            name="lastName"
-            onChange={handleChange}
-            autoComplete="off"
-          />
-          <label>City</label>
-          <input
-            type="text"
-            name="city"
-            value={fields.city}
-            onChange={handleChange}
-            autoComplete="off"
+          <label>Description</label>
+          <textarea
+            rows={5}
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
           />
           <button onClick={handleClick}>Update</button>
         </form>
+
         <button className="close" onClick={() => setOpenUpdate(false)}>
           X
         </button>
