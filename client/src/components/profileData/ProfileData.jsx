@@ -25,7 +25,7 @@ export default function ProfileData() {
 
   const { userId } = useParams();
 
-  // Fetch user's info
+  // Get user's info
   const fetchUserData = async () => {
     return await makeRequest
       .get(`/users/${userId}`)
@@ -33,9 +33,9 @@ export default function ProfileData() {
       .catch((error) => console.log(error));
   };
 
-  const { isLoading, error, data } = useQuery(["user", userId], fetchUserData);
+  const { isLoading, error, data: user } = useQuery(["user"], fetchUserData);
 
-  // Fetch user's relationships
+  // Get user's relationships
   const fetchRelationships = async () => {
     return await makeRequest
       .get(`/relationships?followedUserId=${userId}`)
@@ -80,8 +80,8 @@ export default function ProfileData() {
             <div className="images">
               <img
                 src={
-                  data.coverPic
-                    ? `/uploads/${data.coverPic}`
+                  user.coverPic
+                    ? `/uploads/${user.coverPic}`
                     : "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 }
                 className="cover"
@@ -91,8 +91,8 @@ export default function ProfileData() {
               <div className="img-container">
                 <img
                   src={
-                    data.profilePic
-                      ? `/uploads/${data.profilePic}`
+                    user.profilePic
+                      ? `/uploads/${user.profilePic}`
                       : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   }
                   className="profilePic"
@@ -117,12 +117,12 @@ export default function ProfileData() {
               </div>
               <div className="name">
                 <h2>
-                  {data.firstName} {data.lastName}
+                  {user.firstName} {user.lastName}
                 </h2>
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{data.city || "Non renseigné"}</span>
+                  <span>{user.city || "Non renseigné"}</span>
                 </div>
 
                 {error ? (
@@ -149,7 +149,7 @@ export default function ProfileData() {
       )}
 
       {openUpdate && (
-        <UpdateProfile setOpenUpdate={setOpenUpdate} user={data} />
+        <UpdateProfile setOpenUpdate={setOpenUpdate} user={user} />
       )}
     </div>
   );

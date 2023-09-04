@@ -15,7 +15,7 @@ export default function Register() {
     password: "",
     pswdConfirm: "",
   });
-  
+
   // Handle errors from form
   const [validationErrors, setValidationErrors] = useState({
     firstName: "",
@@ -74,6 +74,7 @@ export default function Register() {
 
     // 1 - Handle form validation and error messages
     const inputsErrors = {};
+
     // Name
     if (
       inputsValues.firstName.length < 2 ||
@@ -81,9 +82,10 @@ export default function Register() {
     ) {
       inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
     }
-    if (inputsValues.lastName.length < 2 || inputsValues.lastName.length > 35) {
-      inputsErrors.lastName = "Enter a name between 2 and 35 characters.";
+    if (inputsValues.lastName.length < 1 || inputsValues.lastName.length > 35) {
+      inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
     }
+
     // Email with regex
     if (
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputsValues.email) ||
@@ -91,6 +93,7 @@ export default function Register() {
     ) {
       inputsErrors.email = "Enter a valid email not exceeding 64 characters.";
     }
+
     // Password with regex
     if (
       !/(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}/.test(
@@ -100,6 +103,7 @@ export default function Register() {
       inputsErrors.password =
         "Password must contain at least 6 characters including at least 1 number and 1 symbol.";
     }
+
     // Confirmation password
     if (inputsValues.password !== inputsValues.pswdConfirm) {
       inputsErrors.pswdConfirm = "Password does not match.";
@@ -116,7 +120,7 @@ export default function Register() {
     try {
       await axios.post(`http://localhost:8000/auth/register`, inputsValues);
 
-      toast.success("Successful registration!");
+      toast.success("Successful registration !");
       clearErrors();
       clearForm();
 
@@ -138,10 +142,9 @@ export default function Register() {
               name="firstName"
               placeholder="First name"
               minLength={2}
-              // maxLength={35}
               autoComplete="off"
               required
-              value={inputsValues.firstName.trim()}
+              value={inputsValues.firstName}
               onChange={handleChange}
             />
             {validationErrors.firstName && (
@@ -154,10 +157,9 @@ export default function Register() {
               name="lastName"
               placeholder="Last name"
               minLength={1}
-              // maxLength={35}
               autoComplete="off"
               required
-              value={inputsValues.lastName.trim()}
+              value={inputsValues.lastName}
               onChange={handleChange}
             />
             {validationErrors.lastName && (

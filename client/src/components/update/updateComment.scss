@@ -73,7 +73,7 @@
         }
 
         textarea {
-          // width: 100%;
+          width: 100%;
           color: #555;
           font-size: 1.6rem;
           margin-bottom: 1rem;
@@ -85,6 +85,7 @@
           width: 200px;
           font-size: 1.7rem;
           padding: 1rem;
+          line-height: 10px; // To fix not vertically centered
           color: white;
           background-color: #5271ff;
           border: none;

@@ -34,10 +34,11 @@ export default function Comments({ postId }) {
       );
   };
 
-  const { isLoading, error, data } = useQuery(
-    ["comments", postId],
-    fetchPostComments
-  );
+  const {
+    isLoading,
+    error,
+    data: comments,
+  } = useQuery(["comments", postId], fetchPostComments);
 
   const queryClient = useQueryClient();
 
@@ -56,9 +57,9 @@ export default function Comments({ postId }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    const trimmedDesc = desc.trim(); // To delete useless spaces
+    const trimmedDesc = desc.trim();
     mutation.mutate({ desc: trimmedDesc, postId });
-    setDesc(""); // Reset field after sending
+    setDesc(""); // Reset field
   };
 
   // Update and delete comment
@@ -73,7 +74,7 @@ export default function Comments({ postId }) {
     {
       onSuccess: () => {
         // Invalidate and refetch
-        queryClient.invalidateQueries(["comments"]);
+        queryClient.invalidateQueries(["comments", postId]);
       },
     }
   );
@@ -121,7 +122,7 @@ export default function Comments({ postId }) {
         ? "Something went wrong"
         : isLoading
         ? "Loading..."
-        : data.map((comment) => (
+        : comments.map((comment) => (
             <div className="comment" key={comment.id}>
               <div className="img-container">
                 <img

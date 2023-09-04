@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import "./post.scss";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
@@ -25,7 +25,6 @@ import { AuthContext } from "../../contexts/authContext";
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
 
-  const [comments, setComments] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
@@ -38,20 +37,18 @@ export default function Post({ post }) {
   };
 
   // Get comments
-  useEffect(() => {
-    fetchPostComments();
-  }, [comments]);
-
   const fetchPostComments = async () => {
     return await makeRequest
       .get(`/comments?postId=${post.id}`)
-      .then((res) => {
-        setComments(res.data);
-      })
+      .then((res) => res.data)
       .catch((error) =>
         console.log("Error fetching comments from Post.jsx:", error)
       );
   };
+
+  const queryClient = useQueryClient();
+
+  const { data: comments } = useQuery(["comments", post.id], fetchPostComments);
 
   // Handle likes
   const fetchPostLikes = async () => {
@@ -61,12 +58,11 @@ export default function Post({ post }) {
       .catch((error) => console.log(error));
   };
 
-  const { isLoading, error, data } = useQuery(
-    ["likes", post.id],
-    fetchPostLikes
-  );
-
-  const queryClient = useQueryClient();
+  const {
+    isLoading,
+    error,
+    data: likes,
+  } = useQuery(["likes", post.id], fetchPostLikes);
 
   const mutation = useMutation(
     (liked) => {
@@ -82,7 +78,7 @@ export default function Post({ post }) {
   );
 
   const handleLikes = () => {
-    mutation.mutate(data.includes(currentUser.id));
+    mutation.mutate(likes.includes(currentUser.id));
   };
 
   // Update and delete post
@@ -97,13 +93,14 @@ export default function Post({ post }) {
       onSuccess: () => {
         // Invalidate and refetch
         queryClient.invalidateQueries(["posts"]);
+
         setMenuOpen(false);
         toast.success("Post deleted.");
       },
     }
   );
 
-  const handleDelete = () => {
+  const handleDelete = (post) => {
     try {
       deleteMutation.mutate(post.id);
     } catch (error) {
@@ -150,7 +147,7 @@ export default function Post({ post }) {
                 <DeleteOutlineOutlinedIcon
                   className="editBtn"
                   fontSize="large"
-                  onClick={handleDelete}
+                  onClick={() => handleDelete(post)}
                 />
               </div>
             )}
@@ -169,17 +166,17 @@ export default function Post({ post }) {
             "Something went wrong."
           ) : isLoading ? (
             "Loading..."
-          ) : data.includes(currentUser.id) ? (
+          ) : likes.includes(currentUser.id) ? (
             <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLikes} />
           ) : (
             <FavoriteBorderOutlinedIcon onClick={handleLikes} />
           )}
-          {data?.length > 0 && data.length} <span>Likes</span>
+          {likes?.length > 0 && likes.length} <span>Likes</span>
         </div>
 
         <div className="item" onClick={() => setCommentsOpen(!commentsOpen)}>
           <TextsmsOutlinedIcon />
-          {comments.length > 0 && comments.length} <span>Comments</span>
+          {comments?.length > 0 && comments.length} <span>Comments</span>
         </div>
 
         <div className="item">

@@ -7,8 +7,6 @@ import { toast } from "react-toastify";
 export default function UpdateComment({ comment, setOpenUpdate }) {
   const [desc, setDesc] = useState(comment.desc);
 
-  console.log("Comment:", comment);
-
   const queryClient = useQueryClient();
 
   const mutation = useMutation(
@@ -18,7 +16,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
     {
       onSuccess: () => {
         // Invalidate and refetch
-        queryClient.invalidateQueries(["comments"]);
+        queryClient.invalidateQueries(["comments", comment.postId]);
 
         setOpenUpdate(false); // To close form
         toast.success("Comment updated.");

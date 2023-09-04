@@ -92,7 +92,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
               onChange={(e) => setImage(e.target.files[0])}
             />
           </div>
-          <label>Description</label>
+          <label>Add a text</label>
           <textarea
             rows={5}
             value={desc}
