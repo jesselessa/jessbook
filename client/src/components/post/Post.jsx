@@ -11,7 +11,6 @@ import Comments from "../comments/Comments.jsx";
 import UpdatePost from "../update/UpdatePost.jsx";
 
 // Icons
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import TextsmsOutlinedIcon from "@mui/icons-material/TextsmsOutlined";
@@ -25,7 +24,6 @@ import { AuthContext } from "../../contexts/authContext";
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
 
-  const [menuOpen, setMenuOpen] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
 
@@ -84,7 +82,6 @@ export default function Post({ post }) {
   // Update and delete post
   const handleUpdate = () => {
     setOpenUpdate(true);
-    setMenuOpen(false);
   };
 
   const deleteMutation = useMutation(
@@ -94,7 +91,6 @@ export default function Post({ post }) {
         // Invalidate and refetch
         queryClient.invalidateQueries(["posts"]);
 
-        setMenuOpen(false);
         toast.success("Post deleted.");
       },
     }
@@ -132,25 +128,17 @@ export default function Post({ post }) {
         </div>
 
         {currentUser.id === post.userId && (
-          <div className="buttons">
-            <MoreHorizIcon
-              className="moreBtn"
-              onClick={() => setMenuOpen(!menuOpen)}
+          <div className="editBtns">
+            <EditOutlinedIcon
+              className="editBtn"
+              fontSize="large"
+              onClick={handleUpdate}
             />
-            {menuOpen && currentUser.id === post.userId && (
-              <div className="editBtns">
-                <EditOutlinedIcon
-                  className="editBtn"
-                  fontSize="large"
-                  onClick={handleUpdate}
-                />
-                <DeleteOutlineOutlinedIcon
-                  className="editBtn"
-                  fontSize="large"
-                  onClick={() => handleDelete(post)}
-                />
-              </div>
-            )}
+            <DeleteOutlineOutlinedIcon
+              className="editBtn"
+              fontSize="large"
+              onClick={() => handleDelete(post)}
+            />
           </div>
         )}
       </div>

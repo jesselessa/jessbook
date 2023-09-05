@@ -10,7 +10,6 @@
 
     .user {
       display: flex;
-      // align-items: center;
       justify-content: space-between;
       padding: 1rem;
 
@@ -61,29 +60,23 @@
         }
       }
 
-      .buttons {
+      .editBtns {
         display: flex;
-        flex-direction: column;
-        align-items: flex-end;
         gap: 0.5rem;
 
-        .moreBtn {
+        @media screen and (max-width: 400px) {
+          gap: 0.3rem;
+        }
+
+        .editBtn {
           color: themed("textColorSoft");
+
           &:hover {
             cursor: pointer;
           }
-        }
 
-        .editBtns {
-          display: flex;
-          flex-direction: column;
-          gap: 0.8rem;
-
-          .editBtn {
-            color: themed("textColorSoft");
-            &:hover {
-              cursor: pointer;
-            }
+          @include xsmall {
+            font-size: 24px;
           }
         }
       }
