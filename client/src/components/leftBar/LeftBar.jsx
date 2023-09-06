@@ -38,7 +38,7 @@ export default function LeftBar() {
               src={
                 currentUser.profilePic
                   ? `/uploads/${currentUser.profilePic}`
-                  : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
               }
               alt="profile"
             />

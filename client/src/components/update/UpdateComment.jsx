@@ -35,7 +35,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
 
     const updatedComment = {
       ...comment,
-      desc: desc,
+      desc: desc.trim(),
     };
 
     mutation.mutate(updatedComment);

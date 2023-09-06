@@ -13,6 +13,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
 
   const queryClient = useQueryClient();
 
+  // Upload image
   const uploadImage = async (file) => {
     try {
       const formData = new FormData();
@@ -57,7 +58,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
 
     const updatedPost = {
       ...post,
-      desc: desc,
+      desc: desc.trim(),
     };
 
     if (image) {

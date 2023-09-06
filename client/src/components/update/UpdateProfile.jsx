@@ -26,9 +26,8 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
 
   const navigate = useNavigate();
 
+  // Upload image
   const upload = async (file) => {
-    console.log("File:", file);
-
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -78,22 +77,20 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       return;
     }
 
-    // Create a copy of the user object with updated values
+    // Create a copy of user object with updated values
+
     const updatedUser = {
-      ...user,
+      ...user, // user currently displayed in component
       ...fields,
       coverPic: coverUrl,
       profilePic: profileUrl,
     };
 
-    mutation.mutate(updatedUser);
-
-    // Update localStorage with new user data
     setCurrentUser(updatedUser);
-
-    setOpenUpdate(false);
     setCover(null);
     setProfile(null);
+
+    mutation.mutate(updatedUser);
 
     toast.success("Profile updated.");
     navigate(`/profile/${currentUser.id}`);
@@ -160,7 +157,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
           {/* <label>Email</label>
           <input
             type="text"
-            value={fields.email.trim()}
+            value={fields.email}
             name="email"
             onChange={handleChange}
           /> */}
@@ -168,7 +165,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
           {/* <label>Password</label>
           <input
             type="text"
-            value={fields.password.trim()}
+            value={fields.password}
             name="password"
             onChange={handleChange}
           /> */}
@@ -176,7 +173,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
           <label>First name</label>
           <input
             type="text"
-            value={fields.firstName.trim()}
+            value={fields.firstName}
             name="firstName"
             onChange={handleChange}
             autoComplete="off"
@@ -185,7 +182,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
           <label>Last name</label>
           <input
             type="text"
-            value={fields.lastName.trim()}
+            value={fields.lastName}
             name="lastName"
             onChange={handleChange}
             autoComplete="off"
@@ -195,7 +192,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
           <input
             type="text"
             name="city"
-            value={fields.city.trim()}
+            value={fields.city}
             onChange={handleChange}
             autoComplete="off"
           />

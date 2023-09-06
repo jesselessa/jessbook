@@ -71,7 +71,7 @@ export default function RightBar() {
           <div className="userInfo">
             <div className="img-container">
               <img
-                src="https://images.pexels.com/photos/1858175/pexels-photo-1858175.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                src="https://images.pexels.com/photos/8295844/pexels-photo-8295844.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 alt="user"
               />
             </div>
@@ -124,12 +124,12 @@ export default function RightBar() {
           <div className="user">
             <div className="img-container">
               <img
-                src="https://images.pexels.com/photos/1858175/pexels-photo-1858175.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                src="https://images.pexels.com/photos/8295844/pexels-photo-8295844.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                 alt="user"
               />
               <div className="status-dot"></div>
             </div>
-            <span>Cinderella Princess</span>
+            <span>Cindy Rella</span>
           </div>
 
           <div className="user">

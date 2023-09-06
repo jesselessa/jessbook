@@ -96,7 +96,7 @@ export default function Login() {
               id="email"
               placeholder="Email"
               required
-              value={inputsValues.email.trim()}
+              value={inputsValues.email}
               onChange={handleChange}
               autoComplete="off"
             />
@@ -107,7 +107,7 @@ export default function Login() {
               id="password"
               placeholder="Password"
               required
-              value={inputsValues.password.trim()}
+              value={inputsValues.password}
               onChange={handleChange}
               autoComplete="off"
             />

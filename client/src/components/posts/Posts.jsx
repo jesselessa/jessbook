@@ -13,15 +13,21 @@ export default function Posts({ userId }) {
       .catch((error) => console.log(error));
   };
 
-  const { isLoading, error, data } = useQuery(["posts"], getPosts);
+  const { isLoading, error, data: posts } = useQuery(["posts"], getPosts);
 
   return (
     <div className="posts">
-      {error
-        ? "Something went wrong."
-        : isLoading
-        ? "Loading..."
-        : data.map((post) => <Post post={post} key={post.id} />)}
+      {error ? (
+        "Something went wrong."
+      ) : isLoading ? (
+        "Loading..."
+      ) : posts.length === 0 ? (
+        <div className="msg">No post to show yet.</div>
+      ) : (
+        posts.map((post) => <Post post={post} key={post.id} />)
+      )}
     </div>
+    //     : posts.map((post) => <Post post={post} key={post.id} />)}
+    // </div>
   );
 }

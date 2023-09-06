@@ -173,7 +173,7 @@ export default function Register() {
               placeholder="Email"
               autoComplete="off"
               required
-              value={inputsValues.email.trim()}
+              value={inputsValues.email}
               onChange={handleChange}
             />
             {validationErrors.email && (
@@ -187,7 +187,7 @@ export default function Register() {
               placeholder="Password"
               autoComplete="off"
               required
-              value={inputsValues.password.trim()}
+              value={inputsValues.password}
               onChange={handleChange}
             />
             {validationErrors.password && (
@@ -201,7 +201,7 @@ export default function Register() {
               placeholder="Confirm password"
               autoComplete="off"
               required
-              value={inputsValues.pswdConfirm.trim()}
+              value={inputsValues.pswdConfirm}
               onChange={handleChange}
             />
             {validationErrors.pswdConfirm && (

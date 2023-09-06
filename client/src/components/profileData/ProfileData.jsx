@@ -43,10 +43,11 @@ export default function ProfileData() {
       .catch((error) => console.log(error));
   };
 
-  const { isLoading: rIsLoading, data: relationshipsData } = useQuery(
-    ["relationships"],
-    fetchRelationships
-  );
+  const {
+    isLoading: rIsLoading,
+    error: rError,
+    data: relationshipsData,
+  } = useQuery(["relationships"], fetchRelationships);
 
   const queryClient = useQueryClient();
 
@@ -93,7 +94,7 @@ export default function ProfileData() {
                   src={
                     user.profilePic
                       ? `/uploads/${user.profilePic}`
-                      : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                      : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   }
                   className="profilePic"
                   alt="profile"
@@ -125,7 +126,7 @@ export default function ProfileData() {
                   <span>{user.city || "Non renseigné"}</span>
                 </div>
 
-                {error ? (
+                {rError ? (
                   "Something went wrong."
                 ) : rIsLoading ? (
                   "Loading..."

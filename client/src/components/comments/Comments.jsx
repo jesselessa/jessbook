@@ -12,7 +12,6 @@ import UpdateComment from "../update/UpdateComment.jsx";
 
 // Icons
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
@@ -20,7 +19,6 @@ export default function Comments({ postId }) {
   const { currentUser } = useContext(AuthContext);
 
   const [desc, setDesc] = useState("");
-  const [menuOpen, setMenuOpen] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
 
@@ -57,8 +55,7 @@ export default function Comments({ postId }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    const trimmedDesc = desc.trim();
-    mutation.mutate({ desc: trimmedDesc, postId });
+    mutation.mutate({ desc: desc.trim(), postId });
     setDesc(""); // Reset field
   };
 
@@ -66,7 +63,6 @@ export default function Comments({ postId }) {
   const handleUpdate = (comment) => {
     setSelectedComment(comment); // To store selectedComment
     setOpenUpdate(true);
-    setMenuOpen(false);
   };
 
   const deleteMutation = useMutation(
@@ -95,7 +91,7 @@ export default function Comments({ postId }) {
             src={
               currentUser.profilePic
                 ? `/uploads/${currentUser.profilePic}`
-                : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
             }
             alt="user"
           />
@@ -129,7 +125,7 @@ export default function Comments({ postId }) {
                   src={
                     comment.profilePic
                       ? `/uploads/${comment.profilePic}`
-                      : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                      : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                   }
                   alt="user"
                 />

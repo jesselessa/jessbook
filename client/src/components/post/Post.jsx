@@ -46,7 +46,10 @@ export default function Post({ post }) {
 
   const queryClient = useQueryClient();
 
-  const { data: comments } = useQuery(["comments", post.id], fetchPostComments);
+  const { data: comments } = useQuery({
+    queryKey: ["comments", post.id],
+    queryFn: fetchPostComments,
+  });
 
   // Handle likes
   const fetchPostLikes = async () => {
@@ -84,6 +87,7 @@ export default function Post({ post }) {
     setOpenUpdate(true);
   };
 
+// 
   const deleteMutation = useMutation(
     (postId) => makeRequest.delete(`/posts/${postId}`),
     {
@@ -113,7 +117,7 @@ export default function Post({ post }) {
               src={
                 post.profilePic
                   ? `/uploads/${post.profilePic}`
-                  : "https://images.pexels.com/photos/1586981/pexels-photo-1586981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
               }
               alt="user"
             />
