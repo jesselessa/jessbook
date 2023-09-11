@@ -36,7 +36,7 @@ export default function Comments({ postId }) {
     isLoading,
     error,
     data: comments,
-  } = useQuery(["comments", postId], fetchPostComments);
+  } = useQuery({ queryKey: ["comments", postId], queryFn: fetchPostComments });
 
   const queryClient = useQueryClient();
 
@@ -59,12 +59,13 @@ export default function Comments({ postId }) {
     setDesc(""); // Reset field
   };
 
-  // Update and delete comment
+  // Open update form and store selected comment
   const handleUpdate = (comment) => {
-    setSelectedComment(comment); // To store selectedComment
     setOpenUpdate(true);
+    setSelectedComment(comment);
   };
 
+  // Delete comment
   const deleteMutation = useMutation(
     (commentId) => makeRequest.delete(`/comments/${commentId}`),
     {

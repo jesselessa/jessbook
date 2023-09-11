@@ -20,6 +20,11 @@
         display: none;
       }
 
+      .msg {
+        color: themed("textColor");
+        font-size: 1.6rem;
+      }
+      
       .story {
         min-width: 120px;
         max-width: 125px;

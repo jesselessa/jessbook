@@ -13,7 +13,11 @@ export default function Posts({ userId }) {
       .catch((error) => console.log(error));
   };
 
-  const { isLoading, error, data: posts } = useQuery(["posts"], getPosts);
+  const {
+    isLoading,
+    error,
+    data: posts,
+  } = useQuery({ queryKey: ["posts"], queryFn: getPosts });
 
   return (
     <div className="posts">
@@ -24,10 +28,8 @@ export default function Posts({ userId }) {
       ) : posts.length === 0 ? (
         <div className="msg">No post to show yet.</div>
       ) : (
-        posts.map((post) => <Post post={post} key={post.id} />)
+        posts.map((post) => <Post key={post.id} post={post} />)
       )}
     </div>
-    //     : posts.map((post) => <Post post={post} key={post.id} />)}
-    // </div>
   );
 }

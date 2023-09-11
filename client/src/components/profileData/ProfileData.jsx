@@ -33,7 +33,11 @@ export default function ProfileData() {
       .catch((error) => console.log(error));
   };
 
-  const { isLoading, error, data: user } = useQuery(["user"], fetchUserData);
+  const {
+    isLoading,
+    error,
+    data: user,
+  } = useQuery({ queryKey: ["user"], queryFn: fetchUserData });
 
   // Get user's relationships
   const fetchRelationships = async () => {
@@ -47,7 +51,7 @@ export default function ProfileData() {
     isLoading: rIsLoading,
     error: rError,
     data: relationshipsData,
-  } = useQuery(["relationships"], fetchRelationships);
+  } = useQuery({ queryKey: ["relationships"], queryFn: fetchRelationships });
 
   const queryClient = useQueryClient();
 

@@ -63,7 +63,7 @@ export default function Post({ post }) {
     isLoading,
     error,
     data: likes,
-  } = useQuery(["likes", post.id], fetchPostLikes);
+  } = useQuery({ queryKey: ["likes", post.id], queryFn: fetchPostLikes });
 
   const mutation = useMutation(
     (liked) => {
@@ -82,12 +82,12 @@ export default function Post({ post }) {
     mutation.mutate(likes.includes(currentUser.id));
   };
 
-  // Update and delete post
+  // Open update form
   const handleUpdate = () => {
     setOpenUpdate(true);
   };
 
-// 
+  // Delete post
   const deleteMutation = useMutation(
     (postId) => makeRequest.delete(`/posts/${postId}`),
     {

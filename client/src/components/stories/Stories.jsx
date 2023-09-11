@@ -64,7 +64,7 @@ export default function Stories() {
   //     .catch((error) => console.log(error));
   // };
 
-  // const { isLoading, error, data } = useQuery(["stories"], fetchStories);
+  // const { isLoading, error, data: stories } = useQuery({queryKey: ["stories"], queryFn: fetchStories});
 
   return (
     <div className="stories">
@@ -98,12 +98,12 @@ export default function Stories() {
           ? "Something went wrong."
           : isLoading
           ? "Loading..."
-          : data.map((story) => (
+          : stories.length === 0 ? (<div className="msg">No story to show yet.</div>) : (stories.map((story) => (
               <div className="story" key={story.id}>
                 <img src={story.img} alt="story" />
                  <span>{story.firstName} {story.lastName}</span>
               </div>
-            ))} */}
+            )))} */}
       </div>
     </div>
   );
