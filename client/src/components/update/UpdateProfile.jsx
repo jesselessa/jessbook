@@ -19,6 +19,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     lastName: user.lastName,
     // email: user.email,
     // password: user.password,
+    // confirmPswsd: user.confirmPswd,
     city: user.city,
   });
 
@@ -166,6 +167,14 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
           <input
             type="text"
             value={fields.password}
+            name="password"
+            onChange={handleChange}
+          /> */}
+
+          {/* <label>Confirm password</label>
+          <input
+            type="text"
+            value={fields.confirmPswd}
             name="password"
             onChange={handleChange}
           /> */}
