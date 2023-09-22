@@ -12,8 +12,8 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function UpdateProfile({ user, setOpenUpdate }) {
-  const [cover, setCover] = useState(null);
-  const [profile, setProfile] = useState(null);
+  const [cover, setCover] = useState("");
+  const [profile, setProfile] = useState("");
   const [fields, setFields] = useState({
     firstName: user.firstName,
     lastName: user.lastName,

@@ -8,10 +8,17 @@ export const getPosts = (req, res) => {
   const q =
     userId !== "undefined"
       ? `SELECT p.*, u.id AS userId, firstName, lastName, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) WHERE p.userId = ? ORDER BY p.creationDate DESC`
-      : `SELECT p.*, u.id AS userId, firstName, lastName, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId)
-  LEFT JOIN relationships AS r ON (p.userId = r.followedUserId) WHERE r.followerUserId = ? OR p.userId = ?
-  ORDER BY p.creationDate DESC`;
+      // Using a subquery instead of LEFT JOIN prevents from getting connected user's posts with the same ID rendered multiple times - Still don't know why
+      : `SELECT p.*, u.id AS userId, firstName, lastName, profilePic FROM posts AS p
+      JOIN users AS u ON (u.id = p.userId)
+      WHERE p.userId = ? OR p.userId IN (SELECT followedUserId FROM relationships WHERE followerUserId = ?)
+      ORDER BY p.creationDate DESC`;
+  //     `SELECT p.*, u.id AS userId, firstName, lastName, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId)
+  // LEFT JOIN relationships AS r ON (p.userId = r.followedUserId) WHERE r.followerUserId = ? OR p.userId = ?
+  // ORDER BY p.creationDate DESC`;
   // DESC = most recent posts shown first
+
+   
 
   const values =
     userId !== "undefined" ? [userId] : [loggedInUserId, loggedInUserId];
