@@ -5,6 +5,10 @@ import cookieParser from "cookie-parser";
 // Multer configuration
 import { upload } from "./middlewares/upload.js";
 
+// Environment variables
+const HOST = process.env.REACT_APP_HOST;
+const PORT = process.env.REACT_APP_PORT;
+
 // Routes
 import authRoute from "./routes/auth.js"; //! Error if no file extension
 import usersRoute from "./routes/users.js";
@@ -45,8 +49,6 @@ app.post("/uploads", upload, (req, res) => {
 });
 
 // Start server
-const HOST = process.env.REACT_APP_HOST;
-const PORT = process.env.REACT_APP_PORT;
 app.listen(PORT, () => {
   console.log(`Server listening at http://${HOST}:${PORT}`);
 });
