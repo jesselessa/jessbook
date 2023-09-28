@@ -25,7 +25,7 @@ app.use((_req, res, next) => {
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173", // 5173 = Vite (CRA alternative)
+    origin: process.env.REACT_APP_CLIENT_URL,
   })
 );
 app.use(cookieParser());
@@ -38,14 +38,15 @@ app.use("/likes", likesRoute);
 app.use("/relationships", relationshipsRoute);
 app.use("/stories", storiesRoute);
 
-// Multer 
+// Multer
 app.post("/uploads", upload, (req, res) => {
   const file = req.file;
   res.status(200).json(file.filename);
 });
 
 // Start server
-const PORT = process.env.REACT_APP_PORT || 8000;
+const HOST = process.env.REACT_APP_HOST;
+const PORT = process.env.REACT_APP_PORT;
 app.listen(PORT, () => {
-  console.log(`Server listening at http://localhost:${PORT}`);
+  console.log(`Server listening at http://${HOST}:${PORT}`);
 });
