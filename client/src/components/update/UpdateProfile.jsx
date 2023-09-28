@@ -19,9 +19,18 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     lastName: user.lastName,
     // email: user.email,
     // password: user.password,
-    // confirmPswsd: user.confirmPswd,
+    // confirmPswd: user.confirmPswd,
     city: user.city,
   });
+
+  // Handle errors from form
+  // const [validationErrors, setValidationErrors] = useState({
+  //   firstName: "",
+  //   lastName: "",
+  //   email: "",
+  //   password: "",
+  //   confirmPswd: "",
+  // });
 
   const { currentUser, setCurrentUser } = useContext(AuthContext);
 
@@ -79,7 +88,6 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     }
 
     // Create a copy of user object with updated values
-
     const updatedUser = {
       ...user, // user currently displayed in component
       ...fields,

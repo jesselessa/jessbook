@@ -3,6 +3,7 @@ import "./leftBar.scss";
 import { useNavigate } from "react-router-dom";
 
 // Images
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 import friends from "../../assets/images/leftBar/friends.png";
 import video from "../../assets/images/leftBar/video.png";
 import groups from "../../assets/images/leftBar/group.png";
@@ -38,7 +39,7 @@ export default function LeftBar() {
               src={
                 currentUser.profilePic
                   ? `/uploads/${currentUser.profilePic}`
-                  : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  : defaultProfile
               }
               alt="profile"
             />

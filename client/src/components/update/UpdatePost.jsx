@@ -9,7 +9,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 export default function UpdatePost({ post, setOpenUpdate }) {
   const [desc, setDesc] = useState(post.desc);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState("");
 
   const queryClient = useQueryClient();
 

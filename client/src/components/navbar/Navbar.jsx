@@ -18,6 +18,9 @@ import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 
+// Images
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
+
 // Contexts
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
 import { AuthContext } from "../../contexts/authContext.jsx";
@@ -95,7 +98,7 @@ export default function Navbar() {
           src={
             currentUser.profilePic
               ? `/uploads/${currentUser.profilePic}`
-              : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              : defaultProfile
           }
           onClick={navigateAndScrollTop}
           alt="profile"

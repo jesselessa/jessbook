@@ -18,6 +18,9 @@ import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
+// Images
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
+
 // Context
 import { AuthContext } from "../../contexts/authContext";
 
@@ -117,7 +120,7 @@ export default function Post({ post }) {
               src={
                 post.profilePic
                   ? `/uploads/${post.profilePic}`
-                  : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  : defaultProfile
               }
               alt="user"
             />

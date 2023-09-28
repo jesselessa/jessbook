@@ -15,6 +15,10 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlaceIcon from "@mui/icons-material/Place";
 
+// Images
+import defaultCover from "../../assets/images/users/defaultCover.jpeg";
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
+
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
@@ -84,11 +88,7 @@ export default function ProfileData() {
           <div className="profileContainer">
             <div className="images">
               <img
-                src={
-                  user.coverPic
-                    ? `/uploads/${user.coverPic}`
-                    : "https://images.pexels.com/photos/2314363/pexels-photo-2314363.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                }
+                src={user.coverPic ? `/uploads/${user.coverPic}` : defaultCover}
                 className="cover"
                 alt="cover"
               />
@@ -98,7 +98,7 @@ export default function ProfileData() {
                   src={
                     user.profilePic
                       ? `/uploads/${user.profilePic}`
-                      : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                      : defaultProfile
                   }
                   className="profilePic"
                   alt="profile"

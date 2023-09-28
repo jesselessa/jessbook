@@ -3,6 +3,9 @@ import "./publish.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.jsx";
 
+// Images
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
+
 // Contexts
 import { AuthContext } from "../../contexts/authContext.jsx";
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
@@ -80,7 +83,7 @@ export default function Publish() {
               src={
                 currentUser.profilePic
                   ? `/uploads/${currentUser.profilePic}`
-                  : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  : defaultProfile
               }
               alt="user"
             />

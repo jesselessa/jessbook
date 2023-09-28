@@ -4,6 +4,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.jsx";
 import moment from "moment";
 
+// Images
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
+
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
@@ -92,7 +95,7 @@ export default function Comments({ postId }) {
             src={
               currentUser.profilePic
                 ? `/uploads/${currentUser.profilePic}`
-                : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                : defaultProfile
             }
             alt="user"
           />
@@ -126,7 +129,7 @@ export default function Comments({ postId }) {
                   src={
                     comment.profilePic
                       ? `/uploads/${comment.profilePic}`
-                      : "https://images.pexels.com/photos/1454288/pexels-photo-1454288.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                      : defaultProfile
                   }
                   alt="user"
                 />
