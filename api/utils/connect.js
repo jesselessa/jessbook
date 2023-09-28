@@ -3,10 +3,10 @@ import mysql from "mysql";
 
 // Configure database
 export const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
+  host: process.env.REACT_APP_DB_HOST,
+  user: process.env.REACT_APP_DB_USER,
   password: process.env.REACT_APP_DB_PSWD,
-  database: "jessbook",
+  database: process.env.REACT_APP_DB_NAME,
 });
 
 db.connect(function (error) {
