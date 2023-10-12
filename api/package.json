@@ -1,8 +1,8 @@
 {
-  "name": "backend",
+  "name": "api",
   "version": "1.0.0",
   "type": "module",
-  "description": "Backend for Social Media App",
+  "description": "API for Jessbook, a social media app",
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js"
