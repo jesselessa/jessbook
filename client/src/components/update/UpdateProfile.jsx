@@ -64,6 +64,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       onSuccess: () => {
         // Invalidate and refetch
         queryClient.invalidateQueries(["user"]);
+        toast.success("Profile updated.");
       },
     }
   );
@@ -101,7 +102,6 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
 
     mutation.mutate(updatedUser);
 
-    toast.success("Profile updated.");
     navigate(`/profile/${currentUser.id}`);
   };
 
