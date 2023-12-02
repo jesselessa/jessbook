@@ -51,7 +51,7 @@ export const login = (req, res) => {
     if (!checkPswd) return res.status(400).json("Invalid email or password.");
 
     //* Generate token with jsonwebtoken
-    const secretKey = process.env.REACT_APP_SECRET;
+    const secretKey = process.env.SECRET;
 
     let token;
 

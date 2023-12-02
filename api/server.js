@@ -6,8 +6,8 @@ import cookieParser from "cookie-parser";
 import { upload } from "./middlewares/upload.js";
 
 // Environment variables
-const HOST = process.env.REACT_APP_HOST;
-const PORT = process.env.REACT_APP_PORT;
+const host = process.env.HOST;
+const port = process.env.PORT;
 
 // Routes
 import authRoute from "./routes/auth.js"; //! Error if no file extension
@@ -29,7 +29,7 @@ app.use((_req, res, next) => {
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.REACT_APP_CLIENT_URL,
+    origin: process.env.CLIENT_URL,
   })
 );
 app.use(cookieParser());
@@ -49,6 +49,6 @@ app.post("/uploads", upload, (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server listening at http://${host}:${port}`);
 });

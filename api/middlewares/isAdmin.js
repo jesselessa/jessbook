@@ -7,7 +7,7 @@ export const isAdmin = (req, res, next) => {
     return res.status(401).json("User not logged in.");
   }
 
-  jwt.verify(token, process.env.REACT_APP_SECRET, (error, userInfo) => {
+  jwt.verify(token, process.env.SECRET, (error, userInfo) => {
     if (error) {
       console.log(error);
       return res.status(403).json("Invalid token.");
