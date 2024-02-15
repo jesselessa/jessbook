@@ -10,6 +10,7 @@ Jessbook is a social media application inspired from Facebook and Twitter that a
   - [Backend](#backend)
 - [Screenshot](#screenshot)
 - [Main features](#main-features)
+- [Setting up the database](#setting-up-the-database)
 - [Run the project locally](#run-the-project-locally)
 - [Getting started with Vite](#getting-started-with-vite)
 - [Contributing](#contributing)
@@ -34,7 +35,7 @@ You can see a live demo of the project [here](https://).
 
 - The API was built with **Node.js** and **Express**.
 
-- The database queries were performed using **SQL** with **MySQL Workbench**.
+- The database queries were performed using **MySQL**.
 
 ## Screenshot
 
@@ -42,23 +43,36 @@ You can see a live demo of the project [here](https://).
 
 ## Main features
 
-- Authenticate users with JWT an bcrypt.
+- Authenticate users with **JWT** an **bcrypt**.
 - Allow users to reset their password.
 - Enable user to create, update or delete posts.
 - Fetch users posts from the backend API and display them on their profile page.
 - Facilitate interactions between users with features such as "like" and "follow"/"unfollow".
 - Support both dark and light themes for the user interface.
 
+## Setting up the database
+
+Before running the project locally, you will need to set up the database. Follow the following steps :
+
+### 1. Create a MySQL database
+
+If you have not already done so, create a MySQL database for Jessbook. You can do this using MySQL Workbench or any other MySQL database management tool.
+
+### 2. Configure database connection
+
+Update the database connection configuration in the project to match your local MySQL database settings. You can find the database configuration file at the following path : `api/utils/connect.js`.
+
 ## Run the project locally
 
-1. Before running the project locally, launch the database.
-2. Open your terminal and navigate to the location where you want the local repository to be copied
-3. Clone the repository : `git clone https://github.com/jesselessa/jessbook.git`
-4. Navigate to the project directory : `cd jessbook`
-5. Inside the project directory :
+Now that the database is set up, you can run the project locally by following these steps :
+
+1. Open your terminal and navigate to the location where you want the local repository to be copied
+2. Clone the repository : `git clone https://github.com/jesselessa/jessbook.git`
+3. Navigate to the project directory : `cd jessbook`
+4. Inside the project directory :
    - Run the application in development mode : `npm run dev`
    - Start the server to connect it to the database : `npm start`
-6. Open http://localhost:5173 in your web browser to view the live application
+5. Open http://localhost:5173 in your web browser to view the live application
 
 ## Getting Started with Vite
 
@@ -94,7 +108,7 @@ This will generate a production-ready version of your application in the `dist` 
 
 Feel free to make improvements, fix bugs, or suggest new features. Contributions are welcomed !
 
-- Fork the repository and clone it to your local machine : `git clone https://github.com/jesselessa/jessbook.git`
+- Fork the repository and clone it to your local machine : `git clone https://github.com/jesselessa/jessbook.git`.
 - Install dependencies by running `npm install`.
 - Create a new branch for your feature or bug fix : `git checkout -b my-feature`.
 - Make your changes and ensure that your code follows the project coding style.
@@ -104,7 +118,7 @@ Feel free to make improvements, fix bugs, or suggest new features. Contributions
 
 ## Stay updated
 
-To stay updated with the project latest changes, you can pull them from the repository : `git pull origin main`
+To stay updated with the project latest changes, you can pull them from the repository : `git pull origin main`.
 
 ## Contact
 
