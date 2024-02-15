@@ -74,6 +74,8 @@ Now that the database is set up, you can run the project locally by following th
    - Start the server to connect it to the database : `npm start`.
 5. Open http://localhost:5173 in your web browser to view the live application.
 
+Make sure to complete the values of the **environment variables** necessary to the project in a `.env` file in order to make it work.
+
 ## Getting Started with Vite
 
 [Vite](https://vitejs.dev/) is a fast development tool for modern web applications. To get started with Vite, follow these simple steps :
@@ -111,11 +113,11 @@ Feel free to make improvements, fix bugs, or suggest new features. Contributions
 - Fork the repository and clone it to your local machine : `git clone https://github.com/jesselessa/jessbook.git`.
 - Navigate to the project directory : `cd jessbook`.
 - Inside the project directory :
-   - Install dependencies by running `npm install`.
-   - Create a new branch for your feature or bug fix : `git checkout -b my-feature`.
-   - Make your changes and ensure that your code follows the project coding style.
-   - Test your changes locally.
-   - Commit your changes and push them to your forked repository.
+  - Install dependencies by running `npm install`.
+  - Create a new branch for your feature or bug fix : `git checkout -b my-feature`.
+  - Make your changes and ensure that your code follows the project coding style.
+  - Test your changes locally.
+  - Commit your changes and push them to your forked repository.
 - Finally, submit a pull request to the main repository with a clear description of your changes.
 
 ## Stay updated
