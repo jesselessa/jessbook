@@ -27,7 +27,7 @@ You can see a live demo of the project [here](https://).
 
 - The user interface was created with **React** using **Vite** tool for rapid development and **Sass** for styling.
 
-- Client-side data requests, intelligent caching, and loading/error state management were handled using **TantStack Query** (formerly known as **React Query**).
+- Client-side data requests, intelligent caching, and loading/error state management were handled using **TanStack Query** (formerly known as **React Query**).
 
 - The application navigation was managed by **React Router**.
 
@@ -66,13 +66,13 @@ Update the database connection configuration in the project to match your local 
 
 Now that the database is set up, you can run the project locally by following these steps :
 
-1. Open your terminal and navigate to the location where you want the local repository to be copied
-2. Clone the repository : `git clone https://github.com/jesselessa/jessbook.git`
-3. Navigate to the project directory : `cd jessbook`
+1. Open your terminal and navigate to the location where you want the local repository to be copied.
+2. Clone the repository : `git clone https://github.com/jesselessa/jessbook.git`.
+3. Navigate to the project directory : `cd jessbook`.
 4. Inside the project directory :
-   - Run the application in development mode : `npm run dev`
-   - Start the server to connect it to the database : `npm start`
-5. Open http://localhost:5173 in your web browser to view the live application
+   - Run the application in development mode : `npm run dev`.
+   - Start the server to connect it to the database : `npm start`.
+5. Open http://localhost:5173 in your web browser to view the live application.
 
 ## Getting Started with Vite
 
@@ -109,12 +109,14 @@ This will generate a production-ready version of your application in the `dist` 
 Feel free to make improvements, fix bugs, or suggest new features. Contributions are welcomed !
 
 - Fork the repository and clone it to your local machine : `git clone https://github.com/jesselessa/jessbook.git`.
-- Install dependencies by running `npm install`.
-- Create a new branch for your feature or bug fix : `git checkout -b my-feature`.
-- Make your changes and ensure that your code follows the project coding style.
-- Test your changes locally.
-- Commit your changes and push them to your forked repository.
-- Submit a pull request to the main repository with a clear description of your changes.
+- Navigate to the project directory : `cd jessbook`.
+- Inside the project directory :
+   - Install dependencies by running `npm install`.
+   - Create a new branch for your feature or bug fix : `git checkout -b my-feature`.
+   - Make your changes and ensure that your code follows the project coding style.
+   - Test your changes locally.
+   - Commit your changes and push them to your forked repository.
+- Finally, submit a pull request to the main repository with a clear description of your changes.
 
 ## Stay updated
 
