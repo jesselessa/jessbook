@@ -6,8 +6,8 @@ Jessbook is a social media application inspired from Facebook and Twitter that a
 
 - [Demo](#demo)
 - [Stack](#stack)
-    - [Frontend](#frontend)
-    - [Backend](#backend)
+  - [Frontend](#frontend)
+  - [Backend](#backend)
 - [Screenshot](#screenshot)
 - [Main features](#main-features)
 - [Run the project locally](#run-the-project-locally)
@@ -25,16 +25,16 @@ You can see a live demo of the project [here](https://).
 ### Frontend
 
 - The user interface was created with **React** using **Vite** tool for rapid development and **Sass** for styling.
-  
+
 - Client-side data requests, intelligent caching, and loading/error state management were handled using **TantStack Query** (formerly known as **React Query**).
-  
+
 - The application navigation was managed by **React Router**.
 
 ### Backend
 
 - The API was built with **Node.js** and **Express**.
 
-- The database queries were performed using **SQL** with **MySQL Workbench**.  
+- The database queries were performed using **SQL** with **MySQL Workbench**.
 
 ## Screenshot
 
@@ -42,11 +42,12 @@ You can see a live demo of the project [here](https://).
 
 ## Main features
 
-- User authentication with JWT an bcrypt
-- Password reset
-- Content management
-- Interactions between users ("like" and "follow"/"unfollow" features)
-- Dark/light theme
+- Authenticate users with JWT an bcrypt.
+- Allow users to reset their password.
+- Enable user to create, update or delete posts.
+- Fetch users posts from the backend API and display them on their profile page.
+- Facilitate interactions between users with features such as "like" and "follow"/"unfollow".
+- Support both dark and light themes for the user interface.
 
 ## Run the project locally
 
@@ -55,9 +56,9 @@ You can see a live demo of the project [here](https://).
 3. Clone the repository : `git clone https://github.com/jesselessa/jessbook.git`
 4. Navigate to the project directory : `cd jessbook`
 5. Inside the project directory :
-    - Run the application in development mode : `npm run dev`
-    - Start the server to connect it to the database : `npm start`
-7. Open http://localhost:5173 in your web browser to view the live application
+   - Run the application in development mode : `npm run dev`
+   - Start the server to connect it to the database : `npm start`
+6. Open http://localhost:5173 in your web browser to view the live application
 
 ## Getting Started with Vite
 
@@ -98,7 +99,7 @@ Feel free to make improvements, fix bugs, or suggest new features. Contributions
 - Create a new branch for your feature or bug fix : `git checkout -b my-feature`.
 - Make your changes and ensure that your code follows the project coding style.
 - Test your changes locally.
-- Commit your changes and push to your forked repository.
+- Commit your changes and push them to your forked repository.
 - Submit a pull request to the main repository with a clear description of your changes.
 
 ## Stay updated

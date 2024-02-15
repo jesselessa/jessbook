@@ -7,7 +7,7 @@ import { upload } from "./middlewares/upload.js";
 
 // Environment variables
 const host = process.env.HOST;
-const port = process.env.PORT;
+const PORT = process.env.PORT;
 
 // Routes
 import authRoute from "./routes/auth.js"; //! Error if no file extension
@@ -49,6 +49,6 @@ app.post("/uploads", upload, (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`Server listening at http://${host}:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server listening at http://${host}:${PORT}`);
 });

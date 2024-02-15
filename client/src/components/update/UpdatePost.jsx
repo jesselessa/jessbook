@@ -8,7 +8,8 @@ import { toast } from "react-toastify";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 export default function UpdatePost({ post, setOpenUpdate }) {
-  const [desc, setDesc] = useState(post.desc);
+  const [desc, setDesc] = useState("");
+  // const [desc, setDesc] = useState(post.desc);
   const [image, setImage] = useState("");
 
   const queryClient = useQueryClient();
