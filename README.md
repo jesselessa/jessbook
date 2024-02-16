@@ -8,7 +8,7 @@ Jessbook is a social media application inspired from Facebook and Twitter that a
 - [Stack](#stack)
   - [Frontend](#frontend)
   - [Backend](#backend)
-- [Screenshot](#screenshot)
+- [Screenshots](#screenshots)
 - [Main features](#main-features)
 - [Setting up the database](#setting-up-the-database)
 - [Run the project locally](#run-the-project-locally)
@@ -37,9 +37,15 @@ You can see a live demo of the project [here](https://).
 
 - The database queries were performed using **MySQL**.
 
-## Screenshot
+## Screenshots
 
-![Screenshot](./public/screenshot.png)
+### Login and register pages
+
+![Screenshot1](./public/screenshots/screenshot1.png)
+
+### Home and profile pages
+
+![Screenshot2](./public/screenshots/screenshot2.png)
 
 ## Main features
 
