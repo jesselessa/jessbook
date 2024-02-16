@@ -39,11 +39,7 @@ You can see a live demo of the project [here](https://).
 
 ## Screenshots
 
-### Login and register pages
-
 ![Screenshot1](./client/public/screenshots/screenshot1.png)
-
-### Home and profile pages
 
 ![Screenshot2](./client/public/screenshots/screenshot2.png)
 
