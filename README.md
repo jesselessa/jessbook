@@ -2,6 +2,7 @@
 
 Jessbook is a social media application inspired from Facebook and Twitter that allows users to manage content and interact with other users.
 
+
 ## Table of Contents
 
 - [Demo](#demo)
@@ -17,9 +18,11 @@ Jessbook is a social media application inspired from Facebook and Twitter that a
 - [Stay Updated](#stay-updated)
 - [Contact](#contact)
 
+
 ## Demo
 
 You can see a live demo of the project [here](https://).
+
 
 ## Stack
 
@@ -40,8 +43,8 @@ You can see a live demo of the project [here](https://).
 ## Screenshots
 
 ![Screenshot1](./client/public/screenshots/screenshot1.png)
-
 ![Screenshot2](./client/public/screenshots/screenshot2.png)
+
 
 ## Main features
 
@@ -64,6 +67,7 @@ If you have not already done so, create a MySQL database for Jessbook. You can d
 
 Update the database connection configuration in the project to match your local MySQL database settings. You can find the database configuration file at the following path : `api/utils/connect.js`.
 
+
 ## Run the project locally
 
 Now that the database is set up, you can run the project locally by following these steps :
@@ -77,6 +81,7 @@ Now that the database is set up, you can run the project locally by following th
 5. Open http://localhost:5173 in your web browser to view the live application.
 
 Make sure to complete the values of the **environment variables** necessary to the project in a `.env` file in order to make it work.
+
 
 ## Getting Started with Vite
 
@@ -108,6 +113,7 @@ To build an optimized version of your application ready for production, use the 
 
 This will generate a production-ready version of your application in the `dist` directory of your project.
 
+
 ## Contributing
 
 Feel free to make improvements, fix bugs, or suggest new features. Contributions are welcomed !
@@ -122,9 +128,11 @@ Feel free to make improvements, fix bugs, or suggest new features. Contributions
   - Commit your changes and push them to your forked repository.
 - Finally, submit a pull request to the main repository with a clear description of your changes.
 
+
 ## Stay updated
 
 To stay updated with the project latest changes, you can pull them from the repository : `git pull origin main`.
+
 
 ## Contact
 
