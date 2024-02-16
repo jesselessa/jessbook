@@ -41,11 +41,11 @@ You can see a live demo of the project [here](https://).
 
 ### Login and register pages
 
-![Screenshot1](./public/screenshots/screenshot1.png)
+![Screenshot1](./client/public/screenshots/screenshot1.png)
 
 ### Home and profile pages
 
-![Screenshot2](./public/screenshots/screenshot2.png)
+![Screenshot2](./client/public/screenshots/screenshot2.png)
 
 ## Main features
 
