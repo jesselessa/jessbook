@@ -40,11 +40,12 @@ You can see a live demo of the project [here](https://).
 ## Screenshots
 
 ![Screenshot1](./client/public/screenshots/screenshot1.png)
+
 ![Screenshot2](./client/public/screenshots/screenshot2.png)
 
 ## Main features
 
-- Authenticate users with **JWT** an **bcrypt**.
+- Set up users authentication and registration.
 - Allow users to reset their password.
 - Enable user to create, update or delete posts.
 - Fetch users posts from the backend API and display them on their profile page.
