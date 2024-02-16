@@ -40,6 +40,7 @@ You can see a live demo of the project [here](https://).
 
 - The database queries were performed using **MySQL**.
 
+
 ## Screenshots
 
 ![Screenshot1](./client/public/screenshots/screenshot1.png)
@@ -54,6 +55,7 @@ You can see a live demo of the project [here](https://).
 - Fetch users posts from the backend API and display them on their profile page.
 - Facilitate interactions between users with features such as "like" and "follow"/"unfollow".
 - Support both dark and light themes for the user interface.
+
 
 ## Setting up the database
 
