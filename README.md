@@ -40,7 +40,6 @@ You can see a live demo of the project [here](https://).
 ## Screenshots
 
 ![Screenshot1](./client/public/screenshots/screenshot1.png)
-
 ![Screenshot2](./client/public/screenshots/screenshot2.png)
 
 ## Main features
