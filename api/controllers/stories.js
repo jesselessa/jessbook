@@ -2,12 +2,34 @@ import { db } from "../utils/connect.js";
 import moment from "moment";
 
 export const getStories = (req, res) => {
+  const userId = req.query.userId;
   const loggedInUserId = req.userInfo.id;
 
-  const q = `SELECT s.*, name FROM stories AS s JOIN users AS u ON (u.id = s.userId)
-    LEFT JOIN relationships AS r ON (s.userId = r.followedUserId AND r.followerUserId= ?) LIMIT 5`;
+  const q =
+    userId !== "undefined"
+      ? `SELECT s.*, u.id AS userId, u.firstName, u.lastName
+      FROM stories AS s 
+      JOIN users AS u ON (u.id = s.userId) 
+      WHERE s.userId = ? 
+      ORDER BY s.createdAt DESC`
+      : `
 
-  db.query(q, [loggedInUserId], (error, data) => {
+      SELECT s.*, u.id as userId, u.firstName, u.lastName
+      FROM stories AS s
+      JOIN users AS u ON (u.id = s.userId)
+      WHERE s.userId = ? OR s.userId IN (SELECT followedUserId 
+      FROM relationships WHERE followerUserId = ?)
+      AND s.expiresAt > NOW()
+      ORDER BY
+            CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
+            s.createdAt DESC;`;
+
+  const values =
+    userId !== "undefined"
+      ? [userId]
+      : [loggedInUserId, loggedInUserId, loggedInUserId];
+
+  db.query(q, values, (error, data) => {
     if (error) return res.status(500).json(error);
     return res.status(200).json(data);
   });
@@ -16,10 +38,24 @@ export const getStories = (req, res) => {
 export const addStory = (req, res) => {
   const loggedInUserId = req.userInfo.id;
 
-  const q = "INSERT INTO stories(`img`, `creationDate`, `userId`) VALUES (?)";
+  // Check video length doesn't exceede 60 secondes
+  if (req.body.videoDuration > 60) {
+    return res.status(400).json("Video duration exceeds the 60-second limit.");
+  }
+
+  const currentDateTime = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
+  const expirationDateTime = moment(Date.now())
+    .add(24, "hours")
+    .format("YYYY-MM-DD HH:mm:ss");
+
+  const q =
+    "INSERT INTO stories(`image`, `video`,`createdAt`, `expiresAt`, `userId`) VALUES (?)";
+
   const values = [
-    req.body.img,
-    moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+    req.body.image || null,
+    req.body.video || null,
+    currentDateTime,
+    expirationDateTime,
     loggedInUserId,
   ];
 
@@ -31,12 +67,13 @@ export const addStory = (req, res) => {
 
 export const deleteStory = (req, res) => {
   const loggedInUserId = req.userInfo.id;
+  const storyId = req.params.storyId;
 
-  const q = "DELETE FROM stories WHERE `id`=? AND `userId` = ?";
+  const q = "DELETE FROM stories WHERE `id`= ? AND `userId` = ?";
 
-  db.query(q, [req.params.id, loggedInUserId], (error, data) => {
+  db.query(q, [storyId, loggedInUserId], (error, data) => {
     if (error) return res.status(500).json(error);
     if (data.affectedRows > 0) return res.status(200).json("Story deleted.");
-    return res.status(403).json("User can only delete their own post.");
+    return res.status(403).json("User can only delete their own story.");
   });
 };

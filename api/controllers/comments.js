@@ -4,9 +4,11 @@ import moment from "moment";
 export const getComments = (req, res) => {
   const postId = req.query.postId;
 
-  const q = `SELECT c.*, u.id AS userId, firstName, lastName, profilePic FROM comments AS c JOIN users AS u ON (u.id = c.userId)
-    WHERE c.postId = ? ORDER BY c.creationDate DESC
-    `;
+  const q = `SELECT c.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 
+    FROM comments AS c 
+    JOIN users AS u ON (u.id = c.userId) WHERE c.postId = ? 
+    ORDER BY c.creationDate DESC
+      `;
 
   db.query(q, [postId], (error, data) => {
     if (error) return res.status(500).json(error);
@@ -19,13 +21,9 @@ export const addComment = (req, res) => {
 
   const q =
     "INSERT INTO comments(`desc`, `creationDate`, `userId`, `postId`) VALUES (?)";
+  creationDate = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
 
-  const values = [
-    req.body.desc,
-    moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-    loggedInUserId,
-    req.body.postId,
-  ];
+  const values = [req.body.desc, creationDate, loggedInUserId, req.body.postId];
 
   db.query(q, [values], (error, _data) => {
     if (error) return res.status(500).json(error);
@@ -34,7 +32,7 @@ export const addComment = (req, res) => {
 };
 
 export const updateComment = (req, res) => {
-  const commentId = req.params.id;
+  const commentId = req.params.commentId;
   const loggedInUserId = req.userInfo.id;
   const { desc } = req.body;
 
@@ -53,8 +51,8 @@ export const updateComment = (req, res) => {
 
 export const deleteComment = (req, res) => {
   const loggedInUserId = req.userInfo.id;
+  const commentId = req.params.commentId;
 
-  const commentId = req.params.id;
   const q = "DELETE FROM comments WHERE `id` = ? AND `userId` = ?";
 
   db.query(q, [commentId, loggedInUserId], (error, data) => {

@@ -5,16 +5,26 @@ export const getPosts = (req, res) => {
   const userId = req.query.userId;
   const loggedInUserId = req.userInfo.id;
 
+  // Get all user's posts plus those of users he follows
   const q =
+    // Determine SQL query based on presence of a specific userId
     userId !== "undefined"
-      ? `SELECT p.*, u.id AS userId, firstName, lastName, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) WHERE p.userId = ? ORDER BY p.creationDate DESC`
-      : // `p.userId IN (...)` : checks whether the user's ID who created the post (p.userId) is included in a set of specific users IDs, which is is obtained from the subquery 
-        `SELECT p.*, u.id AS userId, firstName, lastName, profilePic FROM posts AS p
+      ? `SELECT p.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 
+      FROM posts AS p 
+      JOIN users AS u ON (u.id = p.userId) 
+      WHERE p.userId = ? 
+      ORDER BY p.creationDate DESC`
+      : // `p.userId IN (...)` : checks whether the user's ID who created the post (p.userId) is included in a set of specific users IDs, which is is obtained from the subquery
+        `
+      SELECT p.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 
+      FROM posts AS p
       JOIN users AS u ON (u.id = p.userId)
-      WHERE p.userId = ? OR p.userId IN (SELECT followedUserId FROM relationships WHERE followerUserId = ?)
+      WHERE p.userId = ? OR p.userId IN (SELECT followedUserId 
+      FROM relationships WHERE followerUserId = ?)
       ORDER BY p.creationDate DESC`;
   // DESC = most recent posts shown first
 
+  // Define values for SQL parameters
   const values =
     userId !== "undefined" ? [userId] : [loggedInUserId, loggedInUserId];
 
@@ -26,17 +36,12 @@ export const getPosts = (req, res) => {
 
 export const addPost = (req, res) => {
   const loggedInUserId = req.userInfo.id;
+  const currentDateTime = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"); // Tranforms date in MySQL format
 
   const q =
     "INSERT INTO posts(`desc`, `img`, `creationDate`, `userId`) VALUES (?)";
 
-  const values = [
-    req.body.desc,
-    req.body.img,
-    moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-    // To tranform date in MySQL format
-    loggedInUserId,
-  ];
+  const values = [req.body.desc, req.body.img, currentDateTime, loggedInUserId];
 
   db.query(q, [values], (error, _data) => {
     if (error) return res.status(500).json(error);
@@ -88,10 +93,11 @@ export const updatePost = (req, res) => {
 
 export const deletePost = (req, res) => {
   const loggedInUserId = req.userInfo.id;
+  const postId = req.params.postId;
 
   const q = "DELETE FROM posts WHERE `id`= ? AND `userId` = ?";
 
-  db.query(q, [req.params.postId, loggedInUserId], (error, data) => {
+  db.query(q, [postId, loggedInUserId], (error, data) => {
     if (error) return res.status(500).json(error);
     if (data.affectedRows > 0) return res.status(200).json("Post deleted.");
     return res.status(403).json("User can only delete their post.");
