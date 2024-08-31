@@ -96,7 +96,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
           </div>
           <label>Add a text</label>
           <textarea
-            rows={5}
+            rows={8}
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
           />

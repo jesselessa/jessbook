@@ -3,40 +3,36 @@
 .update {
   @include themify($themes) {
     position: fixed;
-    top: 71px;
-    right: 30vw;
-    width: 50vw;
-    min-height: calc(100vh - 71px);
-    background-color: rgba(0, 0, 0, 0.5);
+    top: 70px; // Navbar height
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 500;
-
-    @include medium {
-      width: 80vw;
-      right: 0;
-    }
-
-    @include tablet {
-      width: 100vw;
-    }
 
     .wrapper {
-      position: relative;
-      width: 100%;
-      color: themed("textColor");
-      background-color: themed("bg");
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      max-width: 600px;
+      min-height: 425px;
+      overflow-y: auto;
+      color: #333;
+      background-color: white;
       display: flex;
       flex-direction: column;
-      padding: 2rem;
-      box-shadow: 0px 0px 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      -webkit-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      -moz-box-shadow: 0px 0px 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+      justify-content: space-between;
+      padding: 2rem 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
 
       @include small {
-        padding: 3.5rem 1rem 2rem 1rem;
+        width: 95%;
       }
 
       h1 {
@@ -48,7 +44,7 @@
       form {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 1rem;
 
         .files {
           display: flex;
@@ -62,7 +58,7 @@
           }
 
           span {
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
           }
         }
 
@@ -84,6 +80,7 @@
               width: 80px;
               height: 80px;
               object-fit: cover;
+              object-position: center;
             }
 
             .icon {
@@ -133,11 +130,11 @@
 
       .close {
         position: absolute;
-        top: 10px;
-        right: 20px;
+        top: 1rem;
+        right: 1rem;
         border: none;
         background-color: #f0544f;
-        padding: 5px;
+        padding: 0.5rem;
         cursor: pointer;
         color: white;
         font-weight: bold;

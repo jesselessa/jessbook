@@ -11,6 +11,7 @@
     background-color: themed(bgSoft);
     padding: 2rem 1rem;
     gap: 2rem;
+    z-index: -1; // Modal over right bar
 
     @include medium {
       display: none;
