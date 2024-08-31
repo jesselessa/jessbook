@@ -12,6 +12,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    z-index: 100; // Modal over profile pic in ProfileData
 
     .wrapper {
       position: absolute;

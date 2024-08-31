@@ -52,7 +52,7 @@
           right: 0;
           top: 195px; // 280px (cover height) - 85px (1/2 div height)
           margin: auto;
-          z-index: 100;
+          z-index: 90;
 
           @include small {
             width: 110px;
