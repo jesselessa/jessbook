@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -17,6 +17,28 @@ import { AuthContext } from "./contexts/authContext.jsx";
 function App() {
   const { currentUser } = useContext(AuthContext);
 
+  // Force portrait mode for mobile devices on component mounting
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+      const isSmallScreen = window.innerWidth <= 600;
+
+      if (isLandscape && isSmallScreen) {
+        screen.orientation.lock("portrait").catch((err) => {
+          console.warn("Orientation lock failed: ", err);
+        });
+      }
+    };
+
+    window.addEventListener("orientationchange", handleOrientationChange);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("orientationchange", handleOrientationChange);
+    };
+  }, []);
+
+  // Handle navigation
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
       return <Login />;

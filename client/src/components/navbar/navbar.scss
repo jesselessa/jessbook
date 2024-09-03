@@ -3,7 +3,7 @@
 .navbar {
   @include themify($themes) {
     height: 70px;
-    width: 100vw;
+    max-width: 100vw;
     position: sticky;
     top: 0;
     color: themed("iconColor");
@@ -15,7 +15,7 @@
     z-index: 100;
 
     @include small {
-      padding: 1rem;
+      padding: 0.5rem;
       justify-content: center;
     }
 
