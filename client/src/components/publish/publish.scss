@@ -22,6 +22,12 @@
         align-items: center;
         flex: 1;
         gap: 1rem;
+
+        .img-container {
+          @include small {
+            display: none;
+          }
+        }
       }
 
       .right {
@@ -104,10 +110,6 @@
     hr {
       border-top: 0.1rem solid themed("hr");
       margin: 1.5rem 0;
-
-      @include small {
-        display: none;
-      }
     }
 
     .bottom {
@@ -115,14 +117,15 @@
       align-items: center;
       justify-content: space-between;
 
-      @include small {
-        display: none;
-      }
-
       .left {
         display: flex;
         align-items: center;
         gap: 2rem;
+
+        @include small {
+          width: 100%;
+          justify-content: space-around;
+        }
 
         #file {
           display: none;
@@ -137,11 +140,20 @@
           img {
             height: 20px;
             width: 20px;
+
+            @include small {
+              height: 24px;
+              width: 24px;
+            }
           }
 
           span {
             font-size: 1.3rem;
             color: themed("textColorSoft");
+
+            @include small {
+              display: none;
+            }
           }
         }
       }
@@ -157,6 +169,10 @@
           background-color: teal;
           border-radius: 0.5rem;
           cursor: pointer;
+
+          @include small {
+            display: none;
+          }
         }
       }
     }

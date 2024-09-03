@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 
 // Icons
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import Overlay from "../overlay/Overlay.jsx";
 
 // Component
 import Overlay from "../overlay/Overlay.jsx";
