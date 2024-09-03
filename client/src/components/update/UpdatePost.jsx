@@ -6,6 +6,10 @@ import { toast } from "react-toastify";
 
 // Icons
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import Overlay from "../overlay/Overlay.jsx";
+
+// Component
+import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdatePost({ post, setOpenUpdate }) {
   const [desc, setDesc] = useState("");
@@ -71,42 +75,46 @@ export default function UpdatePost({ post, setOpenUpdate }) {
   };
 
   return (
-    <div className="updatePost">
-      <div className="wrapper">
-        <h1>Update Your Post</h1>
+    <>
+      <div className="updatePost">
+        <div className="wrapper">
+          <h1>Update Your Post</h1>
 
-        <form>
-          <div className="files">
-            <label htmlFor="image">
-              <span>Choose an image</span>
-              <div className="imgContainer">
-                {image && (
-                  <img src={URL.createObjectURL(image)} alt="post-image" />
-                )}
-                <CloudUploadIcon className="icon" />
-              </div>
-            </label>
-            <input
-              type="file"
-              id="image"
-              style={{ display: "none" }}
-              accept="image/*"
-              onChange={(e) => setImage(e.target.files[0])}
+          <form>
+            <div className="files">
+              <label htmlFor="image">
+                <span>Choose an image</span>
+                <div className="imgContainer">
+                  {image && (
+                    <img src={URL.createObjectURL(image)} alt="post-image" />
+                  )}
+                  <CloudUploadIcon className="icon" />
+                </div>
+              </label>
+              <input
+                type="file"
+                id="image"
+                style={{ display: "none" }}
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files[0])}
+              />
+            </div>
+            <label>Add a text</label>
+            <textarea
+              rows={8}
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
             />
-          </div>
-          <label>Add a text</label>
-          <textarea
-            rows={8}
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-          />
-          <button onClick={handleClick}>Update</button>
-        </form>
+            <button onClick={handleClick}>Update</button>
+          </form>
 
-        <button className="close" onClick={() => setOpenUpdate(false)}>
-          X
-        </button>
+          <button className="close" onClick={() => setOpenUpdate(false)}>
+            X
+          </button>
+        </div>
       </div>
-    </div>
+      
+      <Overlay />
+    </>
   );
 }

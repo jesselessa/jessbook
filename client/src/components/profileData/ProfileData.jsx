@@ -24,9 +24,7 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function ProfileData() {
   const [openUpdate, setOpenUpdate] = useState(false);
-
   const { currentUser } = useContext(AuthContext);
-
   const { userId } = useParams();
 
   // Get user's info

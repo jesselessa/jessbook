@@ -8,8 +8,11 @@ import { toast } from "react-toastify";
 // Icon
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
-// Contexts
+// Context
 import { AuthContext } from "../../contexts/authContext.jsx";
+
+// Component
+import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdateProfile({ user, setOpenUpdate }) {
   const [cover, setCover] = useState("");
@@ -106,64 +109,65 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   };
 
   return (
-    <div className="update">
-      <div className="wrapper">
-        <h1>Update Your Profile</h1>
+    <>
+      <div className="update">
+        <div className="wrapper">
+          <h1>Update Your Profile</h1>
 
-        <form>
-          <div className="files">
-            <label htmlFor="cover">
-              <span>Cover Picture</span>
+          <form>
+            <div className="files">
+              <label htmlFor="cover">
+                <span>Cover Picture</span>
 
-              <div className="imgContainer">
-                {cover && (
-                  <img
-                    src={
-                      cover
-                        ? URL.createObjectURL(cover)
-                        : `/uploads/${user.coverPic}`
-                    }
-                    alt="cover"
-                  />
-                )}
-                <CloudUploadIcon className="icon" />
-              </div>
-            </label>
+                <div className="imgContainer">
+                  {cover && (
+                    <img
+                      src={
+                        cover
+                          ? URL.createObjectURL(cover)
+                          : `/uploads/${user.coverPic}`
+                      }
+                      alt="cover"
+                    />
+                  )}
+                  <CloudUploadIcon className="icon" />
+                </div>
+              </label>
 
-            <input
-              type="file"
-              id="cover"
-              style={{ display: "none" }}
-              onChange={(e) => setCover(e.target.files[0])}
-            />
+              <input
+                type="file"
+                id="cover"
+                style={{ display: "none" }}
+                onChange={(e) => setCover(e.target.files[0])}
+              />
 
-            <label htmlFor="profile">
-              <span>Profile Picture</span>
-              <div className="imgContainer">
-                {profile && (
-                  <img
-                    src={
-                      profile
-                        ? URL.createObjectURL(profile)
-                        : `/uploads/${user.profilePic}`
-                    }
-                    alt="profile"
-                  />
-                )}
+              <label htmlFor="profile">
+                <span>Profile Picture</span>
+                <div className="imgContainer">
+                  {profile && (
+                    <img
+                      src={
+                        profile
+                          ? URL.createObjectURL(profile)
+                          : `/uploads/${user.profilePic}`
+                      }
+                      alt="profile"
+                    />
+                  )}
 
-                <CloudUploadIcon className="icon" />
-              </div>
-            </label>
+                  <CloudUploadIcon className="icon" />
+                </div>
+              </label>
 
-            <input
-              type="file"
-              id="profile"
-              style={{ display: "none" }}
-              onChange={(e) => setProfile(e.target.files[0])}
-            />
-          </div>
+              <input
+                type="file"
+                id="profile"
+                style={{ display: "none" }}
+                onChange={(e) => setProfile(e.target.files[0])}
+              />
+            </div>
 
-          {/* <label>Email</label>
+            {/* <label>Email</label>
           <input
             type="text"
             value={fields.email}
@@ -171,7 +175,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
             onChange={handleChange}
           /> */}
 
-          {/* <label>Password</label>
+            {/* <label>Password</label>
           <input
             type="text"
             value={fields.password}
@@ -179,7 +183,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
             onChange={handleChange}
           /> */}
 
-          {/* <label>Confirm password</label>
+            {/* <label>Confirm password</label>
           <input
             type="text"
             value={fields.confirmPswd}
@@ -187,40 +191,43 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
             onChange={handleChange}
           /> */}
 
-          <label>First name</label>
-          <input
-            type="text"
-            value={fields.firstName}
-            name="firstName"
-            onChange={handleChange}
-            autoComplete="off"
-          />
+            <label>First name</label>
+            <input
+              type="text"
+              value={fields.firstName}
+              name="firstName"
+              onChange={handleChange}
+              autoComplete="off"
+            />
 
-          <label>Last name</label>
-          <input
-            type="text"
-            value={fields.lastName}
-            name="lastName"
-            onChange={handleChange}
-            autoComplete="off"
-          />
+            <label>Last name</label>
+            <input
+              type="text"
+              value={fields.lastName}
+              name="lastName"
+              onChange={handleChange}
+              autoComplete="off"
+            />
 
-          <label>City</label>
-          <input
-            type="text"
-            name="city"
-            value={fields.city}
-            onChange={handleChange}
-            autoComplete="off"
-          />
+            <label>City</label>
+            <input
+              type="text"
+              name="city"
+              value={fields.city}
+              onChange={handleChange}
+              autoComplete="off"
+            />
 
-          <button onClick={handleClick}>Update</button>
-        </form>
+            <button onClick={handleClick}>Update</button>
+          </form>
 
-        <button className="close" onClick={() => setOpenUpdate(false)}>
-          X
-        </button>
+          <button className="close" onClick={() => setOpenUpdate(false)}>
+            X
+          </button>
+        </div>
       </div>
-    </div>
+
+      <Overlay />
+    </>
   );
 }
