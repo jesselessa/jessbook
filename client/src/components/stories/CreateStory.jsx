@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./createStory.scss";
 import { makeRequest } from "../../utils/axios.jsx";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 export default function CreateStory({ setOpenCreateStory }) {
   const [file, setFile] = useState(null);
@@ -32,6 +33,9 @@ export default function CreateStory({ setOpenCreateStory }) {
       onSuccess: () => {
         // Invalidate and refetch
         queryClient.invalidateQueries(["stories"]);
+
+        setOpenCreateStory(false); // To close form
+        toast.success("Story published.");
       },
     }
   );
@@ -97,6 +101,7 @@ export default function CreateStory({ setOpenCreateStory }) {
               <input
                 type="file"
                 id="file"
+                accept="image/*,video/*"
                 onChange={(e) => setFile(e.target.files[0])}
               />
               Add an image or a video
