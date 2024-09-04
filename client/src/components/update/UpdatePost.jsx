@@ -11,8 +11,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdatePost({ post, setOpenUpdate }) {
-  const [desc, setDesc] = useState("");
-  // const [desc, setDesc] = useState(post.desc);
+  const [desc, setDesc] = useState(post.desc);
   const [image, setImage] = useState("");
 
   const queryClient = useQueryClient();
@@ -112,7 +111,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
           </button>
         </div>
       </div>
-      
+
       <Overlay />
     </>
   );

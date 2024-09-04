@@ -49,11 +49,11 @@ export const addStory = (req, res) => {
     .format("YYYY-MM-DD HH:mm:ss");
 
   const q =
-    "INSERT INTO stories(`img`, `video`,`userId`,`createdAt`, `expiresAt`) VALUES (?)";
+    "INSERT INTO stories(`img`, `desc`, `userId`,`createdAt`, `expiresAt`) VALUES (?)";
 
   const values = [
-    req.body.img || null,
-    req.body.video || null,
+    req.body.img,
+    req.body.desc,
     loggedInUserId,
     currentDateTime,
     expirationDate,

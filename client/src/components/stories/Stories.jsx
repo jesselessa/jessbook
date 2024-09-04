@@ -14,7 +14,8 @@ import { AuthContext } from "../../contexts/authContext";
 
 export default function Stories({ userId }) {
   const { currentUser } = useContext(AuthContext);
-  const { openCreateStory, setOpenCreateStory } = useState(false);
+
+  const [openCreateStory, setOpenCreateStory] = useState(false);
 
   // Get stories
   const fetchStories = async () => {
@@ -49,7 +50,7 @@ export default function Stories({ userId }) {
             <div className="add">Create a story</div>
             <button
               onClick={() => {
-                setOpenCreateStory(!openCreateStory);
+                setOpenCreateStory(true);
               }}
             >
               +
@@ -67,7 +68,7 @@ export default function Stories({ userId }) {
           ) : (
             stories.map((story) => (
               <div className="story" key={story.id}>
-                <img src={story.img} alt="story" />
+                <img src={`/uploads/${story.img}`} alt="story" />
                 <span>
                   {story.firstName} {story.lastName}
                 </span>
@@ -77,7 +78,9 @@ export default function Stories({ userId }) {
         </div>
       </div>
 
-      {openCreateStory && <CreateStory />}
+      {openCreateStory && (
+        <CreateStory setOpenCreateStory={setOpenCreateStory} />
+      )}
     </>
   );
 }

@@ -1,11 +1,11 @@
 import { useState } from "react";
+import "./createStory.scss";
+import { makeRequest } from "../../utils/axios.jsx";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 
-import "./createStory.scss";
-
-export default function CreateStory() {
+export default function CreateStory({ setOpenCreateStory }) {
   const [file, setFile] = useState(null);
-  //   const [desc, setDesc] = useState("");
+  const [desc, setDesc] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
 
   // Handle image or video upload
@@ -39,23 +39,28 @@ export default function CreateStory() {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    let imgUrl, videoUrl;
-
-    if (imgUrl === "" || videoUrl === "") {
+    // Check if image or video selected
+    if (!file) {
       setError({
         isError: true,
         message: "You can't edit a story without an image or a video.",
       });
-    } else {
-      setFile(null);
-      //   setDesc("");
-      setError({ isError: false, message: "" });
-
-      if (file) imgUrl = await upload();
-      if (file) videoUrl = await upload();
-
-      mutation.mutate({ image: imgUrl, video: videoUrl }); // If success URL sent to database (stories table)
+      return;
     }
+
+    // Reset error message
+    setError({ isError: false, message: "" });
+
+    // Reset inputs after submission
+    setFile(null);
+    setDesc("");
+
+    // Initialize variable, then, upload file and download URL
+    let fileUrl = "";
+
+    if (file) fileUrl = await upload();
+
+    mutation.mutate({ img: fileUrl }); // If success URL sent to database (stories table)
   };
 
   // Delete a story
@@ -81,20 +86,21 @@ export default function CreateStory() {
 
   return (
     <div className="createStory">
-      <h1>Create a story</h1>
+      <div className="wrapper">
+        <h1>Create a story</h1>
 
-      {file && (
         <form>
           {/* Add an image or a video */}
           <div className="input-group">
-            {/* input: file - value linked with state "file" doesn't work except if value equals "" or "null" */}
-            <input
-              type="file"
-              id="file"
-              onChange={(e) => setFile(e.target.files[0])}
-            />
-
-            <label htmlFor="file">Add an image or a video</label>
+            <label htmlFor="file">
+              {/* input: file - value linked with state "file" doesn't work except if value equals "" or "null" */}
+              <input
+                type="file"
+                id="file"
+                onChange={(e) => setFile(e.target.files[0])}
+              />
+              Add an image or a video
+            </label>
 
             {file && (
               <div className="img-container">
@@ -108,19 +114,29 @@ export default function CreateStory() {
             )}
           </div>
 
-          {/* <input
+          <textarea
+            id="desc"
+            name="desc"
             type="text"
+            rows={3}
             placeholder="Add a short description."
             maxLength={100}
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
-          /> */}
-          <input type="submit" value="Publish" onClick={handleClick} />
-        </form>
-      )}
+          />
 
-      {/* Error message */}
-      {error.isError && <span className="errorMsg">{error.message}</span>}
+          <button type="submit" onClick={handleClick}>
+            Publish
+          </button>
+        </form>
+
+        {/* Error message */}
+        {error.isError && <span className="errorMsg">{error.message}</span>}
+
+        <button className="close" onClick={() => setOpenCreateStory(false)}>
+          X
+        </button>
+      </div>
     </div>
   );
 }

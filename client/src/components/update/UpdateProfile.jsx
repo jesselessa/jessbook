@@ -155,30 +155,6 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               />
             </div>
 
-            {/* <label>Email</label>
-          <input
-            type="text"
-            value={fields.email}
-            name="email"
-            onChange={handleChange}
-          /> */}
-
-            {/* <label>Password</label>
-          <input
-            type="text"
-            value={fields.password}
-            name="password"
-            onChange={handleChange}
-          /> */}
-
-            {/* <label>Confirm password</label>
-          <input
-            type="text"
-            value={fields.confirmPswd}
-            name="password"
-            onChange={handleChange}
-          /> */}
-
             <label>First name</label>
             <input
               type="text"

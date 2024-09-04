@@ -63,16 +63,21 @@ export default function Publish() {
         isError: true,
         message: "You can't edit a post without a description.",
       });
-    } else {
-      setFile(null);
-      setDesc("");
-      setError({ isError: false, message: "" });
-
-      let imgUrl;
-      if (file) imgUrl = await upload();
-
-      mutation.mutate({ desc: desc.trim(), img: imgUrl }); // If success URL sent to database (posts table)
+      return;
     }
+
+    // Reset error message
+    setError({ isError: false, message: "" });
+
+    // Reset inputs after submission
+    setFile(null);
+    setDesc("");
+
+    // Initialize variable, then, upload file and download URL
+    let imgUrl = "";
+    if (file) imgUrl = await upload();
+
+    mutation.mutate({ desc: desc.trim(), img: imgUrl }); // If success URL sent to database (posts table)
   };
 
   return (
