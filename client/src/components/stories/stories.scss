@@ -19,9 +19,13 @@
         display: none;
       }
 
-      .msg {
+      .msg,
+      .no-story {
         color: themed("textColor");
         font-size: 1.6rem;
+      }
+
+      .no-story {
         margin: auto;
       }
 

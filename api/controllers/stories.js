@@ -12,7 +12,7 @@ export const getStories = (req, res) => {
     if (error) console.log("Error deleting expired stories:", error);
   });
 
-  const q =
+  const selectQuery =
     userId !== "undefined"
       ? `SELECT s.*, u.id AS userId, u.firstName, u.lastName
       FROM stories AS s 
@@ -36,7 +36,7 @@ export const getStories = (req, res) => {
       ? [userId]
       : [loggedInUserId, loggedInUserId, loggedInUserId];
 
-  db.query(q, values, (error, data) => {
+  db.query(selectQuery, values, (error, data) => {
     if (error) return res.status(500).json(error);
     return res.status(200).json(data);
   });
@@ -56,20 +56,30 @@ export const addStory = (req, res) => {
     // .add(2, "minutes") // Test
     .format("YYYY-MM-DD HH:mm:ss");
 
-  const q =
-    "INSERT INTO stories(`img`, `desc`, `userId`,`createdAt`, `expiresAt`) VALUES (?)";
+  // Delete previous story if non expired before adding new one
+  const deleteQuery = `
+  DELETE FROM stories WHERE userId = ? AND expiresAt > NOW()
+`;
 
-  const values = [
-    req.body.img,
-    req.body.desc,
-    loggedInUserId,
-    currentDateTime,
-    expirationDate,
-  ];
+  db.query(deleteQuery, [loggedInUserId], (deleteErr) => {
+    if (deleteErr) return res.status(500).json(deleteErr);
 
-  db.query(q, [values], (err, _data) => {
-    if (err) return res.status(500).json(err);
-    return res.status(200).json("New story created.");
+    // Insert a new story
+    const insertQuery =
+      "INSERT INTO stories(`img`, `desc`, `userId`,`createdAt`, `expiresAt`) VALUES (?)";
+
+    const values = [
+      req.body.img,
+      req.body.desc,
+      loggedInUserId,
+      currentDateTime,
+      expirationDate,
+    ];
+
+    db.query(insertQuery, [values], (insertErr) => {
+      if (insertErr) return res.status(500).json(insertErr);
+      return res.status(200).json("New story created.");
+    });
   });
 };
 

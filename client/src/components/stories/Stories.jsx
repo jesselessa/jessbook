@@ -60,11 +60,13 @@ export default function Stories({ userId }) {
           {/* Friends' stories */}
 
           {error ? (
-            "Something went wrong."
-          ) : isLoading ? (
-            "Loading..."
+            <span className="msg">Something went wrong</span>
+          ) : // "Something went wrong."
+          isLoading ? (
+            // "Loading..."
+            <span className="msg">Loading...</span>
           ) : stories.length === 0 ? (
-            <div className="msg">No story to show yet.</div>
+            <span className="no-story">No story to show yet.</span>
           ) : (
             stories.map((story) => (
               <div className="story" key={story.id}>
