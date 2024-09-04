@@ -7,7 +7,7 @@ export const getComments = (req, res) => {
   const q = `SELECT c.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 
     FROM comments AS c 
     JOIN users AS u ON (u.id = c.userId) WHERE c.postId = ? 
-    ORDER BY c.creationDate DESC
+    ORDER BY c.createdAt DESC
       `;
 
   db.query(q, [postId], (error, data) => {
@@ -20,10 +20,15 @@ export const addComment = (req, res) => {
   const loggedInUserId = req.userInfo.id;
 
   const q =
-    "INSERT INTO comments(`desc`, `creationDate`, `userId`, `postId`) VALUES (?)";
-  creationDate = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
+    "INSERT INTO comments(`desc`, `userId`, `postId`, `createdAt`) VALUES (?)";
+  const currentDateTime = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
 
-  const values = [req.body.desc, creationDate, loggedInUserId, req.body.postId];
+  const values = [
+    req.body.desc,
+    loggedInUserId,
+    req.body.postId,
+    currentDateTime,
+  ];
 
   db.query(q, [values], (error, _data) => {
     if (error) return res.status(500).json(error);

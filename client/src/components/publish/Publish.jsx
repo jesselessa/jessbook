@@ -22,8 +22,8 @@ export default function Publish() {
   const { currentUser } = useContext(AuthContext);
   const { darkMode } = useContext(DarkModeContext);
 
-  const [desc, setDesc] = useState("");
   const [file, setFile] = useState(null);
+  const [desc, setDesc] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
 
   // Handle image upload
@@ -39,6 +39,7 @@ export default function Publish() {
     }
   };
 
+  // Add a new post
   const queryClient = useQueryClient();
 
   const mutation = useMutation(
@@ -63,14 +64,14 @@ export default function Publish() {
         message: "You can't edit a post without a description.",
       });
     } else {
+      setFile(null);
+      setDesc("");
       setError({ isError: false, message: "" });
 
-      let imgUrl = "";
+      let imgUrl;
       if (file) imgUrl = await upload();
 
       mutation.mutate({ desc: desc.trim(), img: imgUrl }); // If success URL sent to database (posts table)
-      setDesc("");
-      setFile(null);
     }
   };
 

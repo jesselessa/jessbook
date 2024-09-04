@@ -13,7 +13,7 @@ export const getPosts = (req, res) => {
       FROM posts AS p 
       JOIN users AS u ON (u.id = p.userId) 
       WHERE p.userId = ? 
-      ORDER BY p.creationDate DESC`
+      ORDER BY p.createdAt DESC`
       : // `p.userId IN (...)` : checks whether the user's ID who created the post (p.userId) is included in a set of specific users IDs, which is is obtained from the subquery
         `
       SELECT p.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 
@@ -21,7 +21,7 @@ export const getPosts = (req, res) => {
       JOIN users AS u ON (u.id = p.userId)
       WHERE p.userId = ? OR p.userId IN (SELECT followedUserId 
       FROM relationships WHERE followerUserId = ?)
-      ORDER BY p.creationDate DESC`;
+      ORDER BY p.createdAt DESC`;
   // DESC = most recent posts shown first
 
   // Define values for SQL parameters
@@ -30,6 +30,7 @@ export const getPosts = (req, res) => {
 
   db.query(q, values, (error, data) => {
     if (error) return res.status(500).json(error);
+
     return res.status(200).json(data);
   });
 };
@@ -39,9 +40,9 @@ export const addPost = (req, res) => {
   const currentDateTime = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"); // Tranforms date in MySQL format
 
   const q =
-    "INSERT INTO posts(`desc`, `img`, `creationDate`, `userId`) VALUES (?)";
+    "INSERT INTO posts(`desc`, `img`, `userId`, `createdAt`) VALUES (?)";
 
-  const values = [req.body.desc, req.body.img, currentDateTime, loggedInUserId];
+  const values = [req.body.desc, req.body.img, loggedInUserId, currentDateTime];
 
   db.query(q, [values], (error, _data) => {
     if (error) return res.status(500).json(error);

@@ -17,7 +17,10 @@ export default function Posts({ userId }) {
     isLoading,
     error,
     data: posts,
-  } = useQuery({ queryKey: ["posts"], queryFn: getPosts });
+  } = useQuery({
+    queryKey: ["posts", userId],
+    queryFn: getPosts,
+  });
 
   return (
     <div className="posts">

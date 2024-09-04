@@ -118,9 +118,7 @@ export default function Post({ post }) {
           <div className="img-container" onClick={navigateAndScrollTop}>
             <img
               src={
-                post.profilePic
-                  ? `/uploads/${post.profilePic}`
-                  : defaultProfile
+                post.profilePic ? `/uploads/${post.profilePic}` : defaultProfile
               }
               alt="user"
             />
@@ -130,7 +128,7 @@ export default function Post({ post }) {
             <span className="name" onClick={navigateAndScrollTop}>
               {post.firstName} {post.lastName}
             </span>
-            <span className="date">{moment(post.creationDate).fromNow()}</span>
+            <span className="date">{moment(post.createdAt).fromNow()}</span>
           </div>
         </div>
 

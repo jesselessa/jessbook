@@ -23,12 +23,14 @@
       .msg {
         color: themed("textColor");
         font-size: 1.6rem;
+        margin: auto;
       }
-      
+
       .story {
-        min-width: 120px;
-        max-width: 125px;
+        width: 120px;
+        max-width: 120px;
         height: 200px;
+        max-height: 100%;
         position: relative;
         border-radius: 1rem;
         overflow: hidden;
@@ -70,10 +72,11 @@
 
         button {
           position: absolute;
-          left: 0;
-          right: 0;
-          top: 115px; // 200 (story height) - 70px (add div) - 15(1/2 button)
-          margin: auto;
+          left: 50%;
+          // right: 0;
+          top: 130px; // 200px (story height) - 70px ('add' div height)
+          transform: translate(-50%, -50%);
+          bottom: 70px;
           width: 30px;
           height: 30px;
           display: flex;

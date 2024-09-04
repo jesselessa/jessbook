@@ -20,20 +20,8 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   const [fields, setFields] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
-    // email: user.email,
-    // password: user.password,
-    // confirmPswd: user.confirmPswd,
     city: user.city,
   });
-
-  // Handle errors from form
-  // const [validationErrors, setValidationErrors] = useState({
-  //   firstName: "",
-  //   lastName: "",
-  //   email: "",
-  //   password: "",
-  //   confirmPswd: "",
-  // });
 
   const { currentUser, setCurrentUser } = useContext(AuthContext);
 

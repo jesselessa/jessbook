@@ -44,19 +44,19 @@ export const addStory = (req, res) => {
   }
 
   const currentDateTime = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
-  const expirationDateTime = moment(Date.now())
+  const expirationDate = moment(Date.now())
     .add(24, "hours")
     .format("YYYY-MM-DD HH:mm:ss");
 
   const q =
-    "INSERT INTO stories(`image`, `video`,`createdAt`, `expiresAt`, `userId`) VALUES (?)";
+    "INSERT INTO stories(`img`, `video`,`userId`,`createdAt`, `expiresAt`) VALUES (?)";
 
   const values = [
-    req.body.image || null,
+    req.body.img || null,
     req.body.video || null,
-    currentDateTime,
-    expirationDateTime,
     loggedInUserId,
+    currentDateTime,
+    expirationDate,
   ];
 
   db.query(q, [values], (err, _data) => {
