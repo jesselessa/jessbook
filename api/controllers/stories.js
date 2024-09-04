@@ -5,6 +5,13 @@ export const getStories = (req, res) => {
   const userId = req.query.userId;
   const loggedInUserId = req.userInfo.id;
 
+  // Delete expired stories before getting new ones (in large-scale projects, better use a cron job to reduce loading time of SQL query)
+  const deleteExpiredStoriesQuery =
+    "DELETE FROM stories WHERE expiresAt <= NOW()";
+  db.query(deleteExpiredStoriesQuery, (error, _data) => {
+    if (error) console.log("Error deleting expired stories:", error);
+  });
+
   const q =
     userId !== "undefined"
       ? `SELECT s.*, u.id AS userId, u.firstName, u.lastName
@@ -46,6 +53,7 @@ export const addStory = (req, res) => {
   const currentDateTime = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
   const expirationDate = moment(Date.now())
     .add(24, "hours")
+    // .add(2, "minutes") // Test
     .format("YYYY-MM-DD HH:mm:ss");
 
   const q =
