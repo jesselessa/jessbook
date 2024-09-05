@@ -118,7 +118,8 @@ export default function ProfileData() {
                   <MoreVertIcon fontSize="large" />
                 </div>
               </div>
-              <div className="name">
+
+              <div className="main-info">
                 <h2>
                   {user.firstName} {user.lastName}
                 </h2>

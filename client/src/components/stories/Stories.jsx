@@ -6,8 +6,9 @@ import { makeRequest } from "../../utils/axios.jsx";
 // Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
-// Component
+// Components
 import CreateStory from "./CreateStory.jsx";
+import ModalStory from "./ModalStory.jsx";
 
 // Context
 import { AuthContext } from "../../contexts/authContext";
@@ -16,6 +17,8 @@ export default function Stories({ userId }) {
   const { currentUser } = useContext(AuthContext);
 
   const [openCreateStory, setOpenCreateStory] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedStory, setSelectedStory] = useState(null);
 
   // Get stories
   const fetchStories = async () => {
@@ -33,11 +36,16 @@ export default function Stories({ userId }) {
     data: stories,
   } = useQuery({ queryKey: ["stories", userId], queryFn: fetchStories });
 
+  const handleClick = (story) => {
+    setSelectedStory(story);
+    setOpenModal(true);
+  };
+
   return (
     <>
       <div className="stories">
         {/* Add a story */}
-        <div className="wrapper">
+        <div className="stories-wrapper">
           <div className="story">
             <img
               src={
@@ -69,7 +77,12 @@ export default function Stories({ userId }) {
             <span className="no-story">No story to show yet.</span>
           ) : (
             stories.map((story) => (
-              <div className="story" key={story.id}>
+              <div
+                className="story"
+                key={story.id}
+                onClick={() => handleClick(story)}
+                style={{ cursor: "pointer" }}
+              >
                 <img src={`/uploads/${story.img}`} alt="story" />
                 <span>
                   {story.firstName} {story.lastName}
@@ -82,6 +95,14 @@ export default function Stories({ userId }) {
 
       {openCreateStory && (
         <CreateStory setOpenCreateStory={setOpenCreateStory} />
+      )}
+
+      {openModal && (
+        <ModalStory
+          story={selectedStory}
+          setOpenModal={setOpenModal}
+          onClose={() => setOpenModal(false)}
+        />
       )}
     </>
   );

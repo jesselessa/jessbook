@@ -43,6 +43,11 @@
             color: themed("textColor");
             font-size: 1.7rem;
             font-weight: bold;
+            word-break: break-word;
+
+            @include small {
+              font-size: 1.6rem;
+            }
 
             &:hover {
               cursor: pointer;

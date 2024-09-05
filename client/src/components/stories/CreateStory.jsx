@@ -4,6 +4,9 @@ import { makeRequest } from "../../utils/axios.jsx";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
+// Component
+import Overlay from "../overlay/Overlay.jsx";
+
 export default function CreateStory({ setOpenCreateStory }) {
   const [file, setFile] = useState(null);
   const [desc, setDesc] = useState("");
@@ -64,28 +67,7 @@ export default function CreateStory({ setOpenCreateStory }) {
 
     if (file) fileUrl = await upload();
 
-    mutation.mutate({ img: fileUrl }); // If success URL sent to database (stories table)
-  };
-
-  // Delete a story
-  const deleteMutation = useMutation(
-    (storyId) => makeRequest.delete(`/stories/${storyId}`),
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["stories"]);
-
-        toast.success("Story deleted.");
-      },
-    }
-  );
-
-  const handleDelete = (story) => {
-    try {
-      deleteMutation.mutate(story.id);
-    } catch (error) {
-      console.error("Error deleting story:", error);
-    }
+    mutation.mutate({ img: fileUrl, desc: desc }); // If success URL sent to database (stories table)
   };
 
   return (
@@ -124,7 +106,7 @@ export default function CreateStory({ setOpenCreateStory }) {
             name="desc"
             type="text"
             rows={3}
-            placeholder="Add a short description."
+            placeholder="You can add a short description to your post."
             maxLength={100}
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
@@ -142,6 +124,8 @@ export default function CreateStory({ setOpenCreateStory }) {
           X
         </button>
       </div>
+
+      <Overlay />
     </div>
   );
 }

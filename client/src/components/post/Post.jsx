@@ -22,7 +22,7 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Context
-import { AuthContext } from "../../contexts/authContext";
+import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);

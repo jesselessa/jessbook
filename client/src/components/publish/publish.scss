@@ -70,14 +70,9 @@
           background-color: themed("bgSoft");
           font-size: 1.6rem;
           border: none;
-          border-radius: 1rem;
+          border-radius: 0.8rem;
           padding: 1rem;
           outline: none;
-
-          &::placeholder {
-            color: themed("textColor");
-            font-size: 1.6rem;
-          }
 
           @include small {
             padding: 0.5rem 3rem 0.5rem 0.5rem;
@@ -85,6 +80,15 @@
 
           @include xsmall {
             font-size: 1.5rem;
+          }
+
+          &::placeholder {
+            color: themed("textColor");
+            font-size: 1.6rem;
+
+            @include xsmall {
+              font-size: 1.5rem;
+            }
           }
         }
 
@@ -159,7 +163,7 @@
 
       .right {
         button {
-          width: 100px;
+          width: 125px;
           height: 40px;
           letter-spacing: 0.1rem;
           border: none;
