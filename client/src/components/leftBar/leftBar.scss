@@ -2,10 +2,10 @@
 
 .leftBar {
   @include themify($themes) {
-    width: 20vw;
-    min-height: calc(100vh - 70px); // 70px = navbar height
     position: sticky;
     top: 70px;
+    width: 20vw;
+    min-height: calc(100vh - 70px);
     background-color: themed("bg");
     color: themed("logo");
     padding: 2rem 1rem;

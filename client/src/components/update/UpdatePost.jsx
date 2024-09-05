@@ -100,6 +100,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
             <label>Add a text</label>
             <textarea
               rows={8}
+              placeholder="Write a text..."
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />

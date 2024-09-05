@@ -2,10 +2,10 @@
 
 .timeline {
   @include themify($themes) {
-    width: 50vw;
-    min-height: calc(100vh - 70px); // 70px = navbar height
     position: sticky;
     top: 70px;
+    width: 50vw;
+    min-height: calc(100vh - 70px); // 70px = navbar height
     background-color: themed("bgSoft");
     padding: 2rem 1rem 2rem 2rem;
 
@@ -18,8 +18,8 @@
       width: 100vw;
     }
 
-    @include xsmall {
-      padding: 1rem;
+    @include small {
+      padding: 2rem 1rem;
     }
   }
 }

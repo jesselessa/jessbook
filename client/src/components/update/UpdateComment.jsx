@@ -53,6 +53,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
           <form>
             <textarea
               rows={5}
+              placeholder="Write a text..."
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />

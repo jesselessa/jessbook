@@ -2,10 +2,11 @@
 
 .profileData {
   @include themify($themes) {
-    width: 50vw;
-    min-height: calc(100vh - 70px); // 70px = navbar height
     position: sticky;
     top: 70px;
+    width: 50vw;
+    min-height: calc(100vh - 70px); // 70px = navbar height
+    overflow-y: auto;
     color: themed("textColor");
     background-color: themed("bgSoft");
     padding: 0 1rem 2rem 2rem;

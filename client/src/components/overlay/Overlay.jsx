@@ -18,16 +18,18 @@ export default function Overlay() {
     };
 
     handleOrientationChange(); // Initial check
+
     window.addEventListener("orientationchange", handleOrientationChange);
+
     window.addEventListener("resize", handleOrientationChange); // Handle size changes
 
-    // Cleanup on unmount
+    // Cleanup on unmounting
     return () => {
       window.removeEventListener("orientationchange", handleOrientationChange);
       window.removeEventListener("resize", handleOrientationChange);
     };
   }, []);
-  
+
   return (
     <>
       {showOverlay && (

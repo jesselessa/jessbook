@@ -6,7 +6,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
   z-index: 500;
 
   .wrapper {
@@ -79,12 +79,8 @@
 
       textarea {
         color: #333;
+        font-size: 1.6rem;
         padding: 0.5rem;
-
-        &::placeholder {
-          color: #333;
-          font-size: 1.6rem;
-        }
       }
 
       button {

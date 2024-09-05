@@ -61,6 +61,7 @@ export default function ProfileData() {
     (following) => {
       if (following)
         return makeRequest.delete(`/relationships?userId=${userId}`);
+
       return makeRequest.post("/relationships", { userId });
     },
     {

@@ -7,7 +7,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.9);
     z-index: 100; // Modal over profile pic in ProfileData
 
     .wrapper {
@@ -57,7 +57,7 @@
           height: 50px;
           font-size: 1.7rem;
           padding: 1rem;
-          line-height: 1rem; // To fix not vertically centered
+          line-height: 1rem; // Fix text not vertically centered
           color: white;
           background-color: #5271ff;
           border: none;
