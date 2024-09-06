@@ -46,8 +46,8 @@ You can see a live demo of the project [here](https://).
 
 - Set up users authentication and registration.
 - Allow users to reset their password.
-- Enable user to create, update or delete posts.
-- Fetch users posts from the backend API and display them on their profile page.
+- Enable user to create, update or delete posts/comments/stories.
+- Fetch users posts/stories from the backend API and display these on their profile page or timeline.
 - Facilitate interactions between users with features such as "like" and "follow"/"unfollow".
 - Support both dark and light themes for the user interface.
 
