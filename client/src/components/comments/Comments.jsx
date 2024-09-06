@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import "./comments.scss";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../utils/axios.jsx";
+import { makeRequest } from "../../utils/axios.js";
 import moment from "moment";
 
 // Images

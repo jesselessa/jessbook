@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import "./navbar.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { makeRequest } from "../../utils/axios.jsx";
+import { makeRequest } from "../../utils/axios.js";
 
 // Icons
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";

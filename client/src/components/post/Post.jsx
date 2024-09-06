@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import "./post.scss";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { makeRequest } from "../../utils/axios.jsx";
+import { makeRequest } from "../../utils/axios.js";
 import moment from "moment";
 import { toast } from "react-toastify";
 

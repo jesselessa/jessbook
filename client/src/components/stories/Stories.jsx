@@ -1,7 +1,8 @@
 import { useContext, useState } from "react";
 import "./stories.scss";
 import { useQuery } from "@tanstack/react-query";
-import { makeRequest } from "../../utils/axios.jsx";
+import { makeRequest } from "../../utils/axios.js";
+import { isVideo } from "../../utils/utils.js";
 
 // Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
@@ -83,7 +84,23 @@ export default function Stories({ userId }) {
                 onClick={() => handleClick(story)}
                 style={{ cursor: "pointer" }}
               >
-                <img src={`/uploads/${story.img}`} alt="story" />
+                {isVideo(story.img) ? (
+                  <video
+                  // 'controls' and 'type' attributes not needed
+                  >
+                    <source
+                      src={`/uploads/${story.img}`}
+                      type={
+                        isVideo(story.img)
+                          ? `video/${story.img.split(".").pop()}`
+                          : ""
+                      }
+                    />
+                  </video>
+                ) : (
+                  <img src={`/uploads/${story.img}`} alt="story" />
+                )}
+
                 <span>
                   {story.firstName} {story.lastName}
                 </span>

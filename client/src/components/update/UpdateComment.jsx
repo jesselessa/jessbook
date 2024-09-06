@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./updateComment.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../utils/axios.jsx";
+import { makeRequest } from "../../utils/axios.js";
 import { toast } from "react-toastify";
 
 // Component

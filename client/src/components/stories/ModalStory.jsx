@@ -1,9 +1,13 @@
 import { useContext } from "react";
 import "./modalStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { makeRequest } from "../../utils/axios.jsx";
+import { makeRequest } from "../../utils/axios.js";
+import { isVideo } from "../../utils/utils.js";
 import { toast } from "react-toastify";
 import moment from "moment";
+
+// Component
+import Overlay from "../overlay/Overlay.jsx";
 
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
@@ -42,7 +46,21 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
         </button>
 
         <div className="img-container">
-          <img src={`/uploads/${story.img}`} alt="story" />
+          {isVideo(story.img) ? (
+            <video controls autoplay>
+              <source
+                src={`/uploads/${story.img}`}
+                type={
+                  isVideo(story.img)
+                    ? `video/${story.img.split(".").pop()}`
+                    : ""
+                }
+              />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <img src={`/uploads/${story.img}`} alt="story" />
+          )}
         </div>
 
         <div className="info-container">
@@ -64,6 +82,8 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
           </div>
         </div>
       </div>
+
+      <Overlay />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import "./createStory.scss";
-import { makeRequest } from "../../utils/axios.jsx";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { makeRequest } from "../../utils/axios.js";
+import { isVideo } from "../../utils/utils.js";
 
 // Component
 import Overlay from "../overlay/Overlay.jsx";
@@ -91,12 +92,19 @@ export default function CreateStory({ setOpenCreateStory }) {
 
             {file && (
               <div className="img-container">
-                <img
-                  className="file"
-                  alt="story pic"
-                  src={URL.createObjectURL(file)}
-                  // This creates a fake URL so we can show our image
-                />
+                {isVideo(file.type) ? (
+                  <video
+                  // 'controls' and 'type' attributes not needed
+                  >
+                    <source src={URL.createObjectURL(file)} />
+                  </video>
+                ) : (
+                  <img
+                    alt="image"
+                    src={URL.createObjectURL(file)}
+                    // Creates a fake URL to show our file image
+                  />
+                )}
               </div>
             )}
           </div>

@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext();
-import { makeRequest } from "../utils/axios.jsx";
+import { makeRequest } from "../utils/axios.js";
 
 export const AuthContextProvider = ({ children }) => {
   // children = props.chidren

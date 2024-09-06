@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./profileData.scss";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { makeRequest } from "../../utils/axios.jsx";
+import { makeRequest } from "../../utils/axios.js";
 
 // Components
 import Publish from "../../components/publish/Publish.jsx";

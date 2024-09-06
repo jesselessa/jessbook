@@ -6,27 +6,28 @@
   left: 0;
   width: 100%;
   height: 100%;
-  overflow-y: auto;
-  background-color: rgba(0, 0, 0, 0.9);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.9);
   z-index: 1000;
 
   .modal-content {
     position: relative;
-    width: 380px;
-    max-width: 380px;
-    min-height: 595px;
+    width: 300px;
+    max-width: 300px;
+    min-height: 300px;
     max-height: 100%;
     overflow-y: auto;
     background-color: white;
-    padding: 1rem;
+    padding: 1rem 1rem 2rem 1rem;
     border-radius: 1rem;
     box-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.3);
-    overflow-y: auto;
+    overflow: hidden;
 
     @include small {
+      top: 2rem;
       width: 95%;
     }
 
@@ -41,15 +42,17 @@
       border-radius: 0.2rem;
       padding: 0.5rem;
       cursor: pointer;
+      z-index: 10; // Otherwise, can't click on button to close modal
     }
 
     .img-container {
       width: 100%;
-      height: 100%;
+      height: 375px;
       overflow: hidden;
       margin-bottom: 1rem;
 
-      img {
+      img,
+      video {
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -58,9 +61,9 @@
     }
 
     .info-container {
+      width: 100%;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
 
       h1 {
         color: #222;
@@ -72,11 +75,10 @@
       .story-details {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        gap: 1.5rem;
 
         @include small {
           flex-direction: column;
+          gap: 1rem;
         }
 
         .story-edit-info {
@@ -96,6 +98,10 @@
           border-radius: 0.3rem;
           padding: 0.5rem 1rem;
           cursor: pointer;
+
+          @include small {
+            margin: auto;
+          }
         }
       }
     }

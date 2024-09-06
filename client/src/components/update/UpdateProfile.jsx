@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import "./updateProfile.scss";
 import { useNavigate } from "react-router-dom";
-import { makeRequest } from "../../utils/axios.jsx";
+import { makeRequest } from "../../utils/axios.js";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
