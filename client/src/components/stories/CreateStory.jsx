@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { makeRequest } from "../../utils/axios.js";
-import { isVideo } from "../../utils/utils.js";
 
 // Component
 import Overlay from "../overlay/Overlay.jsx";
+
+// Utility function checking if file is a video based on the name of its "type" attribute
+const isVideo = (type) => type.startsWith("video/");
 
 export default function CreateStory({ setOpenCreateStory }) {
   const [file, setFile] = useState(null);
   const [desc, setDesc] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
-  const [imgURL, setImgURL] = useState("");
-  const [videoURL, setVideoURL] = useState("");
 
   // Handle image or video upload
   const upload = async () => {
@@ -23,7 +23,7 @@ export default function CreateStory({ setOpenCreateStory }) {
 
       const res = await makeRequest.post("/uploads", formData);
 
-      return res.data; // image or video file
+      return res.data; // image or video file sent to database
     } catch (error) {
       console.log(error);
     }
@@ -77,51 +77,23 @@ export default function CreateStory({ setOpenCreateStory }) {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
 
-    // Reset error everytime file changes
+    // Reset error message everytime file changes
     setError({ isError: false, message: "" });
 
-    // Check video duration not exceeds 60 seconds
     if (selectedFile) {
+      // Check file type is a video
       if (isVideo(selectedFile.type)) {
-        const videoElement = document.createElement("video");
-
-        const videoPath = URL.createObjectURL(selectedFile); // Generate dynamic URL for video preview
-
-        videoElement.src = videoPath;
-
-        videoElement.onloadedmetadata = () => {
-          // loadedmetadata event is fired when metadata has been loaded
-          if (videoElement.duration > 60) {
-            // Failed upload
-            setError({
-              isError: true,
-              message: "The video duration can't exceed a 60-second limit.",
-            });
-            setFile(null);
-            setVideoURL(videoPath); // Set video URL for preview
-          } else {
-            // Successful upload : store file and update its URL
-            setFile(selectedFile);
-            setVideoURL(videoPath);
-          }
-        };
-      } else {
-        // If uploaded file is an image, store it and update its URL
         setFile(selectedFile);
+        console.log(selectedFile);
 
-        const imgPath = URL.createObjectURL(selectedFile);
-        setImgURL(imgPath);
+        // Video duration
+        // console.log("Video duration:", file.duration);
+      } else {
+        // File is an image
+        setFile(selectedFile);
       }
     }
   };
-
-  // Cleanup function inside useEffect to release URL resources when component is unmounted or URLs change
-  useEffect(() => {
-    return () => {
-      if (videoURL) URL.revokeObjectURL(videoURL);
-      if (imgURL) URL.revokeObjectURL(imgURL);
-    };
-  }, [videoURL, imgURL]);
 
   return (
     <div className="createStory">
@@ -144,11 +116,19 @@ export default function CreateStory({ setOpenCreateStory }) {
 
             {file && (
               <div className="img-container">
-                {/* Create a video or image preview */}
                 {isVideo(file?.type) ? (
-                  <video src={videoURL} />
+                  <video
+                  // 'controls' and 'type' attributes not needed
+                  >
+                    <source
+                      src={
+                        URL.createObjectURL(file) // Creates a fake URL for file preview
+                      }
+                    />
+                    Your browser doesn't support video.
+                  </video>
                 ) : (
-                  <img alt="preview" src={imgURL} />
+                  <img alt="image" src={URL.createObjectURL(file)} />
                 )}
               </div>
             )}

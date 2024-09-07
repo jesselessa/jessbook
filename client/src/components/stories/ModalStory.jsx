@@ -2,9 +2,13 @@ import { useContext } from "react";
 import "./modalStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
-import { isVideo } from "../../utils/utils.js";
 import { toast } from "react-toastify";
 import moment from "moment";
+
+// Utility function checking if file is a video based on its extension
+const isVideo = (fileName) => {
+  return /\.(mp4|mov|avi|mkv|webm|flv|wmv|3gp|m4v|ogv)$/i.test(fileName);
+};
 
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
@@ -43,20 +47,16 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
         </button>
 
         <div className="img-container">
-          {isVideo(story.img) ? (
+          {isVideo(story?.img) ? (
             <video controls>
               <source
-                src={`/uploads/${story.img}`}
-                type={
-                  isVideo(story.img)
-                    ? `video/${story.img.split(".").pop()}`
-                    : ""
-                }
+                src={`/uploads/${story?.img}`}
+                type={`video/${story?.img.split(".").pop()}`}
               />
               Your browser does not support the video tag.
             </video>
           ) : (
-            <img src={`/uploads/${story.img}`} alt="story" />
+            <img src={`/uploads/${story?.img}`} alt="preview" />
           )}
         </div>
 
