@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -14,6 +14,8 @@ export default function CreateStory({ setOpenCreateStory }) {
   const [file, setFile] = useState(null);
   const [desc, setDesc] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
+  const [imgURL, setImgURL] = useState("");
+  const [videoURL, setVideoURL] = useState("");
 
   // Handle image or video upload
   const upload = async () => {
@@ -77,23 +79,53 @@ export default function CreateStory({ setOpenCreateStory }) {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
 
-    // Reset error message everytime file changes
+    // Reset error everytime file changes
     setError({ isError: false, message: "" });
 
+    // Check video duration not exceeds 60 seconds
     if (selectedFile) {
-      // Check file type is a video
       if (isVideo(selectedFile.type)) {
-        setFile(selectedFile);
-        console.log(selectedFile);
+        const videoElement = document.createElement("video");
 
-        // Video duration
-        // console.log("Video duration:", file.duration);
+        const videoPath = URL.createObjectURL(selectedFile); // Generate dynamic URL for selected file
+
+        videoElement.src = videoPath;
+
+        videoElement.onloadedmetadata = () => {
+          // loadedmetadata event is fired when metadata has been loaded
+          if (videoElement.duration > 60) {
+            // Failed upload
+            setError({
+              isError: true,
+              message: "Video duration can't exceed a 60-second limit.",
+            });
+
+            setFile(null);
+            setVideoURL(""); // Clear URL preview
+            return;
+          } else {
+            // Successful upload : store file and update its URL
+            setFile(selectedFile);
+            setVideoURL(videoPath);
+          }
+        };
       } else {
-        // File is an image
+        // If uploaded file is an image, store it and update its URL
         setFile(selectedFile);
+
+        const imgPath = URL.createObjectURL(selectedFile);
+        setImgURL(imgPath);
       }
     }
   };
+
+  // Cleanup function inside useEffect to release URL resources when component is unmounted or URLs change
+  useEffect(() => {
+    return () => {
+      if (videoURL) URL.revokeObjectURL(videoURL);
+      if (imgURL) URL.revokeObjectURL(imgURL);
+    };
+  }, [videoURL, imgURL]);
 
   return (
     <div className="createStory">
