@@ -66,16 +66,13 @@ export default function Stories({ userId }) {
             </button>
           </div>
 
-          {/* Friends' stories */}
-
+          {/* Stories display */}
           {error ? (
-            <span className="msg">Something went wrong</span>
-          ) : // "Something went wrong."
-          isLoading ? (
-            // "Loading..."
-            <span className="msg">Loading...</span>
+            <span className="loading-msg">Something went wrong</span>
+          ) : isLoading ? (
+            <span className="loading-msg">Loading...</span>
           ) : stories.length === 0 ? (
-            <span className="no-story">No story to show yet.</span>
+            <span className="loading-msg">No story to show yet.</span>
           ) : (
             stories.map((story) => (
               <div
@@ -84,9 +81,10 @@ export default function Stories({ userId }) {
                 onClick={() => handleClick(story)}
                 style={{ cursor: "pointer" }}
               >
+                {/* Check if file type is a video depending on its extension */}
                 {isVideo(story.img) ? (
                   <video
-                  // 'controls' and 'type' attributes not needed
+                  // 'controls' not necessary because it's a preview but we need 'type' to determine extension
                   >
                     <source
                       src={`/uploads/${story.img}`}
@@ -96,6 +94,7 @@ export default function Stories({ userId }) {
                           : ""
                       }
                     />
+                    Your browser doesn't support video.
                   </video>
                 ) : (
                   <img src={`/uploads/${story.img}`} alt="story" />

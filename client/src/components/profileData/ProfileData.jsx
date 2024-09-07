@@ -78,10 +78,11 @@ export default function ProfileData() {
 
   return (
     <div className="profileData">
+      {/* User data */}
       {error ? (
-        "Something went wrong."
+        <span className="loading-msg">Something went wrong.</span>
       ) : isLoading ? (
-        "Loading..."
+        <span className="loading-msg">Loading...</span>
       ) : (
         <>
           <div className="profileContainer">
@@ -109,7 +110,7 @@ export default function ProfileData() {
               <div className="friends-contact">
                 <div className="friends">
                   <PeopleAltOutlinedIcon fontSize="large" />
-                  {/* Change later with data fetched from API */}
+                  {/* T0 DO - Change later with real data fetched from API */}
                   <span>441 Friends</span>
                 </div>
 
@@ -130,10 +131,11 @@ export default function ProfileData() {
                   <span>{user.city || "Non renseigné"}</span>
                 </div>
 
+                {/* Relationships data */}
                 {rError ? (
-                  "Something went wrong."
+                  <span className="loading-msg">Something went wrong.</span>
                 ) : rIsLoading ? (
-                  "Loading..."
+                  <span className="loading-msg">Loading...</span>
                 ) : userId == currentUser.id ? (
                   <button onClick={() => setOpenUpdate(true)}>Update</button>
                 ) : (

@@ -126,7 +126,12 @@
           gap: 0.3rem;
         }
 
-        span {
+        .loading-msg {
+          font-size: 1.5rem;
+        }
+
+        .likes,
+        .commentsNb {
           @include small {
             display: none;
           }

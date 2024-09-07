@@ -6,9 +6,6 @@ import { isVideo } from "../../utils/utils.js";
 import { toast } from "react-toastify";
 import moment from "moment";
 
-// Component
-import Overlay from "../overlay/Overlay.jsx";
-
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
@@ -47,7 +44,7 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
 
         <div className="img-container">
           {isVideo(story.img) ? (
-            <video controls autoplay>
+            <video controls>
               <source
                 src={`/uploads/${story.img}`}
                 type={
@@ -82,8 +79,6 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
           </div>
         </div>
       </div>
-
-      <Overlay />
     </div>
   );
 }

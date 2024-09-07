@@ -118,50 +118,52 @@ export default function Comments({ postId }) {
         <button onClick={handleClick}>Send</button>
       </form>
 
-      {error
-        ? "Something went wrong"
-        : isLoading
-        ? "Loading..."
-        : comments.map((comment) => (
-            <div className="comment" key={comment.id}>
-              <div className="img-container">
-                <img
-                  src={
-                    comment.profilePic
-                      ? `/uploads/${comment.profilePic}`
-                      : defaultProfile
-                  }
-                  alt="user"
-                />
-              </div>
-              <div className="info">
-                <h3>
-                  {comment.firstName} {comment.lastName}
-                </h3>
-                <p>{comment.desc}</p>
-              </div>
-              <div className="buttons-time">
-                {currentUser.id === comment.userId && (
-                  <div className="editBtns">
-                    <EditOutlinedIcon
-                      className="editBtn"
-                      fontSize="large"
-                      onClick={() => handleUpdate(comment)}
-                    />
-                    <DeleteOutlineOutlinedIcon
-                      className="editBtn"
-                      fontSize="large"
-                      onClick={() => handleDelete(comment)}
-                    />
-                  </div>
-                )}
-
-                <span className="time">
-                  {moment(comment.createdAt).fromNow()}
-                </span>
-              </div>
+      {error ? (
+        <span className="loading-msg">Something went wrong</span>
+      ) : isLoading ? (
+        <span className="loading-msg">Loading...</span>
+      ) : (
+        comments.map((comment) => (
+          <div className="comment" key={comment.id}>
+            <div className="img-container">
+              <img
+                src={
+                  comment.profilePic
+                    ? `/uploads/${comment.profilePic}`
+                    : defaultProfile
+                }
+                alt="user"
+              />
             </div>
-          ))}
+            <div className="info">
+              <h3>
+                {comment.firstName} {comment.lastName}
+              </h3>
+              <p>{comment.desc}</p>
+            </div>
+            <div className="buttons-time">
+              {currentUser.id === comment.userId && (
+                <div className="editBtns">
+                  <EditOutlinedIcon
+                    className="editBtn"
+                    fontSize="large"
+                    onClick={() => handleUpdate(comment)}
+                  />
+                  <DeleteOutlineOutlinedIcon
+                    className="editBtn"
+                    fontSize="large"
+                    onClick={() => handleDelete(comment)}
+                  />
+                </div>
+              )}
+
+              <span className="time">
+                {moment(comment.createdAt).fromNow()}
+              </span>
+            </div>
+          </div>
+        ))
+      )}
 
       {openUpdate && selectedComment && (
         <UpdateComment

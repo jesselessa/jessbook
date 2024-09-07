@@ -25,11 +25,11 @@ export default function Posts({ userId }) {
   return (
     <div className="posts">
       {error ? (
-        "Something went wrong."
+        <span className="loading-msg">Something went wrong.</span>
       ) : isLoading ? (
-        "Loading..."
+        <span className="loading-msg">Loading...</span>
       ) : posts.length === 0 ? (
-        <div className="msg">No post to show yet.</div>
+        <span className="loading-msg">No post to show yet.</span>
       ) : (
         posts.map((post) => <Post key={post.id} post={post} />)
       )}

@@ -156,23 +156,30 @@ export default function Post({ post }) {
       <div className="interactions">
         <div className="item">
           {error ? (
-            "Something went wrong."
+            <span className="loading-msg">Something went wrong.</span>
           ) : isLoading ? (
-            "Loading..."
+            <span className="loading-msg">Loading...</span>
           ) : likes.includes(currentUser.id) ? (
             <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLikes} />
           ) : (
             <FavoriteBorderOutlinedIcon onClick={handleLikes} />
           )}
-          {likes?.length > 0 && likes.length} <span>Likes</span>
+          {/* Likes */}
+          {likes?.length > 0 && likes.length}{" "}
+          <span className="likes">{likes?.length > 1 ? "Likes" : "Like"}</span>
         </div>
 
+        {/* Comments */}
         <div className="item" onClick={() => setCommentsOpen(!commentsOpen)}>
           <TextsmsOutlinedIcon />
-          {comments?.length > 0 && comments.length} <span>Comments</span>
+          {comments?.length > 0 && comments.length}{" "}
+          <span className="commentsNb">
+            {comments?.length > 1 ? "Comments" : "Comment"}
+          </span>
         </div>
 
         <div className="item">
+          {/* TODO - Implement later */}
           <ShareOutlinedIcon />
           Share
         </div>

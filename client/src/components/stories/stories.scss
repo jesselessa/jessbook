@@ -21,13 +21,11 @@
         display: none;
       }
 
-      .msg,
-      .no-story {
+      .loading-msg {
+        flex: 1;
         color: themed("textColor");
-        font-size: 1.6rem;
-      }
-
-      .no-story {
+        font-size: 1.4rem;
+        text-align: center;
         margin: auto;
       }
 
