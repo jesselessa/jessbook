@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import "./comments.scss";
 import { makeRequest } from "../../utils/axios.js";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToggle } from "../../hooks/useToggle.js";
 import { usePostComments } from "../../hooks/usePostComments.js";
 import moment from "moment";
 
@@ -23,7 +24,7 @@ export default function Comments({ postId }) {
   const { currentUser } = useContext(AuthContext);
 
   const [desc, setDesc] = useState("");
-  const [openUpdate, setOpenUpdate] = useState(false);
+  const [openUpdate, toggleOpenUpdate] = useToggle();
   const [selectedComment, setSelectedComment] = useState(null);
 
   // Fetch post comments by using custom hook
@@ -52,7 +53,7 @@ export default function Comments({ postId }) {
 
   // Open update form and store selected comment
   const handleUpdate = (comment) => {
-    setOpenUpdate(true);
+    toggleOpenUpdate();
     setSelectedComment(comment);
   };
 
@@ -153,10 +154,11 @@ export default function Comments({ postId }) {
         ))
       )}
 
-      {openUpdate && selectedComment && (
+      {/* Display update form when a specific comment has been selected */}
+      {selectedComment && openUpdate && (
         <UpdateComment
-          setOpenUpdate={setOpenUpdate}
           comment={selectedComment}
+          toggleOpenUpdate={toggleOpenUpdate}
         />
       )}
     </div>

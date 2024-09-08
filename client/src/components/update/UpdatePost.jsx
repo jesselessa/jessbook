@@ -11,7 +11,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 // Component
 import Overlay from "../overlay/Overlay.jsx";
 
-export default function UpdatePost({ post, setOpenUpdate }) {
+export default function UpdatePost({ post, toggleOpenUpdate }) {
   const [desc, setDesc] = useState(post.desc);
   const [image, setImage] = useState("");
 
@@ -26,7 +26,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
         // Invalidate and refetch
         queryClient.invalidateQueries(["posts"]);
 
-        setOpenUpdate(false); // To close form
+        toggleOpenUpdate(); // Close form after submission
         toast.success("Post updated.");
       },
     }
@@ -95,7 +95,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
             <button onClick={handleClick}>Update</button>
           </form>
 
-          <button className="close" onClick={() => setOpenUpdate(false)}>
+          <button className="close" onClick={toggleOpenUpdate}>
             X
           </button>
         </div>

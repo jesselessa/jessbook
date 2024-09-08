@@ -6,22 +6,17 @@
     top: 70px;
     width: 50vw;
     min-height: calc(100vh - 70px); // 70px = navbar height
-    overflow-y: auto;
     color: themed("textColor");
     background-color: themed("bgSoft");
-    padding: 0 1rem 2rem 2rem;
+    padding: 0 0.5rem 2rem 1.5rem;
 
     @include medium {
-      width: 80vw;
-      padding: 2rem;
-    }
-
-    @include tablet {
       width: 100vw;
+      padding: 0 1.5rem 2rem 1.5rem;
     }
 
-    @include xsmall {
-      padding: 1rem;
+    @include small {
+      padding: 0 1rem 2rem 1rem;
     }
 
     .loading-msg {
@@ -32,6 +27,10 @@
       display: flex;
       flex-direction: column;
       margin-bottom: 2rem;
+
+      @include tablet {
+        margin-bottom: 1.5rem;
+      }
 
       .images {
         position: relative;

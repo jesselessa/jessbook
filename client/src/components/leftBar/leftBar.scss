@@ -8,10 +8,11 @@
     min-height: calc(100vh - 70px);
     background-color: themed("bg");
     color: themed("logo");
-    padding: 2rem 1rem;
+    padding: 2rem 1rem 2rem 1rem;
 
-    @include tablet {
+    @include medium {
       display: none;
+      width: 100vw;
     }
 
     a {

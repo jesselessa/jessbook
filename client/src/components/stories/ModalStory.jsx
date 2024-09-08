@@ -13,7 +13,7 @@ const isVideo = (fileName) =>
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-export default function ModalStory({ story, setOpenModal, onClose }) {
+export default function ModalStory({ story, toggleOpenModal }) {
   const { currentUser } = useContext(AuthContext);
 
   // Delete a story
@@ -32,8 +32,8 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
 
   const handleDelete = () => {
     try {
-      deleteMutation.mutate(story?.id);
-      setOpenModal(false); // Close modal after submission
+      deleteMutation.mutate(story.id);
+      toggleOpenModal();
     } catch (error) {
       console.error("Error deleting story:", error);
     }
@@ -42,7 +42,7 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
   return (
     <div className="modalStory">
       <div className="modal-content">
-        <button className="close" onClick={onClose}>
+        <button className="close" onClick={toggleOpenModal}>
           X
         </button>
 
@@ -72,10 +72,7 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
             </div>
 
             {currentUser?.id === story?.userId && (
-              <button
-                className="delete"
-                onClick={() => handleDelete(story?.id)}
-              >
+              <button className="delete" onClick={() => handleDelete(story.id)}>
                 Delete
               </button>
             )}

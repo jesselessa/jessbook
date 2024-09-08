@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 // Component
 import Overlay from "../overlay/Overlay.jsx";
 
-export default function UpdateComment({ comment, setOpenUpdate }) {
+export default function UpdateComment({ comment, toggleOpenUpdate }) {
   const [desc, setDesc] = useState(comment?.desc);
 
   const queryClient = useQueryClient();
@@ -21,7 +21,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
         // Invalidate and refetch
         queryClient.invalidateQueries(["comments", comment?.postId]);
 
-        setOpenUpdate(false); // To close form
+        toggleOpenUpdate(); // Close form after submission
         toast.success("Comment updated.");
       },
     }
@@ -63,7 +63,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
             </button>
           </form>
 
-          <button className="close" onClick={() => setOpenUpdate(false)}>
+          <button className="close" onClick={toggleOpenUpdate}>
             X
           </button>
         </div>

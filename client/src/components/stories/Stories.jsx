@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import "./stories.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
+import { useToggle } from "../../hooks/useToggle.js";
 
 // Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
@@ -21,8 +22,8 @@ import { AuthContext } from "../../contexts/authContext";
 export default function Stories({ userId }) {
   const { currentUser } = useContext(AuthContext);
 
-  const [openCreateStory, setOpenCreateStory] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
+  const [openCreateStory, toggleOpenCreateStory] = useToggle();
+  const [openModal, toggleOpenModal] = useToggle();
   const [selectedStory, setSelectedStory] = useState(null);
 
   // Get stories
@@ -43,7 +44,7 @@ export default function Stories({ userId }) {
 
   const handleClick = (story) => {
     setSelectedStory(story);
-    setOpenModal(true);
+    toggleOpenModal();
   };
 
   return (
@@ -61,13 +62,7 @@ export default function Stories({ userId }) {
               alt="user"
             />
             <div className="add">Create a story</div>
-            <button
-              onClick={() => {
-                setOpenCreateStory(true);
-              }}
-            >
-              +
-            </button>
+            <button onClick={toggleOpenCreateStory}>+</button>
           </div>
 
           {/* Stories display */}
@@ -108,15 +103,12 @@ export default function Stories({ userId }) {
         </div>
       </div>
 
-      {openCreateStory && (
-        <CreateStory setOpenCreateStory={setOpenCreateStory} />
-      )}
+      {openCreateStory && <CreateStory toggleOpenCreateStory={toggleOpenCreateStory} />}
 
       {openModal && (
         <ModalStory
           story={selectedStory}
-          setOpenModal={setOpenModal}
-          onClose={() => setOpenModal(false)}
+          toggleOpenModal={toggleOpenModal}
         />
       )}
     </>

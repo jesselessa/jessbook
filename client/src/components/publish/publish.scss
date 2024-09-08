@@ -9,6 +9,10 @@
     border-radius: 1rem;
     margin-bottom: 2rem;
 
+    @include tablet {
+      margin-bottom: 1.5rem;
+    }
+
     .top {
       display: flex;
       align-items: center;

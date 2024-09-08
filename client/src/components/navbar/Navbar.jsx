@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import "./navbar.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../utils/axios.js";
+import { useToggle } from "../../hooks/useToggle.js";
 
 // Icons
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -29,7 +30,7 @@ export default function Navbar() {
   const { darkMode, toggleTheme } = useContext(DarkModeContext);
   const { currentUser } = useContext(AuthContext);
 
-  const [burgerClicked, setBurgerClicked] = useState(false);
+  const [burgerClicked, toggleBurgerClicked] = useToggle();
 
   const navigate = useNavigate();
 
@@ -44,7 +45,7 @@ export default function Navbar() {
   };
 
   const toggleMenu = () => {
-    setBurgerClicked(!burgerClicked);
+    toggleBurgerClicked(!burgerClicked);
   };
 
   return (

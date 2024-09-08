@@ -12,7 +12,7 @@ import Overlay from "../overlay/Overlay.jsx";
 //! A regex must always return a value (true or false)
 const isVideo = (type) => type.startsWith("video/");
 
-export default function CreateStory({ setOpenCreateStory }) {
+export default function CreateStory({ toggleOpenCreateStory }) {
   const [file, setFile] = useState(null);
   const [desc, setDesc] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
@@ -31,7 +31,7 @@ export default function CreateStory({ setOpenCreateStory }) {
         // Invalidate and refetch
         queryClient.invalidateQueries(["stories"]);
 
-        setOpenCreateStory(false); // To close form
+        toggleOpenCreateStory();
         toast.success("Story published.");
       },
     }
@@ -173,7 +173,7 @@ export default function CreateStory({ setOpenCreateStory }) {
         {/* Error message */}
         {error.isError && <span className="errorMsg">{error.message}</span>}
 
-        <button className="close" onClick={() => setOpenCreateStory(false)}>
+        <button className="close" onClick={() => toggleOpenCreateStory()}>
           X
         </button>
       </div>

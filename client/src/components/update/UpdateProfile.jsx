@@ -15,7 +15,7 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 // Component
 import Overlay from "../overlay/Overlay.jsx";
 
-export default function UpdateProfile({ user, setOpenUpdate }) {
+export default function UpdateProfile({ user, toggleOpenUpdate }) {
   const [cover, setCover] = useState("");
   const [profile, setProfile] = useState("");
   const [fields, setFields] = useState({
@@ -178,7 +178,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
             <button onClick={handleClick}>Update</button>
           </form>
 
-          <button className="close" onClick={() => setOpenUpdate(false)}>
+          <button className="close" onClick={toggleOpenUpdate}>
             X
           </button>
         </div>

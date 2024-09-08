@@ -1,9 +1,10 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import "./post.scss";
 import { useNavigate } from "react-router-dom";
-import { makeRequest } from "../../utils/axios.js";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { makeRequest } from "../../utils/axios.js";
 import { usePostComments } from "../../hooks/usePostComments.js";
+import { useToggle } from "../../hooks/useToggle.js";
 import moment from "moment";
 import { toast } from "react-toastify";
 
@@ -28,8 +29,8 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
 
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [openUpdate, toggleOpenUpdate] = useToggle();
+  const [openComments, toggleOpenComments] = useToggle();
 
   const navigate = useNavigate();
 
@@ -72,11 +73,6 @@ export default function Post({ post }) {
 
   const handleLikes = () => {
     deleteLikeMutation.mutate(likes.includes(currentUser?.id));
-  };
-
-  // Open update form
-  const handleUpdate = () => {
-    setOpenUpdate(true);
   };
 
   // Delete post
@@ -128,7 +124,7 @@ export default function Post({ post }) {
             <EditOutlinedIcon
               className="editBtn"
               fontSize="large"
-              onClick={handleUpdate}
+              onClick={toggleOpenUpdate}
             />
             <DeleteOutlineOutlinedIcon
               className="editBtn"
@@ -161,7 +157,7 @@ export default function Post({ post }) {
         </div>
 
         {/* Comments */}
-        <div className="item" onClick={() => setCommentsOpen(!commentsOpen)}>
+        <div className="item" onClick={toggleOpenComments}>
           <TextsmsOutlinedIcon />
           {comments?.length > 0 && comments?.length}{" "}
           <span className="commentsNb">
@@ -176,9 +172,11 @@ export default function Post({ post }) {
         </div>
       </div>
 
-      {commentsOpen && <Comments postId={post?.id} />}
+      {openComments && <Comments postId={post.id} />}
 
-      {openUpdate && <UpdatePost setOpenUpdate={setOpenUpdate} post={post} />}
+      {openUpdate && (
+        <UpdatePost post={post} toggleOpenUpdate={toggleOpenUpdate} />
+      )}
     </div>
   );
 }

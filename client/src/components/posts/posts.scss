@@ -8,6 +8,10 @@
     color: themed("textColor");
     gap: 2rem;
 
+    @include tablet {
+      gap: 1.5rem;
+    }
+
     .loading-msg {
       color: themed("textColor");
       font-size: 1.5rem;
