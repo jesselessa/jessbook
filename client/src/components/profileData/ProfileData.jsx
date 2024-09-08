@@ -31,7 +31,7 @@ export default function ProfileData() {
   const fetchUserData = async () => {
     return await makeRequest
       .get(`/users/${userId}`)
-      .then((res) => res.data)
+      .then((res) => res?.data)
       .catch((error) => console.log(error));
   };
 
@@ -45,7 +45,7 @@ export default function ProfileData() {
   const fetchRelationships = async () => {
     return await makeRequest
       .get(`/relationships?followedUserId=${userId}`)
-      .then((res) => res.data)
+      .then((res) => res?.data)
       .catch((error) => console.log(error));
   };
 
@@ -73,7 +73,7 @@ export default function ProfileData() {
   );
 
   const handleFollow = () => {
-    mutation.mutate(relationshipsData.includes(currentUser.id));
+    mutation.mutate(relationshipsData.includes(currentUser?.id));
   };
 
   return (
@@ -88,7 +88,7 @@ export default function ProfileData() {
           <div className="profileContainer">
             <div className="images">
               <img
-                src={user.coverPic ? `/uploads/${user.coverPic}` : defaultCover}
+                src={user?.coverPic ? `/uploads/${user?.coverPic}` : defaultCover}
                 className="cover"
                 alt="cover"
               />
@@ -96,8 +96,8 @@ export default function ProfileData() {
               <div className="img-container">
                 <img
                   src={
-                    user.profilePic
-                      ? `/uploads/${user.profilePic}`
+                    user?.profilePic
+                      ? `/uploads/${user?.profilePic}`
                       : defaultProfile
                   }
                   className="profilePic"
@@ -111,7 +111,7 @@ export default function ProfileData() {
                 <div className="friends">
                   <PeopleAltOutlinedIcon fontSize="large" />
                   {/* T0 DO - Change later with real data fetched from API */}
-                  <span>441 Friends</span>
+                  <span>441 Friends</span> 
                 </div>
 
                 <div className="contact">
@@ -123,12 +123,12 @@ export default function ProfileData() {
 
               <div className="main-info">
                 <h2>
-                  {user.firstName} {user.lastName}
+                  {user?.firstName} {user?.lastName}
                 </h2>
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{user.city || "Non renseigné"}</span>
+                  <span>{user?.city || "Non renseigné"}</span>
                 </div>
 
                 {/* Relationships data */}
@@ -136,11 +136,11 @@ export default function ProfileData() {
                   <span className="loading-msg">Something went wrong.</span>
                 ) : rIsLoading ? (
                   <span className="loading-msg">Loading...</span>
-                ) : userId == currentUser.id ? (
+                ) : userId == currentUser?.id ? (
                   <button onClick={() => setOpenUpdate(true)}>Update</button>
                 ) : (
                   <button onClick={handleFollow}>
-                    {relationshipsData.includes(currentUser.id)
+                    {relationshipsData.includes(currentUser?.id)
                       ? "Following"
                       : "Follow"}
                   </button>
@@ -149,7 +149,7 @@ export default function ProfileData() {
             </div>
           </div>
 
-          {userId == currentUser.id && <Publish />}
+          {userId == currentUser?.id && <Publish />}
 
           <Posts userId={userId} />
         </>

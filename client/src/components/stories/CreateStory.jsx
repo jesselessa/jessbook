@@ -3,11 +3,13 @@ import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { makeRequest } from "../../utils/axios.js";
+import { upload } from "../../utils/upload.js";
 
 // Component
 import Overlay from "../overlay/Overlay.jsx";
 
 // Utility function checking if file is a video based on the name of its "type" attribute
+//! A regex must always return a value (true or false)
 const isVideo = (type) => type.startsWith("video/");
 
 export default function CreateStory({ setOpenCreateStory }) {
@@ -16,20 +18,6 @@ export default function CreateStory({ setOpenCreateStory }) {
   const [error, setError] = useState({ isError: false, message: "" });
   const [imgURL, setImgURL] = useState("");
   const [videoURL, setVideoURL] = useState("");
-
-  // Handle image or video upload
-  const upload = async () => {
-    try {
-      const formData = new FormData(); // File can't be directly sent to API
-      formData.append("file", file);
-
-      const res = await makeRequest.post("/uploads", formData);
-
-      return res.data; // image or video file sent to database
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   // Add a new story
   const queryClient = useQueryClient();
@@ -71,7 +59,7 @@ export default function CreateStory({ setOpenCreateStory }) {
     // Initialize variable, then, upload file and download URL
     let fileUrl = "";
 
-    if (file) fileUrl = await upload();
+    if (file) fileUrl = await upload(file);
 
     mutation.mutate({ img: fileUrl, desc: desc }); // If success URL sent to database (stories table)
   };
@@ -87,9 +75,9 @@ export default function CreateStory({ setOpenCreateStory }) {
       if (isVideo(selectedFile.type)) {
         const videoElement = document.createElement("video");
 
-        const videoPath = URL.createObjectURL(selectedFile); // Generate dynamic URL for selected file
+        const fileURL = URL.createObjectURL(selectedFile); // Generate dynamic URL for selected file
 
-        videoElement.src = videoPath;
+        videoElement.src = fileURL;
 
         videoElement.onloadedmetadata = () => {
           // loadedmetadata event is fired when metadata has been loaded
@@ -97,16 +85,16 @@ export default function CreateStory({ setOpenCreateStory }) {
             // Failed upload
             setError({
               isError: true,
-              message: "Video duration can't exceed a 60-second limit.",
+              message: "You can't publish a video exceeding 60 seconds.",
             });
 
             setFile(null);
-            setVideoURL(""); // Clear URL preview
+            setVideoURL(""); // Clear video URL to prevent preview
             return;
           } else {
             // Successful upload : store file and update its URL
             setFile(selectedFile);
-            setVideoURL(videoPath);
+            setVideoURL(fileURL);
           }
         };
       } else {

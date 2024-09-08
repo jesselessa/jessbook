@@ -1,7 +1,8 @@
 import { useContext, useState } from "react";
 import "./comments.scss";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePostComments } from "../../hooks/usePostComments.js";
 import moment from "moment";
 
 // Images
@@ -25,25 +26,12 @@ export default function Comments({ postId }) {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
 
-  // Fetch post comments
-  const fetchPostComments = async () => {
-    return await makeRequest
-      .get(`/comments?postId=${postId}`)
-      .then((res) => res.data)
-      .catch((error) =>
-        console.log("Error fetching comments from Comments.jsx:", error)
-      );
-  };
-
-  const {
-    isLoading,
-    error,
-    data: comments,
-  } = useQuery({ queryKey: ["comments", postId], queryFn: fetchPostComments });
+  // Fetch post comments by using custom hook
+  const { data: comments, isLoading, error } = usePostComments(postId);
 
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(
+  const updateComMutation = useMutation(
     (newComment) => {
       return makeRequest.post("/comments", newComment);
     },
@@ -58,7 +46,7 @@ export default function Comments({ postId }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    mutation.mutate({ desc: desc.trim(), postId });
+    updateComMutation.mutate({ desc: desc.trim(), postId });
     setDesc(""); // Reset field
   };
 
@@ -69,7 +57,7 @@ export default function Comments({ postId }) {
   };
 
   // Delete comment
-  const deleteMutation = useMutation(
+  const deleteComMutation = useMutation(
     (commentId) => makeRequest.delete(`/comments/${commentId}`),
     {
       onSuccess: () => {
@@ -81,7 +69,7 @@ export default function Comments({ postId }) {
 
   const handleDelete = (comment) => {
     try {
-      deleteMutation.mutate(comment.id);
+      deleteComMutation.mutate(comment.id);
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
@@ -93,8 +81,8 @@ export default function Comments({ postId }) {
         <div className="img-container">
           <img
             src={
-              currentUser.profilePic
-                ? `/uploads/${currentUser.profilePic}`
+              currentUser?.profilePic
+                ? `/uploads/${currentUser?.profilePic}`
                 : defaultProfile
             }
             alt="user"
@@ -124,12 +112,12 @@ export default function Comments({ postId }) {
         <span className="loading-msg">Loading...</span>
       ) : (
         comments.map((comment) => (
-          <div className="comment" key={comment.id}>
+          <div className="comment" key={comment?.id}>
             <div className="img-container">
               <img
                 src={
-                  comment.profilePic
-                    ? `/uploads/${comment.profilePic}`
+                  comment?.profilePic
+                    ? `/uploads/${comment?.profilePic}`
                     : defaultProfile
                 }
                 alt="user"
@@ -137,12 +125,12 @@ export default function Comments({ postId }) {
             </div>
             <div className="info">
               <h3>
-                {comment.firstName} {comment.lastName}
+                {comment?.firstName} {comment?.lastName}
               </h3>
-              <p>{comment.desc}</p>
+              <p>{comment?.desc}</p>
             </div>
             <div className="buttons-time">
-              {currentUser.id === comment.userId && (
+              {currentUser?.id === comment?.userId && (
                 <div className="editBtns">
                   <EditOutlinedIcon
                     className="editBtn"
@@ -158,7 +146,7 @@ export default function Comments({ postId }) {
               )}
 
               <span className="time">
-                {moment(comment.createdAt).fromNow()}
+                {moment(comment?.createdAt).fromNow()}
               </span>
             </div>
           </div>

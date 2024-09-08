@@ -34,7 +34,7 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const navigateAndScrollTop = () => {
-    navigate(`/profile/${currentUser.id}`);
+    navigate(`/profile/${currentUser?.id}`);
     window.scrollTo(0, 0);
   };
 
@@ -97,7 +97,7 @@ export default function Navbar() {
         <img
           src={
             currentUser.profilePic
-              ? `/uploads/${currentUser.profilePic}`
+              ? `/uploads/${currentUser?.profilePic}`
               : defaultProfile
           }
           onClick={navigateAndScrollTop}
@@ -108,7 +108,7 @@ export default function Navbar() {
 
       {/* Burger menu */}
       <div className="rightMob">
-        <Link to={`/profile/${currentUser.id}`}>
+        <Link to={`/profile/${currentUser?.id}`}>
           <PersonOutlinedIcon className="iconMob" fontSize="large" />
         </Link>
         <Link to="#">

@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import "./publish.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
+import { upload } from "../../utils/upload.js";
 
 // Images
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
@@ -26,23 +27,10 @@ export default function Publish() {
   const [desc, setDesc] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
 
-  // Handle image upload
-  const upload = async () => {
-    try {
-      const formData = new FormData(); // Because we can't send file directly to API
-      formData.append("file", file);
-
-      const res = await makeRequest.post("/uploads", formData);
-      return res.data;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   // Add a new post
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(
+  const addPostMutation = useMutation(
     (newPost) => {
       return makeRequest.post("/posts", newPost);
     },
@@ -75,9 +63,9 @@ export default function Publish() {
 
     // Initialize variable, then, upload file and download URL
     let imgUrl = "";
-    if (file) imgUrl = await upload();
+    if (file) imgUrl = await upload(file);
 
-    mutation.mutate({ desc: desc.trim(), img: imgUrl }); // If success URL sent to database (posts table)
+    addPostMutation.mutate({ desc: desc.trim(), img: imgUrl }); // If success URL sent to database (posts table)
   };
 
   return (
@@ -88,7 +76,7 @@ export default function Publish() {
             <img
               src={
                 currentUser.profilePic
-                  ? `/uploads/${currentUser.profilePic}`
+                  ? `/uploads/${currentUser?.profilePic}`
                   : defaultProfile
               }
               alt="user"
@@ -98,7 +86,7 @@ export default function Publish() {
           <div className="inputGroup">
             <input
               type="text"
-              placeholder={`What's up, ${currentUser.firstName} ?`}
+              placeholder={`What's up, ${currentUser?.firstName} ?`}
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />
@@ -116,7 +104,7 @@ export default function Publish() {
               />
             )}
           </div>
-          {error.isError && <span className="errorMsg">{error.message}</span>}
+          {error?.isError && <span className="errorMsg">{error?.message}</span>}
         </div>
         <div className="right">
           {file && (
@@ -141,7 +129,7 @@ export default function Publish() {
             type="file"
             id="file"
             accept="image/*"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={(e) => setFile(e?.target?.files[0])}
           />
           <label htmlFor="file">
             <div className="item">

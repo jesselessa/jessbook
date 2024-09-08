@@ -1,8 +1,9 @@
 import { useState, useContext } from "react";
 import "./post.scss";
 import { useNavigate } from "react-router-dom";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { usePostComments } from "../../hooks/usePostComments.js";
 import moment from "moment";
 import { toast } from "react-toastify";
 
@@ -33,32 +34,20 @@ export default function Post({ post }) {
   const navigate = useNavigate();
 
   const navigateAndScrollTop = () => {
-    navigate(`/profile/${post.userId}`);
+    navigate(`/profile/${post?.userId}`);
     window.scrollTo(0, 0);
   };
 
-  // Get comments
-  const fetchPostComments = async () => {
-    return await makeRequest
-      .get(`/comments?postId=${post.id}`)
-      .then((res) => res.data)
-      .catch((error) =>
-        console.log("Error fetching comments from Post.jsx:", error)
-      );
-  };
+  // Fetch post comments by using custom hook
+  const { data: comments } = usePostComments(post?.id);
 
   const queryClient = useQueryClient();
-
-  const { data: comments } = useQuery({
-    queryKey: ["comments", post.id],
-    queryFn: fetchPostComments,
-  });
 
   // Handle likes
   const fetchPostLikes = async () => {
     return await makeRequest
-      .get(`/likes?postId=${post.id}`)
-      .then((res) => res.data)
+      .get(`/likes?postId=${post?.id}`)
+      .then((res) => res?.data)
       .catch((error) => console.log(error));
   };
 
@@ -66,23 +55,23 @@ export default function Post({ post }) {
     isLoading,
     error,
     data: likes,
-  } = useQuery({ queryKey: ["likes", post.id], queryFn: fetchPostLikes });
+  } = useQuery({ queryKey: ["likes", post?.id], queryFn: fetchPostLikes });
 
-  const mutation = useMutation(
+  const deleteLikeMutation = useMutation(
     (liked) => {
-      if (liked) return makeRequest.delete(`/likes?postId=${post.id}`);
-      return makeRequest.post("/likes", { postId: post.id });
+      if (liked) return makeRequest.delete(`/likes?postId=${post?.id}`);
+      return makeRequest.post("/likes", { postId: post?.id });
     },
     {
       onSuccess: () => {
         // Invalidate and refetch
-        queryClient.invalidateQueries(["likes", post.id]);
+        queryClient.invalidateQueries(["likes", post?.id]);
       },
     }
   );
 
   const handleLikes = () => {
-    mutation.mutate(likes.includes(currentUser.id));
+    deleteLikeMutation.mutate(likes.includes(currentUser?.id));
   };
 
   // Open update form
@@ -91,7 +80,7 @@ export default function Post({ post }) {
   };
 
   // Delete post
-  const deleteMutation = useMutation(
+  const deletePostMutation = useMutation(
     (postId) => makeRequest.delete(`/posts/${postId}`),
     {
       onSuccess: () => {
@@ -105,7 +94,7 @@ export default function Post({ post }) {
 
   const handleDelete = (post) => {
     try {
-      deleteMutation.mutate(post.id);
+      deletePostMutation.mutate(post?.id);
     } catch (error) {
       console.error("Error deleting post:", error);
     }
@@ -118,7 +107,9 @@ export default function Post({ post }) {
           <div className="img-container" onClick={navigateAndScrollTop}>
             <img
               src={
-                post.profilePic ? `/uploads/${post.profilePic}` : defaultProfile
+                post?.profilePic
+                  ? `/uploads/${post?.profilePic}`
+                  : defaultProfile
               }
               alt="user"
             />
@@ -126,13 +117,13 @@ export default function Post({ post }) {
 
           <div className="details">
             <span className="name" onClick={navigateAndScrollTop}>
-              {post.firstName} {post.lastName}
+              {post?.firstName} {post?.lastName}
             </span>
-            <span className="date">{moment(post.createdAt).fromNow()}</span>
+            <span className="date">{moment(post?.createdAt).fromNow()}</span>
           </div>
         </div>
 
-        {currentUser.id === post.userId && (
+        {currentUser?.id === post?.userId && (
           <div className="editBtns">
             <EditOutlinedIcon
               className="editBtn"
@@ -149,8 +140,8 @@ export default function Post({ post }) {
       </div>
 
       <div className="content">
-        <p>{post.desc}</p>
-        {post.img && <img src={`/uploads/${post.img}`} alt="post" />}
+        <p>{post?.desc}</p>
+        {post?.img && <img src={`/uploads/${post?.img}`} alt="post" />}
       </div>
 
       <div className="interactions">
@@ -159,20 +150,20 @@ export default function Post({ post }) {
             <span className="loading-msg">Something went wrong.</span>
           ) : isLoading ? (
             <span className="loading-msg">Loading...</span>
-          ) : likes.includes(currentUser.id) ? (
+          ) : likes?.includes(currentUser?.id) ? (
             <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLikes} />
           ) : (
             <FavoriteBorderOutlinedIcon onClick={handleLikes} />
           )}
           {/* Likes */}
-          {likes?.length > 0 && likes.length}{" "}
+          {likes?.length > 0 && likes?.length}{" "}
           <span className="likes">{likes?.length > 1 ? "Likes" : "Like"}</span>
         </div>
 
         {/* Comments */}
         <div className="item" onClick={() => setCommentsOpen(!commentsOpen)}>
           <TextsmsOutlinedIcon />
-          {comments?.length > 0 && comments.length}{" "}
+          {comments?.length > 0 && comments?.length}{" "}
           <span className="commentsNb">
             {comments?.length > 1 ? "Comments" : "Comment"}
           </span>
@@ -185,7 +176,7 @@ export default function Post({ post }) {
         </div>
       </div>
 
-      {commentsOpen && <Comments postId={post.id} />}
+      {commentsOpen && <Comments postId={post?.id} />}
 
       {openUpdate && <UpdatePost setOpenUpdate={setOpenUpdate} post={post} />}
     </div>

@@ -1,8 +1,9 @@
 import { useContext, useState } from "react";
 import "./updateProfile.scss";
 import { useNavigate } from "react-router-dom";
-import { makeRequest } from "../../utils/axios.js";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { makeRequest } from "../../utils/axios.js";
+import { upload } from "../../utils/upload.js";
 import { toast } from "react-toastify";
 
 // Icon
@@ -27,19 +28,6 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
 
   const navigate = useNavigate();
 
-  // Upload image
-  const upload = async (file) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await makeRequest.post("/uploads", formData);
-      return res.data;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFields((prevFields) => ({ ...prevFields, [name]: value }));
@@ -48,13 +36,17 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation(
-    (user) => {
-      return makeRequest.put("/users", user);
+    (updatedUser) => {
+      return makeRequest.put("/users", updatedUser);
     },
     {
-      onSuccess: () => {
-        // Invalidate and refetch
+      onSuccess: (user) => {
+        // Update cache with user's new data
+        queryClient.setQueryData(["user", user.id], user);
+
+        //Invalidate and refetch
         queryClient.invalidateQueries(["user"]);
+
         toast.success("Profile updated.");
       },
     }
@@ -87,6 +79,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       profilePic: profileUrl,
     };
 
+    // Update user state in AuthContext
     setCurrentUser(updatedUser);
     setCover(null);
     setProfile(null);

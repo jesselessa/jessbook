@@ -40,7 +40,7 @@ export default function Login() {
     });
   };
 
-  //* Login function
+  // Login function
   const handleLogin = async (e) => {
     e.preventDefault();
 

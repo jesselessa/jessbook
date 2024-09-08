@@ -11,9 +11,9 @@ import CreateStory from "./CreateStory.jsx";
 import ModalStory from "./ModalStory.jsx";
 
 // Utility function checking if file is a video based on its extension
-const isVideo = (fileName) => {
-  return /\.(mp4|mov|avi|mkv|webm|flv|wmv|3gp|m4v|ogv)$/i.test(fileName);
-};
+//! A regex must always return a value (true or false)
+const isVideo = (fileName) =>
+  /\.(mp4|mov|avi|mkv|webm|flv|wmv|3gp|m4v|ogv)$/i.test(fileName);
 
 // Context
 import { AuthContext } from "../../contexts/authContext";
@@ -54,8 +54,8 @@ export default function Stories({ userId }) {
           <div className="story">
             <img
               src={
-                currentUser.profilePic
-                  ? `/uploads/${currentUser.profilePic}`
+                currentUser?.profilePic
+                  ? `/uploads/${currentUser?.profilePic}`
                   : defaultProfile
               }
               alt="user"
@@ -81,7 +81,7 @@ export default function Stories({ userId }) {
             stories.map((story) => (
               <div
                 className="story"
-                key={story.id}
+                key={story?.id}
                 onClick={() => handleClick(story)}
                 style={{ cursor: "pointer" }}
               >
@@ -100,7 +100,7 @@ export default function Stories({ userId }) {
                 )}
 
                 <span>
-                  {story.firstName} {story.lastName}
+                  {story?.firstName} {story?.lastName}
                 </span>
               </div>
             ))

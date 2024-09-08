@@ -8,18 +8,18 @@ import { toast } from "react-toastify";
 import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdateComment({ comment, setOpenUpdate }) {
-  const [desc, setDesc] = useState(comment.desc);
+  const [desc, setDesc] = useState(comment?.desc);
 
   const queryClient = useQueryClient();
 
   const mutation = useMutation(
     (updatedComment) => {
-      return makeRequest.put(`/comments/${comment.id}`, updatedComment);
+      return makeRequest.put(`/comments/${comment?.id}`, updatedComment);
     },
     {
       onSuccess: () => {
         // Invalidate and refetch
-        queryClient.invalidateQueries(["comments", comment.postId]);
+        queryClient.invalidateQueries(["comments", comment?.postId]);
 
         setOpenUpdate(false); // To close form
         toast.success("Comment updated.");
@@ -31,7 +31,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
     e.preventDefault();
 
     // Check if post has been modified
-    if (desc.trim() === comment.desc.trim()) {
+    if (desc.trim() === comment?.desc.trim()) {
       toast.info("No changes detected.");
       return;
     }

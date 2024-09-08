@@ -6,10 +6,10 @@ import { makeRequest } from "../../utils/axios.js";
 import Post from "../post/Post.jsx";
 
 export default function Posts({ userId }) {
-  const getPosts = async () => {
+  const getUserPosts = async () => {
     return await makeRequest
       .get(`/posts?userId=${userId}`)
-      .then((res) => res.data)
+      .then((res) => res?.data)
       .catch((error) => console.log(error));
   };
 
@@ -19,7 +19,7 @@ export default function Posts({ userId }) {
     data: posts,
   } = useQuery({
     queryKey: ["posts", userId],
-    queryFn: getPosts,
+    queryFn: getUserPosts,
   });
 
   return (
@@ -31,7 +31,7 @@ export default function Posts({ userId }) {
       ) : posts.length === 0 ? (
         <span className="loading-msg">No post to show yet.</span>
       ) : (
-        posts.map((post) => <Post key={post.id} post={post} />)
+        posts.map((post) => <Post key={post?.id} post={post} />)
       )}
     </div>
   );
