@@ -171,7 +171,7 @@ export default function CreateStory({ toggleOpenCreateStory }) {
         </form>
 
         {/* Error message */}
-        {error.isError && <span className="errorMsg">{error.message}</span>}
+        {error.isError && <span className="error-msg">{error.message}</span>}
 
         <button className="close" onClick={() => toggleOpenCreateStory()}>
           X

@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
 import "./comments.scss";
 import { makeRequest } from "../../utils/axios.js";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToggle } from "../../hooks/useToggle.js";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { usePostComments } from "../../hooks/usePostComments.js";
+import { useToggle } from "../../hooks/useToggle.js";
+import { toast } from "react-toastify";
 import moment from "moment";
 
 // Images
@@ -24,53 +25,52 @@ export default function Comments({ postId }) {
   const { currentUser } = useContext(AuthContext);
 
   const [desc, setDesc] = useState("");
-  const [openUpdate, toggleOpenUpdate] = useToggle();
   const [selectedComment, setSelectedComment] = useState(null);
+  const [openUpdate, toggleUpdate] = useToggle();
 
   // Fetch post comments by using custom hook
   const { data: comments, isLoading, error } = usePostComments(postId);
 
   const queryClient = useQueryClient();
 
-  const updateComMutation = useMutation(
-    (newComment) => {
-      return makeRequest.post("/comments", newComment);
+  // Create comment
+  const postMutation = useMutation({
+    mutationFn: (newComment) => makeRequest.post("/comments", newComment),
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["comments", postId]);
+      toast.success("Comment published.");
     },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["comments", postId]);
-      },
-    }
-  );
+  });
 
   const handleClick = async (e) => {
     e.preventDefault();
 
-    updateComMutation.mutate({ desc: desc.trim(), postId });
-    setDesc(""); // Reset field
+    postMutation.mutate({ desc: desc.trim(), postId });
+    setDesc(""); // Reset field after submission
   };
 
-  // Open update form and store selected comment
-  const handleUpdate = (comment) => {
-    toggleOpenUpdate();
+  // Open selected comment for update
+  const handleToggleComment = (comment) => {
     setSelectedComment(comment);
+    toggleUpdate();
   };
 
   // Delete comment
-  const deleteComMutation = useMutation(
-    (commentId) => makeRequest.delete(`/comments/${commentId}`),
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["comments", postId]);
-      },
-    }
-  );
+  const deleteMutation = useMutation({
+    mutationFn: (commentId) => makeRequest.delete(`/comments/${commentId}`),
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["comments", postId]);
+      toast.success("Comment deleted.");
+    },
+  });
 
   const handleDelete = (comment) => {
     try {
-      deleteComMutation.mutate(comment.id);
+      deleteMutation.mutate(comment.id);
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
@@ -82,15 +82,15 @@ export default function Comments({ postId }) {
         <div className="img-container">
           <img
             src={
-              currentUser?.profilePic
-                ? `/uploads/${currentUser?.profilePic}`
+              currentUser.profilePic
+                ? `/uploads/${currentUser.profilePic}`
                 : defaultProfile
             }
             alt="user"
           />
         </div>
 
-        <div className="inputGroup">
+        <div className="input-group">
           <input
             type="text"
             placeholder="Write a comment..."
@@ -113,12 +113,12 @@ export default function Comments({ postId }) {
         <span className="loading-msg">Loading...</span>
       ) : (
         comments.map((comment) => (
-          <div className="comment" key={comment?.id}>
+          <div className="comment" key={comment.id}>
             <div className="img-container">
               <img
                 src={
-                  comment?.profilePic
-                    ? `/uploads/${comment?.profilePic}`
+                  comment.profilePic
+                    ? `/uploads/${comment.profilePic}`
                     : defaultProfile
                 }
                 alt="user"
@@ -126,20 +126,20 @@ export default function Comments({ postId }) {
             </div>
             <div className="info">
               <h3>
-                {comment?.firstName} {comment?.lastName}
+                {comment.firstName} {comment.lastName}
               </h3>
-              <p>{comment?.desc}</p>
+              <p>{comment.desc}</p>
             </div>
             <div className="buttons-time">
-              {currentUser?.id === comment?.userId && (
-                <div className="editBtns">
+              {currentUser.id === comment.userId && (
+                <div className="edit-buttons">
                   <EditOutlinedIcon
-                    className="editBtn"
+                    className="edit-btn"
                     fontSize="large"
-                    onClick={() => handleUpdate(comment)}
+                    onClick={() => handleToggleComment(comment)}
                   />
                   <DeleteOutlineOutlinedIcon
-                    className="editBtn"
+                    className="edit-btn"
                     fontSize="large"
                     onClick={() => handleDelete(comment)}
                   />
@@ -147,19 +147,16 @@ export default function Comments({ postId }) {
               )}
 
               <span className="time">
-                {moment(comment?.createdAt).fromNow()}
+                {moment(comment.createdAt).fromNow()}
               </span>
             </div>
           </div>
         ))
       )}
 
-      {/* Display update form when a specific comment has been selected */}
-      {selectedComment && openUpdate && (
-        <UpdateComment
-          comment={selectedComment}
-          toggleOpenUpdate={toggleOpenUpdate}
-        />
+      {/* Display update form when clicking on comment */}
+      {openUpdate && (
+        <UpdateComment comment={selectedComment} toggleUpdate={toggleUpdate} />
       )}
     </div>
   );

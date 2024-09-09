@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import "./register.scss";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -24,7 +23,7 @@ export default function Register() {
     password: "",
     pswdConfirm: "",
   });
-  // To handle errors from API
+  // Handle errors from API
   const [error, setError] = useState("");
 
   // Check window object width when loading page (for responsive)
@@ -120,7 +119,7 @@ export default function Register() {
     try {
       await axios.post(`http://localhost:8000/auth/register`, inputsValues);
 
-      toast.success("Successful registration !");
+      toast.success("Successful registration.");
       clearErrors();
       clearForm();
 
@@ -148,7 +147,7 @@ export default function Register() {
               onChange={handleChange}
             />
             {validationErrors.firstName && (
-              <span className="errorMsg">{validationErrors.firstName}</span>
+              <span className="error-msg">{validationErrors.firstName}</span>
             )}
 
             {/* Last Name */}
@@ -163,7 +162,7 @@ export default function Register() {
               onChange={handleChange}
             />
             {validationErrors.lastName && (
-              <span className="errorMsg">{validationErrors.lastName}</span>
+              <span className="error-msg">{validationErrors.lastName}</span>
             )}
 
             {/* Email */}
@@ -177,7 +176,7 @@ export default function Register() {
               onChange={handleChange}
             />
             {validationErrors.email && (
-              <span className="errorMsg">{validationErrors.email}</span>
+              <span className="error-msg">{validationErrors.email}</span>
             )}
 
             {/* Password */}
@@ -191,7 +190,7 @@ export default function Register() {
               onChange={handleChange}
             />
             {validationErrors.password && (
-              <span className="errorMsg">{validationErrors.password}</span>
+              <span className="error-msg">{validationErrors.password}</span>
             )}
 
             {/* Confirm Password */}
@@ -205,17 +204,17 @@ export default function Register() {
               onChange={handleChange}
             />
             {validationErrors.pswdConfirm && (
-              <span className="errorMsg">{validationErrors.pswdConfirm}</span>
+              <span className="error-msg">{validationErrors.pswdConfirm}</span>
             )}
 
             {/* API Error */}
-            {error && <span className="errorMsg api">{error}</span>}
+            {error && <span className="error-msg api">{error}</span>}
 
             {/* Submit button */}
             <button type="submit">Sign up</button>
 
             {windowWidth <= 1150 && (
-              <p className="loginMsg">
+              <p className="login-msg">
                 Have an account ?{" "}
                 <Link to="/login">
                   <span>Login</span>

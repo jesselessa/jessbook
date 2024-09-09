@@ -1,10 +1,10 @@
 import { useContext, useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import "./login.scss";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 // Context
-import { AuthContext } from "../../contexts/authContext";
+import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Login() {
   const { login } = useContext(AuthContext);
@@ -47,14 +47,16 @@ export default function Login() {
     try {
       await login(inputsValues);
 
-      toast.success("Successful login !");
+      // Reset form and error message
       setError("");
       clearForm();
+      toast.success("Successful login !");
 
+      // Go to homepage
       navigate("/");
     } catch (error) {
       // Handle errors from API
-      console.log(error);
+      console.error(error);
       setError(error.response?.data || "An unknown error occured.");
     }
   };
@@ -81,7 +83,7 @@ export default function Login() {
 
         <div className="right">
           {windowWidth <= 1150 ? (
-            <h1 className="titleMob">Welcome&nbsp;to Jessbook</h1>
+            <h1 className="title-mob">Welcome&nbsp;to Jessbook</h1>
           ) : (
             <h1>Login</h1>
           )}
@@ -118,7 +120,7 @@ export default function Login() {
 
             {windowWidth <= 1150 && (
               <Link to="/register">
-                <button type="submit" className="registerBtn">
+                <button type="submit" className="register-btn">
                   Register
                 </button>
               </Link>

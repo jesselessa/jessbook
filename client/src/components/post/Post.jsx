@@ -28,155 +28,153 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
-
-  const [openUpdate, toggleOpenUpdate] = useToggle();
-  const [openComments, toggleOpenComments] = useToggle();
+  const [openComments, toggleComments] = useToggle();
+  const [openUpdate, toggleUpdate] = useToggle();
 
   const navigate = useNavigate();
 
   const navigateAndScrollTop = () => {
-    navigate(`/profile/${post?.userId}`);
+    navigate(`/profile/${post.userId}`);
     window.scrollTo(0, 0);
   };
 
   // Fetch post comments by using custom hook
-  const { data: comments } = usePostComments(post?.id);
+  const { data: comments } = usePostComments(post.id);
 
   const queryClient = useQueryClient();
 
   // Handle likes
   const fetchPostLikes = async () => {
     return await makeRequest
-      .get(`/likes?postId=${post?.id}`)
-      .then((res) => res?.data)
+      .get(`/likes?postId=${post.id}`)
+      .then((res) => res.data)
       .catch((error) => console.log(error));
   };
 
-  const {
-    isLoading,
-    error,
-    data: likes,
-  } = useQuery({ queryKey: ["likes", post?.id], queryFn: fetchPostLikes });
+  const { data: likes } = useQuery({
+    queryKey: ["likes", post.id],
+    queryFn: fetchPostLikes,
+  });
 
-  const deleteLikeMutation = useMutation(
-    (liked) => {
-      if (liked) return makeRequest.delete(`/likes?postId=${post?.id}`);
-      return makeRequest.post("/likes", { postId: post?.id });
+  const handleLikesMutation = useMutation({
+    mutationFn: (liked) => {
+      if (liked) return makeRequest.delete(`/likes?postId=${post.id}`);
+      return makeRequest.post("/likes", { postId: post.id });
     },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["likes", post?.id]);
-      },
-    }
-  );
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["likes", post.id]);
+    },
+  });
 
   const handleLikes = () => {
-    deleteLikeMutation.mutate(likes.includes(currentUser?.id));
+    handleLikesMutation.mutate(likes.includes(currentUser.id));
   };
 
   // Delete post
-  const deletePostMutation = useMutation(
-    (postId) => makeRequest.delete(`/posts/${postId}`),
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["posts"]);
+  const deletePostMutation = useMutation({
+    mutationFn: (postId) => makeRequest.delete(`/posts/${postId}`),
 
-        toast.success("Post deleted.");
-      },
-    }
-  );
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["posts"]);
+      toast.success("Post deleted.");
+    },
+  });
 
   const handleDelete = (post) => {
     try {
-      deletePostMutation.mutate(post?.id);
+      deletePostMutation.mutate(post.id);
     } catch (error) {
       console.error("Error deleting post:", error);
     }
   };
 
   return (
-    <div className="post">
-      <div className="user">
-        <div className="userInfo">
-          <div className="img-container" onClick={navigateAndScrollTop}>
-            <img
-              src={
-                post?.profilePic
-                  ? `/uploads/${post?.profilePic}`
-                  : defaultProfile
-              }
-              alt="user"
-            />
+    <>
+      <div className="post">
+        <div className="user">
+          <div className="user-info">
+            <div className="img-container" onClick={navigateAndScrollTop}>
+              <img
+                src={
+                  post?.profilePic
+                    ? `/uploads/${post.profilePic}`
+                    : defaultProfile
+                }
+                alt="user"
+              />
+            </div>
+
+            <div className="details">
+              <span className="name" onClick={navigateAndScrollTop}>
+                {post.firstName} {post.lastName}
+              </span>
+              <span className="date">{moment(post.createdAt).fromNow()}</span>
+            </div>
           </div>
 
-          <div className="details">
-            <span className="name" onClick={navigateAndScrollTop}>
-              {post?.firstName} {post?.lastName}
-            </span>
-            <span className="date">{moment(post?.createdAt).fromNow()}</span>
-          </div>
-        </div>
-
-        {currentUser?.id === post?.userId && (
-          <div className="editBtns">
-            <EditOutlinedIcon
-              className="editBtn"
-              fontSize="large"
-              onClick={toggleOpenUpdate}
-            />
-            <DeleteOutlineOutlinedIcon
-              className="editBtn"
-              fontSize="large"
-              onClick={() => handleDelete(post)}
-            />
-          </div>
-        )}
-      </div>
-
-      <div className="content">
-        <p>{post?.desc}</p>
-        {post?.img && <img src={`/uploads/${post?.img}`} alt="post" />}
-      </div>
-
-      <div className="interactions">
-        <div className="item">
-          {error ? (
-            <span className="loading-msg">Something went wrong.</span>
-          ) : isLoading ? (
-            <span className="loading-msg">Loading...</span>
-          ) : likes?.includes(currentUser?.id) ? (
-            <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLikes} />
-          ) : (
-            <FavoriteBorderOutlinedIcon onClick={handleLikes} />
+          {currentUser.id === post.userId && (
+            <div className="edit-buttons">
+              <EditOutlinedIcon
+                className="edit-btn"
+                fontSize="large"
+                onClick={toggleUpdate}
+              />
+              <DeleteOutlineOutlinedIcon
+                className="edit-btn"
+                fontSize="large"
+                onClick={() => handleDelete(post)}
+              />
+            </div>
           )}
+        </div>
+
+        <div className="content">
+          <p>{post.desc}</p>
+          {post.img && <img src={`/uploads/${post.img}`} alt="post" />}
+        </div>
+
+        <div className="interactions">
           {/* Likes */}
-          {likes?.length > 0 && likes?.length}{" "}
-          <span className="likes">{likes?.length > 1 ? "Likes" : "Like"}</span>
+          <div className="item">
+            {likes?.includes(currentUser.id) ? (
+              <FavoriteOutlinedIcon
+                sx={{ color: "red" }}
+                onClick={handleLikes}
+              />
+            ) : (
+              <FavoriteBorderOutlinedIcon onClick={handleLikes} />
+            )}
+            <span className="likes">
+              {likes?.length > 0 && likes?.length}{" "}
+              {likes?.length > 1 ? "Likes" : "Like"}
+            </span>
+          </div>
+
+          {/* Comments */}
+          <div className="item" onClick={toggleComments}>
+            <TextsmsOutlinedIcon />
+            <span className="comments-nb">
+              {comments?.length > 0 && comments?.length}{" "}
+              {comments?.length > 1 ? "Comments" : "Comment"}
+            </span>
+          </div>
+
+          {/* TODO : Share feature */}
+          <div className="item">
+            <ShareOutlinedIcon />
+            Share
+          </div>
         </div>
 
-        {/* Comments */}
-        <div className="item" onClick={toggleOpenComments}>
-          <TextsmsOutlinedIcon />
-          {comments?.length > 0 && comments?.length}{" "}
-          <span className="commentsNb">
-            {comments?.length > 1 ? "Comments" : "Comment"}
-          </span>
-        </div>
+        {openComments && <Comments postId={post.id} toggleUpdate={toggleUpdate}/>}
 
-        <div className="item">
-          {/* TODO - Implement later */}
-          <ShareOutlinedIcon />
-          Share
-        </div>
+        {/* {openComments && <Comments postId={post.id} />} */}
+
+        {openUpdate && <UpdatePost post={post} toggleUpdate={toggleUpdate} />}
       </div>
-
-      {openComments && <Comments postId={post.id} />}
-
-      {openUpdate && (
-        <UpdatePost post={post} toggleOpenUpdate={toggleOpenUpdate} />
-      )}
-    </div>
+    </>
   );
 }

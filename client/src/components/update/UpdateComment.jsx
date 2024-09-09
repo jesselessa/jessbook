@@ -1,37 +1,35 @@
 import { useState } from "react";
 import "./updateComment.scss";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { toast } from "react-toastify";
 
 // Component
 import Overlay from "../overlay/Overlay.jsx";
 
-export default function UpdateComment({ comment, toggleOpenUpdate }) {
-  const [desc, setDesc] = useState(comment?.desc);
+export default function UpdateComment({ comment, toggleUpdate }) {
+  const [desc, setDesc] = useState(comment.desc);
 
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(
-    (updatedComment) => {
-      return makeRequest.put(`/comments/${comment?.id}`, updatedComment);
-    },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["comments", comment?.postId]);
+  const updateMutation = useMutation({
+    mutationFn: (updatedComment) =>
+      makeRequest.put(`/comments/${comment.id}`, updatedComment),
 
-        toggleOpenUpdate(); // Close form after submission
-        toast.success("Comment updated.");
-      },
-    }
-  );
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["comments", comment.postId]);
+
+      toggleUpdate(); // Close form after submission
+      toast.success("Comment updated.");
+    },
+  });
 
   const handleClick = async (e) => {
     e.preventDefault();
 
     // Check if post has been modified
-    if (desc.trim() === comment?.desc.trim()) {
+    if (desc.trim() === comment.desc.trim()) {
       toast.info("No changes detected.");
       return;
     }
@@ -41,7 +39,7 @@ export default function UpdateComment({ comment, toggleOpenUpdate }) {
       desc: desc.trim(),
     };
 
-    mutation.mutate(updatedComment);
+    updateMutation.mutate(updatedComment);
   };
 
   return (
@@ -58,12 +56,12 @@ export default function UpdateComment({ comment, toggleOpenUpdate }) {
               onChange={(e) => setDesc(e.target.value)}
             />
 
-            <button className="updateBtn" onClick={handleClick}>
+            <button className="update-btn" onClick={handleClick}>
               Update
             </button>
           </form>
 
-          <button className="close" onClick={toggleOpenUpdate}>
+          <button className="close" onClick={toggleUpdate}>
             X
           </button>
         </div>

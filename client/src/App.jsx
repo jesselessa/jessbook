@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 
@@ -62,7 +61,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <ToastContainer autoclose={1500} draggable={false} />
+      <ToastContainer autoclose={1000} draggable={false} />
     </QueryClientProvider>
   );
 }

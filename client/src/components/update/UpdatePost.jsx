@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./updatePost.scss";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { upload } from "../../utils/upload.js";
 import { toast } from "react-toastify";
@@ -11,26 +11,24 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 // Component
 import Overlay from "../overlay/Overlay.jsx";
 
-export default function UpdatePost({ post, toggleOpenUpdate }) {
+export default function UpdatePost({ post, toggleUpdate }) {
   const [desc, setDesc] = useState(post.desc);
   const [image, setImage] = useState("");
 
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(
-    (updatedPost) => {
-      return makeRequest.put(`/posts/${post.id}`, updatedPost);
-    },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["posts"]);
+  const updateMutation = useMutation({
+    mutationFn: (updatedPost) =>
+      makeRequest.put(`/posts/${post.id}`, updatedPost),
 
-        toggleOpenUpdate(); // Close form after submission
-        toast.success("Post updated.");
-      },
-    }
-  );
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["posts"]);
+
+      toast.success("Post updated.");
+      toggleUpdate(); // Close form after submission
+    },
+  });
 
   const handleClick = async (e) => {
     e.preventDefault();
@@ -57,7 +55,7 @@ export default function UpdatePost({ post, toggleOpenUpdate }) {
       updatedPost.img = imageUrl;
     }
 
-    mutation.mutate(updatedPost);
+    updateMutation.mutate(updatedPost);
   };
 
   return (
@@ -70,7 +68,7 @@ export default function UpdatePost({ post, toggleOpenUpdate }) {
             <div className="files">
               <label htmlFor="image">
                 <span>Choose an image</span>
-                <div className="imgContainer">
+                <div className="img-container">
                   {image && (
                     <img src={URL.createObjectURL(image)} alt="post-image" />
                   )}
@@ -80,8 +78,8 @@ export default function UpdatePost({ post, toggleOpenUpdate }) {
               <input
                 type="file"
                 id="image"
-                style={{ display: "none" }}
                 accept="image/*"
+                style={{ display: "none" }}
                 onChange={(e) => setImage(e.target.files[0])}
               />
             </div>
@@ -95,7 +93,7 @@ export default function UpdatePost({ post, toggleOpenUpdate }) {
             <button onClick={handleClick}>Update</button>
           </form>
 
-          <button className="close" onClick={toggleOpenUpdate}>
+          <button className="close" onClick={toggleUpdate}>
             X
           </button>
         </div>

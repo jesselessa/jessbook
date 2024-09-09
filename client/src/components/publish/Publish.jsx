@@ -1,8 +1,9 @@
 import { useContext, useState } from "react";
 import "./publish.scss";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { upload } from "../../utils/upload.js";
+import { toast } from "react-toastify";
 
 // Images
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
@@ -23,30 +24,29 @@ export default function Publish() {
   const { currentUser } = useContext(AuthContext);
   const { darkMode } = useContext(DarkModeContext);
 
-  const [file, setFile] = useState(null);
   const [desc, setDesc] = useState("");
+  const [file, setFile] = useState(null);
   const [error, setError] = useState({ isError: false, message: "" });
 
-  // Add a new post
+  // Add new post
   const queryClient = useQueryClient();
 
-  const addPostMutation = useMutation(
-    (newPost) => {
-      return makeRequest.post("/posts", newPost);
+  const postMutation = useMutation({
+    mutationFn: (newPost) => makeRequest.post("/posts", newPost),
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["posts"]);
+
+      toast.success("Post created.");
     },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["posts"]);
-      },
-    }
-  );
+  });
 
   const handleClick = async (e) => {
     e.preventDefault();
 
     if (desc.trim() === "") {
-      // .trim() = to delete spaces at the beginning and at the end of a string
+      // .trim() deletes spaces at the beginning and end of a string
       setError({
         isError: true,
         message: "You can't edit a post without a description.",
@@ -65,7 +65,8 @@ export default function Publish() {
     let imgUrl = "";
     if (file) imgUrl = await upload(file);
 
-    addPostMutation.mutate({ desc: desc.trim(), img: imgUrl }); // If success URL sent to database (posts table)
+    postMutation.mutate({ desc: desc.trim(), img: imgUrl }); 
+    // Data sent to 'posts' table
   };
 
   return (
@@ -76,17 +77,17 @@ export default function Publish() {
             <img
               src={
                 currentUser.profilePic
-                  ? `/uploads/${currentUser?.profilePic}`
+                  ? `/uploads/${currentUser.profilePic}`
                   : defaultProfile
               }
               alt="user"
             />
           </div>
 
-          <div className="inputGroup">
+          <div className="input-group">
             <input
               type="text"
-              placeholder={`What's up, ${currentUser?.firstName} ?`}
+              placeholder={`What's up, ${currentUser.firstName} ?`}
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />
@@ -104,7 +105,6 @@ export default function Publish() {
               />
             )}
           </div>
-          {error?.isError && <span className="errorMsg">{error?.message}</span>}
         </div>
         <div className="right">
           {file && (
@@ -113,23 +113,25 @@ export default function Publish() {
                 className="file"
                 alt="post pic"
                 src={URL.createObjectURL(file)}
-                // This creates a fake URL so we can show our image
+                // Create a fake URL to preview post image
               />
             </div>
           )}
         </div>
       </div>
 
+      {error.isError && <span className="error-msg">{error.message}</span>}
+
       <hr />
 
       <div className="bottom">
         <div className="left">
-          {/* Input image - value linked with state "file" doesn't work with file input except if value equals "" or "null" */}
+          {/* Input:file - value linked with state doesn't work except if value equals "" or "null" */}
           <input
             type="file"
             id="file"
             accept="image/*"
-            onChange={(e) => setFile(e?.target?.files[0])}
+            onChange={(e) => setFile(e.target.files[0])}
           />
           <label htmlFor="file">
             <div className="item">

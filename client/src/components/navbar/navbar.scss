@@ -58,7 +58,7 @@
         }
       }
 
-      .logoMob {
+      .logo-mob {
         display: none;
 
         @include small {
@@ -69,13 +69,13 @@
         }
       }
 
-      .themeBtn {
+      .theme-btn {
         &:hover {
           cursor: pointer;
         }
       }
 
-      .searchBar {
+      .searchbar {
         display: flex;
         align-items: center;
         gap: 1rem;
@@ -148,7 +148,7 @@
       }
     }
 
-    .rightMob {
+    .right-mob {
       display: none;
 
       @include medium {
@@ -182,7 +182,7 @@
         }
       }
 
-      .burgerList {
+      .burger-list {
         position: absolute;
         top: 71px;
         right: 0;

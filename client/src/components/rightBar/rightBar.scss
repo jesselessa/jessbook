@@ -78,7 +78,7 @@
           display: flex;
           align-items: center;
           gap: 1rem;
-          word-break: break-word; // To prevent name text from overflowing div
+          word-break: break-word; // Prevents text from overflowing div
 
           .img-container {
             width: 32px;
