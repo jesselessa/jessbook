@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
 import "./publish.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { makeRequest } from "../../utils/axios.js";
 import { upload } from "../../utils/upload.js";
-import { toast } from "react-toastify";
+import { useRevokeObjectURL } from "../../hooks/useRevokeObjectURL.js";
 
 // Images
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
@@ -65,9 +66,12 @@ export default function Publish() {
     let imgUrl = "";
     if (file) imgUrl = await upload(file);
 
-    postMutation.mutate({ desc: desc.trim(), img: imgUrl }); 
+    postMutation.mutate({ desc: desc.trim(), img: imgUrl });
     // Data sent to 'posts' table
   };
+
+  // Cleanup function to release URL resources when component is unmounted or file URL changes
+  useRevokeObjectURL(file);
 
   return (
     <div className="publish">

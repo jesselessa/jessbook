@@ -86,22 +86,26 @@ export default function ProfileData() {
           {/* User's data */}
           <div className="profile-container">
             <div className="images">
+              {/* Cover pic */}
               <img
                 src={
-                  user?.coverPic ? `/uploads/${user?.coverPic}` : defaultCover
+                  currentUser
+                    ? `/uploads/${currentUser.coverPic}`
+                    : defaultCover
                 }
                 className="cover"
                 alt="cover"
               />
 
+              {/* Profile pic */}
               <div className="img-container">
                 <img
                   src={
-                    user?.profilePic
-                      ? `/uploads/${user?.profilePic}`
+                    currentUser
+                      ? `/uploads/${currentUser.profilePic}`
                       : defaultProfile
                   }
-                  className="profile-pic"
+                  className="profile"
                   alt="profile"
                 />
               </div>
@@ -124,12 +128,12 @@ export default function ProfileData() {
 
               <div className="main-info">
                 <h2>
-                  {user?.firstName} {user?.lastName}
+                  {currentUser.firstName} {currentUser.lastName}
                 </h2>
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{user?.city || "Non renseigné"}</span>
+                  <span>{currentUser.city || "Non renseigné"}</span>
                 </div>
 
                 {/* Relationships data */}
@@ -138,7 +142,7 @@ export default function ProfileData() {
                   <button onClick={toggleUpdate}>Update</button>
                 ) : (
                   <button onClick={handleUserRelationships}>
-                    {relationships?.includes(currentUser?.id)
+                    {relationships?.includes(currentUser.id)
                       ? "Following"
                       : "Follow"}
                   </button>

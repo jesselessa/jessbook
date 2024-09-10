@@ -2,9 +2,10 @@ import { useContext, useState } from "react";
 import "./updateProfile.scss";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { makeRequest } from "../../utils/axios.js";
 import { upload } from "../../utils/upload.js";
-import { toast } from "react-toastify";
+import { useRevokeObjectURL } from "../../hooks/useRevokeObjectURL.js";
 
 // Icon
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -23,16 +24,18 @@ export default function UpdateProfile({ user, toggleUpdate }) {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
 
   const [fields, setFields] = useState({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    city: user.city,
+    firstName: user.firstName || "",
+    lastName: user.lastName || "",
+    city: user.city || "",
   });
   const [profilePic, setProfilePic] = useState(null);
   const [coverPic, setCoverPic] = useState(null);
-  const [profileUrl, setProfileUrl] = useState(user.profilePic);
-  const [coverUrl, setCoverUrl] = useState(user.coverPic || defaultCover);
+  const [profileUrl, setProfileUrl] = useState(user.profilePic || "");
+  const [coverUrl, setCoverUrl] = useState(user.coverPic || "");
 
   const navigate = useNavigate();
+
+  // Update user's info
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
@@ -43,7 +46,7 @@ export default function UpdateProfile({ user, toggleUpdate }) {
     },
   });
 
-  const handleChange = (e) => {
+  const handleTextChange = (e) => {
     const { name, value } = e.target;
     setFields((prevFields) => ({ ...prevFields, [name]: value }));
   };
@@ -51,13 +54,14 @@ export default function UpdateProfile({ user, toggleUpdate }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
+    // Handle uploaded files
     const newCoverUrl = coverPic ? await upload(coverPic) : coverUrl;
     const newProfileUrl = profilePic ? await upload(profilePic) : profileUrl;
 
-    // Update current with new data
+    // Update current user's data
     const updatedUser = {
-      ...currentUser, // Utilise les données actuelles de currentUser
-      ...fields,
+      ...currentUser, // Copy and update
+      ...fields, // Copy and update
       coverPic: newCoverUrl,
       profilePic: newProfileUrl,
     };
@@ -67,25 +71,29 @@ export default function UpdateProfile({ user, toggleUpdate }) {
 
     // Send mutation to database
     updateMutation.mutate(updatedUser);
-
     navigate(`/profile/${currentUser.id}`);
   };
 
   // Handle file change for profile or cover picture
-  const handleFileChange = (e, type) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
+    const id = e.target.id;
     if (file) {
       const previewUrl = URL.createObjectURL(file);
 
-      if (type === "profile") {
+      if (id === "profile") {
         setProfilePic(file);
-        setProfileUrl(previewUrl); // Preview new profile pic
-      } else if (type === "cover") {
+        setProfileUrl(previewUrl); // New profile pic preview
+      } else if (id === "cover") {
         setCoverPic(file);
-        setCoverUrl(previewUrl); // Preview new cover pic
+        setCoverUrl(previewUrl); // New cover pic preview
       }
     }
   };
+
+  // Cleanup function to release URL resources when component is unmounted or file URL changes
+  useRevokeObjectURL(profilePic);
+  useRevokeObjectURL(coverPic);
 
   return (
     <>
@@ -118,7 +126,7 @@ export default function UpdateProfile({ user, toggleUpdate }) {
                 name="cover"
                 accept="image/*"
                 style={{ display: "none" }}
-                onChange={(e) => handleFileChange(e, "cover")}
+                onChange={handleFileChange}
               />
 
               <label htmlFor="profile">
@@ -144,7 +152,7 @@ export default function UpdateProfile({ user, toggleUpdate }) {
                 name="profile"
                 accept="image/*"
                 style={{ display: "none" }}
-                onChange={(e) => handleFileChange(e, "profile")}
+                onChange={handleFileChange}
               />
             </div>
 
@@ -153,7 +161,7 @@ export default function UpdateProfile({ user, toggleUpdate }) {
               type="text"
               value={fields.firstName}
               name="firstName"
-              onChange={handleChange}
+              onChange={handleTextChange}
               autoComplete="off"
             />
 
@@ -162,7 +170,7 @@ export default function UpdateProfile({ user, toggleUpdate }) {
               type="text"
               value={fields.lastName}
               name="lastName"
-              onChange={handleChange}
+              onChange={handleTextChange}
               autoComplete="off"
             />
 
@@ -171,7 +179,7 @@ export default function UpdateProfile({ user, toggleUpdate }) {
               type="text"
               name="city"
               value={fields.city}
-              onChange={handleChange}
+              onChange={handleTextChange}
               autoComplete="off"
             />
 

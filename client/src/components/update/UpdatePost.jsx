@@ -1,9 +1,10 @@
 import { useState } from "react";
 import "./updatePost.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { makeRequest } from "../../utils/axios.js";
 import { upload } from "../../utils/upload.js";
-import { toast } from "react-toastify";
+import { useRevokeObjectURL } from "../../hooks/useRevokeObjectURL.js";
 
 // Icons
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -57,6 +58,9 @@ export default function UpdatePost({ post, toggleUpdate }) {
 
     updateMutation.mutate(updatedPost);
   };
+
+  // Cleanup function inside useEffect to release URL resources when component is unmounted or image URL change
+  useRevokeObjectURL(image);
 
   return (
     <>

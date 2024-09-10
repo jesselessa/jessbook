@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { makeRequest } from "../../utils/axios.js";
 import { upload } from "../../utils/upload.js";
+import { useRevokeObjectURL } from "../../hooks/useRevokeObjectURL.js";
 
 // Component
 import Overlay from "../overlay/Overlay.jsx";
@@ -12,7 +13,7 @@ import Overlay from "../overlay/Overlay.jsx";
 //! A regex must always return a value (true or false)
 const isVideo = (type) => type.startsWith("video/");
 
-export default function CreateStory({ toggleOpenCreateStory }) {
+export default function CreateStory({ toggleCreateStory }) {
   const [file, setFile] = useState(null);
   const [desc, setDesc] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
@@ -31,7 +32,7 @@ export default function CreateStory({ toggleOpenCreateStory }) {
         // Invalidate and refetch
         queryClient.invalidateQueries(["stories"]);
 
-        toggleOpenCreateStory();
+        toggleCreateStory(); // Close form after submission
         toast.success("Story published.");
       },
     }
@@ -107,13 +108,9 @@ export default function CreateStory({ toggleOpenCreateStory }) {
     }
   };
 
-  // Cleanup function inside useEffect to release URL resources when component is unmounted or URLs change
-  useEffect(() => {
-    return () => {
-      if (videoURL) URL.revokeObjectURL(videoURL);
-      if (imgURL) URL.revokeObjectURL(imgURL);
-    };
-  }, [videoURL, imgURL]);
+  // Cleanup function to release URL resources when component is unmounted or URLs changes
+  useRevokeObjectURL(videoURL); // Dans UpdateProfile
+  useRevokeObjectURL(imgURL); // Dans UpdateProfile
 
   return (
     <div className="createStory">
@@ -173,7 +170,7 @@ export default function CreateStory({ toggleOpenCreateStory }) {
         {/* Error message */}
         {error.isError && <span className="error-msg">{error.message}</span>}
 
-        <button className="close" onClick={() => toggleOpenCreateStory()}>
+        <button className="close" onClick={() => toggleCreateStory()}>
           X
         </button>
       </div>

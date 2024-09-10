@@ -20,7 +20,7 @@ export default function ModalStory({ story, toggleOpenModal }) {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation(
-    () => makeRequest.delete(`/stories/${story?.id}`),
+    () => makeRequest.delete(`/stories/${story.id}`),
     {
       onSuccess: () => {
         // Invalidate and refetch
@@ -47,16 +47,16 @@ export default function ModalStory({ story, toggleOpenModal }) {
         </button>
 
         <div className="img-container">
-          {isVideo(story?.img) ? (
+          {isVideo(story.img) ? (
             <video controls>
               <source
-                src={`/uploads/${story?.img}`}
-                type={`video/${story?.img.split(".").pop()}`}
+                src={`/uploads/${story.img}`}
+                type={`video/${story.img.split(".").pop()}`}
               />
               Your browser does not support the video tag.
             </video>
           ) : (
-            <img src={`/uploads/${story?.img}`} alt="preview" />
+            <img src={`/uploads/${story.img}`} alt="preview" />
           )}
         </div>
 
@@ -66,12 +66,12 @@ export default function ModalStory({ story, toggleOpenModal }) {
           <div className="story-details">
             <div className="story-edit-info">
               <p>
-                Posted by {story?.firstName} {story?.lastName}
+                Posted by {story.firstName} {story.lastName}
               </p>
-              <p>Created {moment(story?.createdAt).fromNow()}</p>
+              <p>Created {moment(story.createdAt).fromNow()}</p>
             </div>
 
-            {currentUser?.id === story?.userId && (
+            {currentUser.id === story.userId && (
               <button className="delete" onClick={() => handleDelete(story.id)}>
                 Delete
               </button>

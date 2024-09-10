@@ -22,7 +22,7 @@ import { AuthContext } from "../../contexts/authContext";
 export default function Stories({ userId }) {
   const { currentUser } = useContext(AuthContext);
 
-  const [openCreateStory, toggleOpenCreateStory] = useToggle();
+  const [openCreateStory, toggleCreateStory] = useToggle();
   const [openModal, toggleOpenModal] = useToggle();
   const [selectedStory, setSelectedStory] = useState(null);
 
@@ -55,14 +55,14 @@ export default function Stories({ userId }) {
           <div className="story">
             <img
               src={
-                currentUser?.profilePic
-                  ? `/uploads/${currentUser?.profilePic}`
+                currentUser.profilePic
+                  ? `/uploads/${currentUser.profilePic}`
                   : defaultProfile
               }
               alt="user"
             />
             <div className="add">Create a story</div>
-            <button onClick={toggleOpenCreateStory}>+</button>
+            <button onClick={toggleCreateStory}>+</button>
           </div>
 
           {/* Stories display */}
@@ -103,13 +103,10 @@ export default function Stories({ userId }) {
         </div>
       </div>
 
-      {openCreateStory && <CreateStory toggleOpenCreateStory={toggleOpenCreateStory} />}
+      {openCreateStory && <CreateStory toggleCreateStory={toggleCreateStory} />}
 
       {openModal && (
-        <ModalStory
-          story={selectedStory}
-          toggleOpenModal={toggleOpenModal}
-        />
+        <ModalStory story={selectedStory} toggleOpenModal={toggleOpenModal} />
       )}
     </>
   );
