@@ -6,8 +6,9 @@ import { makeRequest } from "../../utils/axios.js";
 import { upload } from "../../utils/upload.js";
 import { useRevokeObjectURL } from "../../hooks/useRevokeObjectURL.js";
 
-// Component
+// Components
 import Overlay from "../overlay/Overlay.jsx";
+import LazyImage from "../LazyImage.jsx";
 
 // Utility function checking if file is a video based on the name of its "type" attribute
 //! A regex must always return a value (true or false)
@@ -145,7 +146,7 @@ export default function CreateStory({ toggleCreateStory }) {
                     Your browser doesn't support video.
                   </video>
                 ) : (
-                  <img alt="image" src={URL.createObjectURL(file)} />
+                  <LazyImage src={URL.createObjectURL(file)} alt="image" />
                 )}
               </div>
             )}

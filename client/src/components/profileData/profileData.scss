@@ -19,6 +19,8 @@
       padding: 0 1rem 2rem 1rem;
     }
 
+    
+
     .loading-msg {
       font-size: 1.5rem;
     }
@@ -54,8 +56,8 @@
           z-index: 90;
 
           @include xsmall {
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
           }
 
           .profile {
@@ -66,8 +68,8 @@
             object-position: center;
 
             @include xsmall {
-              width: 140px;
-              height: 140px;
+              width: 150px;
+              height: 150px;
             }
           }
         }

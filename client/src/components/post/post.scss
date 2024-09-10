@@ -123,15 +123,14 @@
 
         @include small {
           font-size: 1.3rem;
-          gap: 0.3rem;
         }
 
         .loading-msg {
           font-size: 1.5rem;
         }
 
-        .likes,
-        .comments-nb {
+        .likes span,
+        .comments-nb span {
           @include small {
             display: none;
           }

@@ -19,8 +19,11 @@ import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 
-// Images
+// Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
+
+// Component
+import LazyImage from "../LazyImage.jsx";
 
 // Contexts
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
@@ -95,7 +98,7 @@ export default function Navbar() {
         <Link to="#">
           <NotificationsOutlinedIcon fontSize="large" />
         </Link>
-        <img
+        <LazyImage
           src={
             currentUser.profilePic
               ? `/uploads/${currentUser.profilePic}`

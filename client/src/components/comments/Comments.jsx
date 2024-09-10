@@ -13,8 +13,9 @@ import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-// Component
+// Components
 import UpdateComment from "../update/UpdateComment.jsx";
+import LazyImage from "../LazyImage.jsx";
 
 // Icons
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
@@ -80,7 +81,7 @@ export default function Comments({ postId }) {
     <div className="comments">
       <form>
         <div className="img-container">
-          <img
+          <LazyImage
             src={
               currentUser.profilePic
                 ? `/uploads/${currentUser.profilePic}`
@@ -115,7 +116,7 @@ export default function Comments({ postId }) {
         comments.map((comment) => (
           <div className="comment" key={comment.id}>
             <div className="img-container">
-              <img
+              <LazyImage
                 src={
                   comment.profilePic
                     ? `/uploads/${comment.profilePic}`

@@ -16,6 +16,9 @@ import fundraiser from "../../assets/images/leftBar/fundraiser.png";
 import flag from "../../assets/images/leftBar/flag.png";
 import tutorials from "../../assets/images/leftBar/tutorials.png";
 
+// Component
+import LazyImage from "../LazyImage.jsx";
+
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
@@ -35,7 +38,7 @@ export default function LeftBar() {
       <div className="main-info">
         <div className="user" onClick={navigateAndScrollTop}>
           <div className="img-container">
-            <img
+            <LazyImage
               src={
                 currentUser?.profilePic
                   ? `/uploads/${currentUser?.profilePic}`
@@ -50,27 +53,27 @@ export default function LeftBar() {
         </div>
 
         <div className="item">
-          <img src={friends} alt="friends" />
+          <LazyImage src={friends} alt="friends" />
           <span>Friends</span>
         </div>
 
         <div className="item">
-          <img src={video} alt="video" />
+          <LazyImage src={video} alt="video" />
           <span>Video</span>
         </div>
 
         <div className="item">
-          <img src={groups} alt="groups" />
+          <LazyImage src={groups} alt="groups" />
           <span>Groups</span>
         </div>
 
         <div className="item">
-          <img src={news} alt="memories" />
+          <LazyImage src={news} alt="memories" />
           <span>News</span>
         </div>
 
         <div className="item">
-          <img src={messages} alt="messages" />
+          <LazyImage src={messages} alt="messages" />
           <span>Messages</span>
         </div>
       </div>
@@ -82,17 +85,17 @@ export default function LeftBar() {
         <h3>Your shortcuts</h3>
 
         <div className="item">
-          <img src={events} alt="events" />
+          <LazyImage src={events} alt="events" />
           <span>Events</span>
         </div>
 
         <div className="item">
-          <img src={flag} alt="gaming" />
+          <LazyImage src={flag} alt="gaming" />
           <span>Pages</span>
         </div>
 
         <div className="item">
-          <img src={marketPlace} alt="marketplace" />
+          <LazyImage src={marketPlace} alt="marketplace" />
           <span>Market Place</span>
         </div>
       </div>
@@ -104,17 +107,17 @@ export default function LeftBar() {
         <h3>Others</h3>
 
         <div className="item">
-          <img src={gaming} alt="gaming" />
+          <LazyImage src={gaming} alt="gaming" />
           <span>Gaming</span>
         </div>
 
         <div className="item">
-          <img src={fundraiser} alt="fundraiser" />
+          <LazyImage src={fundraiser} alt="fundraiser" />
           <span>Fundraiser</span>
         </div>
 
         <div className="item">
-          <img src={tutorials} alt="tutorials" />
+          <LazyImage src={tutorials} alt="tutorials" />
           <span>Tutorials</span>
         </div>
       </div>

@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 // Components
 import Comments from "../comments/Comments.jsx";
 import UpdatePost from "../update/UpdatePost.jsx";
+import LazyImage from "../LazyImage.jsx";
 
 // Icons
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
@@ -97,7 +98,7 @@ export default function Post({ post }) {
         <div className="user">
           <div className="user-info">
             <div className="img-container" onClick={navigateAndScrollTop}>
-              <img
+              <LazyImage
                 src={
                   post?.profilePic
                     ? `/uploads/${post.profilePic}`
@@ -133,7 +134,7 @@ export default function Post({ post }) {
 
         <div className="content">
           <p>{post.desc}</p>
-          {post.img && <img src={`/uploads/${post.img}`} alt="post" />}
+          {post.img && <LazyImage src={`/uploads/${post.img}`} alt="post" />}
         </div>
 
         <div className="interactions">
@@ -149,7 +150,7 @@ export default function Post({ post }) {
             )}
             <span className="likes">
               {likes?.length > 0 && likes?.length}{" "}
-              {likes?.length > 1 ? "Likes" : "Like"}
+              <span>{likes?.length > 1 ? "Likes" : "Like"}</span>
             </span>
           </div>
 
@@ -158,7 +159,7 @@ export default function Post({ post }) {
             <TextsmsOutlinedIcon />
             <span className="comments-nb">
               {comments?.length > 0 && comments?.length}{" "}
-              {comments?.length > 1 ? "Comments" : "Comment"}
+              <span> {comments?.length > 1 ? "Comments" : "Comment"}</span>
             </span>
           </div>
 
@@ -169,9 +170,9 @@ export default function Post({ post }) {
           </div>
         </div>
 
-        {openComments && <Comments postId={post.id} toggleUpdate={toggleUpdate}/>}
-
-        {/* {openComments && <Comments postId={post.id} />} */}
+        {openComments && (
+          <Comments postId={post.id} toggleUpdate={toggleUpdate} />
+        )}
 
         {openUpdate && <UpdatePost post={post} toggleUpdate={toggleUpdate} />}
       </div>

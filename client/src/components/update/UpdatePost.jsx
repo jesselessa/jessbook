@@ -9,8 +9,9 @@ import { useRevokeObjectURL } from "../../hooks/useRevokeObjectURL.js";
 // Icons
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
-// Component
+// Components
 import Overlay from "../overlay/Overlay.jsx";
+import LazyImage from "../LazyImage.jsx";
 
 export default function UpdatePost({ post, toggleUpdate }) {
   const [desc, setDesc] = useState(post.desc);
@@ -74,7 +75,10 @@ export default function UpdatePost({ post, toggleUpdate }) {
                 <span>Choose an image</span>
                 <div className="img-container">
                   {image && (
-                    <img src={URL.createObjectURL(image)} alt="post-image" />
+                    <LazyImage
+                      src={URL.createObjectURL(image)}
+                      alt="post-image"
+                    />
                   )}
                   <CloudUploadIcon className="icon" />
                 </div>

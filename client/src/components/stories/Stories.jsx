@@ -10,6 +10,7 @@ import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 // Components
 import CreateStory from "./CreateStory.jsx";
 import ModalStory from "./ModalStory.jsx";
+import LazyImage from "../LazyImage.jsx";
 
 // Utility function checking if file is a video based on its extension
 //! A regex must always return a value (true or false)
@@ -53,7 +54,7 @@ export default function Stories({ userId }) {
         {/* Add a story */}
         <div className="stories-wrapper">
           <div className="story">
-            <img
+            <LazyImage
               src={
                 currentUser.profilePic
                   ? `/uploads/${currentUser.profilePic}`
@@ -91,7 +92,7 @@ export default function Stories({ userId }) {
                     Your browser doesn't support video.
                   </video>
                 ) : (
-                  <img src={`/uploads/${story?.img}`} alt="preview" />
+                  <LazyImage src={`/uploads/${story?.img}`} alt="preview" />
                 )}
 
                 <span>

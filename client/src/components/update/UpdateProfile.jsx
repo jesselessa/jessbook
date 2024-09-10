@@ -17,8 +17,9 @@ import defaultCover from "../../assets/images/users/defaultCover.jpeg";
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-// Component
+// Components
 import Overlay from "../overlay/Overlay.jsx";
+import LazyImage from "../LazyImage.jsx";
 
 export default function UpdateProfile({ user, toggleUpdate }) {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
@@ -116,7 +117,7 @@ export default function UpdateProfile({ user, toggleUpdate }) {
               <label htmlFor="cover">
                 <span>Cover Picture</span>
                 <div className="img-container">
-                  <img
+                  <LazyImage
                     src={
                       coverPic
                         ? URL.createObjectURL(coverPic)
@@ -142,7 +143,7 @@ export default function UpdateProfile({ user, toggleUpdate }) {
               <label htmlFor="profile">
                 <span>Profile Picture</span>
                 <div className="img-container">
-                  <img
+                  <LazyImage
                     src={
                       profilePic
                         ? URL.createObjectURL(profilePic)

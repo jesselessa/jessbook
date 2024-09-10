@@ -8,6 +8,9 @@ import jack from "../../assets/images/users/jack-bauer.webp";
 import cindy from "../../assets/images/users/cindy-rella.jpeg";
 import simba from "../../assets/images/users/simba-lion.jpeg";
 
+// Component
+import LazyImage from "../LazyImage.jsx";
+
 export default function RightBar() {
   return (
     <div className="rightBar">
@@ -16,7 +19,7 @@ export default function RightBar() {
         <h3>Birthdays</h3>
 
         <div className="birthday">
-          <img src={gift} alt="gift" />
+          <LazyImage src={gift} alt="gift" />
           <p>
             It's <span>Jane Doe</span>'s birthday today.
           </p>
@@ -30,7 +33,7 @@ export default function RightBar() {
         <div className="activity">
           <div className="userInfo">
             <div className="img-container">
-              <img src={jane} alt="jane doe" />
+              <LazyImage src={jane} alt="jane doe" />
             </div>
             <p>
               <span>Jane Doe</span> changed their profile picture
@@ -42,7 +45,7 @@ export default function RightBar() {
         <div className="activity">
           <div className="userInfo">
             <div className="img-container">
-              <img src={clark} alt="clark kent" />
+              <LazyImage src={clark} alt="clark kent" />
             </div>
             <p>
               <span>Clark Kent</span> liked a post
@@ -54,7 +57,7 @@ export default function RightBar() {
         <div className="activity">
           <div className="userInfo">
             <div className="img-container">
-              <img src={jack} alt="jack bauer" />
+              <LazyImage src={jack} alt="jack bauer" />
             </div>
             <p>
               <span>Jack Bauer</span> liked a comment
@@ -66,7 +69,7 @@ export default function RightBar() {
         <div className="activity">
           <div className="userInfo">
             <div className="img-container">
-              <img src={cindy} alt="cindy rella" />
+              <LazyImage src={cindy} alt="cindy rella" />
             </div>
             <p>
               <span>Cindy Rella</span> posted
@@ -83,7 +86,7 @@ export default function RightBar() {
         <div className="friends">
           <div className="user">
             <div className="img-container">
-              <img src={cindy} alt="jane doe" />
+              <LazyImage src={cindy} alt="jane doe" />
               <div className="status-dot"></div>
             </div>
             <span>Jane Doe</span>
@@ -91,7 +94,7 @@ export default function RightBar() {
 
           <div className="user">
             <div className="img-container">
-              <img src={clark} alt="clark kent" />
+              <LazyImage src={clark} alt="clark kent" />
               <div className="status-dot"></div>
             </div>
             <span>Clark Kent</span>
@@ -99,7 +102,7 @@ export default function RightBar() {
 
           <div className="user">
             <div className="img-container">
-              <img src={jack} alt="jack bauer" />
+              <LazyImage src={jack} alt="jack bauer" />
               <div className="status-dot"></div>
             </div>
             <span>Jack Bauer</span>
@@ -107,7 +110,7 @@ export default function RightBar() {
 
           <div className="user">
             <div className="img-container">
-              <img src={cindy} alt="cindy rella" />
+              <LazyImage src={cindy} alt="cindy rella" />
               <div className="status-dot"></div>
             </div>
             <span>Cindy Rella</span>
@@ -115,7 +118,7 @@ export default function RightBar() {
 
           <div className="user">
             <div className="img-container">
-              <img src={simba} alt="simba lion" />
+              <LazyImage src={simba} alt="simba lion" />
               <div className="status-dot"></div>
             </div>
             <span>Simba Lion</span>

@@ -9,6 +9,7 @@ import { useToggle } from "../../hooks/useToggle.js";
 import Publish from "../../components/publish/Publish.jsx";
 import Posts from "../../components/posts/Posts.jsx";
 import UpdateProfile from "../../components/update/UpdateProfile.jsx";
+import LazyImage from "../LazyImage.jsx";
 
 // Icons
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
@@ -87,7 +88,7 @@ export default function ProfileData() {
           <div className="profile-container">
             <div className="images">
               {/* Cover pic */}
-              <img
+              <LazyImage
                 src={
                   currentUser
                     ? `/uploads/${currentUser.coverPic}`
@@ -99,7 +100,7 @@ export default function ProfileData() {
 
               {/* Profile pic */}
               <div className="img-container">
-                <img
+                <LazyImage
                   src={
                     currentUser
                       ? `/uploads/${currentUser.profilePic}`

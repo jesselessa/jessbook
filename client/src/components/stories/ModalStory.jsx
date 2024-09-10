@@ -10,6 +10,9 @@ import moment from "moment";
 const isVideo = (fileName) =>
   /\.(mp4|mov|avi|mkv|webm|flv|wmv|3gp|m4v|ogv)$/i.test(fileName);
 
+// Component
+import LazyImage from "../LazyImage.jsx";
+
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
@@ -56,7 +59,7 @@ export default function ModalStory({ story, toggleOpenModal }) {
               Your browser does not support the video tag.
             </video>
           ) : (
-            <img src={`/uploads/${story.img}`} alt="preview" />
+            <LazyImage src={`/uploads/${story.img}`} alt="preview" />
           )}
         </div>
 
