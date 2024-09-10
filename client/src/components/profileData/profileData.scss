@@ -4,14 +4,14 @@
   @include themify($themes) {
     position: sticky;
     top: 70px;
-    width: 50vw;
+    width: 50%;
     min-height: calc(100vh - 70px); // 70px = navbar height
     color: themed("textColor");
     background-color: themed("bgSoft");
     padding: 0 0.5rem 2rem 1.5rem;
 
     @include medium {
-      width: 100vw;
+      width: 100%;
       padding: 0 1.5rem 2rem 1.5rem;
     }
 
@@ -53,9 +53,9 @@
           height: 170px;
           z-index: 90;
 
-          @include small {
-            width: 110px;
-            height: 110px;
+          @include xsmall {
+            width: 140px;
+            height: 140px;
           }
 
           .profile {
@@ -65,9 +65,9 @@
             object-fit: cover;
             object-position: center;
 
-            @include small {
-              width: 110px;
-              height: 110px;
+            @include xsmall {
+              width: 140px;
+              height: 140px;
             }
           }
         }

@@ -4,13 +4,13 @@
   @include themify($themes) {
     position: sticky;
     top: 70px;
-    width: 50vw;
+    width: 50%;
     min-height: calc(100vh - 70px); // 70px = navbar height
     background-color: themed("bgSoft");
     padding: 1rem 0.5rem 2rem 1.5rem;
 
     @include medium {
-      width: 100vw;
+      width: 100%;
       padding: 1rem 1.5rem 2rem 1.5rem;
     }
 

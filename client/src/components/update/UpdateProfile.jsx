@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import "./updateProfile.scss";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
@@ -33,6 +33,15 @@ export default function UpdateProfile({ user, toggleUpdate }) {
   const [profileUrl, setProfileUrl] = useState(user.profilePic || "");
   const [coverUrl, setCoverUrl] = useState(user.coverPic || "");
 
+  // Make sure to always update form with latest values
+  useEffect(() => {
+    setFields({
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
+      city: currentUser.city,
+    });
+  }, [currentUser]);
+
   const navigate = useNavigate();
 
   // Update user's info
@@ -40,6 +49,7 @@ export default function UpdateProfile({ user, toggleUpdate }) {
 
   const updateMutation = useMutation({
     mutationFn: (updatedUser) => makeRequest.put("/users", updatedUser),
+
     onSuccess: () => {
       queryClient.invalidateQueries(["user", currentUser.id]);
       toast.success("Profile updated.");
@@ -60,8 +70,8 @@ export default function UpdateProfile({ user, toggleUpdate }) {
 
     // Update current user's data
     const updatedUser = {
-      ...currentUser, // Copy and update
-      ...fields, // Copy and update
+      ...currentUser,
+      ...fields,
       coverPic: newCoverUrl,
       profilePic: newProfileUrl,
     };
