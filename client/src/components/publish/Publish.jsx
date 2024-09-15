@@ -98,7 +98,7 @@ export default function Publish() {
           <div className="inputGroup">
             <input
               type="text"
-              placeholder={`What's up, ${currentUser.firstName} ?`}
+              placeholder={`What's up, ${currentUser.firstName}\u00A0?`}
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />

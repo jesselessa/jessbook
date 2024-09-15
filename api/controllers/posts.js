@@ -19,8 +19,8 @@ export const getPosts = (req, res) => {
       SELECT p.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 
       FROM posts AS p
       JOIN users AS u ON (u.id = p.userId)
-      WHERE p.userId = ? OR p.userId IN (SELECT followedUserId 
-      FROM relationships WHERE followerUserId = ?)
+      WHERE p.userId = ? OR p.userId IN (SELECT followedId 
+      FROM relationships WHERE followerId = ?)
       ORDER BY p.createdAt DESC`;
   // DESC = most recent posts shown first
 

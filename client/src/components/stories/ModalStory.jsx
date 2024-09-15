@@ -3,6 +3,7 @@ import "./modalStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { isVideo } from "../../utils/utils.js";
+import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import { toast } from "react-toastify";
 import moment from "moment";
 
@@ -47,7 +48,7 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
 
         <div className="img-container">
           {isVideo(story.img) ? (
-            <video controls autoplay>
+            <video controls autoPlay>
               <source
                 src={`/uploads/${story.img}`}
                 type={
@@ -64,7 +65,7 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
         </div>
 
         <div className="info-container">
-          <h1>{story.desc}</h1>
+          <h1>{addNonBreakingSpace(story.desc)}</h1>
 
           <div className="story-details">
             <div className="story-edit-info">

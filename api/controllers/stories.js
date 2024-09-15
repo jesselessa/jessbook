@@ -24,8 +24,8 @@ export const getStories = (req, res) => {
       SELECT s.*, u.id as userId, u.firstName, u.lastName
       FROM stories AS s
       JOIN users AS u ON (u.id = s.userId)
-      WHERE s.userId = ? OR s.userId IN (SELECT followedUserId 
-      FROM relationships WHERE followerUserId = ?)
+      WHERE s.userId = ? OR s.userId IN (SELECT followedId 
+      FROM relationships WHERE followerId = ?)
       AND s.expiresAt > NOW()
       ORDER BY
             CASE WHEN s.userId = ? THEN 0 ELSE 1 END,

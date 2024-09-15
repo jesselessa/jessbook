@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import "./comments.scss";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
+import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import moment from "moment";
 
 // Images
@@ -138,7 +139,7 @@ export default function Comments({ postId }) {
                 <h3>
                   {comment.firstName} {comment.lastName}
                 </h3>
-                <p>{comment.desc}</p>
+                <p>{addNonBreakingSpace(comment.desc)}</p>
               </div>
               <div className="buttons-time">
                 {currentUser.id === comment.userId && (

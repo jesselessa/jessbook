@@ -3,6 +3,7 @@ import "./post.scss";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
+import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import moment from "moment";
 import { toast } from "react-toastify";
 
@@ -149,7 +150,7 @@ export default function Post({ post }) {
       </div>
 
       <div className="content">
-        <p>{post.desc}</p>
+        <p>{addNonBreakingSpace(post.desc)}</p>
         {post.img && <img src={`/uploads/${post.img}`} alt="post" />}
       </div>
 
@@ -164,12 +165,14 @@ export default function Post({ post }) {
           ) : (
             <FavoriteBorderOutlinedIcon onClick={handleLikes} />
           )}
-          {likes?.length > 0 && likes.length} <span>Likes</span>
+          {likes?.length > 0 && likes.length} {""}
+          <span>{likes?.length > 1 ? "Likes" : "Like"}</span>
         </div>
 
         <div className="item" onClick={() => setCommentsOpen(!commentsOpen)}>
           <TextsmsOutlinedIcon />
-          {comments?.length > 0 && comments.length} <span>Comments</span>
+          {comments?.length > 0 && comments.length} {""}
+          <span>{comments?.length > 1 ? "Comments" : "Comment"}</span>
         </div>
 
         <div className="item">

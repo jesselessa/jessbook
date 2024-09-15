@@ -44,7 +44,7 @@ export default function ProfileData() {
   // Get user's relationships
   const fetchRelationships = async () => {
     return await makeRequest
-      .get(`/relationships?followedUserId=${userId}`)
+      .get(`/relationships?followedId=${userId}`)
       .then((res) => res.data)
       .catch((error) => console.log(error));
   };
