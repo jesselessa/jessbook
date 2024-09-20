@@ -10,7 +10,6 @@ export const getUser = (req, res) => {
 
     // All user info except password
     const { password, ...others } = data[0]; // Result = table 1st line
-
     return res.status(200).json(others);
   });
 };

@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
-import { useParams } from "react-router-dom";
 import "./profileData.scss";
+import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 
@@ -32,21 +32,21 @@ export default function ProfileData() {
     return await makeRequest
       .get(`/users/${userId}`)
       .then((res) => res.data)
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   const {
     isLoading,
     error,
     data: user,
-  } = useQuery({ queryKey: ["user"], queryFn: fetchUserData });
+  } = useQuery({ queryKey: ["user", userId], queryFn: fetchUserData });
 
   // Get user's relationships
   const fetchRelationships = async () => {
     return await makeRequest
       .get(`/relationships?followedId=${userId}`)
       .then((res) => res.data)
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   const {

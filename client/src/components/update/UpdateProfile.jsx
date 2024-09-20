@@ -1,12 +1,17 @@
 import { useContext, useState } from "react";
 import "./updateProfile.scss";
-import { useNavigate } from "react-router-dom";
-import { makeRequest } from "../../utils/axios.js";
+import { useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { makeRequest } from "../../utils/axios.js";
+import { uploadFile } from "../../utils/uploadFile.js";
 import { toast } from "react-toastify";
 
 // Icon
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+
+// Images
+import defaultCover from "../../assets/images/users/defaultCover.jpeg";
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
@@ -25,37 +30,25 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     city: user.city || "Non renseigné",
   });
 
+  const { userId } = useParams();
+
   const navigate = useNavigate();
 
-  // Upload image
-  const upload = async (file) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await makeRequest.post("/uploads", formData);
-      return res.data;
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const queryClient = useQueryClient();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFields((prevFields) => ({ ...prevFields, [name]: value }));
   };
 
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation(
+  const updateMutation = useMutation(
     (updatedUser) => {
       return makeRequest.put("/users", updatedUser);
     },
     {
       onSuccess: () => {
         // Invalidate and refetch
-        queryClient.invalidateQueries(["user"]);
-
+        queryClient.invalidateQueries(["user", userId]);
         toast.success("Profile updated.");
       },
     }
@@ -64,21 +57,20 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    const newCover = cover ? await upload(cover) : cover;
-    const newProfile = profile ? await upload(profile) : profile;
+    const newCover = cover ? await uploadFile(cover) : user.coverPic;
+    const newProfile = profile ? await uploadFile(profile) : user.profilePic;
 
-    // Check if any of the fields are modified
+    // Check if form fields have been modified
     const isAnyFieldModified = Object.keys(fields).some(
-      (field) => fields[field] !== currentUser[field]
+      (field) => fields[field] !== user[field]
     );
 
-    // If no fields or images modified, show message
     if (!isAnyFieldModified && !cover && !profile) {
       toast.info("No changes detected.");
       return;
     }
 
-    // Create a copy of user object with updated values
+    // Update user's data
     const updatedUser = {
       ...user,
       ...fields,
@@ -86,11 +78,11 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       profilePic: newProfile,
     };
 
+    // Update user in global context
     setCurrentUser(updatedUser);
-    setCover(null);
-    setProfile(null);
 
-    mutation.mutate(updatedUser);
+    // Send mutation to database
+    updateMutation.mutate(updatedUser);
 
     navigate(`/profile/${currentUser.id}`);
   };
@@ -105,18 +97,17 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
             <div className="files">
               <label htmlFor="cover">
                 <span>Cover Picture</span>
-
                 <div className="imgContainer">
-                  {cover && (
-                    <img
-                      src={
-                        cover
-                          ? URL.createObjectURL(cover)
-                          : `/uploads/${currentUser.coverPic}`
-                      }
-                      alt="cover"
-                    />
-                  )}
+                  <img
+                    src={
+                      cover
+                        ? URL.createObjectURL(cover)
+                        : user.coverPic
+                        ? `/uploads/${user.coverPic}`
+                        : defaultCover
+                    }
+                    alt="cover"
+                  />
                   <CloudUploadIcon className="icon" />
                 </div>
               </label>
@@ -131,17 +122,16 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               <label htmlFor="profile">
                 <span>Profile Picture</span>
                 <div className="imgContainer">
-                  {profile && (
-                    <img
-                      src={
-                        profile
-                          ? URL.createObjectURL(profile)
-                          : `/uploads/${currentUser.profilePic}`
-                      }
-                      alt="profile"
-                    />
-                  )}
-
+                  <img
+                    src={
+                      profile
+                        ? URL.createObjectURL(profile)
+                        : user.profilePic
+                        ? `/uploads/${user.profilePic}`
+                        : defaultProfile
+                    }
+                    alt="profile"
+                  />
                   <CloudUploadIcon className="icon" />
                 </div>
               </label>

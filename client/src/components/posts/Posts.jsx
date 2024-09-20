@@ -10,7 +10,7 @@ export default function Posts({ userId }) {
     return await makeRequest
       .get(`/posts?userId=${userId}`)
       .then((res) => res.data)
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   const {
@@ -18,7 +18,7 @@ export default function Posts({ userId }) {
     error,
     data: posts,
   } = useQuery({
-    queryKey: ["posts", userId],
+    queryKey: ["posts"],
     queryFn: getPosts,
   });
 

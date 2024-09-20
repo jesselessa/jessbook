@@ -25,7 +25,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
       const res = await makeRequest.post("/uploads", formData);
       return res.data;
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

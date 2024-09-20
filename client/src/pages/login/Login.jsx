@@ -54,7 +54,7 @@ export default function Login() {
       navigate("/");
     } catch (error) {
       // Handle errors from API
-      console.log(error);
+      console.error(error);
       setError(error.response?.data || "An unknown error occured.");
     }
   };

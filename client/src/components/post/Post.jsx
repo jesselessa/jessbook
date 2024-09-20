@@ -60,7 +60,7 @@ export default function Post({ post }) {
     return await makeRequest
       .get(`/likes?postId=${post.id}`)
       .then((res) => res.data)
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   const {

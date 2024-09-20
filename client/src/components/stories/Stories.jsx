@@ -28,7 +28,7 @@ export default function Stories({ userId }) {
       .then((res) => {
         return res.data;
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   const {
