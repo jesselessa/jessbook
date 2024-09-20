@@ -154,7 +154,7 @@ export default function ProfileData() {
       )}
 
       {openUpdate && (
-        <UpdateProfile setOpenUpdate={setOpenUpdate} user={user} />
+        <UpdateProfile user={user} setOpenUpdate={setOpenUpdate} />
       )}
     </div>
   );

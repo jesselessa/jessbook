@@ -2,7 +2,7 @@ import { useContext } from "react";
 import "./modalStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
-import { isVideo } from "../../utils/utils.js";
+import { isVideo } from "../../utils/isVideo.js";
 import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import { toast } from "react-toastify";
 import moment from "moment";

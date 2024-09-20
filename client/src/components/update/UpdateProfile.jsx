@@ -15,15 +15,15 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdateProfile({ user, setOpenUpdate }) {
-  const [cover, setCover] = useState("");
-  const [profile, setProfile] = useState("");
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
+
+  const [cover, setCover] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [fields, setFields] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
-    city: user.city,
+    city: user.city || "Non renseigné",
   });
-
-  const { currentUser, setCurrentUser } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -36,7 +36,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       const res = await makeRequest.post("/uploads", formData);
       return res.data;
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -48,13 +48,14 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation(
-    (user) => {
-      return makeRequest.put("/users", user);
+    (updatedUser) => {
+      return makeRequest.put("/users", updatedUser);
     },
     {
       onSuccess: () => {
         // Invalidate and refetch
         queryClient.invalidateQueries(["user"]);
+
         toast.success("Profile updated.");
       },
     }
@@ -63,14 +64,12 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    let coverUrl;
-    let profileUrl;
-    coverUrl = cover ? await upload(cover) : user.coverPic;
-    profileUrl = profile ? await upload(profile) : user.profilePic;
+    const newCover = cover ? await upload(cover) : cover;
+    const newProfile = profile ? await upload(profile) : profile;
 
     // Check if any of the fields are modified
     const isAnyFieldModified = Object.keys(fields).some(
-      (field) => fields[field] !== user[field]
+      (field) => fields[field] !== currentUser[field]
     );
 
     // If no fields or images modified, show message
@@ -81,10 +80,10 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
 
     // Create a copy of user object with updated values
     const updatedUser = {
-      ...user, // user currently displayed in component
+      ...user,
       ...fields,
-      coverPic: coverUrl,
-      profilePic: profileUrl,
+      coverPic: newCover,
+      profilePic: newProfile,
     };
 
     setCurrentUser(updatedUser);
@@ -113,7 +112,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                       src={
                         cover
                           ? URL.createObjectURL(cover)
-                          : `/uploads/${user.coverPic}`
+                          : `/uploads/${currentUser.coverPic}`
                       }
                       alt="cover"
                     />
@@ -137,7 +136,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                       src={
                         profile
                           ? URL.createObjectURL(profile)
-                          : `/uploads/${user.profilePic}`
+                          : `/uploads/${currentUser.profilePic}`
                       }
                       alt="profile"
                     />

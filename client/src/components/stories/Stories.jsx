@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import "./stories.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
-import { isVideo } from "../../utils/utils.js";
+import { isVideo } from "../../utils/isVideo.js";
 
 // Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
@@ -67,12 +67,9 @@ export default function Stories({ userId }) {
           </div>
 
           {/* Friends' stories */}
-
           {error ? (
             <span className="msg">Something went wrong</span>
-          ) : // "Something went wrong."
-          isLoading ? (
-            // "Loading..."
+          ) : isLoading ? (
             <span className="msg">Loading...</span>
           ) : stories.length === 0 ? (
             <span className="no-story">No story to show yet.</span>

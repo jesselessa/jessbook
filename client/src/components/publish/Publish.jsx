@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import "./publish.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
+import { uploadFile } from "../../utils/uploadFile.js";
 
 // Images
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
@@ -25,19 +26,6 @@ export default function Publish() {
   const [file, setFile] = useState(null);
   const [desc, setDesc] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
-
-  // Handle image upload
-  const upload = async () => {
-    try {
-      const formData = new FormData(); // Because we can't send file directly to API
-      formData.append("file", file);
-
-      const res = await makeRequest.post("/uploads", formData);
-      return res.data;
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   // Add a new post
   const queryClient = useQueryClient();
@@ -74,10 +62,10 @@ export default function Publish() {
     setDesc("");
 
     // Initialize variable, then, upload file and download URL
-    let imgUrl = "";
-    if (file) imgUrl = await upload();
+    let fileUrl = "";
+    if (file) fileUrl = await uploadFile(file);
 
-    mutation.mutate({ desc: desc.trim(), img: imgUrl }); // If success URL sent to database (posts table)
+    mutation.mutate({ desc: desc.trim(), img: fileUrl }); // If success URL sent to database (posts table)
   };
 
   return (

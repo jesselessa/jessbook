@@ -44,7 +44,7 @@ export default function Post({ post }) {
       .get(`/comments?postId=${post.id}`)
       .then((res) => res.data)
       .catch((error) =>
-        console.log("Error fetching comments from Post.jsx:", error)
+        console.error("Error fetching comments from Post.jsx:", error)
       );
   };
 

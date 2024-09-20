@@ -32,7 +32,7 @@ export default function Comments({ postId }) {
       .get(`/comments?postId=${postId}`)
       .then((res) => res.data)
       .catch((error) =>
-        console.log("Error fetching comments from Comments.jsx:", error)
+        console.error("Error fetching comments from Comments.jsx:", error)
       );
   };
 

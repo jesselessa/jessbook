@@ -1,30 +1,18 @@
 import { useState } from "react";
 import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { uploadFile } from "../../utils/uploadFile.js";
+import { isVideo } from "../../utils/isVideo.js";
 import { toast } from "react-toastify";
-import { makeRequest } from "../../utils/axios.js";
-import { isVideo } from "../../utils/utils.js";
 
 // Component
 import Overlay from "../overlay/Overlay.jsx";
 
 export default function CreateStory({ setOpenCreateStory }) {
-  const [file, setFile] = useState(null);
+  const [image, setImage] = useState(null);
+  const [video, setVideo] = useState(null);
   const [desc, setDesc] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
-
-  // Handle image or video upload
-  const upload = async () => {
-    try {
-      const formData = new FormData(); // File can't be directly sent to API
-      formData.append("file", file);
-
-      const res = await makeRequest.post("/uploads", formData);
-      return res.data;
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   // Add a new story
   const queryClient = useQueryClient();
@@ -35,10 +23,8 @@ export default function CreateStory({ setOpenCreateStory }) {
     },
     {
       onSuccess: () => {
-        // Invalidate and refetch
         queryClient.invalidateQueries(["stories"]);
-
-        setOpenCreateStory(false); // To close form
+        setOpenCreateStory(false);
         toast.success("Story published.");
       },
     }
@@ -47,28 +33,49 @@ export default function CreateStory({ setOpenCreateStory }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    // Check if image or video selected
-    if (!file) {
+    if (!image && !video) {
       setError({
         isError: true,
-        message: "You can't edit a story without an image or a video.",
+        message: "You must upload either an image or a video.",
       });
+
+      setTimeout(() => {
+        setError({ isError: false, message: "" });
+      }, 3000);
       return;
     }
 
-    // Reset error message
-    setError({ isError: false, message: "" });
+    let imageUrl = "";
+    let videoUrl = "";
+    try {
+      if (image) {
+        imageUrl = await uploadFile(image);
+        mutation.mutate({ img: imageUrl, desc: desc });
+      } else if (video) {
+        videoUrl = await uploadFile(video);
+        mutation.mutate({ img: videoUrl, desc: desc });
+      }
+      // mutation.mutate({ img: fileUrl, desc: desc });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to upload file. Please try again.");
+    }
+  };
 
-    // Reset inputs after submission
-    setFile(null);
-    setDesc("");
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
 
-    // Initialize variable, then, upload file and download URL
-    let fileUrl = "";
-
-    if (file) fileUrl = await upload();
-
-    mutation.mutate({ img: fileUrl, desc: desc }); // If success URL sent to database (stories table)
+    if (isVideo(selectedFile.type)) {
+      setVideo(selectedFile);
+      videoUrl = URL.createObjectURL(selectedFile);
+      setImage(null);
+      imageUrl = "";
+    } else {
+      setImage(selectedFile);
+      imageUrl = URL.createObjectURL(selectedFile);
+      setVideo(null);
+      videoUrl = "";
+    }
   };
 
   return (
@@ -80,33 +87,20 @@ export default function CreateStory({ setOpenCreateStory }) {
           {/* Add an image or a video */}
           <div className="input-group">
             <label htmlFor="file">
-              {/* input: file - value linked with state "file" doesn't work except if value equals "" or "null" */}
               <input
                 type="file"
-                id="file"
+                name="file"
                 accept="image/*,video/*"
-                onChange={(e) => setFile(e.target.files[0])}
+                onChange={handleFileChange}
               />
               Add an image or a video
             </label>
 
-            {file && (
-              <div className="img-container">
-                {isVideo(file.type) ? (
-                  <video
-                  // 'controls' and 'type' attributes not needed
-                  >
-                    <source src={URL.createObjectURL(file)} />
-                  </video>
-                ) : (
-                  <img
-                    alt="image"
-                    src={URL.createObjectURL(file)}
-                    // Creates a fake URL to show our file image
-                  />
-                )}
-              </div>
-            )}
+            {/* Display preview of the selected file */}
+            <div className="img-container">
+              {image && <img src={imageUrl} alt="story preview" />}
+              {video && <video src={videoUrl} type={video.type} />}
+            </div>
           </div>
 
           <textarea
@@ -126,7 +120,7 @@ export default function CreateStory({ setOpenCreateStory }) {
         </form>
 
         {/* Error message */}
-        {error.isError && <span className="errorMsg">{error.message}</span>}
+        {error.isError && <span className="error-msg">{error.message}</span>}
 
         <button className="close" onClick={() => setOpenCreateStory(false)}>
           X
