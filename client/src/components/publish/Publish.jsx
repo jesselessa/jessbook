@@ -16,7 +16,7 @@ import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
 // Images
-import image from "../../assets/images/publish/image.png";
+import picture from "../../assets/images/publish/image.png";
 import map from "../../assets/images/publish/map.png";
 import friends from "../../assets/images/publish/friends.png";
 
@@ -24,7 +24,7 @@ export default function Publish() {
   const { currentUser } = useContext(AuthContext);
   const { darkMode } = useContext(DarkModeContext);
 
-  const [file, setFile] = useState(null);
+  const [image, setImage] = useState(null);
   const [desc, setDesc] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
 
@@ -53,21 +53,26 @@ export default function Publish() {
         isError: true,
         message: "You can't edit a post without a description.",
       });
+
+      // Reset error message after 3 seconds
+      setTimeout(() => {
+        setError({
+          isError: false,
+          message: "",
+        });
+      }, 3000);
       return;
     }
 
-    // Reset error message
-    setError({ isError: false, message: "" });
-
     // Reset inputs after submission
-    setFile(null);
+    setImage(null);
     setDesc("");
 
-    // Initialize variable, then, upload file and download URL
-    let fileUrl = "";
-    if (file) fileUrl = await uploadFile(file);
+    // Initialize variable, then, upload image and download URL
+    let imageUrl = "";
+    if (image) imageUrl = await uploadFile(image);
 
-    mutation.mutate({ desc: desc.trim(), img: fileUrl }); // If success URL sent to database (posts table)
+    mutation.mutate({ desc: desc.trim(), img: imageUrl }); // If success URL sent to database (posts table)
   };
 
   return (
@@ -106,36 +111,42 @@ export default function Publish() {
               />
             )}
           </div>
-          {error.isError && <span className="errorMsg">{error.message}</span>}
         </div>
+
         <div className="right">
-          {file && (
+          {image && (
             <div className="img-container">
               <img
-                className="file"
-                alt="post pic"
-                src={URL.createObjectURL(file)}
-                // This creates a fake URL so we can show our image
+                alt="post preview"
+                src={URL.createObjectURL(image)}
+                // Used to create a fake URL that shows post image
               />
+
+              <button className="close" onClick={() => setImage(null)}>
+                x
+              </button>
             </div>
           )}
         </div>
       </div>
 
+      {error.isError && <span className="error-msg">{error.message}</span>}
+
       <hr />
 
       <div className="bottom">
         <div className="left">
-          {/* Input image - value linked with state "file" doesn't work with file input except if value equals "" or "null" */}
+          {/* Input:file - value linked with state doesn't work with except if value equals "" or "null" */}
           <input
             type="file"
             id="file"
             accept="image/*"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={(e) => setImage(e.target.files[0])}
           />
+
           <label htmlFor="file">
             <div className="item">
-              <img src={image} alt="image icon" />
+              <img src={picture} alt="image icon" />
               <span>Add Image</span>
             </div>
           </label>
@@ -144,11 +155,13 @@ export default function Publish() {
             <img src={map} alt="map icon" />
             <span>Add Place</span>
           </div>
+
           <div className="item">
             <img src={friends} alt="friends icon" />
             <span>Tag Friends</span>
           </div>
         </div>
+
         <div className="right">
           <button type="submit" onClick={handleClick}>
             Publish

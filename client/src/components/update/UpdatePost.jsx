@@ -13,7 +13,7 @@ import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdatePost({ post, setOpenUpdate }) {
   const [desc, setDesc] = useState(post.desc);
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -52,8 +52,8 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     };
 
     if (image) {
-      const imageUrl = await uploadFile(image);
-      updatedPost.img = imageUrl;
+      let newImage = await uploadFile(image);
+      updatedPost.img = newImage;
     }
 
     updateMutation.mutate(updatedPost);
@@ -71,7 +71,16 @@ export default function UpdatePost({ post, setOpenUpdate }) {
                 <span>Choose an image</span>
                 <div className="imgContainer">
                   {image && (
-                    <img src={URL.createObjectURL(image)} alt="post-image" />
+                    <img
+                      src={
+                        image
+                          ? URL.createObjectURL(image)
+                          : post.img
+                          ? `/uploads/${post.img}`
+                          : null
+                      }
+                      alt="post preview"
+                    />
                   )}
                   <CloudUploadIcon className="icon" />
                 </div>

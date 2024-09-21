@@ -39,6 +39,7 @@ export default function CreateStory({ setOpenCreateStory }) {
         message: "You must upload either an image or a video.",
       });
 
+      // Reset error message after 3 seconds
       setTimeout(() => {
         setError({ isError: false, message: "" });
       }, 3000);
