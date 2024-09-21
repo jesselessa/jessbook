@@ -134,7 +134,7 @@ export default function ProfileData() {
                   "Something went wrong."
                 ) : rIsLoading ? (
                   "Loading..."
-                ) : userId == currentUser.id ? (
+                ) : userId === String(currentUser.id) ? (
                   <button onClick={() => setOpenUpdate(true)}>Update</button>
                 ) : (
                   <button onClick={handleFollow}>
@@ -147,7 +147,7 @@ export default function ProfileData() {
             </div>
           </div>
 
-          {userId == currentUser.id && <Publish />}
+          {userId === String(currentUser.id) && <Publish />}
 
           <Posts userId={userId} />
         </>

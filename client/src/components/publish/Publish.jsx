@@ -3,6 +3,7 @@ import "./publish.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
+import { toast } from "react-toastify";
 
 // Images
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
@@ -38,6 +39,7 @@ export default function Publish() {
       onSuccess: () => {
         // Invalidate and refetch
         queryClient.invalidateQueries(["posts"]);
+        toast.success("Post created.");
       },
     }
   );

@@ -3,6 +3,7 @@ import "./comments.scss";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
+import { toast } from "react-toastify";
 import moment from "moment";
 
 // Images
@@ -52,6 +53,7 @@ export default function Comments({ postId }) {
       onSuccess: () => {
         // Invalidate and refetch
         queryClient.invalidateQueries(["comments", postId]);
+        toast.success("Comment published.");
       },
     }
   );
@@ -76,6 +78,7 @@ export default function Comments({ postId }) {
       onSuccess: () => {
         // Invalidate and refetch
         queryClient.invalidateQueries(["comments", postId]);
+        toast.success("Comment deleted.");
       },
     }
   );

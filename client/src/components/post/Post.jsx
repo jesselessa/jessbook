@@ -69,7 +69,7 @@ export default function Post({ post }) {
     data: likes,
   } = useQuery({ queryKey: ["likes", post.id], queryFn: fetchPostLikes });
 
-  const mutation = useMutation(
+  const handleLikesMutation = useMutation(
     (liked) => {
       if (liked) return makeRequest.delete(`/likes?postId=${post.id}`);
       return makeRequest.post("/likes", { postId: post.id });
@@ -83,7 +83,7 @@ export default function Post({ post }) {
   );
 
   const handleLikes = () => {
-    mutation.mutate(likes.includes(currentUser.id));
+    handleLikesMutation.mutate(likes.includes(currentUser.id));
   };
 
   // Open update form
@@ -98,7 +98,6 @@ export default function Post({ post }) {
       onSuccess: () => {
         // Invalidate and refetch
         queryClient.invalidateQueries(["posts"]);
-
         toast.success("Post deleted.");
       },
     }

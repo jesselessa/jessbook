@@ -12,17 +12,16 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
 
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(
+  const updateMutation = useMutation(
     (updatedComment) => {
       return makeRequest.put(`/comments/${comment.id}`, updatedComment);
     },
     {
       onSuccess: () => {
-        // Invalidate and refetch
+        // Invalidate and refetch and close form after submission
         queryClient.invalidateQueries(["comments", comment.postId]);
-
-        setOpenUpdate(false); // To close form
         toast.success("Comment updated.");
+        setOpenUpdate(false);
       },
     }
   );
@@ -30,7 +29,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    // Check if post has been modified
+    // Check if comment has been modified
     if (desc.trim() === comment.desc.trim()) {
       toast.info("No changes detected.");
       return;
@@ -41,7 +40,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
       desc: desc.trim(),
     };
 
-    mutation.mutate(updatedComment);
+    updateMutation.mutate(updatedComment);
   };
 
   return (

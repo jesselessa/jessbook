@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./updatePost.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
+import { uploadFile } from "../../utils/uploadFile.js";
 import { toast } from "react-toastify";
 
 // Icons
@@ -16,30 +17,16 @@ export default function UpdatePost({ post, setOpenUpdate }) {
 
   const queryClient = useQueryClient();
 
-  // Upload image
-  const uploadImage = async (file) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const res = await makeRequest.post("/uploads", formData);
-      return res.data;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const mutation = useMutation(
+  const updateMutation = useMutation(
     (updatedPost) => {
       return makeRequest.put(`/posts/${post.id}`, updatedPost);
     },
     {
       onSuccess: () => {
-        // Invalidate and refetch
+        // Invalidate and refetch and close form after submission
         queryClient.invalidateQueries(["posts"]);
-
-        setOpenUpdate(false); // To close form
         toast.success("Post updated.");
+        setOpenUpdate(false);
       },
     }
   );
@@ -65,11 +52,11 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     };
 
     if (image) {
-      const imageUrl = await uploadImage(image);
+      const imageUrl = await uploadFile(image);
       updatedPost.img = imageUrl;
     }
 
-    mutation.mutate(updatedPost);
+    updateMutation.mutate(updatedPost);
   };
 
   return (

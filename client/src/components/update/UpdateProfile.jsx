@@ -31,16 +31,23 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   });
 
   const { userId } = useParams();
-
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
 
-  const handleChange = (e) => {
+  // Handle form fields changes
+  const handleFieldChange = (e) => {
     const { name, value } = e.target;
     setFields((prevFields) => ({ ...prevFields, [name]: value }));
   };
 
+  // Handle image change
+  const handleImageChange = (e, setImage) => {
+    const file = e.target.files[0];
+    setImage(file);
+  };
+
+  // Mutation to update user's profile data
   const updateMutation = useMutation(
     (updatedUser) => {
       return makeRequest.put("/users", updatedUser);
@@ -54,9 +61,11 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     }
   );
 
+  // Handle form submission
   const handleClick = async (e) => {
     e.preventDefault();
 
+    // Upload new cover and profile pictures if present
     const newCover = cover ? await uploadFile(cover) : user.coverPic;
     const newProfile = profile ? await uploadFile(profile) : user.profilePic;
 
@@ -70,21 +79,23 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       return;
     }
 
-    // Update user's data
+    // Prepare updated user data
     const updatedUser = {
-      ...user,
+      ...currentUser,
       ...fields,
       coverPic: newCover,
       profilePic: newProfile,
     };
 
-    // Update user in global context
+    // Update user's data in global context
     setCurrentUser(updatedUser);
+    setCover(newCover);
+    setProfile(newProfile);
 
-    // Send mutation to database
+    // Trigger mutation to update user's data in database
     updateMutation.mutate(updatedUser);
 
-    navigate(`/profile/${currentUser.id}`);
+    navigate(`/profile/${updatedUser.id}`);
   };
 
   return (
@@ -102,8 +113,8 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                     src={
                       cover
                         ? URL.createObjectURL(cover)
-                        : user.coverPic
-                        ? `/uploads/${user.coverPic}`
+                        : currentUser.coverPic
+                        ? `/uploads/${currentUser.coverPic}`
                         : defaultCover
                     }
                     alt="cover"
@@ -115,8 +126,9 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               <input
                 type="file"
                 id="cover"
+                accept="image/*"
                 style={{ display: "none" }}
-                onChange={(e) => setCover(e.target.files[0])}
+                onChange={(e) => handleImageChange(e, setCover)}
               />
 
               <label htmlFor="profile">
@@ -126,8 +138,8 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                     src={
                       profile
                         ? URL.createObjectURL(profile)
-                        : user.profilePic
-                        ? `/uploads/${user.profilePic}`
+                        : currentUser.profilePic
+                        ? `/uploads/${currentUser.profilePic}`
                         : defaultProfile
                     }
                     alt="profile"
@@ -140,7 +152,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                 type="file"
                 id="profile"
                 style={{ display: "none" }}
-                onChange={(e) => setProfile(e.target.files[0])}
+                onChange={(e) => handleImageChange(e, setCover)}
               />
             </div>
 
@@ -149,7 +161,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               type="text"
               value={fields.firstName}
               name="firstName"
-              onChange={handleChange}
+              onChange={handleFieldChange}
               autoComplete="off"
             />
 
@@ -158,7 +170,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               type="text"
               value={fields.lastName}
               name="lastName"
-              onChange={handleChange}
+              onChange={handleFieldChange}
               autoComplete="off"
             />
 
@@ -167,7 +179,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               type="text"
               name="city"
               value={fields.city}
-              onChange={handleChange}
+              onChange={handleFieldChange}
               autoComplete="off"
             />
 
