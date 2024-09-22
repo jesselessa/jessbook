@@ -34,7 +34,7 @@ export default function Overlay() {
     <>
       {showOverlay && (
         <div className="overlay">
-          <p className="overlayMsg">
+          <p className="overlay-msg">
             Please, use your device in portrait mode.
           </p>
         </div>

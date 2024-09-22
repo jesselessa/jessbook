@@ -56,7 +56,7 @@ export default function Navbar() {
         </Link>
         {/* Logo tablet and mobile */}
         <Link to="/">
-          <span className="logoMob">j</span>
+          <span className="logo-mob">j</span>
         </Link>
         {/* Main icons */}
         <Link to="/">
@@ -66,20 +66,20 @@ export default function Navbar() {
           <WbSunnyOutlinedIcon
             fontSize="large"
             onClick={toggleTheme}
-            className="themeBtn"
+            className="theme-btn"
           />
         ) : (
           <DarkModeOutlinedIcon
-            className="themeBtn"
+            className="theme-btn"
             fontSize="large"
             onClick={toggleTheme}
           />
         )}
 
         {/* Search bar */}
-        <div className="searchBar">
+        <div className="searchbar">
           <SearchOutlinedIcon sx={{ fontSize: "30px" }} />
-          <input type="search" placeholder="Search..." />
+          <input type="search" placeholder="Search..." name="search" />
         </div>
       </div>
 
@@ -107,7 +107,7 @@ export default function Navbar() {
       </div>
 
       {/* Burger menu */}
-      <div className="rightMob">
+      <div className="right-mob">
         <Link to={`/profile/${currentUser.id}`}>
           <PersonOutlinedIcon className="iconMob" fontSize="large" />
         </Link>
@@ -116,21 +116,17 @@ export default function Navbar() {
         </Link>
         {burgerClicked ? (
           <CloseOutlinedIcon
-            className="iconMob burger"
+            className="burger"
             fontSize="large"
             onClick={toggleMenu}
           />
         ) : (
-          <MenuIcon
-            className="iconMob burger"
-            fontSize="large"
-            onClick={toggleMenu}
-          />
+          <MenuIcon className="burger" fontSize="large" onClick={toggleMenu} />
         )}
 
         {/* Burger menu list*/}
         {burgerClicked && (
-          <div className="burgerList">
+          <div className="burger-list">
             <Link to="#">
               <div className="item">
                 <EmailOutlinedIcon fontSize="large" />

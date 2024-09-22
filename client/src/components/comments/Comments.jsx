@@ -29,12 +29,13 @@ export default function Comments({ postId }) {
 
   // Fetch post comments
   const fetchPostComments = async () => {
-    return await makeRequest
-      .get(`/comments?postId=${postId}`)
-      .then((res) => res.data)
-      .catch((error) =>
-        console.error("Error fetching comments from Comments.jsx:", error)
-      );
+    try {
+      const res = await makeRequest.get(`/comments?postId=${postId}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching comments from Comments.jsx:", error);
+      throw new Error(error);
+    }
   };
 
   const {
@@ -93,7 +94,7 @@ export default function Comments({ postId }) {
 
   return (
     <div className="comments">
-      <form>
+      <form name="comment-form">
         <div className="img-container">
           <img
             src={
@@ -105,7 +106,7 @@ export default function Comments({ postId }) {
           />
         </div>
 
-        <div className="inputGroup">
+        <div className="input-group">
           <input
             type="text"
             placeholder="Write a comment..."
@@ -146,14 +147,14 @@ export default function Comments({ postId }) {
               </div>
               <div className="buttons-time">
                 {currentUser.id === comment.userId && (
-                  <div className="editBtns">
+                  <div className="edit-buttons">
                     <EditOutlinedIcon
-                      className="editBtn"
+                      className="edit-btn"
                       fontSize="large"
                       onClick={() => handleUpdate(comment)}
                     />
                     <DeleteOutlineOutlinedIcon
-                      className="editBtn"
+                      className="edit-btn"
                       fontSize="large"
                       onClick={() => handleDelete(comment)}
                     />

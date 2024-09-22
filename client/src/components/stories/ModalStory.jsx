@@ -57,7 +57,7 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
                     : ""
                 }
               />
-              Your browser does not support the video tag.
+              Your browser doesn't support video.
             </video>
           ) : (
             <img src={`/uploads/${story.img}`} alt="story" />

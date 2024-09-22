@@ -53,8 +53,48 @@
           margin-bottom: 1rem;
         }
 
-        span {
-          margin-bottom: 1rem;
+        .cover,
+        .profile {
+          color: #444;
+          display: flex;
+          flex-direction: column;
+          font-weight: bold;
+          font-size: 1.6rem;
+          gap: 1rem;
+
+          span {
+            font-size: 1.6rem;
+            color: #333;
+          }
+
+          .img-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              object-position: center;
+            }
+
+            .icon {
+              position: absolute;
+              top: 0;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              margin: auto;
+              font-size: 30px;
+              color: lightgray;
+              cursor: pointer;
+            }
+          }
         }
       }
 
@@ -65,36 +105,9 @@
         font-weight: bold;
         font-size: 1.6rem;
         gap: 1rem;
-
-        .imgContainer {
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-
-          img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            object-position: center;
-          }
-
-          .icon {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            margin: auto;
-            font-size: 30px;
-            color: lightgray;
-            cursor: pointer;
-          }
-        }
       }
 
-      input {
+      input[type="text"] {
         color: #333;
         background-color: transparent;
         font-size: 1.6rem;

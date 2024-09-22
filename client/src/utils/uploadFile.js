@@ -8,6 +8,6 @@ export const uploadFile = async (file) => {
     return res.data; // Renvoie l'URL du fichier
   } catch (error) {
     console.error("Error uploading file:", error);
-    throw error;
+    throw new Error(error);
   }
 };

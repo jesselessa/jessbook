@@ -24,7 +24,7 @@
       padding: 1rem;
     }
 
-    .profileContainer {
+    .profile-container {
       display: flex;
       flex-direction: column;
       margin-bottom: 2rem;
@@ -55,7 +55,7 @@
             height: 110px;
           }
 
-          .profilePic {
+          .profile-pic {
             width: 170px;
             height: 170px;
             border-radius: 50%;
@@ -70,7 +70,7 @@
         }
       }
 
-      .userInfo {
+      .user-info {
         position: relative;
         width: 100%;
         min-height: 260px;

@@ -9,10 +9,12 @@ export const register = (req, res) => {
   const q = "SELECT * FROM users WHERE email = ?";
 
   db.query(q, [email], (error, data) => {
-    if (error) {
-      return res.status(500).json("An unknown error occured.");
-    }
-    if (data.length) return res.status(409).json("User already exists.");
+    if (error)
+      return res
+        .status(500)
+        .json("An unknown error has occured. Please, try again later.");
+
+    if (data.length > 0) return res.status(409).json("User already exists.");
 
     //* If no data, create new user
     // Hash password
@@ -21,15 +23,16 @@ export const register = (req, res) => {
 
     // Store new user in database
     const q =
-      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`) VALUES (?)";
+      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `role`) VALUES (?)";
 
-    const values = [firstName, lastName, email, hashedPswd];
+    const values = [firstName, lastName, email, hashedPswd, "user"];
 
     db.query(q, [values], (error, _data) => {
-      if (error) {
-        return res.status(500).json("An unknown error occured.");
-      }
-
+      if (error)
+        return res
+          .status(500)
+          .json("An unknown error has occured. Please, try again later.");
+          
       return res.status(200).json("New user created.");
     });
   });
@@ -40,7 +43,10 @@ export const login = (req, res) => {
   const q = "SELECT * FROM users WHERE email = ?";
 
   db.query(q, [req.body.email], (error, data) => {
-    if (error) return res.status(500).json("An unknown error occured.");
+    if (error)
+      return res
+        .status(500)
+        .json("An unknown error has occured. Please, try again later.");
 
     if (data.length === 0)
       return res.status(404).json("Invalid email or password.");
@@ -52,7 +58,6 @@ export const login = (req, res) => {
 
     //* Generate token with jsonwebtoken
     const secretKey = process.env.SECRET;
-
     let token;
 
     if (data[0].role === "admin") {
@@ -69,10 +74,10 @@ export const login = (req, res) => {
       );
     }
 
-    //* Store token in cookie and send it in response in case of successful login
+    //* Store token in cookie and send it in response if login is successful
     const { password, ...others } = data[0];
 
-    res
+    return res
       .cookie("accessToken", token, { httpOnly: true }) // Random JS script can't access our cookie
       .status(200)
       .json(others);
@@ -80,7 +85,7 @@ export const login = (req, res) => {
 };
 
 export const logout = (_req, res) => {
-  res
+  return res
     .clearCookie("accessToken", {
       secure: true,
       sameSite: "none", // Because API and React app port numbers are not the same
@@ -88,4 +93,3 @@ export const logout = (_req, res) => {
     .status(200)
     .json("User logged out.");
 };
-

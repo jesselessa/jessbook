@@ -1,7 +1,6 @@
 import { useContext, useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import "./login.scss";
-import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
 
 // Context
 import { AuthContext } from "../../contexts/authContext";
@@ -32,30 +31,26 @@ export default function Login() {
     setInputsValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // Clear form
-  const clearForm = () => {
-    setInputsValues({
-      email: "",
-      password: "",
-    });
-  };
-
-  //* Login function
-  const handleLogin = async (e) => {
+  // Login feature
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       await login(inputsValues);
 
-      toast.success("Successful login !");
       setError("");
-      clearForm();
 
+      // Clear form
+      setInputsValues({
+        email: "",
+        password: "",
+      });
+
+      // Navigate to homepage
       navigate("/");
     } catch (error) {
       // Handle errors from API
-      console.error(error);
-      setError(error.response?.data || "An unknown error occured.");
+      setError(error.response.data);
     }
   };
 
@@ -70,25 +65,23 @@ export default function Login() {
               Jessbook is a social media app that helps you stay connected with
               your family and friends.
             </p>
-
-            <span>Don't have any account ?</span>
-
+            <span>Don't have any account ?</span>{" "}
             <Link to="/register">
-              <button type="submit">Register</button>
+              <button> Register</button>
             </Link>
           </div>
         </div>
 
         <div className="right">
           {windowWidth <= 1150 ? (
-            <h1 className="titleMob">Welcome&nbsp;to Jessbook</h1>
+            <h1 className="title-mob">Welcome&nbsp;to Jessbook</h1>
           ) : (
             <h1>Login</h1>
           )}
 
-          <form>
+          <form name="login-form" onSubmit={handleSubmit}>
             {/* Handle error from API */}
-            {error && <span className="errorMsg">{error}</span>}
+            {error && <span className="error-msg">{error}</span>}
 
             <input
               type="email"
@@ -112,15 +105,13 @@ export default function Login() {
               autoComplete="off"
             />
 
-            <button onClick={handleLogin}>Sign in</button>
+            <button type="submit">Sign in</button>
 
             {/* <span>Forgot your password ?</span> */}
 
             {windowWidth <= 1150 && (
               <Link to="/register">
-                <button type="submit" className="registerBtn">
-                  Register
-                </button>
+                <button className="register-btn">Register</button>
               </Link>
             )}
           </form>

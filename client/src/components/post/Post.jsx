@@ -40,12 +40,13 @@ export default function Post({ post }) {
 
   // Get comments
   const fetchPostComments = async () => {
-    return await makeRequest
-      .get(`/comments?postId=${post.id}`)
-      .then((res) => res.data)
-      .catch((error) =>
-        console.error("Error fetching comments from Post.jsx:", error)
-      );
+    try {
+      const res = await makeRequest.get(`/comments?postId=${post.id}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching comments from Post.jsx:", error);
+      throw new Error(error);
+    }
   };
 
   const queryClient = useQueryClient();
@@ -57,10 +58,13 @@ export default function Post({ post }) {
 
   // Handle likes
   const fetchPostLikes = async () => {
-    return await makeRequest
-      .get(`/likes?postId=${post.id}`)
-      .then((res) => res.data)
-      .catch((error) => console.error(error));
+    try {
+      const res = await makeRequest.get(`/likes?postId=${post.id}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching post likes:", error);
+      throw new Error(error);
+    }
   };
 
   const {
@@ -114,7 +118,7 @@ export default function Post({ post }) {
   return (
     <div className="post">
       <div className="user">
-        <div className="userInfo">
+        <div className="user-info">
           <div className="img-container" onClick={navigateAndScrollTop}>
             <img
               src={
@@ -133,14 +137,14 @@ export default function Post({ post }) {
         </div>
 
         {currentUser.id === post.userId && (
-          <div className="editBtns">
+          <div className="edit-buttons">
             <EditOutlinedIcon
-              className="editBtn"
+              className="edit-btn"
               fontSize="large"
               onClick={handleUpdate}
             />
             <DeleteOutlineOutlinedIcon
-              className="editBtn"
+              className="edit-btn"
               fontSize="large"
               onClick={() => handleDelete(post)}
             />

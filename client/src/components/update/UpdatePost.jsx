@@ -65,7 +65,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
         <div className="wrapper">
           <h1>Update Your Post</h1>
 
-          <form>
+          <form name="update-post-form">
             <div className="files">
               <label htmlFor="image">
                 <span>Choose an image</span>

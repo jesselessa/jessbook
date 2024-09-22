@@ -32,7 +32,7 @@ export default function LeftBar() {
   return (
     <div className="leftBar" role="navigation">
       {/* Main info */}
-      <div className="mainInfo">
+      <div className="main-info">
         <div className="user" onClick={navigateAndScrollTop}>
           <div className="img-container">
             <img

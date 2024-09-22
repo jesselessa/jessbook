@@ -62,7 +62,9 @@ export const deleteComment = (req, res) => {
 
   db.query(q, [commentId, loggedInUserId], (error, data) => {
     if (error) return res.status(500).json(error);
+
     if (data.affectedRows > 0) return res.json("Comment deleted.");
-    return res.status(403).json("Only owner can delete their comment.");
+
+    return res.status(403).json("User can only delete their comment.");
   });
 };

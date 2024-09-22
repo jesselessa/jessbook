@@ -23,10 +23,6 @@ export const addLike = (req, res) => {
     if (error) return res.status(500).json(error);
     return res.status(200).json("Post liked.");
   });
-  // Alternative code :
-  // const q = "INSERT INTO likes (`userId`,`postId`) VALUES (?, ?)";
-  // const values = [loggedInUserId, req.body.postId];
-  // db.query(q, values, (error, _data) => {...})
 };
 
 export const deleteLike = (req, res) => {

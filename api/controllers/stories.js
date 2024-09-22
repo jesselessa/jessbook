@@ -45,7 +45,7 @@ export const getStories = (req, res) => {
 export const addStory = (req, res) => {
   const loggedInUserId = req.userInfo.id;
 
-  // Check video duration
+  // Check video duration doesn't exceed 60 seconds
   if (req.body.videoDuration > 60) {
     return res
       .status(400)
@@ -92,7 +92,9 @@ export const deleteStory = (req, res) => {
 
   db.query(q, [storyId, loggedInUserId], (error, data) => {
     if (error) return res.status(500).json(error);
+
     if (data.affectedRows > 0) return res.status(200).json("Story deleted.");
+
     return res.status(403).json("User can only delete their own story.");
   });
 };

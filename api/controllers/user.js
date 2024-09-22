@@ -1,16 +1,18 @@
 import { db } from "../utils/connect.js";
 
+//! Note : In MySQL, when no results are found with a SELECT query, the 'data' variable will contain an empty array ([]), which is always considered a truthy value. Therefore, to check if data really exists, we use 'if(data.length)' and not 'if(data)', the latter always returning 'true'.
+
 export const getUser = (req, res) => {
   const userId = req.params.userId;
 
   const q = "SELECT * FROM users WHERE id = ?";
 
   db.query(q, [userId], (error, data) => {
-    if (error) return res.status(400).json(error);
+    if (error) return res.status(500).json("An unknown error has occured.");
 
     // All user info except password
-    const { password, ...others } = data[0]; // Result = table 1st line
-    return res.status(200).json(others);
+    const { password, ...others } = data[0]; // Result = 1st line of array
+    if (data.length > 0) return res.status(200).json(others);
   });
 };
 
@@ -76,9 +78,8 @@ export const updateUser = (req, res) => {
   db.query(q, values, (error, data) => {
     if (error) return res.status(500).json(error);
 
-    if (data.affectedRows > 0) {
+    if (data.affectedRows > 0)
       return res.status(200).json("User's data updated.");
-    }
 
     return res.status(403).json("User can only update their own data.");
   });
@@ -91,7 +92,9 @@ export const deleteUser = (req, res) => {
 
   db.query(q, [loggedInUserId], (error, data) => {
     if (error) return res.status(500).json(error);
+    
     if (data.affectedRows > 0) return res.status(200).json("User deleted.");
+
     return res.status(403).json("User can only delete their own data.");
   });
 };

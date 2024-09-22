@@ -7,10 +7,13 @@ import Post from "../post/Post.jsx";
 
 export default function Posts({ userId }) {
   const getPosts = async () => {
-    return await makeRequest
-      .get(`/posts?userId=${userId}`)
-      .then((res) => res.data)
-      .catch((error) => console.error(error));
+    try {
+      const res = await makeRequest.get(`/posts?userId=${userId}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      throw new Error(error);
+    }
   };
 
   const {

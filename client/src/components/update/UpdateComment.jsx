@@ -49,7 +49,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
         <div className="wrapper">
           <h1>Update Your Comment</h1>
 
-          <form>
+          <form name="update-comment-form">
             <textarea
               rows={5}
               placeholder="Write a text..."
@@ -57,7 +57,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
               onChange={(e) => setDesc(e.target.value)}
             />
 
-            <button className="updateBtn" onClick={handleClick}>
+            <button className="update-btn" onClick={handleClick}>
               Update
             </button>
           </form>

@@ -30,7 +30,6 @@ export const getPosts = (req, res) => {
 
   db.query(q, values, (error, data) => {
     if (error) return res.status(500).json(error);
-
     return res.status(200).json(data);
   });
 };
@@ -85,9 +84,11 @@ export const updatePost = (req, res) => {
 
   db.query(q, values, (error, data) => {
     if (error) return res.status(500).json(error);
+
     if (data.affectedRows > 0) {
       return res.status(200).json("Post updated.");
     }
+
     return res.status(403).json("User can only update their post.");
   });
 };
@@ -100,7 +101,9 @@ export const deletePost = (req, res) => {
 
   db.query(q, [postId, loggedInUserId], (error, data) => {
     if (error) return res.status(500).json(error);
+
     if (data.affectedRows > 0) return res.status(200).json("Post deleted.");
+    
     return res.status(403).json("User can only delete their post.");
   });
 };

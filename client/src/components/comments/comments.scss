@@ -29,7 +29,7 @@
           object-position: center;
         }
       }
-      .inputGroup {
+      .input-group {
         display: flex;
         align-items: center;
         position: relative;
@@ -121,7 +121,7 @@
         color: themed("textColorSoft");
         gap: 1rem;
 
-        .editBtns {
+        .edit-buttons {
           display: flex;
           gap: 0.5rem;
 
@@ -129,7 +129,7 @@
             gap: 0.3rem;
           }
 
-          .editBtn {
+          .edit-btn {
             color: themed("textColorSoft");
 
             &:hover {

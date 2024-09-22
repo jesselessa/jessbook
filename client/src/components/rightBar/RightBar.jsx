@@ -23,7 +23,7 @@ export default function RightBar() {
         <h3>Latest activities</h3>
 
         <div className="activity">
-          <div className="userInfo">
+          <div className="user-info">
             <div className="img-container">
               <img
                 src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
@@ -38,7 +38,7 @@ export default function RightBar() {
         </div>
 
         <div className="activity">
-          <div className="userInfo">
+          <div className="user-info">
             <div className="img-container">
               <img
                 src="https://images.pexels.com/photos/6333652/pexels-photo-6333652.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
@@ -53,7 +53,7 @@ export default function RightBar() {
         </div>
 
         <div className="activity">
-          <div className="userInfo">
+          <div className="user-info">
             <div className="img-container">
               <img
                 src="https://images.pexels.com/photos/2269872/pexels-photo-2269872.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
@@ -68,7 +68,7 @@ export default function RightBar() {
         </div>
 
         <div className="activity">
-          <div className="userInfo">
+          <div className="user-info">
             <div className="img-container">
               <img
                 src="https://images.pexels.com/photos/8295844/pexels-photo-8295844.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"

@@ -90,6 +90,7 @@ export default function Stories({ userId }) {
                           : ""
                       }
                     />
+                    Your browser doesn't support video.
                   </video>
                 ) : (
                   <img src={`/uploads/${story.img}`} alt="story" />

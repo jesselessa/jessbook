@@ -62,7 +62,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   );
 
   // Handle form submission
-  const handleClick = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Upload new cover and profile pictures if present
@@ -95,6 +95,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     // Trigger mutation to update user's data in database
     updateMutation.mutate(updatedUser);
 
+    // Go to user's updated profile page
     navigate(`/profile/${updatedUser.id}`);
   };
 
@@ -104,11 +105,11 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
         <div className="wrapper">
           <h1>Update Your Profile</h1>
 
-          <form>
+          <form name="update-profile-form" onSubmit={handleSubmit}>
             <div className="files">
-              <label htmlFor="cover">
+              <div className="cover">
                 <span>Cover Picture</span>
-                <div className="imgContainer">
+                <div className="img-container">
                   <img
                     src={
                       cover
@@ -121,19 +122,18 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                   />
                   <CloudUploadIcon className="icon" />
                 </div>
-              </label>
+              </div>
 
               <input
                 type="file"
-                id="cover"
                 accept="image/*"
                 style={{ display: "none" }}
                 onChange={(e) => handleImageChange(e, setCover)}
               />
 
-              <label htmlFor="profile">
+              <div className="profile">
                 <span>Profile Picture</span>
-                <div className="imgContainer">
+                <div className="img-container">
                   <img
                     src={
                       profile
@@ -146,44 +146,46 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                   />
                   <CloudUploadIcon className="icon" />
                 </div>
-              </label>
+              </div>
 
               <input
                 type="file"
-                id="profile"
                 style={{ display: "none" }}
                 onChange={(e) => handleImageChange(e, setCover)}
               />
             </div>
 
-            <label>First name</label>
+            <label htmlFor="firstName">First name</label>
             <input
               type="text"
-              value={fields.firstName}
+              id="firstName"
               name="firstName"
+              value={fields.firstName}
               onChange={handleFieldChange}
               autoComplete="off"
             />
 
-            <label>Last name</label>
+            <label htmlFor="lastName">Last name</label>
             <input
               type="text"
-              value={fields.lastName}
+              id="lastName"
               name="lastName"
+              value={fields.lastName}
               onChange={handleFieldChange}
               autoComplete="off"
             />
 
-            <label>City</label>
+            <label htmlFor="city">City</label>
             <input
               type="text"
+              id="city"
               name="city"
               value={fields.city}
               onChange={handleFieldChange}
               autoComplete="off"
             />
 
-            <button onClick={handleClick}>Update</button>
+            <button type="submit">Update</button>
           </form>
 
           <button className="close" onClick={() => setOpenUpdate(false)}>

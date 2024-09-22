@@ -20,7 +20,7 @@ export const addRelationship = (req, res) => {
 
   db.query(q, [values], (error, _data) => {
     if (error) return res.status(500).json(error);
-    return res.status(200).json("Following");
+    return res.status(200).json("User is following.");
   });
 };
 
@@ -32,6 +32,6 @@ export const deleteRelationship = (req, res) => {
 
   db.query(q, [loggedInUserId, req.query.userId], (error, _data) => {
     if (error) return res.status(500).json(error);
-    return res.status(200).json("Unfollow");
+    return res.status(200).json("User has unfollowed.");
   });
 };

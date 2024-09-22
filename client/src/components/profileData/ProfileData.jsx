@@ -29,10 +29,13 @@ export default function ProfileData() {
 
   // Get user's info
   const fetchUserData = async () => {
-    return await makeRequest
-      .get(`/users/${userId}`)
-      .then((res) => res.data)
-      .catch((error) => console.error(error));
+    try {
+      const res = await makeRequest.get(`/users/${userId}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching user's data:", error);
+      throw new Error(error);
+    }
   };
 
   const {
@@ -43,13 +46,17 @@ export default function ProfileData() {
 
   // Get user's relationships
   const fetchRelationships = async () => {
-    return await makeRequest
-      .get(`/relationships?followedId=${userId}`)
-      .then((res) => res.data)
-      .catch((error) => console.error(error));
+    try {
+      const res = await makeRequest.get(`/relationships?followedId=${userId}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching relationships:", error);
+      throw new Error(error);
+    }
   };
 
   const {
+    // "r" for "relationships"
     isLoading: rIsLoading,
     error: rError,
     data: relationshipsData,
@@ -73,7 +80,7 @@ export default function ProfileData() {
   );
 
   const handleFollow = () => {
-    mutation.mutate(relationshipsData.includes(currentUser.id));
+    mutation.mutate(relationshipsData?.includes(currentUser.id));
   };
 
   return (
@@ -84,10 +91,12 @@ export default function ProfileData() {
         "Loading..."
       ) : (
         <>
-          <div className="profileContainer">
+          <div className="profile-container">
             <div className="images">
               <img
-                src={user.coverPic ? `/uploads/${user.coverPic}` : defaultCover}
+                src={
+                  user?.coverPic ? `/uploads/${user?.coverPic}` : defaultCover
+                }
                 className="cover"
                 alt="cover"
               />
@@ -96,20 +105,20 @@ export default function ProfileData() {
                 <img
                   src={
                     user.profilePic
-                      ? `/uploads/${user.profilePic}`
+                      ? `/uploads/${user?.profilePic}`
                       : defaultProfile
                   }
-                  className="profilePic"
+                  className="profile-pic"
                   alt="profile"
                 />
               </div>
             </div>
 
-            <div className="userInfo">
+            <div className="user-info">
               <div className="friends-contact">
                 <div className="friends">
                   <PeopleAltOutlinedIcon fontSize="large" />
-                  {/* Change later with data fetched from API */}
+                  {/* TODO - Change with data fetched from API */}
                   <span>441 Friends</span>
                 </div>
 
@@ -122,12 +131,12 @@ export default function ProfileData() {
 
               <div className="main-info">
                 <h2>
-                  {user.firstName} {user.lastName}
+                  {user?.firstName} {user?.lastName}
                 </h2>
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{user.city || "Non renseigné"}</span>
+                  <span>{user?.city || "Non renseigné"}</span>
                 </div>
 
                 {rError ? (
@@ -138,7 +147,7 @@ export default function ProfileData() {
                   <button onClick={() => setOpenUpdate(true)}>Update</button>
                 ) : (
                   <button onClick={handleFollow}>
-                    {relationshipsData.includes(currentUser.id)
+                    {relationshipsData?.includes(currentUser.id)
                       ? "Following"
                       : "Follow"}
                   </button>

@@ -109,7 +109,7 @@ export default function CreateStory({ setOpenCreateStory }) {
       <div className="wrapper">
         <h1>Create a story</h1>
 
-        <form>
+        <form name="story-form">
           {/* Add an image or a video */}
           <div className="input-group">
             <label htmlFor="file">

@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import "./register.scss";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 export default function Register() {
-  const navigate = useNavigate();
-
   const [inputsValues, setInputsValues] = useState({
     firstName: "",
     lastName: "",
@@ -15,8 +12,7 @@ export default function Register() {
     password: "",
     pswdConfirm: "",
   });
-
-  // Handle errors from form
+  // Errors from form
   const [validationErrors, setValidationErrors] = useState({
     firstName: "",
     lastName: "",
@@ -24,8 +20,10 @@ export default function Register() {
     password: "",
     pswdConfirm: "",
   });
-  // To handle errors from API
+  // Errors from API
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   // Check window object width when loading page (for responsive)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -56,8 +54,8 @@ export default function Register() {
     });
   };
 
-  // Clear errors
-  const clearErrors = () => {
+  // Clear errors from form
+  const clearValidationErrors = () => {
     setValidationErrors({
       firstName: "",
       lastName: "",
@@ -65,10 +63,9 @@ export default function Register() {
       password: "",
       pswdConfirm: "",
     });
-    setError("");
   };
 
-  // Registration function
+  // Registration feature
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -91,7 +88,7 @@ export default function Register() {
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputsValues.email) ||
       inputsValues.email.length > 64
     ) {
-      inputsErrors.email = "Enter a valid email not exceeding 64 characters.";
+      inputsErrors.email = "Enter a valid email.";
     }
 
     // Password with regex
@@ -105,14 +102,21 @@ export default function Register() {
     }
 
     // Confirmation password
-    if (inputsValues.password !== inputsValues.pswdConfirm) {
+    if (inputsValues.password.trim() !== inputsValues.pswdConfirm.trim()) {
+      // trim() removes whitespace from both sides of a string
       inputsErrors.pswdConfirm = "Password does not match.";
     }
 
-    // If errors during validation, update state and return
+    // If errors during validation, update state and stop process
     if (Object.keys(inputsErrors).length > 0) {
       setValidationErrors(inputsErrors);
       toast.error("Registration failed. Check your information.");
+
+      // Clear error messages after 5 seconds
+      setTimeout(() => {
+        clearValidationErrors();
+      }, 5000);
+
       return;
     }
 
@@ -120,13 +124,19 @@ export default function Register() {
     try {
       await axios.post(`http://localhost:8000/auth/register`, inputsValues);
 
-      toast.success("Successful registration !");
-      clearErrors();
+      // Reset form
       clearForm();
 
+      // Navigate to Login page
+      toast.success("Successful registration.");
       navigate("/login");
     } catch (error) {
-      setError(error.response?.data || "An unknown error occurred.");
+      setError(error.response.data);
+
+      // Clear API error message after 5 seconds
+      setTimeout(() => {
+        setError("");
+      }, 5000);
     }
   };
 
@@ -135,7 +145,8 @@ export default function Register() {
       <div className="card">
         <div className="left">
           <h1>Register</h1>
-          <form onSubmit={handleSubmit}>
+
+          <form name="register-form" onSubmit={handleSubmit}>
             {/* First Name */}
             <input
               type="text"
@@ -148,7 +159,7 @@ export default function Register() {
               onChange={handleChange}
             />
             {validationErrors.firstName && (
-              <span className="errorMsg">{validationErrors.firstName}</span>
+              <span className="error-msg">{validationErrors.firstName}</span>
             )}
 
             {/* Last Name */}
@@ -163,7 +174,7 @@ export default function Register() {
               onChange={handleChange}
             />
             {validationErrors.lastName && (
-              <span className="errorMsg">{validationErrors.lastName}</span>
+              <span className="error-msg">{validationErrors.lastName}</span>
             )}
 
             {/* Email */}
@@ -177,7 +188,7 @@ export default function Register() {
               onChange={handleChange}
             />
             {validationErrors.email && (
-              <span className="errorMsg">{validationErrors.email}</span>
+              <span className="error-msg">{validationErrors.email}</span>
             )}
 
             {/* Password */}
@@ -191,7 +202,7 @@ export default function Register() {
               onChange={handleChange}
             />
             {validationErrors.password && (
-              <span className="errorMsg">{validationErrors.password}</span>
+              <span className="error-msg">{validationErrors.password}</span>
             )}
 
             {/* Confirm Password */}
@@ -205,17 +216,17 @@ export default function Register() {
               onChange={handleChange}
             />
             {validationErrors.pswdConfirm && (
-              <span className="errorMsg">{validationErrors.pswdConfirm}</span>
+              <span className="error-msg">{validationErrors.pswdConfirm}</span>
             )}
 
             {/* API Error */}
-            {error && <span className="errorMsg api">{error}</span>}
+            {error && <span className="error-msg api">{error}</span>}
 
             {/* Submit button */}
             <button type="submit">Sign up</button>
 
             {windowWidth <= 1150 && (
-              <p className="loginMsg">
+              <p className="login-msg">
                 Have an account ?{" "}
                 <Link to="/login">
                   <span>Login</span>
@@ -233,9 +244,7 @@ export default function Register() {
               Jessbook is a social media app that helps you stay connected with
               your family and friends.
             </p>
-
-            <span>Have an account ?</span>
-
+            <span>Have an account ?</span>{" "}
             <Link to="/login">
               <button>Login</button>
             </Link>

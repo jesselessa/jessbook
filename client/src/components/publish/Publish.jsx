@@ -44,11 +44,10 @@ export default function Publish() {
     }
   );
 
-  const handleClick = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (desc.trim() === "") {
-      // .trim() = to delete spaces at the beginning and at the end of a string
       setError({
         isError: true,
         message: "You can't edit a post without a description.",
@@ -76,7 +75,7 @@ export default function Publish() {
   };
 
   return (
-    <div className="publish">
+    <form className="publish" name="post-form" onSubmit={handleSubmit}>
       <div className="top">
         <div className="left">
           <div className="img-container">
@@ -90,9 +89,10 @@ export default function Publish() {
             />
           </div>
 
-          <div className="inputGroup">
+          <div className="input-group">
             <input
               type="text"
+              name="text"
               placeholder={`What's up, ${currentUser.firstName}\u00A0?`}
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
@@ -101,13 +101,13 @@ export default function Publish() {
               <SendOutlinedIcon
                 className="send"
                 sx={{ fontSize: "24px", color: "lightgray" }}
-                onClick={handleClick}
+                onClick={handleSubmit}
               />
             ) : (
               <SendOutlinedIcon
                 className="send"
                 sx={{ fontSize: "24px", color: "#555" }}
-                onClick={handleClick}
+                onClick={handleSubmit}
               />
             )}
           </div>
@@ -163,11 +163,9 @@ export default function Publish() {
         </div>
 
         <div className="right">
-          <button type="submit" onClick={handleClick}>
-            Publish
-          </button>
+          <button type="submit">Publish</button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
