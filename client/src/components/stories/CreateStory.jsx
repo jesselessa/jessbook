@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
-import { isVideo } from "../../utils/isVideo.js";
 import { toast } from "react-toastify";
 
 // Component
 import Overlay from "../overlay/Overlay.jsx";
 
+// Function checking if file is a video based on its MIME type
+const isVideo = (fileType) => {
+  return /^video\//i.test(fileType);
+};
+
 export default function CreateStory({ setOpenCreateStory }) {
-  const [image, setImage] = useState(null);
-  const [video, setVideo] = useState(null);
+  const [file, setFile] = useState(null);
   const [desc, setDesc] = useState("");
+  const [fileURL, setFileURL] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
 
   // Add a new story
@@ -23,6 +28,7 @@ export default function CreateStory({ setOpenCreateStory }) {
     },
     {
       onSuccess: () => {
+        // Invalidate and refetch & close form after submission
         queryClient.invalidateQueries(["stories"]);
         setOpenCreateStory(false);
         toast.success("Story published.");
@@ -33,51 +39,70 @@ export default function CreateStory({ setOpenCreateStory }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    if (!image && !video) {
+    // Check if image or video selected
+    if (!file) {
       setError({
         isError: true,
-        message: "You must upload either an image or a video.",
+        message: "You can't edit a story without an image or a video.",
       });
 
-      // Reset error message after 3 seconds
-      setTimeout(() => {
-        setError({ isError: false, message: "" });
-      }, 3000);
       return;
     }
 
-    let imageUrl = "";
-    let videoUrl = "";
-    try {
-      if (image) {
-        imageUrl = await uploadFile(image);
-        mutation.mutate({ img: imageUrl, desc: desc });
-      } else if (video) {
-        videoUrl = await uploadFile(video);
-        mutation.mutate({ img: videoUrl, desc: desc });
-      }
-      // mutation.mutate({ img: fileUrl, desc: desc });
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to upload file. Please try again.");
-    }
+    // Initialize variable, then, upload file and download URL
+    const newFile = file ? await uploadFile(file) : null;
+
+    // Send mutation to database
+    mutation.mutate({ img: newFile, desc: desc });
   };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
+    const filePath = URL.createObjectURL(selectedFile);
 
-    if (isVideo(selectedFile.type)) {
-      setVideo(selectedFile);
-      videoUrl = URL.createObjectURL(selectedFile);
-      setImage(null);
-      imageUrl = "";
-    } else {
-      setImage(selectedFile);
-      imageUrl = URL.createObjectURL(selectedFile);
-      setVideo(null);
-      videoUrl = "";
+    // Reset error message everytime file changes
+    setError({ isError: false, message: "" });
+
+    // Check video duration
+    if (selectedFile) {
+      if (isVideo(selectedFile.type)) {
+        const video = document.createElement("video");
+
+        video.src = filePath;
+
+        video.addEventListener("loadedmetadata", () => {
+          // 'loadedmetadata' event is fired when metadata has been loaded
+          if (video.duration > 60) {
+            // Unvalid video
+            setError({
+              isError: true,
+              message: "Video duration can't exceed a 60-second limit.",
+            });
+
+            setFile(null); // Unselect file
+            setFileURL(""); // No URL for preview
+
+            return;
+          } else {
+            // Valid video
+            setFile(selectedFile);
+            setFileURL(filePath);
+          }
+        });
+      } else {
+        // If uploaded file is an image, store it and update its URL
+        setFile(selectedFile);
+        setFileURL(filePath);
+      }
     }
   };
+
+  // Release URL resources on unmounting or when file URL changes
+  useEffect(() => {
+    return () => {
+      if (fileURL) URL.revokeObjectURL(fileURL);
+    };
+  }, [fileURL]);
 
   return (
     <div className="createStory">
@@ -90,26 +115,33 @@ export default function CreateStory({ setOpenCreateStory }) {
             <label htmlFor="file">
               <input
                 type="file"
-                name="file"
-                accept="image/*,video/*"
+                id="file"
+                accept="image/*, video/*"
                 onChange={handleFileChange}
               />
               Add an image or a video
             </label>
 
-            {/* Display preview of the selected file */}
-            <div className="img-container">
-              {image && <img src={imageUrl} alt="story preview" />}
-              {video && <video src={videoUrl} type={video.type} />}
-            </div>
+            {file && (
+              <div className="img-container">
+                {/* Create a video or an image preview */}
+                {isVideo(file.type) ? (
+                  <video>
+                    <source src={fileURL} type={file.type} />
+                    Your browser doesn't support video.
+                  </video>
+                ) : (
+                  <img src={fileURL} alt="preview" />
+                )}
+              </div>
+            )}
           </div>
 
           <textarea
             id="desc"
             name="desc"
-            type="text"
             rows={3}
-            placeholder="You can add a short description to your post."
+            placeholder="You can add a short description to your story."
             maxLength={100}
             value={desc}
             onChange={(e) => setDesc(e.target.value)}

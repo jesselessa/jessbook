@@ -1,3 +1,4 @@
-// Utility function checking if file type is a video depending on its extension name
-export const isVideo = (fileName) =>
-  /\.(mp4|mov|avi|mkv|webm|flv|wmv|3gp|m4v|ogv)$/.test(fileName);
+// Function checking if a file is a video based on its extension
+const isVideo = (fileName) => {
+  return /\.(mp4|mov|avi|mkv|flv|wmv|webm|mpeg|mpg|m4v)$/i.test(fileName);
+};

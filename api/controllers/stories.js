@@ -45,15 +45,16 @@ export const getStories = (req, res) => {
 export const addStory = (req, res) => {
   const loggedInUserId = req.userInfo.id;
 
-  // Check video length doesn't exceede 60 secondes
+  // Check video duration
   if (req.body.videoDuration > 60) {
-    return res.status(400).json("Video duration exceeds the 60-second limit.");
+    return res
+      .status(400)
+      .json("Video duration can't exceed a 60-second limit.");
   }
 
   const currentDateTime = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
   const expirationDate = moment(Date.now())
     .add(24, "hours")
-    // .add(2, "minutes") // Test
     .format("YYYY-MM-DD HH:mm:ss");
 
   // Delete previous story if non expired before adding new one

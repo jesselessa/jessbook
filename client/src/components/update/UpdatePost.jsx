@@ -52,7 +52,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     };
 
     if (image) {
-      let newImage = await uploadFile(image);
+      const newImage = await uploadFile(image);
       updatedPost.img = newImage;
     }
 
@@ -69,19 +69,17 @@ export default function UpdatePost({ post, setOpenUpdate }) {
             <div className="files">
               <label htmlFor="image">
                 <span>Choose an image</span>
-                <div className="imgContainer">
-                  {image && (
-                    <img
-                      src={
-                        image
-                          ? URL.createObjectURL(image)
-                          : post.img
-                          ? `/uploads/${post.img}`
-                          : null
-                      }
-                      alt="post preview"
-                    />
-                  )}
+                <div className="img-container">
+                  <img
+                    src={
+                      image
+                        ? URL.createObjectURL(image)
+                        : post.img
+                        ? `/uploads/${post.img}`
+                        : null
+                    }
+                    alt="post preview"
+                  />
                   <CloudUploadIcon className="icon" />
                 </div>
               </label>

@@ -16,7 +16,6 @@ import { AuthContext } from "../../contexts/authContext";
 
 export default function Stories({ userId }) {
   const { currentUser } = useContext(AuthContext);
-
   const [openCreateStory, setOpenCreateStory] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
@@ -82,9 +81,7 @@ export default function Stories({ userId }) {
                 style={{ cursor: "pointer" }}
               >
                 {isVideo(story.img) ? (
-                  <video
-                  // 'controls' and 'type' attributes not needed
-                  >
+                  <video>
                     <source
                       src={`/uploads/${story.img}`}
                       type={

@@ -69,10 +69,10 @@ export default function Publish() {
     setDesc("");
 
     // Initialize variable, then, upload image and download URL
-    let imageUrl = "";
-    if (image) imageUrl = await uploadFile(image);
+    const newImage = image ? await uploadFile(image) : null;
 
-    mutation.mutate({ desc: desc.trim(), img: imageUrl }); // If success URL sent to database (posts table)
+    // Send mutation to database (posts table) to update data
+    mutation.mutate({ desc: desc.trim(), img: newImage });
   };
 
   return (
@@ -119,7 +119,7 @@ export default function Publish() {
               <img
                 alt="post preview"
                 src={URL.createObjectURL(image)}
-                // Used to create a fake URL that shows post image
+                // Generate a dynamic URL for post image preview
               />
 
               <button className="close" onClick={() => setImage(null)}>
@@ -136,7 +136,7 @@ export default function Publish() {
 
       <div className="bottom">
         <div className="left">
-          {/* Input:file - value linked with state doesn't work with except if value equals "" or "null" */}
+          {/* Input:file - value linked with state doesn't work except if value equals "" or "null" */}
           <input
             type="file"
             id="file"
