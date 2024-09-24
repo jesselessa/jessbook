@@ -9,8 +9,8 @@
     display: flex;
     flex-direction: column;
     background-color: themed(bgSoft);
-    padding: 2rem 1rem;
-    gap: 2rem;
+    padding: 1rem 1rem 2rem 1rem;
+    gap: 1.5rem;
     z-index: -1; // Modal over right bar
 
     @include medium {
@@ -19,11 +19,9 @@
 
     .birthdays {
       background-color: themed(bg);
-      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      -webkit-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      -moz-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
+      border-radius: 0.5rem;
       padding: 1rem;
-      gap: 1rem;
 
       h3 {
         font-size: 1.6rem;
@@ -57,16 +55,14 @@
       display: flex;
       flex-direction: column;
       background-color: themed(bg);
-      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      -webkit-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      -moz-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
       gap: 1rem;
-      padding: 1.5rem 1rem;
+      border-radius: 0.5rem;
+      padding: 1rem;
 
       h3 {
         font-size: 1.6rem;
         color: themed("textColorSoft");
-        margin-bottom: 1rem;
       }
 
       .activity {
@@ -120,15 +116,14 @@
 
     .online {
       background-color: themed(bg);
-      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      -webkit-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      -moz-box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
-      padding: 1.5rem 1rem;
+      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
+      border-radius: 0.5rem;
+      padding: 1rem;
 
       h3 {
         font-size: 1.6rem;
         color: themed("textColorSoft");
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
       }
 
       .friends {

@@ -3,7 +3,6 @@ export const AuthContext = createContext();
 import { makeRequest } from "../utils/axios.js";
 
 export const AuthContextProvider = ({ children }) => {
-  // children = props.chidren
   const storedUser = localStorage.getItem("user");
   const [currentUser, setCurrentUser] = useState(
     storedUser ? JSON.parse(storedUser) : null

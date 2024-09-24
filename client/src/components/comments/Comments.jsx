@@ -22,18 +22,17 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 
 export default function Comments({ postId }) {
   const { currentUser } = useContext(AuthContext);
-
   const [desc, setDesc] = useState("");
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
 
-  // Fetch post comments
+  // Get post comments
   const fetchPostComments = async () => {
     try {
       const res = await makeRequest.get(`/comments?postId=${postId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching comments from Comments.jsx:", error);
+      console.error("Error fetching comments:", error);
       throw new Error(error);
     }
   };
@@ -46,18 +45,15 @@ export default function Comments({ postId }) {
 
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(
-    (newComment) => {
-      return makeRequest.post("/comments", newComment);
+  const mutation = useMutation({
+    mutationFn: (newComment) => makeRequest.post("/comments", newComment),
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["comments", postId]);
+      toast.success("Comment published.");
     },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["comments", postId]);
-        toast.success("Comment published.");
-      },
-    }
-  );
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,16 +69,15 @@ export default function Comments({ postId }) {
   };
 
   // Delete comment
-  const deleteMutation = useMutation(
-    (commentId) => makeRequest.delete(`/comments/${commentId}`),
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["comments", postId]);
-        toast.success("Comment deleted.");
-      },
-    }
-  );
+  const deleteMutation = useMutation({
+    mutationFn: (commentId) => makeRequest.delete(`/comments/${commentId}`),
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["comments", postId]);
+      toast.success("Comment deleted.");
+    },
+  });
 
   const handleDelete = (comment) => {
     try {

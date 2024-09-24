@@ -3,9 +3,7 @@
 .post {
   @include themify($themes) {
     background-color: themed("bg");
-    box-shadow: 0 0 2.5rem -1rem rgba(0, 0, 0, 0.38);
-    -webkit-box-shadow: 0 0px 2.5rem -1rem rgba(0, 0, 0, 0.38);
-    -moz-box-shadow: 0 0px 2.5rem -1rem rgba(0, 0, 0, 0.38);
+    box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
     border-radius: 1rem;
 
     .user {

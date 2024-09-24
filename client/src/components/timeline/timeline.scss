@@ -7,7 +7,7 @@
     width: 50vw;
     min-height: calc(100vh - 70px); // 70px = navbar height
     background-color: themed("bgSoft");
-    padding: 2rem 1rem 2rem 2rem;
+    padding: 1rem 1rem 2rem 2rem;
 
     @include medium {
       width: 80vw;
