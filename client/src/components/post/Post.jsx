@@ -91,7 +91,7 @@ export default function Post({ post }) {
   };
 
   // Open update form
-  const handleUpdate = () => {
+  const openUpdateForm = () => {
     setOpenUpdate(true);
   };
 
@@ -141,7 +141,7 @@ export default function Post({ post }) {
             <EditOutlinedIcon
               className="edit-btn"
               fontSize="large"
-              onClick={handleUpdate}
+              onClick={openUpdateForm}
             />
             <DeleteOutlineOutlinedIcon
               className="edit-btn"

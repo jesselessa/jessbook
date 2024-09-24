@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./updatePost.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -59,6 +59,15 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     updateMutation.mutate(updatedPost);
   };
 
+  // Clean up object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (image) {
+        URL.revokeObjectURL(image);
+      }
+    };
+  }, [image]);
+
   return (
     <>
       <div className="updatePost">
@@ -67,38 +76,46 @@ export default function UpdatePost({ post, setOpenUpdate }) {
 
           <form name="update-post-form">
             <div className="files">
-              <label htmlFor="image">
-                <span>Choose an image</span>
+              <div className="image">
+                <label htmlFor="file">Choose an image</label>
                 <div className="img-container">
-                  <img
-                    src={
-                      image
-                        ? URL.createObjectURL(image)
-                        : post.img
-                        ? `/uploads/${post.img}`
-                        : null
-                    }
-                    alt="post preview"
-                  />
+                  {(image || post.img) && (
+                    <img
+                      src={
+                        image
+                          ? URL.createObjectURL(image)
+                          : `/uploads/${post.img}`
+                      }
+                      alt="post preview"
+                    />
+                  )}
+
                   <CloudUploadIcon className="icon" />
+
+                  <input
+                    type="file"
+                    id="file"
+                    name="file"
+                    accept="image/*"
+                    onChange={(e) => setImage(e.target.files[0])}
+                  />
                 </div>
-              </label>
-              <input
-                type="file"
-                id="image"
-                style={{ display: "none" }}
-                accept="image/*"
-                onChange={(e) => setImage(e.target.files[0])}
-              />
+              </div>
             </div>
-            <label>Add a text</label>
+
+            <label htmlFor="text">Add a text</label>
             <textarea
+              id="text"
+              name="text"
               rows={8}
               placeholder="Write a text..."
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />
-            <button onClick={handleClick}>Update</button>
+
+            <button className="submit" onClick={handleClick}>
+              Update
+            </button>
           </form>
 
           <button className="close" onClick={() => setOpenUpdate(false)}>

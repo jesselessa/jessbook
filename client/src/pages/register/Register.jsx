@@ -54,7 +54,7 @@ export default function Register() {
     });
   };
 
-  // Clear errors from form
+  // Clear validation errors in form
   const clearValidationErrors = () => {
     setValidationErrors({
       firstName: "",
@@ -131,7 +131,7 @@ export default function Register() {
       toast.success("Successful registration.");
       navigate("/login");
     } catch (error) {
-      setError(error.response.data);
+      setError(error.response.data); // from Axios
 
       // Clear API error message after 5 seconds
       setTimeout(() => {

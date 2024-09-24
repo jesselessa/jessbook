@@ -59,7 +59,7 @@ export default function Comments({ postId }) {
     }
   );
 
-  const handleClick = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     mutation.mutate({ desc: desc.trim(), postId });
@@ -94,7 +94,7 @@ export default function Comments({ postId }) {
 
   return (
     <div className="comments">
-      <form name="comment-form">
+      <form name="comment-form" onSubmit={handleSubmit}>
         <div className="img-container">
           <img
             src={
@@ -109,6 +109,7 @@ export default function Comments({ postId }) {
         <div className="input-group">
           <input
             type="text"
+            name="text"
             placeholder="Write a comment..."
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
@@ -116,11 +117,11 @@ export default function Comments({ postId }) {
           <SendOutlinedIcon
             className="send"
             sx={{ fontSize: "24px", color: "#333" }}
-            onClick={handleClick}
+            onClick={handleSubmit}
           />
         </div>
 
-        <button onClick={handleClick}>Send</button>
+        <button type="submit">Send</button>
       </form>
 
       {error

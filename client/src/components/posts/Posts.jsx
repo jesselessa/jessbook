@@ -27,15 +27,13 @@ export default function Posts({ userId }) {
 
   return (
     <div className="posts">
-      {error ? (
-        "Something went wrong."
-      ) : isLoading ? (
-        "Loading..."
-      ) : posts.length === 0 ? (
-        <div className="msg">No post to show yet.</div>
-      ) : (
-        posts.map((post) => <Post key={post.id} post={post} />)
-      )}
+      {error
+        ? "Something went wrong."
+        : isLoading
+        ? "Loading..."
+        : posts.length === 0
+        ? "No post to show yet."
+        : posts.map((post) => <Post key={post.id} post={post} />)}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import "./updateProfile.scss";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -42,9 +42,11 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   };
 
   // Handle image change
-  const handleImageChange = (e, setImage) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setImage(file);
+
+    if (e.target.id === "selected-cover") setCover(file);
+    if (e.target.id === "selected-profile") setProfile(file);
   };
 
   // Mutation to update user's profile data
@@ -62,7 +64,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   );
 
   // Handle form submission
-  const handleSubmit = async (e) => {
+  const handleClick = async (e) => {
     e.preventDefault();
 
     // Upload new cover and profile pictures if present
@@ -99,16 +101,29 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     navigate(`/profile/${updatedUser.id}`);
   };
 
+  // Clean up object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (cover) {
+        URL.revokeObjectURL(cover);
+      }
+      if (profile) {
+        URL.revokeObjectURL(profile);
+      }
+    };
+  }, [cover, profile]);
+
   return (
     <>
       <div className="update">
         <div className="wrapper">
           <h1>Update Your Profile</h1>
 
-          <form name="update-profile-form" onSubmit={handleSubmit}>
+          <form name="update-profile-form">
             <div className="files">
               <div className="cover">
                 <span>Cover Picture</span>
+
                 <div className="img-container">
                   <img
                     src={
@@ -120,19 +135,23 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                     }
                     alt="cover"
                   />
-                  <CloudUploadIcon className="icon" />
+                  <label htmlFor="selected-cover">
+                    <CloudUploadIcon className="icon" />
+                  </label>
                 </div>
               </div>
 
               <input
                 type="file"
+                id="selected-cover"
+                name="selected-cover"
                 accept="image/*"
-                style={{ display: "none" }}
-                onChange={(e) => handleImageChange(e, setCover)}
+                onChange={handleFileChange}
               />
 
               <div className="profile">
                 <span>Profile Picture</span>
+
                 <div className="img-container">
                   <img
                     src={
@@ -144,14 +163,18 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                     }
                     alt="profile"
                   />
-                  <CloudUploadIcon className="icon" />
+                  <label htmlFor="selected-profile">
+                    <CloudUploadIcon className="icon" />
+                  </label>
                 </div>
               </div>
 
               <input
                 type="file"
-                style={{ display: "none" }}
-                onChange={(e) => handleImageChange(e, setCover)}
+                id="selected-profile"
+                name="selected-profile"
+                accept="image/*"
+                onChange={handleFileChange}
               />
             </div>
 
@@ -185,7 +208,9 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               autoComplete="off"
             />
 
-            <button type="submit">Update</button>
+            <button type="submit" onClick={handleClick}>
+              Update
+            </button>
           </form>
 
           <button className="close" onClick={() => setOpenUpdate(false)}>

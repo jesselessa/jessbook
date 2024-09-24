@@ -51,6 +51,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
 
           <form name="update-comment-form">
             <textarea
+              name="text"
               rows={5}
               placeholder="Write a text..."
               value={desc}

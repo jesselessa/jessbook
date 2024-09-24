@@ -12,7 +12,7 @@ import CreateStory from "./CreateStory.jsx";
 import ModalStory from "./ModalStory.jsx";
 
 // Context
-import { AuthContext } from "../../contexts/authContext";
+import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Stories({ userId }) {
   const { currentUser } = useContext(AuthContext);
@@ -71,7 +71,7 @@ export default function Stories({ userId }) {
           ) : isLoading ? (
             <span className="msg">Loading...</span>
           ) : stories.length === 0 ? (
-            <span className="no-story">No story to show yet.</span>
+            <span className="msg">No story to show yet.</span>
           ) : (
             stories.map((story) => (
               <div

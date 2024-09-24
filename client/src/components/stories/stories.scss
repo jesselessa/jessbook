@@ -21,13 +21,10 @@
         display: none;
       }
 
-      .msg,
-      .no-story {
+      .msg {
         color: themed("textColor");
         font-size: 1.6rem;
-      }
-
-      .no-story {
+        text-align: center;
         margin: auto;
       }
 
@@ -39,6 +36,7 @@
         max-height: 100%;
         border-radius: 1rem;
         overflow: hidden;
+        box-shadow: 0 1rem 1.5rem 0.3rem rgba(0, 0, 0, 0.1);
 
         img {
           width: 100%;

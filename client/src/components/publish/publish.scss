@@ -94,8 +94,13 @@
       .right {
         .img-container {
           position: relative;
-          width: 100px;
-          height: 100px;
+          width: 70px;
+          height: 70px;
+
+          @include small {
+            width: 50px;
+            height: 50px;
+          }
 
           img {
             width: 100%;
@@ -126,7 +131,7 @@
 
     hr {
       border-top: 0.1rem solid themed("hr");
-      margin: 1.5rem 0;
+      margin: 1.5rem 0 1rem 0;
     }
 
     .bottom {
@@ -144,29 +149,61 @@
           justify-content: space-around;
         }
 
+        .file-label-mob {
+          display: none;
+
+          @include small {
+            display: block;
+            width: 24px;
+            height: 24px;
+          }
+
+          img {
+            height: 24px;
+            width: 24px;
+          }
+        }
+
         #file {
           display: none;
         }
 
-        .item {
+        .add-img {
           display: flex;
           align-items: center;
           gap: 0.6rem;
-          cursor: pointer;
+
+          @include small {
+            display: none;
+          }
 
           img {
-            height: 20px;
-            width: 20px;
+            height: 24px;
+            width: 24px;
+          }
 
-            @include small {
-              height: 24px;
-              width: 24px;
-            }
+          .file-label {
+            font-size: 1.4rem;
+            color: themed("textColorSoft");
+            cursor: pointer;
+          }
+        }
+
+        .item {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 0.6rem;
+
+          img {
+            height: 24px;
+            width: 24px;
           }
 
           span {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             color: themed("textColorSoft");
+            cursor: pointer;
 
             @include small {
               display: none;

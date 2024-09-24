@@ -4,8 +4,9 @@ import { makeRequest } from "../utils/axios.js";
 
 export const AuthContextProvider = ({ children }) => {
   // children = props.chidren
+  const storedUser = localStorage.getItem("user");
   const [currentUser, setCurrentUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || null
+    storedUser ? JSON.parse(storedUser) : null
   );
 
   const login = async (inputsValues) => {

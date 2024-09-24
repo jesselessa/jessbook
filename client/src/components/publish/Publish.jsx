@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import "./publish.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -44,10 +44,10 @@ export default function Publish() {
     }
   );
 
-  const handleSubmit = async (e) => {
+  const handleClick = async (e) => {
     e.preventDefault();
 
-    if (desc.trim() === "") {
+    if (!desc) {
       setError({
         isError: true,
         message: "You can't edit a post without a description.",
@@ -63,19 +63,28 @@ export default function Publish() {
       return;
     }
 
-    // Reset inputs after submission
-    setImage(null);
-    setDesc("");
-
     // Initialize variable, then, upload image and download URL
     const newImage = image ? await uploadFile(image) : null;
 
     // Send mutation to database (posts table) to update data
     mutation.mutate({ desc: desc.trim(), img: newImage });
+
+    // Reset inputs after submission
+    setImage(null);
+    setDesc("");
   };
 
+  // Clean up object URL to prevent memory leaks on component unmounting or when image changes
+  useEffect(() => {
+    return () => {
+      if (image) {
+        URL.revokeObjectURL(image);
+      }
+    };
+  }, [image]);
+
   return (
-    <form className="publish" name="post-form" onSubmit={handleSubmit}>
+    <div className="publish">
       <div className="top">
         <div className="left">
           <div className="img-container">
@@ -101,13 +110,13 @@ export default function Publish() {
               <SendOutlinedIcon
                 className="send"
                 sx={{ fontSize: "24px", color: "lightgray" }}
-                onClick={handleSubmit}
+                onClick={handleClick}
               />
             ) : (
               <SendOutlinedIcon
                 className="send"
                 sx={{ fontSize: "24px", color: "#555" }}
-                onClick={handleSubmit}
+                onClick={handleClick}
               />
             )}
           </div>
@@ -137,19 +146,24 @@ export default function Publish() {
       <div className="bottom">
         <div className="left">
           {/* Input:file - value linked with state doesn't work except if value equals "" or "null" */}
+          <label className="file-label-mob" htmlFor="file">
+            <img src={picture} alt="image icon" />
+          </label>
+
           <input
             type="file"
             id="file"
+            name="file"
             accept="image/*"
             onChange={(e) => setImage(e.target.files[0])}
           />
 
-          <label htmlFor="file">
-            <div className="item">
-              <img src={picture} alt="image icon" />
+          <div className="add-img">
+            <img src={picture} alt="image icon" />
+            <label className="file-label" htmlFor="file">
               <span>Add Image</span>
-            </div>
-          </label>
+            </label>
+          </div>
 
           <div className="item">
             <img src={map} alt="map icon" />
@@ -163,9 +177,11 @@ export default function Publish() {
         </div>
 
         <div className="right">
-          <button type="submit">Publish</button>
+          <button type="submit" onClick={handleClick}>
+            Publish
+          </button>
         </div>
       </div>
-    </form>
+    </div>
   );
 }
