@@ -7,22 +7,22 @@ export const getPosts = (req, res) => {
 
   // Get all user's posts plus those of users he follows
   const q =
-    // Determine SQL query based on presence of a specific userId
     userId !== "undefined"
       ? `SELECT p.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 
       FROM posts AS p 
       JOIN users AS u ON (u.id = p.userId) 
       WHERE p.userId = ? 
       ORDER BY p.createdAt DESC`
-      : // `p.userId IN (...)` : checks whether the user's ID who created the post (p.userId) is included in a set of specific users IDs, which is is obtained from the subquery
-        `
+      : `
       SELECT p.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 
       FROM posts AS p
       JOIN users AS u ON (u.id = p.userId)
-      WHERE p.userId = ? OR p.userId IN (SELECT followedId 
+      WHERE p.userId = ? 
+      OR p.userId IN (SELECT followedId 
       FROM relationships WHERE followerId = ?)
       ORDER BY p.createdAt DESC`;
   // DESC = most recent posts shown first
+  //! `p.userId IN (...)` checks whether the user's ID who created a post (p.userId) is in a list of specific IDs (result from subquery)
 
   // Define values for SQL parameters
   const values =
@@ -43,9 +43,9 @@ export const addPost = (req, res) => {
 
   const values = [req.body.desc, req.body.img, loggedInUserId, currentDateTime];
 
-  db.query(q, [values], (error, _data) => {
+  db.query(q, [values], (error, data) => {
     if (error) return res.status(500).json(error);
-    return res.status(200).json("New post created.");
+    return res.status(200).json(data);
   });
 };
 
@@ -85,9 +85,7 @@ export const updatePost = (req, res) => {
   db.query(q, values, (error, data) => {
     if (error) return res.status(500).json(error);
 
-    if (data.affectedRows > 0) {
-      return res.status(200).json("Post updated.");
-    }
+    if (data.affectedRows > 0) return res.status(200).json("Post updated.");
 
     return res.status(403).json("User can only update their post.");
   });
@@ -103,7 +101,7 @@ export const deletePost = (req, res) => {
     if (error) return res.status(500).json(error);
 
     if (data.affectedRows > 0) return res.status(200).json("Post deleted.");
-    
+
     return res.status(403).json("User can only delete their post.");
   });
 };

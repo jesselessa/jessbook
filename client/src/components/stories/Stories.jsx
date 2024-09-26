@@ -22,12 +22,13 @@ export default function Stories({ userId }) {
 
   // Get stories
   const fetchStories = async () => {
-    return await makeRequest
-      .get(`/stories?userId=${userId}`)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((error) => console.error(error));
+    try {
+      const res = await makeRequest.get(`/stories?userId=${userId}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching stories:", error);
+      throw new Error(error);
+    }
   };
 
   const {
@@ -38,7 +39,7 @@ export default function Stories({ userId }) {
 
   const handleClick = (story) => {
     setSelectedStory(story);
-    setOpenModal(true);
+    setOpenModal((prevState) => !prevState);
   };
 
   return (
@@ -57,9 +58,7 @@ export default function Stories({ userId }) {
             />
             <div className="add">Create a story</div>
             <button
-              onClick={() => {
-                setOpenCreateStory(true);
-              }}
+              onClick={() => setOpenCreateStory((prevState) => !prevState)}
             >
               +
             </button>
@@ -70,34 +69,30 @@ export default function Stories({ userId }) {
             <span className="msg">Something went wrong</span>
           ) : isLoading ? (
             <span className="msg">Loading...</span>
-          ) : stories.length === 0 ? (
+          ) : stories?.length === 0 ? (
             <span className="msg">No story to show yet.</span>
           ) : (
-            stories.map((story) => (
+            stories?.map((story) => (
               <div
                 className="story"
-                key={story.id}
+                key={story?.id}
                 onClick={() => handleClick(story)}
                 style={{ cursor: "pointer" }}
               >
-                {isVideo(story.img) ? (
+                {isVideo(story?.img) ? (
                   <video>
                     <source
-                      src={`/uploads/${story.img}`}
-                      type={
-                        isVideo(story.img)
-                          ? `video/${story.img.split(".").pop()}`
-                          : ""
-                      }
+                      src={`/uploads/${story?.img}`}
+                      type={`video/${story?.img.split(".").pop()}`}
                     />
                     Your browser doesn't support video.
                   </video>
                 ) : (
-                  <img src={`/uploads/${story.img}`} alt="story" />
+                  <img src={`/uploads/${story?.img}`} alt="story" />
                 )}
 
                 <span>
-                  {story.firstName} {story.lastName}
+                  {story?.firstName} {story?.lastName}
                 </span>
               </div>
             ))
@@ -110,11 +105,7 @@ export default function Stories({ userId }) {
       )}
 
       {openModal && (
-        <ModalStory
-          story={selectedStory}
-          setOpenModal={setOpenModal}
-          onClose={() => setOpenModal(false)}
-        />
+        <ModalStory story={selectedStory} setOpenModal={setOpenModal} />
       )}
     </>
   );

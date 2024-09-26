@@ -29,22 +29,20 @@ export default function Register() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
+
     return () => {
       window.removeEventListener("resize", changeWindowWidth);
     };
   }, [windowWidth]);
 
-  const changeWindowWidth = () => {
-    setWindowWidth(window.innerWidth);
-  };
+  const changeWindowWidth = () => setWindowWidth(window.innerWidth);
 
   // Handle inputs
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setInputsValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   // Clear form
-  const clearForm = () => {
+  const clearForm = () =>
     setInputsValues({
       firstName: "",
       lastName: "",
@@ -52,10 +50,9 @@ export default function Register() {
       password: "",
       pswdConfirm: "",
     });
-  };
 
   // Clear validation errors in form
-  const clearValidationErrors = () => {
+  const clearValidationErrors = () =>
     setValidationErrors({
       firstName: "",
       lastName: "",
@@ -63,7 +60,6 @@ export default function Register() {
       password: "",
       pswdConfirm: "",
     });
-  };
 
   // Registration feature
   const handleSubmit = async (e) => {
@@ -73,39 +69,32 @@ export default function Register() {
     const inputsErrors = {};
 
     // Name
-    if (
-      inputsValues.firstName.length < 2 ||
-      inputsValues.firstName.length > 35
-    ) {
+    if (inputsValues.firstName.length < 2 || inputsValues.firstName.length > 35)
       inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
-    }
-    if (inputsValues.lastName.length < 1 || inputsValues.lastName.length > 35) {
+
+    if (inputsValues.lastName.length < 1 || inputsValues.lastName.length > 35)
       inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
-    }
 
     // Email with regex
     if (
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputsValues.email) ||
       inputsValues.email.length > 64
-    ) {
+    )
       inputsErrors.email = "Enter a valid email.";
-    }
 
     // Password with regex
     if (
       !/(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}/.test(
         inputsValues.password
       )
-    ) {
+    )
       inputsErrors.password =
         "Password must contain at least 6 characters including at least 1 number and 1 symbol.";
-    }
 
     // Confirmation password
-    if (inputsValues.password.trim() !== inputsValues.pswdConfirm.trim()) {
+    if (inputsValues.password.trim() !== inputsValues.pswdConfirm.trim())
       // trim() removes whitespace from both sides of a string
       inputsErrors.pswdConfirm = "Password does not match.";
-    }
 
     // If errors during validation, update state and stop process
     if (Object.keys(inputsErrors).length > 0) {
@@ -131,7 +120,7 @@ export default function Register() {
       toast.success("Successful registration.");
       navigate("/login");
     } catch (error) {
-      setError(error.response.data); // from Axios
+      setError(error.response.data);
 
       // Clear API error message after 5 seconds
       setTimeout(() => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 // Component
 import Overlay from "../overlay/Overlay.jsx";
 
-// Function checking if file is a video based on its MIME type
+// Check if a file is a video based on its MIME type
 const isVideo = (fileType) => {
   return /^video\//i.test(fileType);
 };
@@ -19,22 +19,25 @@ export default function CreateStory({ setOpenCreateStory }) {
   const [fileURL, setFileURL] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
 
-  // Add a new story
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(
-    (newStory) => {
-      return makeRequest.post("/stories", newStory);
+  // Create a new story
+  const mutation = useMutation({
+    mutationFn: (newStory) => makeRequest.post("/stories", newStory),
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["stories"]);
+      toast.success("Story published.");
+
+      setOpenCreateStory(false); // Close form
     },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch & close form after submission
-        queryClient.invalidateQueries(["stories"]);
-        setOpenCreateStory(false);
-        toast.success("Story published.");
-      },
-    }
-  );
+
+    onError: (error) => {
+      toast.error("Error creating story.");
+      throw new Error(error);
+    },
+  });
 
   const handleClick = async (e) => {
     e.preventDefault();
@@ -49,11 +52,14 @@ export default function CreateStory({ setOpenCreateStory }) {
       return;
     }
 
-    // Initialize variable, then, upload file and download URL
+    // Upload new file if present
     const newFile = file ? await uploadFile(file) : null;
 
-    // Send mutation to database
+    // Trigger mutation to update database
     mutation.mutate({ img: newFile, desc: desc });
+
+    // Reset file state to release URL resources
+    setFile(null);
   };
 
   const handleFileChange = (e) => {
@@ -97,13 +103,6 @@ export default function CreateStory({ setOpenCreateStory }) {
     }
   };
 
-  // Release URL resources on unmounting or when file URL changes
-  useEffect(() => {
-    return () => {
-      if (fileURL) URL.revokeObjectURL(fileURL);
-    };
-  }, [fileURL]);
-
   return (
     <div className="createStory">
       <div className="wrapper">
@@ -112,13 +111,14 @@ export default function CreateStory({ setOpenCreateStory }) {
         <form name="story-form">
           {/* Add an image or a video */}
           <div className="input-group">
-            <label htmlFor="file">
-              <input
-                type="file"
-                id="file"
-                accept="image/*, video/*"
-                onChange={handleFileChange}
-              />
+            <input
+              type="file"
+              id="file"
+              name="file"
+              accept="image/*, video/*"
+              onChange={handleFileChange}
+            />
+            <label className="file-label" htmlFor="file">
               Add an image or a video
             </label>
 
@@ -131,12 +131,15 @@ export default function CreateStory({ setOpenCreateStory }) {
                     Your browser doesn't support video.
                   </video>
                 ) : (
-                  <img src={fileURL} alt="preview" />
+                  <img src={fileURL} alt="story preview" />
                 )}
               </div>
             )}
           </div>
 
+          <label className="desc-label" htmlFor="desc">
+            Add a text
+          </label>
           <textarea
             id="desc"
             name="desc"

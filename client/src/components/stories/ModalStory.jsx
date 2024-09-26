@@ -13,22 +13,26 @@ import Overlay from "../overlay/Overlay.jsx";
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-export default function ModalStory({ story, setOpenModal, onClose }) {
+export default function ModalStory({ story, setOpenModal }) {
   const { currentUser } = useContext(AuthContext);
 
-  // Delete a story
   const queryClient = useQueryClient();
 
-  const deleteMutation = useMutation(
-    () => makeRequest.delete(`/stories/${story.id}`),
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["stories"]);
-        toast.success("Story deleted.");
-      },
-    }
-  );
+  // Delete a story
+  const deleteMutation = useMutation({
+    mutationFn: () => makeRequest.delete(`/stories/${story.id}`),
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["stories"]);
+      toast.success("Story deleted.");
+    },
+
+    onError: (error) => {
+      toast.error("Error deleting story.");
+      throw new Error(error);
+    },
+  });
 
   const handleDelete = () => {
     try {
@@ -36,13 +40,14 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
       setOpenModal(false); // Close modal after submission
     } catch (error) {
       console.error("Error deleting story:", error);
+      throw new Error(error);
     }
   };
 
   return (
     <div className="modalStory">
       <div className="modal-content">
-        <button className="close" onClick={onClose}>
+        <button className="close" onClick={() => setOpenModal(false)}>
           X
         </button>
 
@@ -51,11 +56,7 @@ export default function ModalStory({ story, setOpenModal, onClose }) {
             <video controls autoPlay>
               <source
                 src={`/uploads/${story.img}`}
-                type={
-                  isVideo(story.img)
-                    ? `video/${story.img.split(".").pop()}`
-                    : ""
-                }
+                type={`video/${story.img.split(".").pop()}`}
               />
               Your browser doesn't support video.
             </video>

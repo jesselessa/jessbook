@@ -18,7 +18,7 @@ import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 
-// Images
+// Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Contexts
@@ -28,7 +28,6 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 export default function Navbar() {
   const { darkMode, toggleTheme } = useContext(DarkModeContext);
   const { currentUser } = useContext(AuthContext);
-
   const [burgerClicked, setBurgerClicked] = useState(false);
 
   const navigate = useNavigate();
@@ -44,7 +43,7 @@ export default function Navbar() {
   };
 
   const toggleMenu = () => {
-    setBurgerClicked(!burgerClicked);
+    setBurgerClicked((prevState) => !prevState);
   };
 
   return (

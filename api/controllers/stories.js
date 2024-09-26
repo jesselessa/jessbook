@@ -6,30 +6,30 @@ export const getStories = (req, res) => {
   const loggedInUserId = req.userInfo.id;
 
   // Delete expired stories before getting new ones (in large-scale projects, better use a cron job to reduce loading time of SQL query)
-  const deleteExpiredStoriesQuery =
-    "DELETE FROM stories WHERE expiresAt <= NOW()";
-  db.query(deleteExpiredStoriesQuery, (error, _data) => {
+  const deleteQuery = "DELETE FROM stories WHERE expiresAt <= NOW()";
+  db.query(deleteQuery, (error, _data) => {
     if (error) console.log("Error deleting expired stories:", error);
   });
 
   const selectQuery =
     userId !== "undefined"
       ? `SELECT s.*, u.id AS userId, u.firstName, u.lastName
-      FROM stories AS s 
-      JOIN users AS u ON (u.id = s.userId) 
-      WHERE s.userId = ? 
-      ORDER BY s.createdAt DESC`
+    FROM stories AS s 
+    JOIN users AS u ON (u.id = s.userId) 
+    WHERE s.userId = ? 
+    ORDER BY s.createdAt DESC`
       : `
-
-      SELECT s.*, u.id as userId, u.firstName, u.lastName
-      FROM stories AS s
-      JOIN users AS u ON (u.id = s.userId)
-      WHERE s.userId = ? OR s.userId IN (SELECT followedId 
-      FROM relationships WHERE followerId = ?)
-      AND s.expiresAt > NOW()
-      ORDER BY
-            CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
-            s.createdAt DESC;`;
+    SELECT s.*, u.id as userId, u.firstName, u.lastName
+    FROM stories AS s
+    JOIN users AS u ON (u.id = s.userId)
+    WHERE s.userId = ? 
+    OR s.userId IN (SELECT followedId 
+    FROM relationships WHERE followerId = ?)
+    AND s.expiresAt > NOW()
+    ORDER BY
+          CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
+          s.createdAt DESC`;
+  // Logged-in user's story displayed first
 
   const values =
     userId !== "undefined"

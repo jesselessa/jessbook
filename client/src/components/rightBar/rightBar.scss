@@ -9,9 +9,9 @@
     display: flex;
     flex-direction: column;
     background-color: themed(bgSoft);
-    padding: 1rem 1rem 2rem 1rem;
     gap: 1.5rem;
-    z-index: -1; // Modal over right bar
+    padding: 1rem 1rem 2rem 1rem;
+    z-index: -1; // RightBar below update forms
 
     @include medium {
       display: none;
@@ -19,8 +19,8 @@
 
     .birthdays {
       background-color: themed(bg);
-      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
       border-radius: 0.5rem;
+      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
       padding: 1rem;
 
       h3 {
@@ -55,9 +55,9 @@
       display: flex;
       flex-direction: column;
       background-color: themed(bg);
+      border-radius: 0.5rem;
       box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
       gap: 1rem;
-      border-radius: 0.5rem;
       padding: 1rem;
 
       h3 {
@@ -76,7 +76,7 @@
           display: flex;
           align-items: center;
           gap: 1rem;
-          word-break: break-word; // To prevent name text from overflowing div
+          word-break: break-word; // Prevent name from overflowing div
 
           .img-container {
             width: 32px;
@@ -116,8 +116,8 @@
 
     .online {
       background-color: themed(bg);
-      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
       border-radius: 0.5rem;
+      box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
       padding: 1rem;
 
       h3 {

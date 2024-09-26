@@ -18,10 +18,7 @@ function App() {
 
   // Handle navigation
   const ProtectedRoute = ({ children }) => {
-    if (!currentUser) {
-      return <Login />;
-    }
-
+    if (!currentUser) return <Login />;
     return children;
   };
 

@@ -19,7 +19,7 @@ import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
-// Images
+// Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Context
@@ -27,11 +27,12 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
-
   const [openUpdate, setOpenUpdate] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   const navigateAndScrollTop = () => {
     navigate(`/profile/${post.userId}`);
@@ -48,8 +49,6 @@ export default function Post({ post }) {
       throw new Error(error);
     }
   };
-
-  const queryClient = useQueryClient();
 
   const { data: comments } = useQuery({
     queryKey: ["comments", post.id],
@@ -73,45 +72,49 @@ export default function Post({ post }) {
     data: likes,
   } = useQuery({ queryKey: ["likes", post.id], queryFn: fetchPostLikes });
 
-  const handleLikesMutation = useMutation(
-    (liked) => {
+  const handleLikesMutation = useMutation({
+    mutationFn: (liked) => {
       if (liked) return makeRequest.delete(`/likes?postId=${post.id}`);
       return makeRequest.post("/likes", { postId: post.id });
     },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["likes", post.id]);
-      },
-    }
-  );
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["likes", post.id]);
+    },
+
+    onError: (error) => {
+      console.error(error);
+      toast.error("Error handling likes data.");
+    },
+  });
 
   const handleLikes = () => {
     handleLikesMutation.mutate(likes.includes(currentUser.id));
   };
 
-  // Open update form
-  const openUpdateForm = () => {
-    setOpenUpdate(true);
-  };
-
   // Delete post
-  const deleteMutation = useMutation(
-    (postId) => makeRequest.delete(`/posts/${postId}`),
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["posts"]);
-        toast.success("Post deleted.");
-      },
-    }
-  );
+  const deleteMutation = useMutation({
+    mutationFn: (postId) => makeRequest.delete(`/posts/${postId}`),
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["posts"]);
+      toast.success("Post deleted.");
+    },
+
+    onError: (error) => {
+      console.error(error);
+      toast.error("Error deleting post.");
+    },
+  });
 
   const handleDelete = (post) => {
     try {
       deleteMutation.mutate(post.id);
     } catch (error) {
       console.error("Error deleting post:", error);
+      throw new Error(error);
     }
   };
 
@@ -141,7 +144,7 @@ export default function Post({ post }) {
             <EditOutlinedIcon
               className="edit-btn"
               fontSize="large"
-              onClick={openUpdateForm}
+              onClick={() => setOpenUpdate((prevState) => !prevState)}
             />
             <DeleteOutlineOutlinedIcon
               className="edit-btn"
@@ -172,9 +175,12 @@ export default function Post({ post }) {
           <span>{likes?.length > 1 ? "Likes" : "Like"}</span>
         </div>
 
-        <div className="item" onClick={() => setCommentsOpen(!commentsOpen)}>
+        <div
+          className="item"
+          onClick={() => setCommentsOpen((prevState) => !prevState)}
+        >
           <TextsmsOutlinedIcon />
-          {comments?.length > 0 && comments.length} {""}
+          {comments?.length > 0 && comments?.length} {""}
           <span>{comments?.length > 1 ? "Comments" : "Comment"}</span>
         </div>
 

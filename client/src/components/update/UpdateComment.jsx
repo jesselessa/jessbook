@@ -12,19 +12,22 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
 
   const queryClient = useQueryClient();
 
-  const updateMutation = useMutation(
-    (updatedComment) => {
-      return makeRequest.put(`/comments/${comment.id}`, updatedComment);
+  const updateMutation = useMutation({
+    mutationFn: (updatedComment) =>
+      makeRequest.put(`/comments/${comment.id}`, updatedComment),
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["comments", comment.postId]);
+      toast.success("Comment updated.");
+      setOpenUpdate(false); // Close form
     },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch and close form after submission
-        queryClient.invalidateQueries(["comments", comment.postId]);
-        toast.success("Comment updated.");
-        setOpenUpdate(false);
-      },
-    }
-  );
+
+    onError: (error) => {
+      toast.error("Error updating comment.");
+      throw new Error(error);
+    },
+  });
 
   const handleClick = async (e) => {
     e.preventDefault();

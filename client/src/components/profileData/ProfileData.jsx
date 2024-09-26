@@ -25,7 +25,10 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 export default function ProfileData() {
   const [openUpdate, setOpenUpdate] = useState(false);
   const { currentUser } = useContext(AuthContext);
+
   const { userId } = useParams();
+
+  const queryClient = useQueryClient();
 
   // Get user's info
   const fetchUserData = async () => {
@@ -62,22 +65,24 @@ export default function ProfileData() {
     data: relationshipsData,
   } = useQuery({ queryKey: ["relationships"], queryFn: fetchRelationships });
 
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation(
-    (following) => {
+  const mutation = useMutation({
+    mutationFn: (following) => {
       if (following)
         return makeRequest.delete(`/relationships?userId=${userId}`);
 
       return makeRequest.post("/relationships", { userId });
     },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["relationships"]);
-      },
-    }
-  );
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["relationships"]);
+    },
+
+    onError: (error) => {
+      console.error(error);
+      toast.error("Error handling relationships data.");
+    },
+  });
 
   const handleFollow = () => {
     mutation.mutate(relationshipsData?.includes(currentUser.id));
@@ -104,7 +109,7 @@ export default function ProfileData() {
               <div className="img-container">
                 <img
                   src={
-                    user.profilePic
+                    user?.profilePic
                       ? `/uploads/${user?.profilePic}`
                       : defaultProfile
                   }
@@ -144,7 +149,11 @@ export default function ProfileData() {
                 ) : rIsLoading ? (
                   "Loading..."
                 ) : userId === String(currentUser.id) ? (
-                  <button onClick={() => setOpenUpdate(true)}>Update</button>
+                  <button
+                    onClick={() => setOpenUpdate((prevState) => !prevState)}
+                  >
+                    Update
+                  </button>
                 ) : (
                   <button onClick={handleFollow}>
                     {relationshipsData?.includes(currentUser.id)

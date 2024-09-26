@@ -4,9 +4,9 @@
   @include themify($themes) {
     background-color: themed("bg");
     color: themed("textColor");
+    border-radius: 1rem;
     box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
     padding: 1rem;
-    border-radius: 1rem;
     margin-bottom: 1.5rem;
 
     .top {
@@ -17,7 +17,7 @@
       margin-bottom: 1rem;
 
       @include small {
-        gap: 0;
+        gap: 0.5rem;
       }
 
       .left {
@@ -56,7 +56,7 @@
             background-color: themed("bgSoft");
             font-size: 1.6rem;
             border: none;
-            border-radius: 0.8rem;
+            border-radius: 0.5rem;
             padding: 1rem;
             outline: none;
 
@@ -94,13 +94,8 @@
       .right {
         .img-container {
           position: relative;
-          width: 70px;
-          height: 70px;
-
-          @include small {
-            width: 50px;
-            height: 50px;
-          }
+          width: 50px;
+          height: 50px;
 
           img {
             width: 100%;
@@ -154,13 +149,11 @@
 
           @include small {
             display: block;
-            width: 24px;
-            height: 24px;
           }
 
           img {
-            height: 24px;
             width: 24px;
+            height: 24px;
           }
         }
 

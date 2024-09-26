@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 export const register = (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
-  //* First, check if user is in database
+  // 1 - Check if user is in database
   const q = "SELECT * FROM users WHERE email = ?";
 
   db.query(q, [email], (error, data) => {
@@ -16,7 +16,7 @@ export const register = (req, res) => {
 
     if (data.length > 0) return res.status(409).json("User already exists.");
 
-    //* If no data, create new user
+    // 2 - If no user, create a new one
     // Hash password
     const salt = bcrypt.genSaltSync(10);
     const hashedPswd = bcrypt.hashSync(password, salt);
@@ -32,14 +32,14 @@ export const register = (req, res) => {
         return res
           .status(500)
           .json("An unknown error has occured. Please, try again later.");
-          
+
       return res.status(200).json("New user created.");
     });
   });
 };
 
 export const login = (req, res) => {
-  //* First, check user's mail
+  // 1 - Check user's mail
   const q = "SELECT * FROM users WHERE email = ?";
 
   db.query(q, [req.body.email], (error, data) => {
@@ -51,12 +51,12 @@ export const login = (req, res) => {
     if (data.length === 0)
       return res.status(404).json("Invalid email or password.");
 
-    //* If mail OK, check password
-    const checkPswd = bcrypt.compareSync(req.body.password, data[0].password); // data[0] because SELECT * query returns an array => if user found by email, will return an array with one entry
+    // 2 - Check password
+    const checkPswd = bcrypt.compareSync(req.body.password, data[0].password); 
 
     if (!checkPswd) return res.status(400).json("Invalid email or password.");
 
-    //* Generate token with jsonwebtoken
+    // 3 - Generate token with jsonwebtoken
     const secretKey = process.env.SECRET;
     let token;
 
@@ -74,7 +74,7 @@ export const login = (req, res) => {
       );
     }
 
-    //* Store token in cookie and send it in response if login is successful
+    // 4 - Store token in cookie and send it in response if login is successful
     const { password, ...others } = data[0];
 
     return res

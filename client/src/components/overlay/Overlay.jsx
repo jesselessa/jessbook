@@ -10,18 +10,15 @@ export default function Overlay() {
       const isLandscape = window.matchMedia("(orientation: landscape)").matches;
       const isSmallScreen = window.innerWidth <= 992;
 
-      if (isLandscape && isSmallScreen) {
-        setShowOverlay(true);
-      } else {
-        setShowOverlay(false);
-      }
+      if (isLandscape && isSmallScreen)
+        setShowOverlay((prevState) => !prevState);
     };
 
     handleOrientationChange(); // Initial check
 
     window.addEventListener("orientationchange", handleOrientationChange);
 
-    window.addEventListener("resize", handleOrientationChange); // Handle size changes
+    window.addEventListener("resize", handleOrientationChange); 
 
     // Cleanup on unmounting
     return () => {

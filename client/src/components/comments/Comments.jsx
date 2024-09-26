@@ -6,7 +6,7 @@ import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import { toast } from "react-toastify";
 import moment from "moment";
 
-// Images
+// Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Context
@@ -26,6 +26,8 @@ export default function Comments({ postId }) {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
 
+  const queryClient = useQueryClient();
+
   // Get post comments
   const fetchPostComments = async () => {
     try {
@@ -43,15 +45,22 @@ export default function Comments({ postId }) {
     data: comments,
   } = useQuery({ queryKey: ["comments", postId], queryFn: fetchPostComments });
 
-  const queryClient = useQueryClient();
-
+  // Create a new comment
   const mutation = useMutation({
-    mutationFn: (newComment) => makeRequest.post("/comments", newComment),
+    mutationFn: async (newComment) => {
+      const res = await makeRequest.post("/comments", newComment);
+      return res.data;
+    },
 
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries(["comments", postId]);
       toast.success("Comment published.");
+    },
+
+    onError: (error) => {
+      toast.error("Error creating comment.");
+      throw new Error(error);
     },
   });
 
@@ -59,12 +68,12 @@ export default function Comments({ postId }) {
     e.preventDefault();
 
     mutation.mutate({ desc: desc.trim(), postId });
-    setDesc(""); // Reset field
+    setDesc(""); // Reset form field
   };
 
   // Open update form and store selected comment
   const handleUpdate = (comment) => {
-    setOpenUpdate(true);
+    setOpenUpdate((prevState) => !prevState);
     setSelectedComment(comment);
   };
 
@@ -77,6 +86,11 @@ export default function Comments({ postId }) {
       queryClient.invalidateQueries(["comments", postId]);
       toast.success("Comment deleted.");
     },
+
+    onError: (error) => {
+      toast.error("Error deleting comment.");
+      throw new Error(error);
+    },
   });
 
   const handleDelete = (comment) => {
@@ -84,6 +98,7 @@ export default function Comments({ postId }) {
       deleteMutation.mutate(comment.id);
     } catch (error) {
       console.error("Error deleting comment:", error);
+      throw new Error(error);
     }
   };
 
@@ -123,13 +138,13 @@ export default function Comments({ postId }) {
         ? "Something went wrong"
         : isLoading
         ? "Loading..."
-        : comments.map((comment) => (
-            <div className="comment" key={comment.id}>
+        : comments?.map((comment) => (
+            <div className="comment" key={comment?.id}>
               <div className="img-container">
                 <img
                   src={
-                    comment.profilePic
-                      ? `/uploads/${comment.profilePic}`
+                    comment?.profilePic
+                      ? `/uploads/${comment?.profilePic}`
                       : defaultProfile
                   }
                   alt="user"
@@ -137,12 +152,12 @@ export default function Comments({ postId }) {
               </div>
               <div className="info">
                 <h3>
-                  {comment.firstName} {comment.lastName}
+                  {comment?.firstName} {comment?.lastName}
                 </h3>
-                <p>{addNonBreakingSpace(comment.desc)}</p>
+                <p>{addNonBreakingSpace(comment?.desc)}</p>
               </div>
               <div className="buttons-time">
-                {currentUser.id === comment.userId && (
+                {currentUser.id === comment?.userId && (
                   <div className="edit-buttons">
                     <EditOutlinedIcon
                       className="edit-btn"
@@ -158,7 +173,7 @@ export default function Comments({ postId }) {
                 )}
 
                 <span className="time">
-                  {moment(comment.createdAt).fromNow()}
+                  {moment(comment?.createdAt).fromNow()}
                 </span>
               </div>
             </div>

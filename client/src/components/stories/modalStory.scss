@@ -19,12 +19,11 @@
     max-width: 300px;
     min-height: 300px;
     max-height: 100%;
-    overflow-y: auto;
     background-color: white;
-    padding: 1rem;
     border-radius: 1rem;
     box-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.3);
     overflow: hidden;
+    padding: 1rem;
 
     @include small {
       top: 2rem;
@@ -42,7 +41,6 @@
       border-radius: 0.2rem;
       padding: 0.5rem;
       cursor: pointer;
-      z-index: 10; // Otherwise, can't click on button to close modal
     }
 
     .img-container {

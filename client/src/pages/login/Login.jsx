@@ -7,14 +7,13 @@ import { AuthContext } from "../../contexts/authContext";
 
 export default function Login() {
   const { login } = useContext(AuthContext);
-
-  const navigate = useNavigate();
-
   const [inputsValues, setInputsValues] = useState({
     email: "",
     password: "",
   });
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   // Check window object width when loading page (for responsive)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -22,15 +21,13 @@ export default function Login() {
     window.addEventListener("resize", changeWindowWidth);
   }, [windowWidth]);
 
-  const changeWindowWidth = () => {
-    setWindowWidth(window.innerWidth);
-  };
+  const changeWindowWidth = () => setWindowWidth(window.innerWidth);
 
   // Handle inputs
   const handleChange = (e) => {
-    setInputsValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setInputsValues((prevFields) => ({ ...prevFields, [name]: value }));
   };
-
   // Login feature
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,6 +35,7 @@ export default function Login() {
     try {
       await login(inputsValues);
 
+      // Reset API error message
       setError("");
 
       // Clear form
@@ -51,6 +49,7 @@ export default function Login() {
     } catch (error) {
       // Handle errors from API
       setError(error.response.data);
+      throw new Error(error);
     }
   };
 

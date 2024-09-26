@@ -17,7 +17,8 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(currentUser)); // Cannot store objects in localStorage, it has to be a string
+    localStorage.setItem("user", JSON.stringify(currentUser)); 
+    // Cannot store objects in localStorage, it has to be a string
   }, [currentUser]);
 
   const value = { currentUser, setCurrentUser, login };

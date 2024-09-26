@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import "./updateProfile.scss";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -20,8 +20,7 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdateProfile({ user, setOpenUpdate }) {
-  const { currentUser, setCurrentUser } = useContext(AuthContext);
-
+  const { setCurrentUser } = useContext(AuthContext);
   const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
   const [fields, setFields] = useState({
@@ -43,25 +42,39 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
 
   // Handle image change
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const selectedFile = e.target.files[0];
 
-    if (e.target.id === "selected-cover") setCover(file);
-    if (e.target.id === "selected-profile") setProfile(file);
+    if (e.target.id === "selected-cover") setCover(selectedFile);
+    if (e.target.id === "selected-profile") setProfile(selectedFile);
   };
 
-  // Mutation to update user's profile data
-  const updateMutation = useMutation(
-    (updatedUser) => {
-      return makeRequest.put("/users", updatedUser);
+  // Mutation to update user's data
+  const updateMutation = useMutation({
+    mutationFn: (updatedUser) => makeRequest.put("/users", updatedUser),
+
+    onSuccess: (_data, variables) => {
+      // 1. Update cache immediately with updated user's data
+      //! 'setQueryData' is usually used to update data locally before receiving confirmation from server
+      queryClient.setQueryData(["user", userId], (oldData) => ({
+        ...oldData,
+        ...variables, // new user's data passed to mutate
+      }));
+
+      // 2. Update AuthContext with new data
+      setCurrentUser((prevUser) => ({
+        ...prevUser,
+        ...variables,
+      }));
+
+      toast.success("Profile updated.");
+      setOpenUpdate(false); // Close form
     },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["user", userId]);
-        toast.success("Profile updated.");
-      },
-    }
-  );
+
+    onError: (error) => {
+      toast.error("Error updating profile.");
+      throw new Error(error);
+    },
+  });
 
   // Handle form submission
   const handleClick = async (e) => {
@@ -71,47 +84,46 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     const newCover = cover ? await uploadFile(cover) : user.coverPic;
     const newProfile = profile ? await uploadFile(profile) : user.profilePic;
 
-    // Check if form fields have been modified
+    // Check if form fields or images have been modified
     const isAnyFieldModified = Object.keys(fields).some(
       (field) => fields[field] !== user[field]
-    );
+    ); //! Object.keys(object) returns an array with the object string-keyed property names
 
-    if (!isAnyFieldModified && !cover && !profile) {
+    const isCoverModified =
+      cover && cover !== user.coverPic && user.coverPic !== defaultCover;
+
+    const isProfileModified =
+      profile &&
+      profile !== user.profilePic &&
+      user.profilePic !== defaultProfile;
+
+    if (!isAnyFieldModified && !isCoverModified && !isProfileModified) {
       toast.info("No changes detected.");
       return;
     }
 
     // Prepare updated user data
     const updatedUser = {
-      ...currentUser,
+      ...user,
       ...fields,
       coverPic: newCover,
       profilePic: newProfile,
     };
 
-    // Update user's data in global context
-    setCurrentUser(updatedUser);
+    // Update images
     setCover(newCover);
     setProfile(newProfile);
 
-    // Trigger mutation to update user's data in database
+    // Trigger mutation to update database
     updateMutation.mutate(updatedUser);
+
+    // Reset images state to release URL resources
+    setCover(null);
+    setProfile(null);
 
     // Go to user's updated profile page
     navigate(`/profile/${updatedUser.id}`);
   };
-
-  // Clean up object URL to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (cover) {
-        URL.revokeObjectURL(cover);
-      }
-      if (profile) {
-        URL.revokeObjectURL(profile);
-      }
-    };
-  }, [cover, profile]);
 
   return (
     <>
@@ -129,8 +141,8 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                     src={
                       cover
                         ? URL.createObjectURL(cover)
-                        : currentUser.coverPic
-                        ? `/uploads/${currentUser.coverPic}`
+                        : user.coverPic
+                        ? `/uploads/${user.coverPic}`
                         : defaultCover
                     }
                     alt="cover"
@@ -157,8 +169,8 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                     src={
                       profile
                         ? URL.createObjectURL(profile)
-                        : currentUser.profilePic
-                        ? `/uploads/${currentUser.profilePic}`
+                        : user.profilePic
+                        ? `/uploads/${user.profilePic}`
                         : defaultProfile
                     }
                     alt="profile"
@@ -183,6 +195,8 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               type="text"
               id="firstName"
               name="firstName"
+              minLength={2}
+              maxLength={35}
               value={fields.firstName}
               onChange={handleFieldChange}
               autoComplete="off"
@@ -193,6 +207,8 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               type="text"
               id="lastName"
               name="lastName"
+              minLength={1}
+              maxLength={35}
               value={fields.lastName}
               onChange={handleFieldChange}
               autoComplete="off"
@@ -203,6 +219,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               type="text"
               id="city"
               name="city"
+              maxLength={85}
               value={fields.city}
               onChange={handleFieldChange}
               autoComplete="off"

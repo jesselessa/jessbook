@@ -21,7 +21,7 @@ export default function Posts({ userId }) {
     error,
     data: posts,
   } = useQuery({
-    queryKey: ["posts"],
+    queryKey: ["posts", userId],
     queryFn: getPosts,
   });
 
@@ -31,9 +31,9 @@ export default function Posts({ userId }) {
         ? "Something went wrong."
         : isLoading
         ? "Loading..."
-        : posts.length === 0
+        : posts?.length === 0
         ? "No post to show yet."
-        : posts.map((post) => <Post key={post.id} post={post} />)}
+        : posts?.map((post) => <Post key={post?.id} post={post} />)}
     </div>
   );
 }

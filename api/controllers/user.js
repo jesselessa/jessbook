@@ -1,6 +1,6 @@
 import { db } from "../utils/connect.js";
 
-//! Note : In MySQL, when no results are found with a SELECT query, the 'data' variable will contain an empty array ([]), which is always considered a truthy value. Therefore, to check if data really exists, we use 'if(data.length)' and not 'if(data)', the latter always returning 'true'.
+//! In MySQL, when no results are found with a SELECT query, the 'data' variable will contain an empty array ([]), which is always considered a truthy value. Therefore, to check if data really exists, we use 'if(data.length > 0)' and not 'if(data)', the latter returning 'true'
 
 export const getUser = (req, res) => {
   const userId = req.params.userId;
@@ -11,18 +11,15 @@ export const getUser = (req, res) => {
     if (error) return res.status(500).json("An unknown error has occured.");
 
     // All user info except password
-    const { password, ...others } = data[0]; // Result = 1st line of array
+    const { password, ...others } = data[0]; // data[0] represents the query result = an array with one entry
     if (data.length > 0) return res.status(200).json(others);
   });
 };
 
 export const updateUser = (req, res) => {
-  const loggedInUserId = req.userInfo.id; // User ID from token
-
+  const loggedInUserId = req.userInfo.id; // User's ID from token
   const updatedFields = [];
-
-  // Define values for SQL parameters
-  const values = [];
+  const values = []; // Values for SQL parameters
 
   if (req.body.firstName !== undefined) {
     updatedFields.push("`firstName` = ?");
@@ -92,7 +89,7 @@ export const deleteUser = (req, res) => {
 
   db.query(q, [loggedInUserId], (error, data) => {
     if (error) return res.status(500).json(error);
-    
+
     if (data.affectedRows > 0) return res.status(200).json("User deleted.");
 
     return res.status(403).json("User can only delete their own data.");

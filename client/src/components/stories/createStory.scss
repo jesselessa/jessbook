@@ -20,11 +20,11 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow-y: auto;
     background: white;
-    padding: 2rem 1rem;
+    overflow-y: auto;
     border-radius: 0.5rem;
-    box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.09);
+    box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
+    padding: 1rem;
 
     @include small {
       width: 95%;
@@ -39,14 +39,18 @@
     form {
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1rem;
 
       .input-group {
         display: flex;
         justify-content: center;
         gap: 1rem;
 
-        label {
+        #file {
+          display: none;
+        }
+
+        .file-label {
           display: inline-flex;
           justify-content: center;
           align-items: center;
@@ -55,13 +59,10 @@
           font-size: 1.6rem;
           color: teal;
           background-color: #ffd670;
-          padding: 0.5rem 0.8rem;
           border-radius: 0.3rem;
+          padding: 0.5rem 0.8rem;
+          margin-bottom: 1rem;
           cursor: pointer;
-
-          input[type="file"] {
-            display: none;
-          }
         }
 
         .img-container {
@@ -76,6 +77,12 @@
             object-position: center;
           }
         }
+      }
+
+      .desc-label {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #444;
       }
 
       textarea {

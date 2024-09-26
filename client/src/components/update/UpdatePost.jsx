@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./updatePost.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -17,19 +17,22 @@ export default function UpdatePost({ post, setOpenUpdate }) {
 
   const queryClient = useQueryClient();
 
-  const updateMutation = useMutation(
-    (updatedPost) => {
-      return makeRequest.put(`/posts/${post.id}`, updatedPost);
+  const updateMutation = useMutation({
+    mutationFn: (updatedPost) =>
+      makeRequest.put(`/posts/${post.id}`, updatedPost),
+
+    onSuccess: () => {
+      // Invalidate and refetch & close form after submission
+      queryClient.invalidateQueries(["posts"]);
+      toast.success("Post updated.");
+      setOpenUpdate(false);
     },
-    {
-      onSuccess: () => {
-        // Invalidate and refetch and close form after submission
-        queryClient.invalidateQueries(["posts"]);
-        toast.success("Post updated.");
-        setOpenUpdate(false);
-      },
-    }
-  );
+
+    onError: (error) => {
+      toast.error("Error updating post.");
+      throw new Error(error);
+    },
+  });
 
   const handleClick = async (e) => {
     e.preventDefault();
@@ -57,16 +60,10 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     }
 
     updateMutation.mutate(updatedPost);
-  };
 
-  // Clean up object URL to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (image) {
-        URL.revokeObjectURL(image);
-      }
-    };
-  }, [image]);
+    // Reset image state to release URL resources
+    setImage(null);
+  };
 
   return (
     <>
@@ -77,7 +74,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
           <form name="update-post-form">
             <div className="files">
               <div className="image">
-                <label htmlFor="file">Choose an image</label>
+                <span>Choose an image</span>
                 <div className="img-container">
                   {(image || post.img) && (
                     <img
@@ -89,9 +86,9 @@ export default function UpdatePost({ post, setOpenUpdate }) {
                       alt="post preview"
                     />
                   )}
-
-                  <CloudUploadIcon className="icon" />
-
+                  <label className="file-label" htmlFor="file">
+                    <CloudUploadIcon className="icon" />
+                  </label>
                   <input
                     type="file"
                     id="file"
