@@ -44,12 +44,12 @@ You can see a live demo of the project [here](https://).
 
 ## Main features
 
-- Set up users authentication and registration.
+- Users authentication and registration.
 - Allow users to reset their password.
-- Enable user to create, update or delete posts.
-- Fetch users posts from the backend API and display them on their profile page.
+- Enable user to create, update or delete posts/comments.
+- Enable user to create and delete stories.
 - Facilitate interactions between users with features such as "like" and "follow"/"unfollow".
-- Support both dark and light themes for the user interface.
+- User interface supporting both dark and light themes.
 
 ## Setting up the database
 
