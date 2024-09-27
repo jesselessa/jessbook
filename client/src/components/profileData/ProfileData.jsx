@@ -8,7 +8,7 @@ import { makeRequest } from "../../utils/axios.js";
 import Publish from "../../components/publish/Publish.jsx";
 import Posts from "../../components/posts/Posts.jsx";
 import UpdateProfile from "../../components/update/UpdateProfile.jsx";
-import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
+import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 
 // Icons
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";

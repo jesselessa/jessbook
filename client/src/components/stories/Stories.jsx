@@ -5,13 +5,13 @@ import { makeRequest } from "../../utils/axios.js";
 import { isVideo } from "../../utils/isVideo.js";
 import { toast } from "react-toastify";
 
-// Image
-import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
-
 // Components
 import CreateStory from "./CreateStory.jsx";
 import ModalStory from "./ModalStory.jsx";
-import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
+import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
+
+// Image
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";

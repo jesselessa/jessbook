@@ -2,6 +2,9 @@ import { useContext } from "react";
 import "./leftBar.scss";
 import { useNavigate } from "react-router-dom";
 
+// Component
+import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
+
 // Images
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 import friends from "../../assets/images/leftBar/friends.png";
@@ -18,7 +21,6 @@ import tutorials from "../../assets/images/leftBar/tutorials.png";
 
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
-import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 
 export default function LeftBar() {
   const { currentUser } = useContext(AuthContext);

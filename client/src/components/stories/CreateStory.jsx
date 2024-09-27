@@ -6,7 +6,7 @@ import { uploadFile } from "../../utils/uploadFile.js";
 import { toast } from "react-toastify";
 
 // Components
-import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
+import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 import Overlay from "../overlay/Overlay.jsx";
 
 // Check if a file is a video based on its MIME type

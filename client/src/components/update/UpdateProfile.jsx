@@ -6,6 +6,10 @@ import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
 import { toast } from "react-toastify";
 
+// Components
+import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
+import Overlay from "../overlay/Overlay.jsx";
+
 // Icon
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
@@ -15,10 +19,6 @@ import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
-
-// Component
-import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
-import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdateProfile({ user, setOpenUpdate }) {
   const { setCurrentUser } = useContext(AuthContext);
@@ -116,10 +116,10 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
 
     // Trigger mutation to update database
     updateMutation.mutate(updatedUser);
-    
+
     // Close form after submission
-    setOpenUpdate(false); 
-    
+    setOpenUpdate(false);
+
     // Reset images state to release URL resources
     setCover(null);
     setProfile(null);

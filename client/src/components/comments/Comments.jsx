@@ -6,20 +6,20 @@ import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import { toast } from "react-toastify";
 import moment from "moment";
 
-// Image
-import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
-
-// Context
-import { AuthContext } from "../../contexts/authContext.jsx";
-
 // Components
 import UpdateComment from "../update/UpdateComment.jsx";
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
+
+// Image
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Icons
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+
+// Context
+import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Comments({ postId }) {
   const { currentUser } = useContext(AuthContext);

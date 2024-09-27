@@ -6,12 +6,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #8bd1e3;
+  background: #8bd1e3;
   padding: 1rem;
 
   @include medium {
     background: linear-gradient(rgba(2, 81, 81, 0.7), rgba(2, 81, 81, 0.7)),
-      url("../../assets/images/auth/friends.jpg") no-repeat center/cover;
+      url("../../assets/images/auth/friends.webp") no-repeat center/cover;
   }
 
   .card {
@@ -29,7 +29,7 @@
       flex-direction: column;
       color: white;
       background: linear-gradient(rgba(2, 81, 81, 0.7), rgba(2, 81, 81, 0.7)),
-        url("../../assets/images/auth/friends.jpg") no-repeat center/cover;
+        url("../../assets/images/auth/friends.webp") no-repeat center/cover;
       padding: 1rem 1.5rem;
 
       @include medium {

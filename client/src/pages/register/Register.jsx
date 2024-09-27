@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./register.scss";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 export default function Register() {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [inputsValues, setInputsValues] = useState({
     firstName: "",
     lastName: "",
@@ -26,7 +27,6 @@ export default function Register() {
   const navigate = useNavigate();
 
   // Check window object width when loading page (for responsive)
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
 
@@ -38,8 +38,10 @@ export default function Register() {
   const changeWindowWidth = () => setWindowWidth(window.innerWidth);
 
   // Handle inputs
-  const handleChange = (e) =>
-    setInputsValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setInputsValues((prev) => ({ ...prev, [name]: value }));
+  };
 
   // Clear form
   const clearForm = () =>

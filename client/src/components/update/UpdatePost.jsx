@@ -5,12 +5,12 @@ import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
 import { toast } from "react-toastify";
 
-// Icons
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-
 // Components
 import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
 import Overlay from "../overlay/Overlay.jsx";
+
+// Icon
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 export default function UpdatePost({ post, setOpenUpdate }) {
   const [desc, setDesc] = useState(post.desc);

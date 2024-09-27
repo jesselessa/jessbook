@@ -1,4 +1,4 @@
-export const LazyLoadImage = ({ src, alt, ...props }) => {
+const LazyLoadImage = ({ src, alt, ...props }) => {
   return (
     <img
       src={src}
@@ -8,3 +8,5 @@ export const LazyLoadImage = ({ src, alt, ...props }) => {
     />
   );
 };
+
+export default LazyLoadImage;

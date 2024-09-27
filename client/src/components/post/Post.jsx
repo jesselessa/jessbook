@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 // Components
 import Comments from "../comments/Comments.jsx";
 import UpdatePost from "../update/UpdatePost.jsx";
-import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
+import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 
 // Icons
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";

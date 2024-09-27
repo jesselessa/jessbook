@@ -3,6 +3,12 @@ import "./navbar.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../utils/axios.js";
 
+// Component
+import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
+
+// Image
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
+
 // Icons
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -17,12 +23,6 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-
-// Image
-import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
-
-// Component
-import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
 
 // Contexts
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";

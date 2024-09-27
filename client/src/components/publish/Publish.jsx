@@ -5,21 +5,19 @@ import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
 import { toast } from "react-toastify";
 
+// Components
+import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
+
 // Images
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
+import picture from "../../assets/images/publish/image.png";
+import map from "../../assets/images/publish/map.png";
+import friends from "../../assets/images/publish/friends.png";
 
 // Contexts
 import { AuthContext } from "../../contexts/authContext.jsx";
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
-
-// Components
-import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
-import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
-
-// Images
-import picture from "../../assets/images/publish/image.png";
-import map from "../../assets/images/publish/map.png";
-import friends from "../../assets/images/publish/friends.png";
 
 export default function Publish() {
   const { currentUser } = useContext(AuthContext);

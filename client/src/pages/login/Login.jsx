@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useEffect, useContext, useState } from "react";
 import "./login.scss";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -7,6 +7,7 @@ import { AuthContext } from "../../contexts/authContext";
 
 export default function Login() {
   const { login } = useContext(AuthContext);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [inputsValues, setInputsValues] = useState({
     email: "",
     password: "",
@@ -16,7 +17,6 @@ export default function Login() {
   const navigate = useNavigate();
 
   // Check window object width when loading page (for responsive)
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
   }, [windowWidth]);

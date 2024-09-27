@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import moment from "moment";
 
 // Components
-import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
+import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 import Overlay from "../overlay/Overlay.jsx";
 
 // Context
