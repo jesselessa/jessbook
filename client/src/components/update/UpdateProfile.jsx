@@ -17,6 +17,7 @@ import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 import { AuthContext } from "../../contexts/authContext.jsx";
 
 // Component
+import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
 import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdateProfile({ user, setOpenUpdate }) {
@@ -67,7 +68,6 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       }));
 
       toast.success("Profile updated.");
-      setOpenUpdate(false); // Close form
     },
 
     onError: (error) => {
@@ -102,7 +102,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       return;
     }
 
-    // Prepare updated user data
+    // Prepare updated data
     const updatedUser = {
       ...user,
       ...fields,
@@ -116,7 +116,10 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
 
     // Trigger mutation to update database
     updateMutation.mutate(updatedUser);
-
+    
+    // Close form after submission
+    setOpenUpdate(false); 
+    
     // Reset images state to release URL resources
     setCover(null);
     setProfile(null);
@@ -137,7 +140,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                 <span>Cover Picture</span>
 
                 <div className="img-container">
-                  <img
+                  <LazyLoadImage
                     src={
                       cover
                         ? URL.createObjectURL(cover)
@@ -165,7 +168,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                 <span>Profile Picture</span>
 
                 <div className="img-container">
-                  <img
+                  <LazyLoadImage
                     src={
                       profile
                         ? URL.createObjectURL(profile)

@@ -3,6 +3,7 @@ import "./stories.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { isVideo } from "../../utils/isVideo.js";
+import { toast } from "react-toastify";
 
 // Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
@@ -10,6 +11,7 @@ import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 // Components
 import CreateStory from "./CreateStory.jsx";
 import ModalStory from "./ModalStory.jsx";
+import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
 
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
@@ -26,7 +28,7 @@ export default function Stories({ userId }) {
       const res = await makeRequest.get(`/stories?userId=${userId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching stories:", error);
+      toast.error("Error fetching stories.");
       throw new Error(error);
     }
   };
@@ -48,7 +50,7 @@ export default function Stories({ userId }) {
         {/* Add a story */}
         <div className="stories-wrapper">
           <div className="story">
-            <img
+            <LazyLoadImage
               src={
                 currentUser.profilePic
                   ? `/uploads/${currentUser.profilePic}`
@@ -88,7 +90,7 @@ export default function Stories({ userId }) {
                     Your browser doesn't support video.
                   </video>
                 ) : (
-                  <img src={`/uploads/${story?.img}`} alt="story" />
+                  <LazyLoadImage src={`/uploads/${story?.img}`} alt="story" />
                 )}
 
                 <span>

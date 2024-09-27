@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 // Components
 import Comments from "../comments/Comments.jsx";
 import UpdatePost from "../update/UpdatePost.jsx";
+import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
 
 // Icons
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
@@ -45,7 +46,7 @@ export default function Post({ post }) {
       const res = await makeRequest.get(`/comments?postId=${post.id}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching comments:", error);
+      toast.error("Error fetching comments.");
       throw new Error(error);
     }
   };
@@ -61,7 +62,7 @@ export default function Post({ post }) {
       const res = await makeRequest.get(`/likes?postId=${post.id}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching post likes:", error);
+      toast.error("Error fetching post likes.");
       throw new Error(error);
     }
   };
@@ -82,15 +83,15 @@ export default function Post({ post }) {
       // Invalidate and refetch
       queryClient.invalidateQueries(["likes", post.id]);
     },
-
-    onError: (error) => {
-      console.error(error);
-      toast.error("Error handling likes data.");
-    },
   });
 
   const handleLikes = () => {
-    handleLikesMutation.mutate(likes.includes(currentUser.id));
+    try {
+      handleLikesMutation.mutate(likes.includes(currentUser.id));
+    } catch (error) {
+      toast.error("Error handling likes.");
+      throw new Error(error);
+    }
   };
 
   // Delete post
@@ -102,18 +103,13 @@ export default function Post({ post }) {
       queryClient.invalidateQueries(["posts"]);
       toast.success("Post deleted.");
     },
-
-    onError: (error) => {
-      console.error(error);
-      toast.error("Error deleting post.");
-    },
   });
 
   const handleDelete = (post) => {
     try {
       deleteMutation.mutate(post.id);
     } catch (error) {
-      console.error("Error deleting post:", error);
+      toast.error("Error deleting post.");
       throw new Error(error);
     }
   };
@@ -123,7 +119,7 @@ export default function Post({ post }) {
       <div className="user">
         <div className="user-info">
           <div className="img-container" onClick={navigateAndScrollTop}>
-            <img
+            <LazyLoadImage
               src={
                 post.profilePic ? `/uploads/${post.profilePic}` : defaultProfile
               }
@@ -157,7 +153,7 @@ export default function Post({ post }) {
 
       <div className="content">
         <p>{addNonBreakingSpace(post.desc)}</p>
-        {post.img && <img src={`/uploads/${post.img}`} alt="post" />}
+        {post.img && <LazyLoadImage src={`/uploads/${post.img}`} alt="post" />}
       </div>
 
       <div className="interactions">

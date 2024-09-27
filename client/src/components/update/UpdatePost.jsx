@@ -8,7 +8,8 @@ import { toast } from "react-toastify";
 // Icons
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
-// Component
+// Components
+import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
 import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdatePost({ post, setOpenUpdate }) {
@@ -22,10 +23,9 @@ export default function UpdatePost({ post, setOpenUpdate }) {
       makeRequest.put(`/posts/${post.id}`, updatedPost),
 
     onSuccess: () => {
-      // Invalidate and refetch & close form after submission
+      // Invalidate and refetch
       queryClient.invalidateQueries(["posts"]);
       toast.success("Post updated.");
-      setOpenUpdate(false);
     },
 
     onError: (error) => {
@@ -49,9 +49,10 @@ export default function UpdatePost({ post, setOpenUpdate }) {
       return;
     }
 
+    // Prepare updated data
     const updatedPost = {
       ...post,
-      desc: desc.trim(),
+      desc: desc,
     };
 
     if (image) {
@@ -59,10 +60,10 @@ export default function UpdatePost({ post, setOpenUpdate }) {
       updatedPost.img = newImage;
     }
 
+    // Trigger mutation to update database
     updateMutation.mutate(updatedPost);
-
-    // Reset image state to release URL resources
-    setImage(null);
+    setOpenUpdate(false); // Close form
+    setImage(null); // Reset image state to release URL resources
   };
 
   return (
@@ -77,7 +78,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
                 <span>Choose an image</span>
                 <div className="img-container">
                   {(image || post.img) && (
-                    <img
+                    <LazyLoadImage
                       src={
                         image
                           ? URL.createObjectURL(image)

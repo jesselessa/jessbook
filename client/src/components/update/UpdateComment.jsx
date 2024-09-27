@@ -20,7 +20,6 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
       // Invalidate and refetch
       queryClient.invalidateQueries(["comments", comment.postId]);
       toast.success("Comment updated.");
-      setOpenUpdate(false); // Close form
     },
 
     onError: (error) => {
@@ -38,12 +37,15 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
       return;
     }
 
+    // Prepare updated data
     const updatedComment = {
       ...comment,
-      desc: desc.trim(),
+      desc: desc,
     };
 
+    // Trigger mutation to update database
     updateMutation.mutate(updatedComment);
+    setOpenUpdate(false); // Close form
   };
 
   return (

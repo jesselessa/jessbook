@@ -18,7 +18,7 @@ export default function Overlay() {
 
     window.addEventListener("orientationchange", handleOrientationChange);
 
-    window.addEventListener("resize", handleOrientationChange); 
+    window.addEventListener("resize", handleOrientationChange);
 
     // Cleanup on unmounting
     return () => {

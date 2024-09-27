@@ -1,7 +1,15 @@
 import "./rightBar.scss";
 
-// Image
+// Component
+import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
+
+// Images
 import gift from "../../assets/images/rightBar/gift.png";
+import cindy from "../../assets/images/users/cindy.jpeg";
+import clark from "../../assets/images/users/clark.webp";
+import jack from "../../assets/images/users/jack.webp";
+import jane from "../../assets/images/users/jane.webp";
+import simba from "../../assets/images/users/simba.jpeg";
 
 export default function RightBar() {
   return (
@@ -11,7 +19,7 @@ export default function RightBar() {
         <h3>Birthdays</h3>
 
         <div className="birthday">
-          <img src={gift} alt="gift" />
+          <LazyLoadImage src={gift} alt="gift" />
           <p>
             It's <span>Jane Doe</span>'s birthday today.
           </p>
@@ -25,10 +33,7 @@ export default function RightBar() {
         <div className="activity">
           <div className="user-info">
             <div className="img-container">
-              <img
-                src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                alt="user"
-              />
+              <LazyLoadImage src={jane} alt="user" />
             </div>
             <p>
               <span>Jane Doe</span> changed their profile picture
@@ -40,10 +45,7 @@ export default function RightBar() {
         <div className="activity">
           <div className="user-info">
             <div className="img-container">
-              <img
-                src="https://images.pexels.com/photos/6333652/pexels-photo-6333652.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                alt="user"
-              />
+              <LazyLoadImage src={clark} alt="user" />
             </div>
             <p>
               <span>Clark Kent</span> liked a post
@@ -55,10 +57,7 @@ export default function RightBar() {
         <div className="activity">
           <div className="user-info">
             <div className="img-container">
-              <img
-                src="https://images.pexels.com/photos/2269872/pexels-photo-2269872.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                alt="user"
-              />
+              <LazyLoadImage src={jack} alt="user" />
             </div>
             <p>
               <span>Jack Bauer</span> liked a comment
@@ -70,10 +69,7 @@ export default function RightBar() {
         <div className="activity">
           <div className="user-info">
             <div className="img-container">
-              <img
-                src="https://images.pexels.com/photos/8295844/pexels-photo-8295844.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                alt="user"
-              />
+              <LazyLoadImage src={cindy} alt="user" />
             </div>
             <p>
               <span>Cindy Rella</span> posted
@@ -90,10 +86,7 @@ export default function RightBar() {
         <div className="friends">
           <div className="user">
             <div className="img-container">
-              <img
-                src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                alt="user"
-              />
+              <LazyLoadImage src={jane} alt="user" />
               <div className="status-dot"></div>
             </div>
             <span>Jane Doe</span>
@@ -101,10 +94,7 @@ export default function RightBar() {
 
           <div className="user">
             <div className="img-container">
-              <img
-                src="https://images.pexels.com/photos/6333652/pexels-photo-6333652.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                alt="user"
-              />
+              <LazyLoadImage src={clark} alt="user" />
               <div className="status-dot"></div>
             </div>
             <span>Clark Kent</span>
@@ -112,10 +102,7 @@ export default function RightBar() {
 
           <div className="user">
             <div className="img-container">
-              <img
-                src="https://images.pexels.com/photos/2269872/pexels-photo-2269872.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                alt="user"
-              />
+              <LazyLoadImage src={jack} alt="user" />
               <div className="status-dot"></div>
             </div>
             <span>Jack Bauer</span>
@@ -123,10 +110,7 @@ export default function RightBar() {
 
           <div className="user">
             <div className="img-container">
-              <img
-                src="https://images.pexels.com/photos/8295844/pexels-photo-8295844.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                alt="user"
-              />
+              <LazyLoadImage src={cindy} alt="user" />
               <div className="status-dot"></div>
             </div>
             <span>Cindy Rella</span>
@@ -134,10 +118,7 @@ export default function RightBar() {
 
           <div className="user">
             <div className="img-container">
-              <img
-                src="https://images.pexels.com/photos/5792673/pexels-photo-5792673.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                alt="user"
-              />
+              <LazyLoadImage src={simba} alt="user" />
               <div className="status-dot"></div>
             </div>
             <span>Simba Lion</span>

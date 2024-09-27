@@ -5,7 +5,8 @@ import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
 import { toast } from "react-toastify";
 
-// Component
+// Components
+import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
 import Overlay from "../overlay/Overlay.jsx";
 
 // Check if a file is a video based on its MIME type
@@ -131,7 +132,7 @@ export default function CreateStory({ setOpenCreateStory }) {
                     Your browser doesn't support video.
                   </video>
                 ) : (
-                  <img src={fileURL} alt="story preview" />
+                  <LazyLoadImage src={fileURL} alt="story preview" />
                 )}
               </div>
             )}

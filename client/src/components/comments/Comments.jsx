@@ -12,8 +12,9 @@ import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-// Component
+// Components
 import UpdateComment from "../update/UpdateComment.jsx";
+import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 
 // Icons
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
@@ -34,7 +35,7 @@ export default function Comments({ postId }) {
       const res = await makeRequest.get(`/comments?postId=${postId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching comments:", error);
+      toast.error("Error fetching comments.");
       throw new Error(error);
     }
   };
@@ -47,10 +48,8 @@ export default function Comments({ postId }) {
 
   // Create a new comment
   const mutation = useMutation({
-    mutationFn: async (newComment) => {
-      const res = await makeRequest.post("/comments", newComment);
-      return res.data;
-    },
+    mutationFn: async (newComment) =>
+      await makeRequest.post("/comments", newComment),
 
     onSuccess: () => {
       // Invalidate and refetch
@@ -86,18 +85,13 @@ export default function Comments({ postId }) {
       queryClient.invalidateQueries(["comments", postId]);
       toast.success("Comment deleted.");
     },
-
-    onError: (error) => {
-      toast.error("Error deleting comment.");
-      throw new Error(error);
-    },
   });
 
   const handleDelete = (comment) => {
     try {
       deleteMutation.mutate(comment.id);
     } catch (error) {
-      console.error("Error deleting comment:", error);
+      toast.error("Error deleting comment.");
       throw new Error(error);
     }
   };
@@ -106,7 +100,7 @@ export default function Comments({ postId }) {
     <div className="comments">
       <form name="comment-form" onSubmit={handleSubmit}>
         <div className="img-container">
-          <img
+          <LazyLoadImage
             src={
               currentUser.profilePic
                 ? `/uploads/${currentUser.profilePic}`
@@ -141,7 +135,7 @@ export default function Comments({ postId }) {
         : comments?.map((comment) => (
             <div className="comment" key={comment?.id}>
               <div className="img-container">
-                <img
+                <LazyLoadImage
                   src={
                     comment?.profilePic
                       ? `/uploads/${comment?.profilePic}`

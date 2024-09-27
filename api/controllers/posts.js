@@ -5,7 +5,7 @@ export const getPosts = (req, res) => {
   const userId = req.query.userId;
   const loggedInUserId = req.userInfo.id;
 
-  // Get all user's posts plus those of users he follows
+  // Get all user posts plus those of users he follows
   const q =
     userId !== "undefined"
       ? `SELECT p.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 

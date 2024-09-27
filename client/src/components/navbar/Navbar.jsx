@@ -21,6 +21,9 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 // Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
+// Component
+import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
+
 // Contexts
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
 import { AuthContext } from "../../contexts/authContext.jsx";
@@ -42,9 +45,7 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  const toggleMenu = () => {
-    setBurgerClicked((prevState) => !prevState);
-  };
+  const toggleMenu = () => setBurgerClicked((prevState) => !prevState);
 
   return (
     <div className="navbar" role="navigation">
@@ -93,7 +94,7 @@ export default function Navbar() {
         <Link to="#">
           <NotificationsOutlinedIcon fontSize="large" />
         </Link>
-        <img
+        <LazyLoadImage
           src={
             currentUser.profilePic
               ? `/uploads/${currentUser.profilePic}`

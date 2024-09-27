@@ -17,7 +17,7 @@ export const getUser = (req, res) => {
 };
 
 export const updateUser = (req, res) => {
-  const loggedInUserId = req.userInfo.id; // User's ID from token
+  const loggedInUserId = req.userInfo.id; // User ID from token
   const updatedFields = [];
   const values = []; // Values for SQL parameters
 
@@ -76,7 +76,7 @@ export const updateUser = (req, res) => {
     if (error) return res.status(500).json(error);
 
     if (data.affectedRows > 0)
-      return res.status(200).json("User's data updated.");
+      return res.status(200).json("User data updated.");
 
     return res.status(403).json("User can only update their own data.");
   });

@@ -7,7 +7,8 @@ import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import { toast } from "react-toastify";
 import moment from "moment";
 
-// Component
+// Components
+import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
 import Overlay from "../overlay/Overlay.jsx";
 
 // Context
@@ -27,11 +28,6 @@ export default function ModalStory({ story, setOpenModal }) {
       queryClient.invalidateQueries(["stories"]);
       toast.success("Story deleted.");
     },
-
-    onError: (error) => {
-      toast.error("Error deleting story.");
-      throw new Error(error);
-    },
   });
 
   const handleDelete = () => {
@@ -39,7 +35,7 @@ export default function ModalStory({ story, setOpenModal }) {
       deleteMutation.mutate(story.id);
       setOpenModal(false); // Close modal after submission
     } catch (error) {
-      console.error("Error deleting story:", error);
+      toast.error("Error deleting story.");
       throw new Error(error);
     }
   };
@@ -61,7 +57,7 @@ export default function ModalStory({ story, setOpenModal }) {
               Your browser doesn't support video.
             </video>
           ) : (
-            <img src={`/uploads/${story.img}`} alt="story" />
+            <LazyLoadImage src={`/uploads/${story.img}`} alt="story" />
           )}
         </div>
 

@@ -12,8 +12,9 @@ import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 import { AuthContext } from "../../contexts/authContext.jsx";
 import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
 
-// Component
+// Components
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
 
 // Images
 import picture from "../../assets/images/publish/image.png";
@@ -80,7 +81,7 @@ export default function Publish() {
       <div className="top">
         <div className="left">
           <div className="img-container">
-            <img
+            <LazyLoadImage
               src={
                 currentUser.profilePic
                   ? `/uploads/${currentUser.profilePic}`
@@ -118,7 +119,7 @@ export default function Publish() {
         <div className="right">
           {image && (
             <div className="img-container">
-              <img
+              <LazyLoadImage
                 src={URL.createObjectURL(image)}
                 // Generate a dynamic URL for preview
                 alt="post preview"
@@ -140,7 +141,7 @@ export default function Publish() {
         <div className="left">
           {/* Input:file - value linked with state doesn't work except if value equals "" or "null" */}
           <label className="file-label-mob" htmlFor="file">
-            <img src={picture} alt="image icon" />
+            <LazyLoadImage src={picture} alt="image icon" />
           </label>
 
           <input
@@ -152,19 +153,19 @@ export default function Publish() {
           />
 
           <div className="add-img">
-            <img src={picture} alt="image icon" />
+            <LazyLoadImage src={picture} alt="image icon" />
             <label className="file-label" htmlFor="file">
               <span>Add Image</span>
             </label>
           </div>
 
           <div className="item">
-            <img src={map} alt="map icon" />
+            <LazyLoadImage src={map} alt="map icon" />
             <span>Add Place</span>
           </div>
 
           <div className="item">
-            <img src={friends} alt="friends icon" />
+            <LazyLoadImage src={friends} alt="friends icon" />
             <span>Tag Friends</span>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { makeRequest } from "../../utils/axios.js";
 import Publish from "../../components/publish/Publish.jsx";
 import Posts from "../../components/posts/Posts.jsx";
 import UpdateProfile from "../../components/update/UpdateProfile.jsx";
+import { LazyLoadImage } from "../lazyLoadImage/LazyLoadImage.jsx";
 
 // Icons
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
@@ -30,13 +31,13 @@ export default function ProfileData() {
 
   const queryClient = useQueryClient();
 
-  // Get user's info
+  // Get user info
   const fetchUserData = async () => {
     try {
       const res = await makeRequest.get(`/users/${userId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching user's data:", error);
+      toast.error("Error fetching user data.");
       throw new Error(error);
     }
   };
@@ -47,13 +48,13 @@ export default function ProfileData() {
     data: user,
   } = useQuery({ queryKey: ["user", userId], queryFn: fetchUserData });
 
-  // Get user's relationships
+  // Get user relationships
   const fetchRelationships = async () => {
     try {
       const res = await makeRequest.get(`/relationships?followedId=${userId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching relationships:", error);
+      toast.error("Error fetching relationships data.");
       throw new Error(error);
     }
   };
@@ -77,15 +78,15 @@ export default function ProfileData() {
       // Invalidate and refetch
       queryClient.invalidateQueries(["relationships"]);
     },
-
-    onError: (error) => {
-      console.error(error);
-      toast.error("Error handling relationships data.");
-    },
   });
 
   const handleFollow = () => {
-    mutation.mutate(relationshipsData?.includes(currentUser.id));
+    try {
+      mutation.mutate(relationshipsData?.includes(currentUser.id));
+    } catch (error) {
+      toast.error("Error handling relationships data.");
+      throw new Error(error);
+    }
   };
 
   return (
@@ -98,7 +99,7 @@ export default function ProfileData() {
         <>
           <div className="profile-container">
             <div className="images">
-              <img
+              <LazyLoadImage
                 src={
                   user?.coverPic ? `/uploads/${user?.coverPic}` : defaultCover
                 }
@@ -107,7 +108,7 @@ export default function ProfileData() {
               />
 
               <div className="img-container">
-                <img
+                <LazyLoadImage
                   src={
                     user?.profilePic
                       ? `/uploads/${user?.profilePic}`
@@ -123,7 +124,7 @@ export default function ProfileData() {
               <div className="friends-contact">
                 <div className="friends">
                   <PeopleAltOutlinedIcon fontSize="large" />
-                  {/* TODO - Change with data fetched from API */}
+                  {/* TODO - Update with data fetched from API */}
                   <span>441 Friends</span>
                 </div>
 

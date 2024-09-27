@@ -39,7 +39,7 @@ export const register = (req, res) => {
 };
 
 export const login = (req, res) => {
-  // 1 - Check user's mail
+  // 1 - Check user mail
   const q = "SELECT * FROM users WHERE email = ?";
 
   db.query(q, [req.body.email], (error, data) => {

@@ -29,7 +29,7 @@ export const getStories = (req, res) => {
     ORDER BY
           CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
           s.createdAt DESC`;
-  // Logged-in user's story displayed first
+  // Logged-in user story displayed first
 
   const values =
     userId !== "undefined"
