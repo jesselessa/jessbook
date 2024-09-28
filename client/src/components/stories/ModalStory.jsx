@@ -35,8 +35,7 @@ export default function ModalStory({ story, setOpenModal }) {
       deleteMutation.mutate(story.id);
       setOpenModal(false); // Close modal after submission
     } catch (error) {
-      toast.error("Error deleting story.");
-      throw new Error(error);
+      console.error("Error deleting story:", error);
     }
   };
 

@@ -28,6 +28,7 @@ export default function Login() {
     const { name, value } = e.target;
     setInputsValues((prevFields) => ({ ...prevFields, [name]: value }));
   };
+
   // Login feature
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,7 +50,6 @@ export default function Login() {
     } catch (error) {
       // Handle errors from API
       setError(error.response.data);
-      throw new Error(error);
     }
   };
 

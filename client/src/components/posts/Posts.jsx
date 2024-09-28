@@ -11,8 +11,7 @@ export default function Posts({ userId }) {
       const res = await makeRequest.get(`/posts?userId=${userId}`);
       return res.data;
     } catch (error) {
-      toast.error("Error fetching posts.");
-      throw new Error(error);
+      console.error("Error fetching posts:", error);
     }
   };
 

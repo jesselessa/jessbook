@@ -67,8 +67,8 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1 - Handle form validation and error messages
-    const inputsErrors = {};
+    // 1 - Handle form validation
+    let inputsErrors = {};
 
     // Name
     if (inputsValues.firstName.length < 2 || inputsValues.firstName.length > 35)

@@ -3,7 +3,6 @@ import "./stories.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { isVideo } from "../../utils/isVideo.js";
-import { toast } from "react-toastify";
 
 // Components
 import CreateStory from "./CreateStory.jsx";
@@ -28,8 +27,7 @@ export default function Stories({ userId }) {
       const res = await makeRequest.get(`/stories?userId=${userId}`);
       return res.data;
     } catch (error) {
-      toast.error("Error fetching stories.");
-      throw new Error(error);
+      console.error("Error fetching stories:", error);
     }
   };
 

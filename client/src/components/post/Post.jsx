@@ -46,8 +46,7 @@ export default function Post({ post }) {
       const res = await makeRequest.get(`/comments?postId=${post.id}`);
       return res.data;
     } catch (error) {
-      toast.error("Error fetching comments.");
-      throw new Error(error);
+      console.error("Error fetching comments:", error);
     }
   };
 
@@ -62,8 +61,7 @@ export default function Post({ post }) {
       const res = await makeRequest.get(`/likes?postId=${post.id}`);
       return res.data;
     } catch (error) {
-      toast.error("Error fetching post likes.");
-      throw new Error(error);
+      console.error("Error fetching post likes:", error);
     }
   };
 
@@ -89,8 +87,7 @@ export default function Post({ post }) {
     try {
       handleLikesMutation.mutate(likes.includes(currentUser.id));
     } catch (error) {
-      toast.error("Error handling likes.");
-      throw new Error(error);
+      console.error("Error handling likes:", error);
     }
   };
 
@@ -109,8 +106,7 @@ export default function Post({ post }) {
     try {
       deleteMutation.mutate(post.id);
     } catch (error) {
-      toast.error("Error deleting post.");
-      throw new Error(error);
+      console.error("Error deleting post:", error);
     }
   };
 

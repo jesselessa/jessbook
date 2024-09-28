@@ -35,8 +35,7 @@ export default function Comments({ postId }) {
       const res = await makeRequest.get(`/comments?postId=${postId}`);
       return res.data;
     } catch (error) {
-      toast.error("Error fetching comments.");
-      throw new Error(error);
+      console.error("Error fetching comments:", error);
     }
   };
 
@@ -57,10 +56,7 @@ export default function Comments({ postId }) {
       toast.success("Comment published.");
     },
 
-    onError: (error) => {
-      toast.error("Error creating comment.");
-      throw new Error(error);
-    },
+    onError: (error) => console.error("Error creating comment:", error),
   });
 
   const handleSubmit = async (e) => {
@@ -91,8 +87,7 @@ export default function Comments({ postId }) {
     try {
       deleteMutation.mutate(comment.id);
     } catch (error) {
-      toast.error("Error deleting comment.");
-      throw new Error(error);
+      console.error("Error deleting comment:", error);
     }
   };
 

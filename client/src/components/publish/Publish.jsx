@@ -38,10 +38,7 @@ export default function Publish() {
       toast.success("Post created.");
     },
 
-    onError: (error) => {
-      toast.error("Error creating post.");
-      throw new Error(error);
-    },
+    onError: (error) => console.error("Error creating post:", error),
   });
 
   const handleClick = async (e) => {

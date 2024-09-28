@@ -70,10 +70,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       toast.success("Profile updated.");
     },
 
-    onError: (error) => {
-      toast.error("Error updating profile.");
-      throw new Error(error);
-    },
+    onError: (error) => console.error("Error updating profile:", error),
   });
 
   // Handle form submission

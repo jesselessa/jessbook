@@ -34,10 +34,7 @@ export default function CreateStory({ setOpenCreateStory }) {
       setOpenCreateStory(false); // Close form
     },
 
-    onError: (error) => {
-      toast.error("Error creating story.");
-      throw new Error(error);
-    },
+    onError: (error) => console.error("Error creating story:", error),
   });
 
   const handleClick = async (e) => {
