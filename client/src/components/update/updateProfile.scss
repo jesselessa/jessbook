@@ -160,11 +160,18 @@
         padding: 0.5rem 0 0 0.5rem;
         border: none;
         border-bottom: 1px solid #555;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
 
         @include small {
           margin-bottom: 0.5rem;
         }
+      }
+
+      .error-msg {
+        color: #f75252;
+        font-size: 1.3rem;
+        font-weight: 400;
+        margin-bottom: 1rem;
       }
 
       button {

@@ -24,8 +24,8 @@ import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function ProfileData() {
-  const [openUpdate, setOpenUpdate] = useState(false);
   const { currentUser } = useContext(AuthContext);
+  const [openUpdate, setOpenUpdate] = useState(false);
 
   const { userId } = useParams();
 

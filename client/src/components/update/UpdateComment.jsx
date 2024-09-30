@@ -52,7 +52,9 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
           <h1>Update Your Comment</h1>
 
           <form name="update-comment-form">
+            <label htmlFor="text">Add a new text</label>
             <textarea
+              id="text"
               name="text"
               rows={5}
               placeholder="Write a text..."

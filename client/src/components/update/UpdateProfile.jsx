@@ -29,6 +29,11 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     lastName: user.lastName,
     city: user.city,
   });
+  // Errors from form
+  const [validationErrors, setValidationErrors] = useState({
+    firstName: "",
+    lastName: "",
+  });
 
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -54,7 +59,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     mutationFn: (updatedUser) => makeRequest.put("/users", updatedUser),
 
     onSuccess: (_data, variables) => {
-      // 1. Update cache immediately with updated user's data
+      // 1. Update cache immediately with updated user data
       //! 'setQueryData' is usually used to update data locally before receiving confirmation from server
       queryClient.setQueryData(["user", userId], (oldData) => ({
         ...oldData,
@@ -73,13 +78,40 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     onError: (error) => console.error("Error updating profile:", error),
   });
 
+  // Clear validation errors in form
+  const clearValidationErrors = () =>
+    setValidationErrors({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      pswdConfirm: "",
+    });
+
   // Handle form submission
   const handleClick = async (e) => {
     e.preventDefault();
 
-    // Upload new cover and profile pictures if present
-    const newCover = cover ? await uploadFile(cover) : user.coverPic;
-    const newProfile = profile ? await uploadFile(profile) : user.profilePic;
+    // Handle validation errors
+    let inputsErrors = {};
+
+    if (fields.firstName.length < 2 || fields.firstName.length > 35)
+      inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
+
+    if (fields.lastName.length < 1 || fields.lastName.length > 35)
+      inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
+
+    // If errors during validation, update state and stop process
+    if (Object.keys(inputsErrors).length > 0) {
+      setValidationErrors(inputsErrors);
+
+      // Clear error messages after 5 seconds
+      setTimeout(() => {
+        clearValidationErrors();
+      }, 5000);
+
+      return;
+    }
 
     // Check if form fields or images have been modified
     const isAnyFieldModified = Object.keys(fields).some(
@@ -99,6 +131,10 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       return;
     }
 
+    // Upload new cover and profile pictures if present
+    const newCover = cover ? await uploadFile(cover) : user.coverPic;
+    const newProfile = profile ? await uploadFile(profile) : user.profilePic;
+
     // Prepare updated data
     const updatedUser = {
       ...user,
@@ -107,17 +143,15 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       profilePic: newProfile,
     };
 
-    // Update images
+    // Update images states
     setCover(newCover);
     setProfile(newProfile);
 
     // Trigger mutation to update database
     updateMutation.mutate(updatedUser);
+    setOpenUpdate(false); // Close form
 
-    // Close form after submission
-    setOpenUpdate(false);
-
-    // Reset images state to release URL resources
+    // Reset images states to release URL resources
     setCover(null);
     setProfile(null);
 
@@ -201,6 +235,9 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               onChange={handleFieldChange}
               autoComplete="off"
             />
+            {validationErrors.firstName && (
+              <span className="error-msg">{validationErrors.firstName}</span>
+            )}
 
             <label htmlFor="lastName">Last name</label>
             <input
@@ -213,6 +250,9 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               onChange={handleFieldChange}
               autoComplete="off"
             />
+            {validationErrors.lastName && (
+              <span className="error-msg">{validationErrors.lastName}</span>
+            )}
 
             <label htmlFor="city">City</label>
             <input
