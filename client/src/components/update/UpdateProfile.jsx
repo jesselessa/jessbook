@@ -27,7 +27,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   const [fields, setFields] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
-    city: user.city || "Non renseigné",
+    city: user.city,
   });
 
   const { userId } = useParams();

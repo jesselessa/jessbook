@@ -68,7 +68,6 @@ export default function ProfileData() {
     mutationFn: (following) => {
       if (following)
         return makeRequest.delete(`/relationships?userId=${userId}`);
-
       return makeRequest.post("/relationships", { userId });
     },
 

@@ -55,15 +55,17 @@ export default function Comments({ postId }) {
       queryClient.invalidateQueries(["comments", postId]);
       toast.success("Comment published.");
     },
-
-    onError: (error) => console.error("Error creating comment:", error),
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    mutation.mutate({ desc: desc.trim(), postId });
-    setDesc(""); // Reset form field
+    try {
+      mutation.mutate({ desc: desc.trim(), postId });
+      setDesc(""); // Reset form field
+    } catch (error) {
+      console.error("Error creating comment:", error);
+    }
   };
 
   // Open update form and store selected comment

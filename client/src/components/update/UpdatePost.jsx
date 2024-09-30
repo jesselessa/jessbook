@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./updatePost.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -13,11 +13,12 @@ import Overlay from "../overlay/Overlay.jsx";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 export default function UpdatePost({ post, setOpenUpdate }) {
-  const [desc, setDesc] = useState(post.desc);
-  const [image, setImage] = useState(null);
+  const [newDesc, setNewDesc] = useState(post.desc);
+  const [newImg, setNewImg] = useState(null);
 
   const queryClient = useQueryClient();
 
+  // Mutation to handle post update
   const updateMutation = useMutation({
     mutationFn: (updatedPost) =>
       makeRequest.put(`/posts/${post.id}`, updatedPost),
@@ -35,13 +36,16 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     e.preventDefault();
 
     // Check if post has been modified
-    if (desc.trim() === post.desc.trim() && !image) {
+    const isDescModified = newDesc.trim() !== post.desc.trim();
+    const isImageModified = newImg !== null;
+
+    if (!isDescModified && !isImageModified) {
       toast.info("No changes detected.");
       return;
     }
 
-    // Check if post has a description
-    if (!desc.trim()) {
+    // Check if description is empty
+    if (!newDesc.trim()) {
       toast.error("You must add a description to your post.");
       return;
     }
@@ -49,19 +53,31 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     // Prepare updated data
     const updatedPost = {
       ...post,
-      desc: desc,
+      desc: newDesc,
     };
 
-    if (image) {
-      const newImage = await uploadFile(image);
-      updatedPost.img = newImage;
+    // If an image is selected, upload it and update post
+    if (newImg) {
+      const updatedImg = await uploadFile(newImg);
+      updatedPost.img = updatedImg;
     }
 
     // Trigger mutation to update database
     updateMutation.mutate(updatedPost);
     setOpenUpdate(false); // Close form
-    setImage(null); // Reset image state to release URL resources
+
+    // Reset image state to release URL resource
+    setNewImg(null);
   };
+
+  // Clean up URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (newImg) {
+        URL.revokeObjectURL(newImg);
+      }
+    };
+  }, [newImg]);
 
   return (
     <>
@@ -74,38 +90,41 @@ export default function UpdatePost({ post, setOpenUpdate }) {
               <div className="image">
                 <span>Choose an image</span>
                 <div className="img-container">
-                  {(image || post.img) && (
+                  {(newImg || post.img) && (
                     <LazyLoadImage
                       src={
-                        image
-                          ? URL.createObjectURL(image)
+                        newImg
+                          ? URL.createObjectURL(newImg)
                           : `/uploads/${post.img}`
                       }
                       alt="post preview"
                     />
                   )}
-                  <label className="file-label" htmlFor="file">
+
+                  {/* File input for image selection */}
+                  <label className="file-label" htmlFor="newFile">
                     <CloudUploadIcon className="icon" />
                   </label>
                   <input
                     type="file"
-                    id="file"
-                    name="file"
+                    //! 'id' must be different from input in Publish to prevent conflicts when displaying image
+                    id="newFile"
+                    name="newFile"
                     accept="image/*"
-                    onChange={(e) => setImage(e.target.files[0])}
+                    onChange={(e) => setNewImg(e.target.files[0])}
                   />
                 </div>
               </div>
             </div>
 
-            <label htmlFor="text">Add a text</label>
+            <label htmlFor="newDesc">Add a new text</label>
             <textarea
-              id="text"
-              name="text"
+              id="newDesc"
+              name="newDesc"
               rows={8}
               placeholder="Write a text..."
-              value={desc}
-              onChange={(e) => setDesc(e.target.value)}
+              value={newDesc}
+              onChange={(e) => setNewDesc(e.target.value)}
             />
 
             <button className="submit" onClick={handleClick}>
@@ -119,7 +138,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
         </div>
       </div>
 
-      <Overlay />
+      <Overlay onClick={() => setOpenUpdate(false)} />
     </>
   );
 }
