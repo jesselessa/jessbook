@@ -50,6 +50,12 @@ export default function UpdatePost({ post, setOpenUpdate }) {
       return;
     }
 
+    // Check post length
+    if (newDesc.length > 1000) {
+      toast.error("Your post can't contain more than 1000\u00A0characters.");
+      return;
+    }
+
     // Prepare updated data
     const updatedPost = {
       ...post,

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import "./updateProfile.scss";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -95,11 +95,17 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     // Handle validation errors
     let inputsErrors = {};
 
-    if (fields.firstName.length < 2 || fields.firstName.length > 35)
+    if (fields.firstName.length < 2 || fields.firstName.length > 35) {
       inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
+    }
 
-    if (fields.lastName.length < 1 || fields.lastName.length > 35)
+    if (fields.lastName.length < 1 || fields.lastName.length > 35) {
       inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
+    }
+
+    if (fields.city.length > 85) {
+      inputsErrors.city = "Enter a valid city name.";
+    }
 
     // If errors during validation, update state and stop process
     if (Object.keys(inputsErrors).length > 0) {
@@ -158,6 +164,18 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     // Go to user's updated profile page
     navigate(`/profile/${updatedUser.id}`);
   };
+
+  // Clean up URLs to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (cover) {
+        URL.revokeObjectURL(cover);
+      }
+      if (profile) {
+        URL.revokeObjectURL(profile);
+      }
+    };
+  }, [cover, profile]);
 
   return (
     <>
@@ -264,6 +282,9 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               onChange={handleFieldChange}
               autoComplete="off"
             />
+            {validationErrors.city && (
+              <span className="error-msg">{validationErrors.city}</span>
+            )}
 
             <button type="submit" onClick={handleClick}>
               Update

@@ -61,6 +61,19 @@ export default function Comments({ postId }) {
     e.preventDefault();
 
     try {
+      // Check comment length
+      if (desc.trim().length === 0) {
+        toast.error("You must add a text to your comment.");
+        return;
+      }
+      
+      if (desc.trim().length > 500) {
+        toast.error(
+          "Your comment can't contain more than 500\u00A0characters."
+        );
+        return;
+      }
+
       mutation.mutate({ desc: desc.trim(), postId });
       setDesc(""); // Reset form field
     } catch (error) {

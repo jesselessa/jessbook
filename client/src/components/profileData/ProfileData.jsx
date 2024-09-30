@@ -133,12 +133,12 @@ export default function ProfileData() {
 
               <div className="main-info">
                 <h2>
-                  {user?.firstName} {user?.lastName}
+                  {user?.firstName.trim()} {user?.lastName.trim()}
                 </h2>
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{user?.city || "Non renseigné"}</span>
+                  <span>{user?.city.trim() || "Non renseigné"}</span>
                 </div>
 
                 {rError ? (

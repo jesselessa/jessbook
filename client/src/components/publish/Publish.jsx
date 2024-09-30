@@ -44,10 +44,27 @@ export default function Publish() {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    if (!desc) {
+    // Check post length
+    if (desc.trim().length === 0) {
       setError({
         isError: true,
         message: "You can't edit a post without a description.",
+      });
+
+      // Reset error message after 3 seconds
+      setTimeout(() => {
+        setError({
+          isError: false,
+          message: "",
+        });
+      }, 3000);
+      return;
+    }
+
+    if (desc.length > 1000) {
+      setError({
+        isError: true,
+        message: "Your post can't contain more than 1000\u00A0characters.",
       });
 
       // Reset error message after 3 seconds

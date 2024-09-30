@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -100,6 +100,15 @@ export default function CreateStory({ setOpenCreateStory }) {
       }
     }
   };
+
+  // Clean up URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (file) {
+        URL.revokeObjectURL(file);
+      }
+    };
+  }, [file]);
 
   return (
     <div className="createStory">

@@ -34,6 +34,17 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
       return;
     }
 
+    // Check comment length
+    if (desc.trim().length === 0) {
+      toast.error("You must add a text to your comment.");
+      return;
+    }
+    
+    if (desc.trim().length > 500) {
+      toast.error("Your comment can't contain more than 500\u00A0characters.");
+      return;
+    }
+
     // Prepare updated data
     const updatedComment = {
       ...comment,
