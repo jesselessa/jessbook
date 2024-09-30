@@ -90,7 +90,9 @@
 
       p {
         font-size: 1.6rem;
+        word-break: break-word;
         padding: 1rem;
+
 
         @include small {
           font-size: 1.5rem;
