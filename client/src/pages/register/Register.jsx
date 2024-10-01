@@ -71,30 +71,36 @@ export default function Register() {
     let inputsErrors = {};
 
     // Name
-    if (inputsValues.firstName.length < 2 || inputsValues.firstName.length > 35)
+    if (
+      inputsValues?.firstName?.trim()?.length < 2 ||
+      inputsValues?.firstName?.trim()?.length > 35
+    )
       inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
 
-    if (inputsValues.lastName.length < 1 || inputsValues.lastName.length > 35)
+    if (
+      inputsValues?.lastName?.trim()?.length < 1 ||
+      inputsValues?.lastName?.trim()?.length > 35
+    )
       inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
 
     // Email with regex
     if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputsValues.email) ||
-      inputsValues.email.length > 64
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputsValues?.email) ||
+      inputsValues?.email?.length > 64
     )
       inputsErrors.email = "Enter a valid email.";
 
     // Password with regex
     if (
       !/(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}/.test(
-        inputsValues.password
+        inputsValues?.password
       )
     )
       inputsErrors.password =
         "Password must contain at least 6 characters including at least 1 number and 1 symbol.";
 
     // Confirmation password
-    if (inputsValues.password.trim() !== inputsValues.pswdConfirm.trim())
+    if (inputsValues?.password?.trim() !== inputsValues?.pswdConfirm?.trim())
       // trim() removes whitespace from both sides of a string
       inputsErrors.pswdConfirm = "Password does not match.";
 
@@ -115,16 +121,16 @@ export default function Register() {
     try {
       await axios.post(`http://localhost:8000/auth/register`, inputsValues);
 
-      // Reset form
       clearForm();
 
       // Navigate to Login page
       toast.success("Successful registration.");
       navigate("/login");
     } catch (error) {
+      // API error
       setError(error.response.data);
 
-      // Clear API error message after 5 seconds
+      // Clear error message after 5 seconds
       setTimeout(() => {
         setError("");
       }, 5000);
@@ -143,10 +149,9 @@ export default function Register() {
               type="text"
               name="firstName"
               placeholder="First name"
-              minLength={2}
+              value={inputsValues.firstName}
               autoComplete="off"
               required
-              value={inputsValues.firstName}
               onChange={handleChange}
             />
             {validationErrors.firstName && (
@@ -158,10 +163,9 @@ export default function Register() {
               type="text"
               name="lastName"
               placeholder="Last name"
-              minLength={1}
+              value={inputsValues.lastName}
               autoComplete="off"
               required
-              value={inputsValues.lastName}
               onChange={handleChange}
             />
             {validationErrors.lastName && (
@@ -173,9 +177,9 @@ export default function Register() {
               type="email"
               name="email"
               placeholder="Email"
+              value={inputsValues.email}
               autoComplete="off"
               required
-              value={inputsValues.email}
               onChange={handleChange}
             />
             {validationErrors.email && (
@@ -187,9 +191,9 @@ export default function Register() {
               type="password"
               name="password"
               placeholder="Password"
+              value={inputsValues.password}
               autoComplete="off"
               required
-              value={inputsValues.password}
               onChange={handleChange}
             />
             {validationErrors.password && (
@@ -201,9 +205,9 @@ export default function Register() {
               type="password"
               name="pswdConfirm"
               placeholder="Confirm password"
+              value={inputsValues.pswdConfirm}
               autoComplete="off"
               required
-              value={inputsValues.pswdConfirm}
               onChange={handleChange}
             />
             {validationErrors.pswdConfirm && (

@@ -13,13 +13,13 @@ export const getStories = (req, res) => {
 
   const selectQuery =
     userId !== "undefined"
-      ? `SELECT s.*, u.id AS userId, u.firstName, u.lastName
+      ? `SELECT s.*, u.id AS userId, firstName, lastName
     FROM stories AS s 
     JOIN users AS u ON (u.id = s.userId) 
     WHERE s.userId = ? 
     ORDER BY s.createdAt DESC`
       : `
-    SELECT s.*, u.id as userId, u.firstName, u.lastName
+    SELECT s.*, u.id as userId, firstName, lastName
     FROM stories AS s
     JOIN users AS u ON (u.id = s.userId)
     WHERE s.userId = ? 

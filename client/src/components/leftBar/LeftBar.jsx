@@ -28,7 +28,7 @@ export default function LeftBar() {
   const navigate = useNavigate();
 
   const navigateAndScrollTop = () => {
-    navigate(`/profile/${currentUser.id}`);
+    navigate(`/profile/${currentUser?.id}`);
     window.scrollTo(0, 0);
   };
 
@@ -40,7 +40,7 @@ export default function LeftBar() {
           <div className="img-container">
             <LazyLoadImage
               src={
-                currentUser.profilePic
+                currentUser?.profilePic
                   ? `/uploads/${currentUser.profilePic}`
                   : defaultProfile
               }
@@ -48,7 +48,7 @@ export default function LeftBar() {
             />
           </div>
           <span>
-            {currentUser.firstName} {currentUser.lastName}
+            {currentUser?.firstName} {currentUser?.lastName}
           </span>
         </div>
 

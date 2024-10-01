@@ -50,7 +50,7 @@ export default function Stories({ userId }) {
           <div className="story">
             <LazyLoadImage
               src={
-                currentUser.profilePic
+                currentUser?.profilePic
                   ? `/uploads/${currentUser.profilePic}`
                   : defaultProfile
               }

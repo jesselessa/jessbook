@@ -79,7 +79,7 @@ export default function ProfileData() {
 
   const handleFollow = () => {
     try {
-      mutation.mutate(relationshipsData?.includes(currentUser.id));
+      mutation.mutate(relationshipsData?.includes(currentUser?.id));
     } catch (error) {
       console.error("Error handling relationships data:", error);
     }
@@ -133,19 +133,19 @@ export default function ProfileData() {
 
               <div className="main-info">
                 <h2>
-                  {user?.firstName.trim()} {user?.lastName.trim()}
+                  {user?.firstName} {user?.lastName}
                 </h2>
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{user?.city.trim() || "Non renseigné"}</span>
+                  <span>{user?.city || "Non renseigné"}</span>
                 </div>
 
                 {rError ? (
                   "Something went wrong."
                 ) : rIsLoading ? (
                   "Loading..."
-                ) : userId === String(currentUser.id) ? (
+                ) : userId === String(currentUser?.id) ? (
                   <button
                     onClick={() => setOpenUpdate((prevState) => !prevState)}
                   >
@@ -153,7 +153,7 @@ export default function ProfileData() {
                   </button>
                 ) : (
                   <button onClick={handleFollow}>
-                    {relationshipsData?.includes(currentUser.id)
+                    {relationshipsData?.includes(currentUser?.id)
                       ? "Following"
                       : "Follow"}
                   </button>
@@ -162,7 +162,7 @@ export default function ProfileData() {
             </div>
           </div>
 
-          {userId === String(currentUser.id) && <Publish />}
+          {userId === String(currentUser?.id) && <Publish />}
 
           <Posts userId={userId} />
         </>

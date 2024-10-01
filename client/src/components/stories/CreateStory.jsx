@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
+import { useCleanUpFileURL } from "../../hooks/useCleanUpFileURL.js";
 import { toast } from "react-toastify";
 
 // Components
@@ -30,8 +31,6 @@ export default function CreateStory({ setOpenCreateStory }) {
       // Invalidate and refetch
       queryClient.invalidateQueries(["stories"]);
       toast.success("Story published.");
-
-      setOpenCreateStory(false); // Close form
     },
 
     onError: (error) => console.error("Error creating story:", error),
@@ -46,7 +45,15 @@ export default function CreateStory({ setOpenCreateStory }) {
         isError: true,
         message: "You can't edit a story without an image or a video.",
       });
+      return;
+    }
 
+    // Check description length if present
+    if (desc?.trim()?.length > 100) {
+      setError({
+        isError: true,
+        message: "Description can't contain more than 100\u00A0characters.",
+      });
       return;
     }
 
@@ -54,10 +61,10 @@ export default function CreateStory({ setOpenCreateStory }) {
     const newFile = file ? await uploadFile(file) : null;
 
     // Trigger mutation to update database
-    mutation.mutate({ img: newFile, desc: desc });
+    mutation.mutate({ img: newFile, desc: desc.trim() });
 
-    // Reset file state to release URL resources
-    setFile(null);
+    setOpenCreateStory(false); // Close form
+    setFile(null); // Reset file state to release URL resource
   };
 
   const handleFileChange = (e) => {
@@ -80,7 +87,7 @@ export default function CreateStory({ setOpenCreateStory }) {
             // Unvalid video
             setError({
               isError: true,
-              message: "Video duration can't exceed a 60-second limit.",
+              message: "Video duration can't exceed 60\u00A0seconds.",
             });
 
             setFile(null); // Unselect file
@@ -101,14 +108,8 @@ export default function CreateStory({ setOpenCreateStory }) {
     }
   };
 
-  // Clean up URL to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (file) {
-        URL.revokeObjectURL(file);
-      }
-    };
-  }, [file]);
+  // Release URL resource to prevent memory leaks
+  useCleanUpFileURL(file);
 
   return (
     <div className="createStory">
@@ -120,12 +121,12 @@ export default function CreateStory({ setOpenCreateStory }) {
           <div className="input-group">
             <input
               type="file"
-              id="file"
-              name="file"
+              id="story-file"
+              name="story-file"
               accept="image/*, video/*"
               onChange={handleFileChange}
             />
-            <label className="file-label" htmlFor="file">
+            <label className="file-label" htmlFor="story-file">
               Add an image or a video
             </label>
 
@@ -152,7 +153,6 @@ export default function CreateStory({ setOpenCreateStory }) {
             name="desc"
             rows={3}
             placeholder="You can add a short description to your story."
-            maxLength={100}
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
           />

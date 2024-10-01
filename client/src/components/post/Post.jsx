@@ -3,6 +3,7 @@ import "./post.scss";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
+import { fetchPostComments } from "../../utils/fetchPostComments.js";
 import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import moment from "moment";
 import { toast } from "react-toastify";
@@ -41,18 +42,9 @@ export default function Post({ post }) {
   };
 
   // Get comments
-  const fetchPostComments = async () => {
-    try {
-      const res = await makeRequest.get(`/comments?postId=${post.id}`);
-      return res.data;
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-    }
-  };
-
   const { data: comments } = useQuery({
     queryKey: ["comments", post.id],
-    queryFn: fetchPostComments,
+    queryFn: () => fetchPostComments(post.id),
   });
 
   // Handle likes
@@ -85,7 +77,7 @@ export default function Post({ post }) {
 
   const handleLikes = () => {
     try {
-      handleLikesMutation.mutate(likes.includes(currentUser.id));
+      handleLikesMutation.mutate(likes.includes(currentUser?.id));
     } catch (error) {
       console.error("Error handling likes:", error);
     }
@@ -131,7 +123,7 @@ export default function Post({ post }) {
           </div>
         </div>
 
-        {currentUser.id === post.userId && (
+        {currentUser?.id === post.userId && (
           <div className="edit-buttons">
             <EditOutlinedIcon
               className="edit-btn"
@@ -158,7 +150,7 @@ export default function Post({ post }) {
             "Something went wrong."
           ) : isLoading ? (
             "Loading..."
-          ) : likes.includes(currentUser.id) ? (
+          ) : likes.includes(currentUser?.id) ? (
             <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLikes} />
           ) : (
             <FavoriteBorderOutlinedIcon onClick={handleLikes} />

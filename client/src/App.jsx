@@ -58,7 +58,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <ToastContainer autoclose={1500} draggable={false} />
+      <ToastContainer autoclose={1500} />
     </QueryClientProvider>
   );
 }

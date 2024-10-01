@@ -8,13 +8,13 @@ export const getPosts = (req, res) => {
   // Get all user posts plus those of users he follows
   const q =
     userId !== "undefined"
-      ? `SELECT p.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 
+      ? `SELECT p.*, u.id AS userId, firstName, lastName, profilePic 
       FROM posts AS p 
       JOIN users AS u ON (u.id = p.userId) 
       WHERE p.userId = ? 
       ORDER BY p.createdAt DESC`
       : `
-      SELECT p.*, u.id AS userId, u.firstName, u.lastName, u.profilePic 
+      SELECT p.*, u.id AS userId, firstName, lastName, profilePic 
       FROM posts AS p
       JOIN users AS u ON (u.id = p.userId)
       WHERE p.userId = ? 

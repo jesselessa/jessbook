@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./updatePost.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
+import { useCleanUpFileURL } from "../../hooks/useCleanUpFileURL.js";
 import { toast } from "react-toastify";
 
 // Components
@@ -36,7 +37,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     e.preventDefault();
 
     // Check if post has been modified
-    const isDescModified = newDesc.trim() !== post.desc.trim();
+    const isDescModified = newDesc?.trim() !== post.desc?.trim();
     const isImageModified = newImg !== null;
 
     if (!isDescModified && !isImageModified) {
@@ -45,13 +46,13 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     }
 
     // Check if description is empty
-    if (!newDesc.trim()) {
+    if (newDesc?.trim()?.length === 0) {
       toast.error("You must add a description to your post.");
       return;
     }
 
     // Check post length
-    if (newDesc.length > 1000) {
+    if (newDesc?.trim()?.length > 1000) {
       toast.error("Your post can't contain more than 1000\u00A0characters.");
       return;
     }
@@ -59,7 +60,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     // Prepare updated data
     const updatedPost = {
       ...post,
-      desc: newDesc,
+      desc: newDesc.trim(),
     };
 
     // If an image is selected, upload it and update post
@@ -76,14 +77,8 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     setNewImg(null);
   };
 
-  // Clean up URL to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (newImg) {
-        URL.revokeObjectURL(newImg);
-      }
-    };
-  }, [newImg]);
+  // Release URL resource to prevent memory leaks
+  useCleanUpFileURL(newImg);
 
   return (
     <>
@@ -108,14 +103,14 @@ export default function UpdatePost({ post, setOpenUpdate }) {
                   )}
 
                   {/* File input for image selection */}
-                  <label className="file-label" htmlFor="newFile">
+                  <label className="file-label" htmlFor="new-file">
                     <CloudUploadIcon className="icon" />
                   </label>
                   <input
                     type="file"
                     //! 'id' must be different from input in Publish to prevent conflicts when displaying image
-                    id="newFile"
-                    name="newFile"
+                    id="new-file"
+                    name="new-file"
                     accept="image/*"
                     onChange={(e) => setNewImg(e.target.files[0])}
                   />
@@ -123,10 +118,10 @@ export default function UpdatePost({ post, setOpenUpdate }) {
               </div>
             </div>
 
-            <label htmlFor="newDesc">Add a new text</label>
+            <label htmlFor="new-desc">Add a new text</label>
             <textarea
-              id="newDesc"
-              name="newDesc"
+              id="new-desc"
+              name="new-desc"
               rows={8}
               placeholder="Write a text..."
               value={newDesc}

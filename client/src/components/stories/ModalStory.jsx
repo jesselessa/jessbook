@@ -71,7 +71,7 @@ export default function ModalStory({ story, setOpenModal }) {
               <p>Created {moment(story.createdAt).fromNow()}</p>
             </div>
 
-            {currentUser.id === story.userId && (
+            {currentUser?.id === story.userId && (
               <button className="delete" onClick={() => handleDelete(story.id)}>
                 Delete
               </button>

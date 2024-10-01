@@ -84,24 +84,24 @@ export default function Login() {
 
             <input
               type="email"
-              name="email"
               id="email"
+              name="email"
               placeholder="Email"
-              required
               value={inputsValues.email}
-              onChange={handleChange}
               autoComplete="off"
+              required
+              onChange={handleChange}
             />
 
             <input
               type="password"
-              name="password"
               id="password"
+              name="password"
               placeholder="Password"
-              required
               value={inputsValues.password}
-              onChange={handleChange}
               autoComplete="off"
+              required
+              onChange={handleChange}
             />
 
             <button type="submit">Sign in</button>

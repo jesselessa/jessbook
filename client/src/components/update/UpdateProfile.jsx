@@ -1,9 +1,10 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import "./updateProfile.scss";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
+import { useCleanUpFileURL } from "../../hooks/useCleanUpFileURL.js";
 import { toast } from "react-toastify";
 
 // Components
@@ -54,7 +55,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     if (e.target.id === "selected-profile") setProfile(selectedFile);
   };
 
-  // Mutation to update user's data
+  // Mutation to update user data
   const updateMutation = useMutation({
     mutationFn: (updatedUser) => makeRequest.put("/users", updatedUser),
 
@@ -63,7 +64,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       //! 'setQueryData' is usually used to update data locally before receiving confirmation from server
       queryClient.setQueryData(["user", userId], (oldData) => ({
         ...oldData,
-        ...variables, // new user's data passed to mutate
+        ...variables, // new user data passed to mutate
       }));
 
       // 2. Update AuthContext with new data
@@ -95,15 +96,21 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     // Handle validation errors
     let inputsErrors = {};
 
-    if (fields.firstName.length < 2 || fields.firstName.length > 35) {
+    if (
+      fields.firstName?.trim()?.length < 2 ||
+      fields.firstName?.trim()?.length > 35
+    ) {
       inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
     }
 
-    if (fields.lastName.length < 1 || fields.lastName.length > 35) {
+    if (
+      fields.lastName?.trim()?.length < 1 ||
+      fields.lastName?.trim()?.length > 35
+    ) {
       inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
     }
 
-    if (fields.city.length > 85) {
+    if (fields.city?.trim()?.length > 85) {
       inputsErrors.city = "Enter a valid city name.";
     }
 
@@ -161,21 +168,13 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     setCover(null);
     setProfile(null);
 
-    // Go to user's updated profile page
+    // Go to user updated profile page
     navigate(`/profile/${updatedUser.id}`);
   };
 
-  // Clean up URLs to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (cover) {
-        URL.revokeObjectURL(cover);
-      }
-      if (profile) {
-        URL.revokeObjectURL(profile);
-      }
-    };
-  }, [cover, profile]);
+  // Release URL resources to prevent memory leaks
+  useCleanUpFileURL(cover);
+  useCleanUpFileURL(profile);
 
   return (
     <>

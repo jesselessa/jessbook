@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import "./comments.scss";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
+import { fetchPostComments } from "../../utils/fetchPostComments.js";
 import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import { toast } from "react-toastify";
 import moment from "moment";
@@ -30,20 +31,14 @@ export default function Comments({ postId }) {
   const queryClient = useQueryClient();
 
   // Get post comments
-  const fetchPostComments = async () => {
-    try {
-      const res = await makeRequest.get(`/comments?postId=${postId}`);
-      return res.data;
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-    }
-  };
-
   const {
     isLoading,
     error,
     data: comments,
-  } = useQuery({ queryKey: ["comments", postId], queryFn: fetchPostComments });
+  } = useQuery({
+    queryKey: ["comments", postId],
+    queryFn: () => fetchPostComments(postId),
+  });
 
   // Create a new comment
   const mutation = useMutation({
@@ -62,12 +57,12 @@ export default function Comments({ postId }) {
 
     try {
       // Check comment length
-      if (desc.trim().length === 0) {
+      if (desc?.trim()?.length === 0) {
         toast.error("You must add a text to your comment.");
         return;
       }
-      
-      if (desc.trim().length > 500) {
+
+      if (desc?.trim()?.length > 500) {
         toast.error(
           "Your comment can't contain more than 500\u00A0characters."
         );
@@ -112,7 +107,7 @@ export default function Comments({ postId }) {
         <div className="img-container">
           <LazyLoadImage
             src={
-              currentUser.profilePic
+              currentUser?.profilePic
                 ? `/uploads/${currentUser.profilePic}`
                 : defaultProfile
             }
@@ -161,7 +156,7 @@ export default function Comments({ postId }) {
                 <p>{addNonBreakingSpace(comment?.desc)}</p>
               </div>
               <div className="buttons-time">
-                {currentUser.id === comment?.userId && (
+                {currentUser?.id === comment?.userId && (
                   <div className="edit-buttons">
                     <EditOutlinedIcon
                       className="edit-btn"

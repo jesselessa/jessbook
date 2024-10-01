@@ -73,12 +73,9 @@
           border-bottom: 0.1rem solid #8bd1e3;
           margin-top: 1.5rem;
           outline: none;
+          
           &::placeholder {
             color: #08415c;
-          }
-
-          @include xsmall {
-            font-size: 1.5rem;
           }
         }
 

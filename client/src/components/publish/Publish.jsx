@@ -1,8 +1,9 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import "./publish.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
+import { useCleanUpFileURL } from "../../hooks/useCleanUpFileURL.js";
 import { toast } from "react-toastify";
 
 // Components
@@ -45,7 +46,7 @@ export default function Publish() {
     e.preventDefault();
 
     // Check post length
-    if (desc.trim().length === 0) {
+    if (desc?.trim()?.length === 0) {
       setError({
         isError: true,
         message: "You can't edit a post without a description.",
@@ -61,7 +62,7 @@ export default function Publish() {
       return;
     }
 
-    if (desc.length > 1000) {
+    if (desc?.trim()?.length > 1000) {
       setError({
         isError: true,
         message: "Your post can't contain more than 1000\u00A0characters.",
@@ -88,14 +89,8 @@ export default function Publish() {
     setDesc("");
   };
 
-  // Clean up URL resource to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (image) {
-        URL.revokeObjectURL(image);
-      }
-    };
-  }, [image]);
+  // Release URL resource to prevent memory leaks
+  useCleanUpFileURL(image);
 
   return (
     <div className="publish">
@@ -104,7 +99,7 @@ export default function Publish() {
           <div className="img-container">
             <LazyLoadImage
               src={
-                currentUser.profilePic
+                currentUser?.profilePic
                   ? `/uploads/${currentUser.profilePic}`
                   : defaultProfile
               }
@@ -116,7 +111,7 @@ export default function Publish() {
             <input
               type="text"
               name="text"
-              placeholder={`What's up, ${currentUser.firstName}\u00A0?`}
+              placeholder={`What's up, ${currentUser?.firstName}\u00A0?`}
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
               autoComplete="off"

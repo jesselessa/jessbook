@@ -39,7 +39,7 @@ export default function RightBar() {
               <span>Jane Doe</span> changed their profile picture
             </p>
           </div>
-          <span className="time">1min ago</span>
+          <span className="time">1 min ago</span>
         </div>
 
         <div className="activity">

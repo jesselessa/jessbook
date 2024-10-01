@@ -9,7 +9,7 @@ export const db = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
-db.connect(function (error) {
-  if (error) throw error;
+db.connect((error) => {
+  if (error) throw new Error(error);
   console.log("Database connected to server");
 });

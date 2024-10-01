@@ -29,18 +29,18 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
     e.preventDefault();
 
     // Check if comment has been modified
-    if (desc.trim() === comment.desc.trim()) {
+    if (desc?.trim() === comment.desc?.trim()) {
       toast.info("No changes detected.");
       return;
     }
 
     // Check comment length
-    if (desc.trim().length === 0) {
+    if (desc?.trim()?.length === 0) {
       toast.error("You must add a text to your comment.");
       return;
     }
-    
-    if (desc.trim().length > 500) {
+
+    if (desc?.trim()?.length > 500) {
       toast.error("Your comment can't contain more than 500\u00A0characters.");
       return;
     }
@@ -48,7 +48,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
     // Prepare updated data
     const updatedComment = {
       ...comment,
-      desc: desc,
+      desc: desc.trim(),
     };
 
     // Trigger mutation to update database
