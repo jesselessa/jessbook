@@ -9,6 +9,7 @@ import Publish from "../../components/publish/Publish.jsx";
 import Posts from "../../components/posts/Posts.jsx";
 import UpdateProfile from "../../components/update/UpdateProfile.jsx";
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
+import Loader from "../loader/Loader.jsx";
 
 // Icons
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
@@ -90,7 +91,7 @@ export default function ProfileData() {
       {error ? (
         "Something went wrong."
       ) : isLoading ? (
-        "Loading..."
+        <Loader />
       ) : (
         <>
           <div className="profile-container">
@@ -144,7 +145,7 @@ export default function ProfileData() {
                 {rError ? (
                   "Something went wrong."
                 ) : rIsLoading ? (
-                  "Loading..."
+                  <Loader />
                 ) : userId === String(currentUser?.id) ? (
                   <button
                     onClick={() => setOpenUpdate((prevState) => !prevState)}

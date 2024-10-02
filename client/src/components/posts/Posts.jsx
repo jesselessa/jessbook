@@ -2,8 +2,9 @@ import "./posts.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 
-// Component
+// Components
 import Post from "../post/Post.jsx";
+import Loader from "../loader/Loader.jsx";
 
 export default function Posts({ userId }) {
   const getPosts = async () => {
@@ -26,13 +27,15 @@ export default function Posts({ userId }) {
 
   return (
     <div className="posts">
-      {error
-        ? "Something went wrong."
-        : isLoading
-        ? "Loading..."
-        : posts?.length === 0
-        ? "No post to show yet."
-        : posts?.map((post) => <Post key={post?.id} post={post} />)}
+      {error ? (
+        "Something went wrong."
+      ) : isLoading ? (
+        <Loader />
+      ) : posts?.length === 0 ? (
+        "No post to show yet."
+      ) : (
+        posts?.map((post) => <Post key={post?.id} post={post} />)
+      )}
     </div>
   );
 }

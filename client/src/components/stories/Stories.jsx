@@ -8,6 +8,7 @@ import { isVideo } from "../../utils/isVideo.js";
 import CreateStory from "./CreateStory.jsx";
 import ModalStory from "./ModalStory.jsx";
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
+import Loader from "../loader/Loader.jsx";
 
 // Image
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
@@ -68,7 +69,7 @@ export default function Stories({ userId }) {
           {error ? (
             <span className="msg">Something went wrong</span>
           ) : isLoading ? (
-            <span className="msg">Loading...</span>
+            <Loader />
           ) : stories?.length === 0 ? (
             <span className="msg">No story to show yet.</span>
           ) : (

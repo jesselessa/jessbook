@@ -88,8 +88,20 @@ $themes: (
     @content;
   }
 }
+
 @mixin xsmall {
   @media (max-width: 425px) {
     @content;
   }
+}
+
+// Handle animations
+@mixin keyframes($name) {
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
+@mixin animate($animation, $duration, $method, $times) {
+  animation: $animation $duration $method $times;
 }
