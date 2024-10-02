@@ -47,7 +47,7 @@ export default function Post({ post }) {
     queryFn: () => fetchPostComments(post.id),
   });
 
-  // Handle likes
+  // Get likes
   const fetchPostLikes = async () => {
     try {
       const res = await makeRequest.get(`/likes?postId=${post.id}`);
@@ -57,12 +57,12 @@ export default function Post({ post }) {
     }
   };
 
-  const {
-    isLoading,
-    error,
-    data: likes,
-  } = useQuery({ queryKey: ["likes", post.id], queryFn: fetchPostLikes });
+  const { data: likes } = useQuery({
+    queryKey: ["likes", post.id],
+    queryFn: fetchPostLikes,
+  });
 
+  // Handle likes
   const handleLikesMutation = useMutation({
     mutationFn: (liked) => {
       if (liked) return makeRequest.delete(`/likes?postId=${post.id}`);
@@ -77,7 +77,7 @@ export default function Post({ post }) {
 
   const handleLikes = () => {
     try {
-      handleLikesMutation.mutate(likes.includes(currentUser?.id));
+      handleLikesMutation.mutate(likes?.includes(currentUser?.id));
     } catch (error) {
       console.error("Error handling likes:", error);
     }
@@ -146,11 +146,7 @@ export default function Post({ post }) {
 
       <div className="interactions">
         <div className="item">
-          {error ? (
-            "Something went wrong."
-          ) : isLoading ? (
-            "Loading..."
-          ) : likes.includes(currentUser?.id) ? (
+          {likes?.includes(currentUser?.id) ? (
             <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLikes} />
           ) : (
             <FavoriteBorderOutlinedIcon onClick={handleLikes} />

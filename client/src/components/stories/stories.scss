@@ -28,6 +28,10 @@
         color: themed("textColor");
         text-align: center;
         margin: auto;
+
+        @include small {
+          font-size: 1.5rem;
+        }
       }
 
       .story {

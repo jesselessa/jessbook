@@ -14,7 +14,8 @@ export const register = (req, res) => {
         .status(500)
         .json("An unknown error has occured. Please, try again later.");
 
-    if (data.length > 0) return res.status(409).json("User already exists.");
+    if (data.length > 0)
+      return res.status(409).json("A user account with this email address already exists.");
 
     // 2 - If no user, create a new one
     // Hash password
@@ -52,7 +53,7 @@ export const login = (req, res) => {
       return res.status(404).json("Invalid email or password.");
 
     // 2 - Check password
-    const checkPswd = bcrypt.compareSync(req.body.password, data[0].password); 
+    const checkPswd = bcrypt.compareSync(req.body.password, data[0].password);
 
     if (!checkPswd) return res.status(400).json("Invalid email or password.");
 

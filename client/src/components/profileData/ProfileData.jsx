@@ -58,12 +58,10 @@ export default function ProfileData() {
     }
   };
 
-  const {
-    // "r" for "relationships"
-    isLoading: rIsLoading,
-    error: rError,
-    data: relationshipsData,
-  } = useQuery({ queryKey: ["relationships"], queryFn: fetchRelationships });
+  const { data: relationshipsData } = useQuery({
+    queryKey: ["relationships"],
+    queryFn: fetchRelationships,
+  });
 
   const mutation = useMutation({
     mutationFn: (following) => {
@@ -142,11 +140,7 @@ export default function ProfileData() {
                   <span>{user?.city || "Non renseigné"}</span>
                 </div>
 
-                {rError ? (
-                  "Something went wrong."
-                ) : rIsLoading ? (
-                  <Loader />
-                ) : userId === String(currentUser?.id) ? (
+                {userId === String(currentUser?.id) ? (
                   <button
                     onClick={() => setOpenUpdate((prevState) => !prevState)}
                   >
