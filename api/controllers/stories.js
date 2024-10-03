@@ -8,7 +8,7 @@ export const getStories = (req, res) => {
   // Delete expired stories before getting new ones (in large-scale projects, better use a cron job to reduce loading time of SQL query)
   const deleteQuery = "DELETE FROM stories WHERE expiresAt <= NOW()";
   db.query(deleteQuery, (error, _data) => {
-    if (error) console.log("Error deleting expired stories:", error);
+    if (error) return res.json(error);
   });
 
   const selectQuery =

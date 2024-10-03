@@ -9,6 +9,8 @@ import Home from "./pages/home/Home.jsx";
 import Profile from "./pages/profile/Profile.jsx";
 import Login from "./pages/login/Login.jsx";
 import Register from "./pages/register/Register.jsx";
+import ForgotPassword from "./pages/forgotPassword/ForgotPassword.jsx";
+import ResetPassword from "./pages/resetPassword/ResetPassword.jsx";
 
 // Context
 import { AuthContext } from "./contexts/authContext.jsx";
@@ -44,6 +46,14 @@ function App() {
       element: <Login />,
     },
     {
+      path: "/forgot-password",
+      element: <ForgotPassword />,
+    },
+    {
+      path: "/reset-password/:token",
+      element: <ResetPassword />,
+    },
+    {
       path: "/register",
       element: <Register />,
     },
@@ -58,7 +68,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <ToastContainer autoclose={1500} />
+      <ToastContainer autoClose={1500} />
     </QueryClientProvider>
   );
 }

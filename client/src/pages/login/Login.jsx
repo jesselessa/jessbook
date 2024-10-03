@@ -49,7 +49,8 @@ export default function Login() {
       navigate("/");
     } catch (error) {
       // Handle errors from API
-      setError(error.response.data);
+      console.error(error);
+      setError("An unknown error has occurred. Please, try again later.");
     }
   };
 
@@ -106,7 +107,9 @@ export default function Login() {
 
             <button type="submit">Sign in</button>
 
-            {/* <span>Forgot your password ?</span> */}
+            <Link to="/forgot-password">
+              <span>Forgot your password ?</span>
+            </Link>
 
             {windowWidth <= 1150 && (
               <Link to="/register">

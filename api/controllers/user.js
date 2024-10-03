@@ -8,9 +8,9 @@ export const getUser = (req, res) => {
   const q = "SELECT * FROM users WHERE id = ?";
 
   db.query(q, [userId], (error, data) => {
-    if (error) return res.status(500).json("An unknown error has occured.");
+    if (error) return res.status(500).json(error);
 
-    // All user info except password
+    // If user exists, return his info except password
     const { password, ...others } = data[0]; // data[0] represents the query result = an array with one entry
     if (data.length > 0) return res.status(200).json(others);
   });

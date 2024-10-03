@@ -47,11 +47,8 @@
         color: teal;
 
         @include medium {
+          font-size: 3rem;
           margin-bottom: 2rem;
-        }
-
-        @include xsmall {
-          font-size: 3.5rem;
         }
       }
 
@@ -73,7 +70,7 @@
           border-bottom: 0.1rem solid #8bd1e3;
           margin-top: 1.5rem;
           outline: none;
-          
+
           &::placeholder {
             color: #08415c;
           }
@@ -82,7 +79,6 @@
         .error-msg {
           color: #f75252;
           font-size: 1.3rem;
-          font-weight: 400;
           margin-top: 0.7rem;
         }
 

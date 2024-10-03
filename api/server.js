@@ -2,8 +2,8 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-// Multer configuration
-import { upload } from "./middlewares/upload.js";
+import path from "path";
+import { upload } from "./middlewares/upload.js"; // Multer configuration
 
 // Environment variables
 const host = process.env.HOST;
@@ -26,14 +26,20 @@ app.use((_req, res, next) => {
   res.header("Access-Control-Allow-Credentials", true);
   next();
 });
+
 app.use(express.json());
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: process.env.CLIENT_URL, // Front-end URL
+    methods: ["GET", "POST", "PUT", "DELETE"], // Methods authorized
+    credentials: true, // Allow cookies
   })
 );
+
 app.use(cookieParser());
 
+// API routes
 app.use("/auth", authRoute);
 app.use("/users", usersRoute);
 app.use("/posts", postsRoute);
@@ -42,10 +48,18 @@ app.use("/likes", likesRoute);
 app.use("/relationships", relationshipsRoute);
 app.use("/stories", storiesRoute);
 
-// Multer
+// Multer : handle file upload
 app.post("/uploads", upload, (req, res) => {
   const file = req.file;
   res.status(200).json(file.filename);
+});
+
+// Serve static files for our front-end (after Vite build)
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, "client/dist")));
+
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(__dirname, "client/dist", "index.html")); // Serve index.html for any route not handled by the API
 });
 
 // Start server

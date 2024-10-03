@@ -128,7 +128,8 @@ export default function Register() {
       navigate("/login");
     } catch (error) {
       // API error
-      setError(error.response.data);
+      console.error(error);
+      setError("An unknown error has occurred. Please, try again later.");
 
       // Clear error message after 5 seconds
       setTimeout(() => {
