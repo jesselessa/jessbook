@@ -85,10 +85,11 @@ export const recoverAccount = (req, res) => {
     db.query(selectQuery, [email], async (error, data) => {
       if (error) return res.status(500).json(error);
 
-      if (data.length === 0)
+      if (data.length === 0) {
         return res
           .status(404)
           .json("There is no account associated with this email.");
+      }
 
       if (data.length > 0) {
         // Generate a token for reset
@@ -97,8 +98,12 @@ export const recoverAccount = (req, res) => {
           expiresIn: "1h",
         });
 
+        //! Log the generated token for debugging
+        console.log("Generated Token:", token);
+
         // Password reset link
         const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
+        console.log("Reset Link:", resetLink); //! Log reset link
 
         // Send email with Nodemailer
         try {
@@ -106,7 +111,7 @@ export const recoverAccount = (req, res) => {
             to: email,
             subject: "Jessbook - Reset your password",
             html: `<div style="padding: 10px">
-                    <p>Clink the link below to reset your password\u00A0:</p>
+                    <p>Click the link below to reset your password:</p>
                     <a href="${resetLink}" target="_blank" style="font-weight: bold; color: #008080">
                       Change my password
                     </a>
@@ -116,7 +121,7 @@ export const recoverAccount = (req, res) => {
 
           return res
             .status(200)
-            .json("A link to reset your password has be sent to your email.");
+            .json("A link to reset your password has been sent to your email.");
         } catch (err) {
           return res.status(500).json(err);
         }

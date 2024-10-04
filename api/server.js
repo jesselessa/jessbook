@@ -53,13 +53,7 @@ app.use("/likes", likesRoute);
 app.use("/relationships", relationshipsRoute);
 app.use("/stories", storiesRoute);
 
-// Serve files from 'client/public/uploads' as static files
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "../client/public/uploads"))
-);
-
-// Handle file upload with Multer
+// Upload files with Multer
 app.post("/uploads", upload, (req, res) => {
   const file = req.file;
   res.status(200).json(file.filename);
@@ -68,9 +62,10 @@ app.post("/uploads", upload, (req, res) => {
 // Serve static files for our front-end (after Vite build)
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
+// Handle routes not defined by API
 app.get("*", (_req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-}); // Routes not handled by API
+}); // Display Login page
 
 // Start server
 app.listen(PORT, () => {

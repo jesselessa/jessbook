@@ -37,7 +37,7 @@ export const updateUser = (req, res) => {
   }
 
   if (req.body.password !== undefined) {
-    // Hash the password before updating
+    // Hash password before updating it
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(req.body.password, salt);
 

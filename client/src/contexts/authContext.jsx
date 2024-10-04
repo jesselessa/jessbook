@@ -10,7 +10,7 @@ export const AuthContextProvider = ({ children }) => {
 
   const login = async (inputsValues) => {
     const res = await makeRequest.post(
-      `http://localhost:8000/auth/login`,
+      `http://localhost:8080/auth/login`,
       inputsValues
     );
     setCurrentUser(res.data); // User data fetched from API

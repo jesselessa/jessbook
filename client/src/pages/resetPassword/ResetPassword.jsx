@@ -16,6 +16,8 @@ export default function ResetPassword() {
   });
 
   const { token } = useParams(); // Get token from URL
+  console.log("Token reçu : ", token); // Ajoutez ce log pour vérifier le token
+
   const navigate = useNavigate();
 
   // Check window object width for responsive design
