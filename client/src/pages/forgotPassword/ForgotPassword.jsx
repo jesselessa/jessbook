@@ -43,7 +43,7 @@ export default function RecoverAccount() {
       </Link>
 
       <div className="wrapper">
-        <h1>Forgot your password ?</h1>
+        <h1>Forgot your password&nbsp;?</h1>
 
         <form name="recover-form" onSubmit={handleSubmit}>
           <input
