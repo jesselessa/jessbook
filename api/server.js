@@ -69,7 +69,7 @@ app.post("/uploads", upload, (req, res) => {
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
 app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "..client/dist", "index.html"));
+  res.sendFile(path.join(__dirname, "..client/dist/index.html"));
 }); // Routes not handled by API
 
 // Start server
