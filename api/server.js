@@ -56,7 +56,7 @@ app.use("/stories", storiesRoute);
 // Serve files from 'client/public/uploads' as static files
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "client/public/uploads"))
+  express.static(path.join(__dirname, "../client/public/uploads"))
 );
 
 // Handle file upload with Multer
@@ -69,7 +69,7 @@ app.post("/uploads", upload, (req, res) => {
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
 app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "..client/dist/index.html"));
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 }); // Routes not handled by API
 
 // Start server

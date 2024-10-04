@@ -108,7 +108,7 @@ export const recoverAccount = (req, res) => {
             html: `<div style="padding: 10px">
                     <p>Clink the link below to reset your password\u00A0:</p>
                     <a href="${resetLink}" target="_blank" style="font-weight: bold; color: #008080">
-                      Changer my password
+                      Change my password
                     </a>
                     <p style="margin-top: 10px; font-weight: bold">This link will expire in 1 hour.</p>
                   </div>`,
