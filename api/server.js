@@ -3,11 +3,16 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
+import { fileURLToPath } from "url";
 import { upload } from "./middlewares/upload.js"; // Multer configuration
 
 // Environment variables
 const host = process.env.HOST;
 const PORT = process.env.PORT;
+
+// Get __dirname equivalent in ES module mode
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Routes
 import authRoute from "./routes/auth.js"; //! Error if no file extension
@@ -33,6 +38,7 @@ app.use(
   cors({
     origin: process.env.CLIENT_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   })
 );
 
@@ -47,19 +53,24 @@ app.use("/likes", likesRoute);
 app.use("/relationships", relationshipsRoute);
 app.use("/stories", storiesRoute);
 
-// Multer : handle file upload
+// Serve files from 'client/public/uploads' as static files
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "client/public/uploads"))
+);
+
+// Handle file upload with Multer
 app.post("/uploads", upload, (req, res) => {
   const file = req.file;
   res.status(200).json(file.filename);
 });
 
 // Serve static files for our front-end (after Vite build)
-const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, "client/dist")));
+app.use(express.static(path.join(__dirname, "../client/dist")));
 
 app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "client/dist", "index.html")); // Serve index.html for any route not handled by the API
-});
+  res.sendFile(path.join(__dirname, "..client/dist", "index.html"));
+}); // Routes not handled by API
 
 // Start server
 app.listen(PORT, () => {
