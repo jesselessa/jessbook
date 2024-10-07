@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./resetPassword.scss";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { makeRequest } from "../../utils/axios.js";
 import { toast } from "react-toastify";
 
@@ -14,8 +14,7 @@ export default function ResetPassword() {
     password: "",
     confirmPswd: "",
   });
-
-  const { token } = useParams(); // Get token from URL
+  const [error, setError] = useState({ message: "", error: false });
 
   const navigate = useNavigate();
 
@@ -32,9 +31,21 @@ export default function ResetPassword() {
       confirmPswd: "",
     });
 
+  const clearValidationErrors = () =>
+    setValidationErrors({
+      password: "",
+      confirmPswd: "",
+    });
+
   // Handle inputs changes
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Reset error messages everytime inputs change
+    clearValidationErrors();
+    setError({ message: "", error: false });
+
+    // Update inputs values
     setInputsValues((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -45,7 +56,7 @@ export default function ResetPassword() {
     // 1 - Handle form validation
     let inputsErrors = {};
 
-    // Password with regex validation
+    // a - Password with regex validation
     if (
       !/(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}/.test(
         inputsValues.password
@@ -54,34 +65,37 @@ export default function ResetPassword() {
       inputsErrors.password =
         "Password must contain at least 6 characters including at least 1 number and 1 symbol.";
 
-    // Confirmation password
+    // b - Confirmation password
     if (inputsValues.password?.trim() !== inputsValues.confirmPswd?.trim())
       inputsErrors.confirmPswd = "Password does not match.";
 
-    // If errors during validation, update state and stop process
+    // c - If errors during validation, update state and stop process
     if (Object.keys(inputsErrors).length > 0) {
       setValidationErrors(inputsErrors);
       return;
     }
 
-    // Clear error messages and inputs
+    // d - Clear error messages
     setValidationErrors({ password: "", confirmPswd: "" });
 
     // 2 - If successful validation, call API to reset password
     try {
-      await makeRequest.post(`/auth/reset-password/${token}`, {
-        password: inputsValues.password,
-      });
+      await makeRequest.post(`/auth/reset-password`, inputsValues);
 
-      clearForm();
       toast.success("Your password has been successfully sent.");
+      clearForm();
 
       setTimeout(() => {
         navigate("/login");
       }, 3000);
     } catch (error) {
-      console.error("Error during password reset:", error);
+      setError({ message: error.response?.data || error.message, error: true });
       toast.error("Password reset failed.");
+
+      // Reset form and clear API error message after 5 seconds
+      setTimeout(() => {
+        setError({ message: "", error: false });
+      }, 5000);
     }
   };
 
@@ -102,6 +116,7 @@ export default function ResetPassword() {
             id="password"
             name="password"
             value={inputsValues.password}
+            autoComplete="off"
             onChange={handleChange}
           />
           {validationErrors.password && (
@@ -114,12 +129,14 @@ export default function ResetPassword() {
             id="confirmPswd"
             name="confirmPswd"
             value={inputsValues.confirmPswd}
+            autoComplete="off"
             onChange={handleChange}
           />
           {validationErrors.confirmPswd && (
             <span className="error-msg">{validationErrors.confirmPswd}</span>
           )}
 
+          {error.error && <span className="api-msg">{error.message}</span>}
           <button type="submit">Change password</button>
         </form>
 

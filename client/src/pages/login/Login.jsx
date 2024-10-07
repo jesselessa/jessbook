@@ -1,9 +1,10 @@
 import { useEffect, useContext, useState } from "react";
 import "./login.scss";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 // Context
-import { AuthContext } from "../../contexts/authContext";
+import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Login() {
   const { login } = useContext(AuthContext);
@@ -26,8 +27,15 @@ export default function Login() {
   // Handle inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setInputsValues((prevFields) => ({ ...prevFields, [name]: value }));
+    setError(""); // Clear previous error message when inputs change
+    setInputsValues((prev) => ({ ...prev, [name]: value })); // Update values
   };
+
+  const clearForm = () =>
+    setInputsValues({
+      email: "",
+      password: "",
+    });
 
   // Login feature
   const handleSubmit = async (e) => {
@@ -36,20 +44,20 @@ export default function Login() {
     try {
       await login(inputsValues);
 
-      // Reset API error message
+      // Clear form and API error message
+      clearForm();
       setError("");
-
-      // Clear form
-      setInputsValues({
-        email: "",
-        password: "",
-      });
 
       // Navigate to homepage
       navigate("/");
     } catch (error) {
-      // Handle API errors
-      setError(error.response?.data || "An unknow error has occurred.");
+      setError(error.response?.data || error.message);
+      toast.error("Login failed.");
+
+      // Clear API error message after 3 seconds
+      setTimeout(() => {
+        setError("");
+      }, 5000);
     }
   };
 

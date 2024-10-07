@@ -6,6 +6,5 @@ export const fetchPostComments = async (postId) => {
     return res.data;
   } catch (error) {
     console.error("Error fetching comments:", error);
-    
   }
 };

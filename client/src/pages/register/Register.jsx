@@ -37,12 +37,6 @@ export default function Register() {
 
   const changeWindowWidth = () => setWindowWidth(window.innerWidth);
 
-  // Handle inputs
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setInputsValues((prev) => ({ ...prev, [name]: value }));
-  };
-
   // Clear form
   const clearForm = () =>
     setInputsValues({
@@ -63,6 +57,14 @@ export default function Register() {
       confirmPswd: "",
     });
 
+  // Handle inputs
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    clearValidationErrors();
+    setError(""); // Clear API error
+    setInputsValues((prev) => ({ ...prev, [name]: value })); // Update values
+  };
+
   // Registration feature
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,7 +72,7 @@ export default function Register() {
     // 1 - Handle form validation
     let inputsErrors = {};
 
-    // Name
+    // a - Name
     if (
       inputsValues?.firstName?.trim()?.length < 2 ||
       inputsValues?.firstName?.trim()?.length > 35
@@ -83,14 +85,14 @@ export default function Register() {
     )
       inputsErrors.lastName = "Enter a name between 1 and 35\u00A0characters.";
 
-    // Email with regex
+    // b - Email with regex
     if (
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputsValues?.email) ||
       inputsValues?.email?.length > 64
     )
       inputsErrors.email = "Enter a valid email.";
 
-    // Password with regex
+    // c - Password with regex
     if (
       !/(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}/.test(
         inputsValues?.password
@@ -99,20 +101,15 @@ export default function Register() {
       inputsErrors.password =
         "Password must contain at least 6\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.";
 
-    // Confirmation password
+    // d - Confirmation password
     if (inputsValues?.password?.trim() !== inputsValues?.confirmPswd?.trim())
       // trim() removes whitespace from both sides of a string
       inputsErrors.confirmPswd = "Password does not match.";
 
-    // If errors during validation, update state and stop process
+    // e - If errors during validation, update state and stop process
     if (Object.keys(inputsErrors).length > 0) {
       setValidationErrors(inputsErrors);
       toast.error("Registration failed. Check your information.");
-
-      // Clear error messages after 5 seconds
-      setTimeout(() => {
-        clearValidationErrors();
-      }, 5000);
 
       return;
     }
@@ -122,13 +119,15 @@ export default function Register() {
       await axios.post(`http://localhost:8080/auth/register`, inputsValues);
 
       clearForm();
+      toast.success("Successful registration.");
 
       // Navigate to Login page
-      toast.success("Successful registration.");
-      navigate("/login");
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
     } catch (error) {
       // Handle API errors
-      setError(error.response?.data || "An unknown error has occurred.");
+      setError(error.response?.data || error.message);
 
       // Clear error message after 5 seconds
       setTimeout(() => {

@@ -6,41 +6,48 @@ import jwt from "jsonwebtoken";
 export const register = (req, res) => {
   const { firstName, lastName, email, password, confirmPswd } = req.body;
 
-  // 1 - Check if user is in database
+  // Check if user is in database
   const selectQuery = "SELECT * FROM users WHERE email = ?";
 
   db.query(selectQuery, [email], (error, data) => {
-    if (error) return res.status(500).json(error);
+    if (error)
+      return res.status(500).json({
+        message: "An unknown error occurred while fetching user data.",
+        error: error,
+      });
 
-    // If user exists, return a conflict status
-    if (data.length > 0) {
+    // 1 - If user exists, return a conflict status
+    if (data.length > 0)
       return res
         .status(409)
         .json("A user account with this email address already exists.");
-    }
 
-    // 2 - If user doesn't exist, check password validation
+    // 2 - If user doesn't exist, validate request body values
+    let errors = {};
 
-    // a - Check if both password fields are provided
-    if (password?.trim()?.length === 0 || confirmPswd?.trim()?.length === 0) {
-      return res
-        .status(401)
-        .json("You must provide both a password and a confirmation password.");
-    }
+    // a - Check name
+    if (firstName?.trim()?.length < 2 || firstName?.trim()?.length > 35)
+      errors.firstName = "Enter a name between 2 and 35\u00A0characters.";
 
-    // b - Check if passwords match
-    if (password?.trim() !== confirmPswd?.trim()) {
-      return res.status(401).json("The confirmation password does not match.");
-    }
+    if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35)
+      errors.lastName = "Enter a name between 1 and 35\u00A0characters.";
 
-    // c -Check password length and format
-    if (!/(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}/.test(password)) {
-      return res
-        .status(401)
-        .json(
-          "Password must contain at least 6 characters, including at least 1 number and 1 symbol."
-        );
-    }
+    // b - Check email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email?.length > 64)
+      errors.email = "Enter a valid email.";
+
+    // c - Check password
+
+    // c.a - Check password length and format
+    if (!/(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}/.test(password))
+      errors.password =
+        "Password must contain at least 6 characters, including at least 1 number and 1 symbol.";
+
+    // c.b - Check if passwords match
+    if (password?.trim() !== confirmPswd?.trim())
+      errors.confirmPswd = "Confirmation password does not match.";
+
+    if (Object.keys(errors).length > 0) return res.status(400).json(errors);
 
     // 3 - Hash password
     const salt = bcrypt.genSaltSync(10);
@@ -52,28 +59,40 @@ export const register = (req, res) => {
     const values = [firstName, lastName, email, hashedPswd, "user"];
 
     db.query(insertQuery, [values], (error, _data) => {
-      if (error) return res.status(500).json(error);
+      if (error)
+        return res.status(500).json({
+          message: "An unknown error occurred while creating new user.",
+          error: error,
+        });
       return res.status(200).json("New user created.");
     });
   });
 };
 
 export const login = (req, res) => {
-  // 1 - Check email
+  const { email } = req.body;
+
+  // Check if user is in database
   const q = "SELECT * FROM users WHERE email = ?";
 
-  db.query(q, [req.body.email], (error, data) => {
-    if (error) return res.status(500).json(error);
+  db.query(q, [email], (error, data) => {
+    if (error)
+      return res.status(500).json({
+        message: "An unknown error occurred while fetching user data.",
+        error: error,
+      });
 
+    // 1 - If user doesn't exist, send a status 404 error message
     if (data.length === 0)
       return res.status(404).json("Invalid email or password.");
 
-    // 2 - Check password
-    const checkPswd = bcrypt.compareSync(req.body.password, data[0].password);
+    // 2 - If user exists
 
+    // a - Check password
+    const checkPswd = bcrypt.compareSync(req.body.password, data[0].password);
     if (!checkPswd) return res.status(401).json("Invalid email or password.");
 
-    // 3 - Generate token with JWT
+    // b - Generate token with JWT
     const secretKey = process.env.SECRET;
     let token;
 
@@ -87,7 +106,7 @@ export const login = (req, res) => {
       });
     }
 
-    // 4 - Store token in cookie and send it in response
+    // c - Store token in cookie and send it in response
     const { password, ...others } = data[0];
 
     return res
@@ -100,8 +119,9 @@ export const login = (req, res) => {
 export const logout = (_req, res) => {
   return res
     .clearCookie("accessToken", {
-      secure: true,
-      sameSite: "none", // Because API and React app port numbers are not the same
+      httpOnly: true, // Protect agains XSS attacks
+      secure: true, // Prevent cookie from being observed by unauthorized parties
+      sameSite: "none", // Allow cross-site cookies
     })
     .status(200)
     .json("User logged out.");
@@ -110,29 +130,44 @@ export const logout = (_req, res) => {
 export const recoverAccount = (req, res) => {
   const { email } = req.body;
 
-  // If email received
   if (email) {
+    // Check if user is in database
     const selectQuery = "SELECT * FROM users WHERE email = ?";
 
-    db.query(selectQuery, [email], async (error, data) => {
-      if (error) return res.status(500).json(error);
+    // Check email format
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return res.status(400).json("Enter a valid email.");
 
-      if (data.length === 0) {
+    db.query(selectQuery, [email], async (error, data) => {
+      if (error)
+        return res.status(500).json({
+          message: "An unknown error occurred while fetching user data.",
+          error: error,
+        });
+
+      if (data.length === 0)
         return res
           .status(404)
           .json("There is no account associated with this email.");
-      }
 
-      // If user exists, generate token
+      // 1 - If user exists, generate token
       const secretKey = process.env.SECRET;
       const token = jwt.sign({ id: data[0].id }, secretKey, {
         expiresIn: "1h",
       });
 
-      // Password reset link
-      const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`; // TODO - Replace by our own API URL in production
+      // 2 - Create password reset link
+      const resetLink = `${process.env.CLIENT_URL}/reset-password`;
 
-      // Send email with Nodemailer
+      // 3 - Set token in cookie
+      res.cookie("resetToken", token, {
+        httpOnly: true,
+        secure: true, // Ensure that cookies are only sent over HTTPS
+        sameSite: "none", // Allow cross-site cookies
+        maxAge: 3600000, // 1 hour
+      });
+
+      // 4 - Send email with Nodemailer
       try {
         await sendEmail({
           to: email,
@@ -150,31 +185,22 @@ export const recoverAccount = (req, res) => {
           .status(200)
           .json("A link to reset your password has been sent to your email.");
       } catch (err) {
-        // Error while sending email
-        return res.status(500).json(err);
+        return res.status(500).json({
+          message: "An unknown error occurred while sending email.",
+          error: err,
+        });
       }
     });
   } else {
-    // No email in request
-    return res.status(401).json("Invalid request.");
+    return res.status(400).json("Invalid request.");
   }
 };
 
 export const resetPassword = (req, res) => {
   const { password, confirmPswd } = req.body;
-  const { token } = req.params; // Get token from URL
+  const token = req.cookies.resetToken; // Get token from cookie
 
-  // 1 - Check if both password fields are provided
-  if (password?.length === 0 || confirmPswd?.length === 0)
-    return res
-      .status(400)
-      .json("You must provide a password and a confirmation password.");
-
-  // 2 - Check if passwords match
-  if (password?.trim()?.length !== confirmPswd?.trim()?.length)
-    return res.status(400).json("Confirmation password does not match.");
-
-  // 3 - Check password length and format
+  // 1 - Check password length and format
   if (!/(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}/.test(password))
     return res
       .status(400)
@@ -182,24 +208,38 @@ export const resetPassword = (req, res) => {
         "Password must contain at least 6 characters, including at least 1 number and 1 symbol."
       );
 
-  // 4 - Verify token
-  if (!token) return res.status(401).json("Missing token.");
+  // 2 - Check if passwords match
+  if (password?.trim() !== confirmPswd?.trim())
+    return res.status(400).json("Confirmation password does not match.");
+
+  // 3 - Verify token
+  if (!token) return res.status(401).json("Invalid token.");
 
   const secretKey = process.env.SECRET;
 
   try {
-    // Decode token to get user ID
-    const decoded = jwt.verify(token, secretKey);
+    const decoded = jwt.verify(token, secretKey); // Decode token to get user ID
 
-    // 5 - Hash new password
+    // 4 - Hash new password
     const salt = bcrypt.genSaltSync(10);
     const hashedPswd = bcrypt.hashSync(password, salt);
 
-    // 6 - Update password in database
+    // 5 - Update password in database
     const updateQuery = "UPDATE users SET password = ? WHERE id = ?";
 
     db.query(updateQuery, [hashedPswd, decoded.id], (error, _data) => {
-      if (error) return res.status(500).json(error);
+      if (error)
+        return res.status(500).json({
+          message: "An error occurred while updating password.",
+          error: error,
+        });
+
+      // Clear 'resetToken' cookie after password has been reset to make token only usable once
+      res.clearCookie("resetToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
 
       return res.status(200).json("Your password has been successfully reset.");
     });
