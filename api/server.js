@@ -6,8 +6,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { upload } from "./middlewares/upload.js"; // Multer configuration
 
-// Environment variables
-const host = process.env.HOST;
 const PORT = process.env.PORT;
 
 // Get __dirname equivalent in ES module mode
@@ -69,5 +67,5 @@ app.get("*", (_req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server listening at http://${host}:${PORT}`);
+  console.log(`Server listening at ${process.env.SERVER_URL}`);
 });
