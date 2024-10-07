@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 export default function RecoverAccount() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [email, setEmail] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [error, setError] = useState("");
 
   // Check window object width for responsive design
   useEffect(() => {
@@ -15,6 +15,12 @@ export default function RecoverAccount() {
   }, [windowWidth]);
 
   const changeWindowWidth = () => setWindowWidth(window.innerWidth);
+
+  // Handle inputs changes
+  const handleChange = (e) => {
+    setError(""); // Reset error message everytime input changes
+    setEmail(e.target.value); // Update input value
+  };
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -24,14 +30,10 @@ export default function RecoverAccount() {
       // Call API to find account and send email
       await makeRequest.post("/auth/recover-account", { email });
       setEmail(""); // Reset form
-      setErrorMsg(""); // Clear any previous error
+      setError(""); // Clear any previous error
       toast.success("A reset link has been sent to your email.");
     } catch (error) {
-      if (error.response?.status === 404) {
-        setErrorMsg("There is no account associated with this email.");
-      } else {
-        setErrorMsg("An unknown error has occurred. Please, try again later.");
-      }
+      setError(error.response?.data || "An unknown error has occurred.");
     }
   };
 
@@ -53,13 +55,13 @@ export default function RecoverAccount() {
             placeholder="Enter your email"
             value={email}
             autoComplete="off"
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleChange}
           />
 
           <button type="submit">Send a reset link</button>
         </form>
 
-        {errorMsg && <span className="error-msg">{errorMsg}</span>}
+        {error && <span className="error-msg">{error}</span>}
 
         <Link to="/login">
           <span>Go back to Login page</span>

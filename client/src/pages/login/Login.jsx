@@ -48,9 +48,8 @@ export default function Login() {
       // Navigate to homepage
       navigate("/");
     } catch (error) {
-      // Handle errors from API
-      console.error(error);
-      setError("An unknown error has occurred. Please, try again later.");
+      // Handle API errors
+      setError(error.response?.data || "An unknow error has occurred.");
     }
   };
 

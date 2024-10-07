@@ -16,7 +16,6 @@ export default function ResetPassword() {
   });
 
   const { token } = useParams(); // Get token from URL
-  console.log("Token reçu : ", token); // Ajoutez ce log pour vérifier le token
 
   const navigate = useNavigate();
 
@@ -65,7 +64,7 @@ export default function ResetPassword() {
       return;
     }
 
-    // Clear error messages
+    // Clear error messages and inputs
     setValidationErrors({ password: "", confirmPswd: "" });
 
     // 2 - If successful validation, call API to reset password
@@ -81,7 +80,7 @@ export default function ResetPassword() {
         navigate("/login");
       }, 3000);
     } catch (error) {
-      console.error(error);
+      console.error("Error during password reset:", error);
       toast.error("Password reset failed.");
     }
   };

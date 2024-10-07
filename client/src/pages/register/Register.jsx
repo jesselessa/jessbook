@@ -11,7 +11,7 @@ export default function Register() {
     lastName: "",
     email: "",
     password: "",
-    pswdConfirm: "",
+    confirmPswd: "",
   });
   // Errors from form
   const [validationErrors, setValidationErrors] = useState({
@@ -19,7 +19,7 @@ export default function Register() {
     lastName: "",
     email: "",
     password: "",
-    pswdConfirm: "",
+    confirmPswd: "",
   });
   // Errors from API
   const [error, setError] = useState("");
@@ -50,7 +50,7 @@ export default function Register() {
       lastName: "",
       email: "",
       password: "",
-      pswdConfirm: "",
+      confirmPswd: "",
     });
 
   // Clear validation errors in form
@@ -60,7 +60,7 @@ export default function Register() {
       lastName: "",
       email: "",
       password: "",
-      pswdConfirm: "",
+      confirmPswd: "",
     });
 
   // Registration feature
@@ -75,13 +75,13 @@ export default function Register() {
       inputsValues?.firstName?.trim()?.length < 2 ||
       inputsValues?.firstName?.trim()?.length > 35
     )
-      inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
+      inputsErrors.firstName = "Enter a name between 2 and 35\u00A0characters.";
 
     if (
       inputsValues?.lastName?.trim()?.length < 1 ||
       inputsValues?.lastName?.trim()?.length > 35
     )
-      inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
+      inputsErrors.lastName = "Enter a name between 1 and 35\u00A0characters.";
 
     // Email with regex
     if (
@@ -97,12 +97,12 @@ export default function Register() {
       )
     )
       inputsErrors.password =
-        "Password must contain at least 6 characters including at least 1 number and 1 symbol.";
+        "Password must contain at least 6\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.";
 
     // Confirmation password
-    if (inputsValues?.password?.trim() !== inputsValues?.pswdConfirm?.trim())
+    if (inputsValues?.password?.trim() !== inputsValues?.confirmPswd?.trim())
       // trim() removes whitespace from both sides of a string
-      inputsErrors.pswdConfirm = "Password does not match.";
+      inputsErrors.confirmPswd = "Password does not match.";
 
     // If errors during validation, update state and stop process
     if (Object.keys(inputsErrors).length > 0) {
@@ -119,7 +119,7 @@ export default function Register() {
 
     // 2 - If successful validation, continue process and call API
     try {
-      await axios.post(`http://localhost:8000/auth/register`, inputsValues);
+      await axios.post(`http://localhost:8080/auth/register`, inputsValues);
 
       clearForm();
 
@@ -127,9 +127,8 @@ export default function Register() {
       toast.success("Successful registration.");
       navigate("/login");
     } catch (error) {
-      // API error
-      console.error(error);
-      setError("An unknown error has occurred. Please, try again later.");
+      // Handle API errors
+      setError(error.response?.data || "An unknown error has occurred.");
 
       // Clear error message after 5 seconds
       setTimeout(() => {
@@ -204,15 +203,15 @@ export default function Register() {
             {/* Confirm Password */}
             <input
               type="password"
-              name="pswdConfirm"
+              name="confirmPswd"
               placeholder="Confirm password"
-              value={inputsValues.pswdConfirm}
+              value={inputsValues.confirmPswd}
               autoComplete="off"
               required
               onChange={handleChange}
             />
-            {validationErrors.pswdConfirm && (
-              <span className="error-msg">{validationErrors.pswdConfirm}</span>
+            {validationErrors.confirmPswd && (
+              <span className="error-msg">{validationErrors.confirmPswd}</span>
             )}
 
             {/* API Error */}

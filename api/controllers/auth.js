@@ -130,7 +130,7 @@ export const recoverAccount = (req, res) => {
       });
 
       // Password reset link
-      const resetLink = `${process.env.SERVER_URL}/reset-password/${token}`; // TODO - Replace by our own API URL in production
+      const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`; // TODO - Replace by our own API URL in production
 
       // Send email with Nodemailer
       try {
