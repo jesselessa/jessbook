@@ -124,6 +124,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
               name="new-desc"
               rows={8}
               placeholder="Write a text..."
+              maxLength={1000}
               value={newDesc}
               onChange={(e) => setNewDesc(e.target.value)}
             />

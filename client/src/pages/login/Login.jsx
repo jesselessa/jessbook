@@ -95,6 +95,7 @@ export default function Login() {
               id="email"
               name="email"
               placeholder="Email"
+              maxLength={64}
               value={inputsValues.email}
               autoComplete="off"
               required
@@ -106,6 +107,7 @@ export default function Login() {
               id="password"
               name="password"
               placeholder="Password"
+              maxLength={200}
               value={inputsValues.password}
               autoComplete="off"
               required

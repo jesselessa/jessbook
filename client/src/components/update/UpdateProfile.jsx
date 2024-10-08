@@ -246,6 +246,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               type="text"
               id="firstName"
               name="firstName"
+              maxLength={35}
               value={fields.firstName}
               onChange={handleFieldChange}
               autoComplete="off"
@@ -259,6 +260,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               type="text"
               id="lastName"
               name="lastName"
+              maxLength={35}
               value={fields.lastName}
               onChange={handleFieldChange}
               autoComplete="off"
@@ -272,6 +274,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
               type="text"
               id="city"
               name="city"
+              maxLength={85}
               value={fields.city}
               onChange={handleFieldChange}
               autoComplete="off"

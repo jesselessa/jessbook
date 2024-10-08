@@ -148,6 +148,7 @@ export default function Register() {
               type="text"
               name="firstName"
               placeholder="First name"
+              maxLength={35}
               value={inputsValues.firstName}
               autoComplete="off"
               required
@@ -162,6 +163,7 @@ export default function Register() {
               type="text"
               name="lastName"
               placeholder="Last name"
+              maxLength={35}
               value={inputsValues.lastName}
               autoComplete="off"
               required
@@ -176,6 +178,7 @@ export default function Register() {
               type="email"
               name="email"
               placeholder="Email"
+              maxLength={64}
               value={inputsValues.email}
               autoComplete="off"
               required
@@ -190,6 +193,7 @@ export default function Register() {
               type="password"
               name="password"
               placeholder="Password"
+              maxLength={200}
               value={inputsValues.password}
               autoComplete="off"
               required
@@ -204,6 +208,7 @@ export default function Register() {
               type="password"
               name="confirmPswd"
               placeholder="Confirm password"
+              maxLength={200}
               value={inputsValues.confirmPswd}
               autoComplete="off"
               required

@@ -69,6 +69,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
               name="text"
               rows={5}
               placeholder="Write a text..."
+              maxLength={500}
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />

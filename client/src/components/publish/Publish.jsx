@@ -112,6 +112,7 @@ export default function Publish() {
               type="text"
               name="text"
               placeholder={`What's up, ${currentUser?.firstName}\u00A0?`}
+              maxLength={1000}
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
               autoComplete="off"

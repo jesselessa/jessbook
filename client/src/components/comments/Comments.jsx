@@ -120,7 +120,9 @@ export default function Comments({ postId }) {
             type="text"
             name="text"
             placeholder="Write a comment..."
+            maxLength={500}
             value={desc}
+            autoComplete="off"
             onChange={(e) => setDesc(e.target.value)}
           />
           <SendOutlinedIcon
