@@ -73,6 +73,10 @@
         &:hover {
           cursor: pointer;
         }
+
+        &:active {
+          transform: translateY(1px);
+        }
       }
 
       .searchbar {
@@ -148,6 +152,10 @@
         font-weight: bold;
         color: themed("iconColor");
         cursor: pointer;
+
+        &:active {
+        transform: translateY(1px);
+        }
       }
     }
 

@@ -127,7 +127,7 @@ export default function CreateStory({ setOpenCreateStory }) {
               onChange={handleFileChange}
             />
             <label className="file-label" htmlFor="story-file">
-              Add an image or a video
+              Add an image or a&nbsp;video
             </label>
 
             {file && (
@@ -152,6 +152,7 @@ export default function CreateStory({ setOpenCreateStory }) {
             id="desc"
             name="desc"
             rows={3}
+            maxLength={45}
             placeholder="You can add a short description to your story."
             value={desc}
             onChange={(e) => setDesc(e.target.value)}

@@ -34,6 +34,11 @@ export default function RecoverAccount() {
       toast.success("A reset link has been sent to your email.");
     } catch (error) {
       setError(error.response?.data || "An unknown error has occurred.");
+
+      // Clear error message after 5 seconds
+      setTimeout(() => {
+        setError("");
+      }, 5000);
     }
   };
 

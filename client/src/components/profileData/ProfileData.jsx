@@ -65,8 +65,9 @@ export default function ProfileData() {
 
   const mutation = useMutation({
     mutationFn: (following) => {
-      if (following)
+      if (following) {
         return makeRequest.delete(`/relationships?userId=${userId}`);
+      }
       return makeRequest.post("/relationships", { userId });
     },
 
@@ -149,7 +150,7 @@ export default function ProfileData() {
                 ) : (
                   <button onClick={handleFollow}>
                     {relationshipsData?.includes(currentUser?.id)
-                      ? "Following"
+                      ? "Unfollow"
                       : "Follow"}
                   </button>
                 )}

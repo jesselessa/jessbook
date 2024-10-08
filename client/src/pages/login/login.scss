@@ -147,15 +147,24 @@
 
       button {
         height: 3.3rem;
-        background-color: #ffd670;
         font-size: 1.8rem;
         font-weight: bold;
         color: teal;
+        background-color: #ffd670;
         letter-spacing: 0.1rem;
         border: none;
         border-radius: 0.3rem;
         margin: 0rem 0 1rem 0;
         cursor: pointer;
+
+        &:hover {
+          background-color: darken(#ffd670, 10%);
+        }
+
+        &:active {
+          transform: translateY(1px);
+          background-color: darken(#ffd670, 20%);
+        }
       }
 
       span {

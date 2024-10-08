@@ -98,6 +98,15 @@
           margin-top: 2rem;
           cursor: pointer;
 
+          &:hover {
+            background-color: darken(#ffd670, 10%);
+          }
+
+          &:active {
+            transform: translateY(1px);
+            background-color: darken(#ffd670, 20%);
+          }
+
           @include medium {
             margin: 2rem 0;
           }
@@ -113,6 +122,7 @@
           span {
             font-weight: bold;
             color: teal;
+            cursor: pointer;
           }
         }
       }

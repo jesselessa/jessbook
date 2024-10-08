@@ -103,7 +103,9 @@ export default function Navbar() {
           onClick={navigateAndScrollTop}
           alt="profile"
         />
-        <span onClick={handleLogout}>Logout</span>
+        <span className="logout" onClick={handleLogout}>
+          Logout
+        </span>
       </div>
 
       {/* Burger menu */}
