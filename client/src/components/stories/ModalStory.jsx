@@ -47,16 +47,16 @@ export default function ModalStory({ story, setOpenModal }) {
         </button>
 
         <div className="img-container">
-          {isVideo(story.img) ? (
+          {isVideo(story.file) ? (
             <video controls autoPlay>
               <source
-                src={`/uploads/${story.img}`}
-                type={`video/${story.img.split(".").pop()}`}
+                src={`/uploads/${story.file}`}
+                type={`video/${story.file.split(".").pop()}`}
               />
               Your browser doesn't support video.
             </video>
           ) : (
-            <LazyLoadImage src={`/uploads/${story.img}`} alt="story" />
+            <LazyLoadImage src={`/uploads/${story.file}`} alt="story" />
           )}
         </div>
 

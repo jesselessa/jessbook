@@ -12,14 +12,17 @@ export default function RecoverAccount() {
   // Check window object width for responsive design
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
+    return () => {
+      window.removeEventListener("resize", changeWindowWidth);
+    };
   }, [windowWidth]);
 
   const changeWindowWidth = () => setWindowWidth(window.innerWidth);
 
   // Handle inputs changes
   const handleChange = (e) => {
-    setError(""); // Reset error message everytime input changes
-    setEmail(e.target.value); // Update input value
+    setError(""); 
+    setEmail(e.target.value);
   };
 
   // Handle form submission
@@ -29,11 +32,13 @@ export default function RecoverAccount() {
     try {
       // Call API to find account and send email
       await makeRequest.post("/auth/recover-account", { email });
-      setEmail(""); // Reset form
-      setError(""); // Clear any previous error
       toast.success("A reset link has been sent to your email.");
+
+      // Clear form and error message
+      setEmail(""); 
+      setError("");
     } catch (error) {
-      setError(error.response?.data || "An unknown error has occurred.");
+      setError(error.response?.data.message || error.message);
 
       // Clear error message after 5 seconds
       setTimeout(() => {

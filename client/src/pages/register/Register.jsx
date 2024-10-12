@@ -29,7 +29,6 @@ export default function Register() {
   // Check window object width when loading page (for responsive)
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
-
     return () => {
       window.removeEventListener("resize", changeWindowWidth);
     };
@@ -60,9 +59,9 @@ export default function Register() {
   // Handle inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
-    clearValidationErrors();
-    setError(""); // Clear API error
     setInputsValues((prev) => ({ ...prev, [name]: value })); // Update values
+    clearValidationErrors(); // Clear form errors
+    setError(""); // Clear API error
   };
 
   // Registration feature
@@ -72,37 +71,31 @@ export default function Register() {
     // 1 - Handle form validation
     let inputsErrors = {};
 
-    // a - Name
-    if (
-      inputsValues?.firstName?.trim()?.length < 2 ||
-      inputsValues?.firstName?.trim()?.length > 35
-    )
+    const { firstName, lastName, email, password, confirmPswd } = inputsValues;
+
+    // a - Check name
+    if (firstName?.trim()?.length < 2 || firstName?.trim()?.length > 35)
       inputsErrors.firstName = "Enter a name between 2 and 35\u00A0characters.";
 
-    if (
-      inputsValues?.lastName?.trim()?.length < 1 ||
-      inputsValues?.lastName?.trim()?.length > 35
-    )
+    if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35)
       inputsErrors.lastName = "Enter a name between 1 and 35\u00A0characters.";
 
-    // b - Email with regex
-    if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputsValues?.email) ||
-      inputsValues?.email?.length > 64
-    )
+    // b - Check email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email?.length > 320)
       inputsErrors.email = "Enter a valid email.";
 
-    // c - Password with regex
+    // c - Check password
     if (
-      !/(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}/.test(
-        inputsValues?.password
-      )
+      !/(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/.test(
+        password?.trim()
+      ) ||
+      password?.trim()?.length > 200
     )
       inputsErrors.password =
-        "Password must contain at least 6\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.";
+        "Password must be between 6 and 200\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.";
 
-    // d - Confirmation password
-    if (inputsValues?.password?.trim() !== inputsValues?.confirmPswd?.trim())
+    // d - Check confirmation password
+    if (password?.trim() !== confirmPswd?.trim())
       // trim() removes whitespace from both sides of a string
       inputsErrors.confirmPswd = "Password does not match.";
 
@@ -117,17 +110,18 @@ export default function Register() {
     // 2 - If successful validation, continue process and call API
     try {
       await axios.post(`http://localhost:8080/auth/register`, inputsValues);
+      toast.success("Successful registration.");
 
       clearForm();
-      toast.success("Successful registration.");
 
       // Navigate to Login page
       setTimeout(() => {
         navigate("/login");
       }, 3000);
     } catch (error) {
+      console.error("Register API error", error);
       // Handle API errors
-      setError(error.response?.data || error.message);
+      setError(error.response?.data.message || error.message);
 
       // Clear error message after 5 seconds
       setTimeout(() => {
@@ -178,7 +172,7 @@ export default function Register() {
               type="email"
               name="email"
               placeholder="Email"
-              maxLength={64}
+              maxLength={320}
               value={inputsValues.email}
               autoComplete="off"
               required

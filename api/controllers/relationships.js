@@ -5,7 +5,10 @@ export const getRelationships = (req, res) => {
   const q = "SELECT followerId FROM relationships WHERE followedId = ?";
 
   db.query(q, [followerUserId], (error, data) => {
-    if (error) return res.status(500).json(error);
+    if (error)
+      return res
+        .status(500)
+        .json({ message: "Error fetching relationships.", error: error });
 
     return res
       .status(200)
@@ -21,7 +24,10 @@ export const addRelationship = (req, res) => {
   const values = [loggedInUserId, followedUserId];
 
   db.query(q, [values], (error, _data) => {
-    if (error) return res.status(500).json(error);
+    if (error)
+      return res
+        .status(500)
+        .json({ message: "Error creating relationship.", error: error });
     return res.status(200).json("User followed.");
   });
 };
@@ -33,7 +39,10 @@ export const deleteRelationship = (req, res) => {
   const q = "DELETE FROM relationships WHERE followerId = ? AND followedId = ?";
 
   db.query(q, [loggedInUserId, followedUserId], (error, data) => {
-    if (error) return res.status(500).json(error);
+    if (error)
+      return res
+        .status(500)
+        .json({ message: "Error deleting relationship.", error: error });
 
     if (data.affectedRows > 0) return res.status(200).json("User unfollowed.");
 

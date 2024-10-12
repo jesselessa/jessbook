@@ -5,7 +5,10 @@ export const getLikes = (req, res) => {
   const q = "SELECT userId FROM likes WHERE postId = ?";
 
   db.query(q, [postId], (error, data) => {
-    if (error) return res.status(500).json(error);
+    if (error)
+      return res
+        .status(500)
+        .json({ message: "Error fetching likes.", error: error });
     return res.status(200).json(data.map((like) => like.userId));
   });
 };
@@ -18,8 +21,11 @@ export const addLike = (req, res) => {
   const values = [loggedInUserId, postId];
 
   db.query(q, [values], (error, _data) => {
-    if (error) return res.status(500).json(error);
-    return res.status(200).json("Post liked.");
+    if (error)
+      return res
+        .status(500)
+        .json({ message: "Error adding like.", error: error });
+    if (data.affectedRows > 0) return res.status(200).json("Post liked.");
   });
 };
 
@@ -30,10 +36,11 @@ export const deleteLike = (req, res) => {
   const q = "DELETE FROM likes WHERE userId = ? AND postId = ?";
 
   db.query(q, [loggedInUserId, postId], (error, data) => {
-    if (error) return res.status(500).json(error);
+    if (error)
+      return res
+        .status(500)
+        .json({ message: "Error deleting like.", error: error });
 
     if (data.affectedRows > 0) return res.status(200).json("Post unliked.");
-
-    return res.status(403).json("Only user can remove their own like.");
   });
 };

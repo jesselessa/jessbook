@@ -49,7 +49,7 @@ export default function CreateStory({ setOpenCreateStory }) {
     }
 
     // Check description length if present
-    if (desc?.trim()?.length > 100) {
+    if (desc?.trim()?.length > 45) {
       setError({
         isError: true,
         message: "Description can't contain more than 100\u00A0characters.",
@@ -61,7 +61,7 @@ export default function CreateStory({ setOpenCreateStory }) {
     const newFile = file ? await uploadFile(file) : null;
 
     // Trigger mutation to update database
-    mutation.mutate({ img: newFile, desc: desc.trim() });
+    mutation.mutate({ file: newFile, desc: desc.trim() });
 
     setOpenCreateStory(false); // Close form
     setFile(null); // Reset file state to release URL resource

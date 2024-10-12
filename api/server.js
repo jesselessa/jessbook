@@ -43,7 +43,7 @@ app.use(
 app.use(express.json()); //! JSON data transformed into a JS object accessible in 'req.body'
 
 // Parse cookies from incoming requests
-app.use(cookieParser()); //! Cookies content accessible via 'req.cookies' and 'req.signedCookiess'
+app.use(cookieParser()); //! Cookies content accessible via 'req.cookies' and 'req.signedCookies'
 
 // Upload files via 'upload' middleware configured with Multer
 app.post("/uploads", upload, (req, res) => {
@@ -69,6 +69,7 @@ app.get("*", (_req, res) => {
 }); // Display Login page
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server listening at ${process.env.SERVER_URL}`);
+app.listen(PORT, (error) => {
+  if (error) console.log(error);
+  console.log(`Server listening at ${process.env.API_URL}`);
 });

@@ -20,6 +20,9 @@ export default function Login() {
   // Check window object width when loading page (for responsive)
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
+    return () => {
+      window.removeEventListener("resize", changeWindowWidth);
+    };
   }, [windowWidth]);
 
   const changeWindowWidth = () => setWindowWidth(window.innerWidth);
@@ -27,8 +30,8 @@ export default function Login() {
   // Handle inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setError(""); // Clear previous error message when inputs change
-    setInputsValues((prev) => ({ ...prev, [name]: value })); // Update values
+    setInputsValues((prev) => ({ ...prev, [name]: value }));
+    setError("");
   };
 
   const clearForm = () =>
@@ -51,10 +54,10 @@ export default function Login() {
       // Navigate to homepage
       navigate("/");
     } catch (error) {
-      setError(error.response?.data || error.message);
+      setError(error.response?.data.message || error.message);
       toast.error("Login failed.");
 
-      // Clear API error message after 3 seconds
+      // Clear error message after 5 seconds
       setTimeout(() => {
         setError("");
       }, 5000);
@@ -95,7 +98,7 @@ export default function Login() {
               id="email"
               name="email"
               placeholder="Email"
-              maxLength={64}
+              maxLength={320}
               value={inputsValues.email}
               autoComplete="off"
               required

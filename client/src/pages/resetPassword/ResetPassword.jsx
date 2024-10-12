@@ -14,13 +14,16 @@ export default function ResetPassword() {
     password: "",
     confirmPswd: "",
   });
-  const [error, setError] = useState({ message: "", error: false });
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
   // Check window object width for responsive design
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
+    return () => {
+      window.removeEventListener("resize", changeWindowWidth);
+    };
   }, [windowWidth]);
 
   const changeWindowWidth = () => setWindowWidth(window.innerWidth);
@@ -40,13 +43,9 @@ export default function ResetPassword() {
   // Handle inputs changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Reset error messages everytime inputs change
-    clearValidationErrors();
-    setError({ message: "", error: false });
-
-    // Update inputs values
     setInputsValues((prev) => ({ ...prev, [name]: value }));
+    clearValidationErrors();
+    setError("");
   };
 
   // Handle form submission
@@ -56,17 +55,18 @@ export default function ResetPassword() {
     // 1 - Handle form validation
     let inputsErrors = {};
 
-    // a - Password with regex validation
+    // a - Password format
     if (
-      !/(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,}/.test(
-        inputsValues.password
-      )
+      !/(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/.test(
+        inputsValues?.password?.trim()
+      ) ||
+      inputsValues?.password?.trim()?.length > 200
     )
       inputsErrors.password =
-        "Password must contain at least 6 characters including at least 1 number and 1 symbol.";
+        "Password must contain at least 6\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.";
 
-    // b - Confirmation password
-    if (inputsValues.password?.trim() !== inputsValues.confirmPswd?.trim())
+    // b - Check if passwords match
+    if (inputsValues?.password?.trim() !== inputsValues?.confirmPswd?.trim())
       inputsErrors.confirmPswd = "Password does not match.";
 
     // c - If errors during validation, update state and stop process
@@ -76,25 +76,25 @@ export default function ResetPassword() {
     }
 
     // d - Clear error messages
-    setValidationErrors({ password: "", confirmPswd: "" });
+    clearValidationErrors();
 
     // 2 - If successful validation, call API to reset password
     try {
       await makeRequest.post(`/auth/reset-password`, inputsValues);
-
-      toast.success("Your password has been successfully sent.");
+      toast.success("Your password has been successfully reset.");
+      
       clearForm();
 
       setTimeout(() => {
         navigate("/login");
       }, 3000);
     } catch (error) {
-      setError({ message: error.response?.data || error.message, error: true });
+      setError(error.response?.data.message || error.message);
       toast.error("Password reset failed.");
 
       // Reset form and clear API error message after 5 seconds
       setTimeout(() => {
-        setError({ message: "", error: false });
+        setError("");
       }, 5000);
     }
   };
@@ -136,7 +136,7 @@ export default function ResetPassword() {
             <span className="error-msg">{validationErrors.confirmPswd}</span>
           )}
 
-          {error.error && <span className="api-msg">{error.message}</span>}
+          {error && <span className="api-msg">{error}</span>}
           <button type="submit">Change password</button>
         </form>
 

@@ -34,6 +34,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
   const [validationErrors, setValidationErrors] = useState({
     firstName: "",
     lastName: "",
+    city: "",
   });
 
   const { userId } = useParams();
@@ -96,21 +97,20 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     // Handle validation errors
     let inputsErrors = {};
 
-    if (
-      fields.firstName?.trim()?.length < 2 ||
-      fields.firstName?.trim()?.length > 35
-    ) {
+    const { firstName, lastName, city } = fields;
+
+    if (firstName?.trim()?.length < 2 || firstName?.trim()?.length > 35) {
       inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
     }
 
     if (
-      fields.lastName?.trim()?.length < 1 ||
-      fields.lastName?.trim()?.length > 35
+      lastName?.trim()?.length < 1 ||
+      lastName?.trim()?.length > 35
     ) {
       inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
     }
 
-    if (fields.city?.trim()?.length > 85) {
+    if (city?.trim()?.length > 85) {
       inputsErrors.city = "Enter a valid city name.";
     }
 
