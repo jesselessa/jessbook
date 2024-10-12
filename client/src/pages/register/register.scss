@@ -48,7 +48,6 @@
 
         @include medium {
           font-size: 3rem;
-          margin-bottom: 2rem;
         }
       }
 
@@ -68,7 +67,7 @@
           height: 3rem;
           border: none;
           border-bottom: 0.1rem solid #8bd1e3;
-          margin-top: 1.5rem;
+          margin-top: 0.5rem;
           outline: none;
 
           &::placeholder {
@@ -79,7 +78,7 @@
         .error-msg {
           color: #f75252;
           font-size: 1.3rem;
-          margin-top: 0.7rem;
+          margin-top: 0.25rem;
         }
 
         .api {

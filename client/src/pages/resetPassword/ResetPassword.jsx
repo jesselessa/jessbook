@@ -10,10 +10,6 @@ export default function ResetPassword() {
     password: "",
     confirmPswd: "",
   });
-  const [validationErrors, setValidationErrors] = useState({
-    password: "",
-    confirmPswd: "",
-  });
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
@@ -34,17 +30,10 @@ export default function ResetPassword() {
       confirmPswd: "",
     });
 
-  const clearValidationErrors = () =>
-    setValidationErrors({
-      password: "",
-      confirmPswd: "",
-    });
-
   // Handle inputs changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInputsValues((prev) => ({ ...prev, [name]: value }));
-    clearValidationErrors();
     setError("");
   };
 
@@ -52,37 +41,10 @@ export default function ResetPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1 - Handle form validation
-    let inputsErrors = {};
-
-    // a - Password format
-    if (
-      !/(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/.test(
-        inputsValues?.password?.trim()
-      ) ||
-      inputsValues?.password?.trim()?.length > 200
-    )
-      inputsErrors.password =
-        "Password must contain at least 6\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.";
-
-    // b - Check if passwords match
-    if (inputsValues?.password?.trim() !== inputsValues?.confirmPswd?.trim())
-      inputsErrors.confirmPswd = "Password does not match.";
-
-    // c - If errors during validation, update state and stop process
-    if (Object.keys(inputsErrors).length > 0) {
-      setValidationErrors(inputsErrors);
-      return;
-    }
-
-    // d - Clear error messages
-    clearValidationErrors();
-
-    // 2 - If successful validation, call API to reset password
     try {
       await makeRequest.post(`/auth/reset-password`, inputsValues);
       toast.success("Your password has been successfully reset.");
-      
+
       clearForm();
 
       setTimeout(() => {
@@ -90,7 +52,6 @@ export default function ResetPassword() {
       }, 3000);
     } catch (error) {
       setError(error.response?.data.message || error.message);
-      toast.error("Password reset failed.");
 
       // Reset form and clear API error message after 5 seconds
       setTimeout(() => {
@@ -119,9 +80,6 @@ export default function ResetPassword() {
             autoComplete="off"
             onChange={handleChange}
           />
-          {validationErrors.password && (
-            <span className="error-msg">{validationErrors.password}</span>
-          )}
 
           <label htmlFor="confirmPswd">Confirm password :</label>
           <input
@@ -132,9 +90,6 @@ export default function ResetPassword() {
             autoComplete="off"
             onChange={handleChange}
           />
-          {validationErrors.confirmPswd && (
-            <span className="error-msg">{validationErrors.confirmPswd}</span>
-          )}
 
           {error && <span className="api-msg">{error}</span>}
           <button type="submit">Change password</button>

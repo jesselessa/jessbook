@@ -56,7 +56,7 @@ export default function Register() {
       confirmPswd: "",
     });
 
-  // Handle inputs
+  // Handle inputs change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInputsValues((prev) => ({ ...prev, [name]: value })); // Update values
@@ -81,16 +81,14 @@ export default function Register() {
       inputsErrors.lastName = "Enter a name between 1 and 35\u00A0characters.";
 
     // b - Check email
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email?.length > 320)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email?.trim()) || email?.length > 320)
       inputsErrors.email = "Enter a valid email.";
 
     // c - Check password
-    if (
-      !/(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/.test(
-        password?.trim()
-      ) ||
-      password?.trim()?.length > 200
-    )
+    const passwordRegex =
+      /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
+    if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200)
       inputsErrors.password =
         "Password must be between 6 and 200\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.";
 
@@ -102,8 +100,6 @@ export default function Register() {
     // e - If errors during validation, update state and stop process
     if (Object.keys(inputsErrors).length > 0) {
       setValidationErrors(inputsErrors);
-      toast.error("Registration failed. Check your information.");
-
       return;
     }
 
@@ -142,10 +138,8 @@ export default function Register() {
               type="text"
               name="firstName"
               placeholder="First name"
-              maxLength={35}
               value={inputsValues.firstName}
               autoComplete="off"
-              required
               onChange={handleChange}
             />
             {validationErrors.firstName && (
@@ -157,10 +151,8 @@ export default function Register() {
               type="text"
               name="lastName"
               placeholder="Last name"
-              maxLength={35}
               value={inputsValues.lastName}
               autoComplete="off"
-              required
               onChange={handleChange}
             />
             {validationErrors.lastName && (
@@ -172,10 +164,8 @@ export default function Register() {
               type="email"
               name="email"
               placeholder="Email"
-              maxLength={320}
               value={inputsValues.email}
               autoComplete="off"
-              required
               onChange={handleChange}
             />
             {validationErrors.email && (
@@ -187,10 +177,8 @@ export default function Register() {
               type="password"
               name="password"
               placeholder="Password"
-              maxLength={200}
               value={inputsValues.password}
               autoComplete="off"
-              required
               onChange={handleChange}
             />
             {validationErrors.password && (
@@ -202,10 +190,8 @@ export default function Register() {
               type="password"
               name="confirmPswd"
               placeholder="Confirm password"
-              maxLength={200}
               value={inputsValues.confirmPswd}
               autoComplete="off"
-              required
               onChange={handleChange}
             />
             {validationErrors.confirmPswd && (

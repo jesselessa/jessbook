@@ -1,7 +1,6 @@
 import { useEffect, useContext, useState } from "react";
 import "./login.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
@@ -55,7 +54,6 @@ export default function Login() {
       navigate("/");
     } catch (error) {
       setError(error.response?.data.message || error.message);
-      toast.error("Login failed.");
 
       // Clear error message after 5 seconds
       setTimeout(() => {
@@ -98,10 +96,8 @@ export default function Login() {
               id="email"
               name="email"
               placeholder="Email"
-              maxLength={320}
               value={inputsValues.email}
               autoComplete="off"
-              required
               onChange={handleChange}
             />
 
@@ -110,10 +106,8 @@ export default function Login() {
               id="password"
               name="password"
               placeholder="Password"
-              maxLength={200}
               value={inputsValues.password}
               autoComplete="off"
-              required
               onChange={handleChange}
             />
 

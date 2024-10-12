@@ -33,19 +33,14 @@ export const register = (req, res) => {
       errors.lastName = "Enter a name between 1 and 35\u00A0characters.";
 
     // Check email
-    if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email?.trim()) ||
-      email?.trim()?.length > 320
-    )
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email?.trim()) || email?.trim()?.length > 320)
       errors.email = "Invalid email.";
 
     // Check password
-    if (
-      !/(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/.test(
-        password?.trim()
-      ) ||
-      password?.trim()?.length > 200
-    )
+    const passwordRegex =
+      /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
+    if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200)
       errors.password =
         "Password must be between 6 and 200\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.";
 
@@ -126,7 +121,7 @@ export const login = (req, res) => {
     }
 
     // Remove password before sending user data
-    const { password, ...others } = data[0];
+    const { password, ...otherInfo } = data[0];
 
     // Store token in a cookie named 'accessToken' with value of 'token' and send it in response
     return res
@@ -137,7 +132,7 @@ export const login = (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 'maxAge' in milliseconds, must match token expiration date
       })
       .status(201)
-      .json(others);
+      .json(otherInfo);
   });
 };
 
@@ -158,10 +153,8 @@ export const recoverAccount = (req, res) => {
 
   if (email?.trim()?.length > 0) {
     // Check email format
-    if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ||
-      email.trim().length > 320
-    )
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim()) || email.trim().length > 320)
       return res.status(401).json({ message: "Invalid email." });
 
     // Find user by mail
@@ -239,12 +232,9 @@ export const resetPassword = (req, res) => {
       .json({ message: "Please, fill in all required fields." });
 
   // Check password format
-  if (
-    !/(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/.test(
-      password?.trim()
-    ) ||
-    password?.trim()?.length > 200
-  )
+  const passwordRegex =
+    /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
+  if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200)
     return res.status(401).json({
       message:
         "Password must be between 6 and 200\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.",

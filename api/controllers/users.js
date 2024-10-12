@@ -4,6 +4,25 @@ import bcrypt from "bcryptjs";
 
 //! In MySQL, when no results are found with a SELECT query, the 'data' variable will contain an empty array '[]', which is considered a truthy value. Therefore, to check if data really exists, we use 'if(data.length > 0)' and not 'if(data)', the latter always returning 'true'
 
+export const getAllUsers = (req, res) => {
+  const q = "SELECT * FROM users";
+
+  db.query(q, (error, data) => {
+    if (error)
+      return res
+        .status(500)
+        .json({ message: "Error fetching all users data.", error: error });
+
+    // Exclude password from users data
+    const users = data.map((user) => {
+      const { password, ...otherInfo } = user;
+      return otherInfo;
+    });
+
+    return res.status(200).json(users);
+  });
+};
+
 export const getUser = (req, res) => {
   const userId = req.params.userId;
   const q = "SELECT * FROM users WHERE id = ?";
@@ -16,8 +35,8 @@ export const getUser = (req, res) => {
 
     if (data.length === 0) return res.status(404).json("User not found.");
 
-    const { password, ...others } = data[0];
-    return res.status(200).json(others);
+    const { password, ...otherInfo } = data[0];
+    return res.status(200).json(otherInfo);
   });
 };
 
@@ -33,7 +52,7 @@ export const updateUser = (req, res) => {
 
   if (firstName) {
     if (firstName.trim().length < 2 || firstName.trim().length > 35) {
-      errors.firstName = "First name must be between 2 and 35 characters.";
+      errors.firstName = "First name must be between 2 and 35\u00A0characters.";
     } else {
       updatedFields.push("`firstName` = ?");
       values.push(firstName.trim());
@@ -42,15 +61,15 @@ export const updateUser = (req, res) => {
 
   if (lastName) {
     if (lastName.trim().length < 1 || lastName.trim().length > 35) {
-      errors.lastName = "Last name must be between 1 and 35 characters.";
+      errors.lastName = "Last name must be between 1 and 35\u00A0characters.";
     } else {
       updatedFields.push("`lastName` = ?");
       values.push(lastName.trim());
     }
   }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (email) {
+    // Check format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim()) || email.trim().length > 320) {
       errors.email = "Invalid email format or too long.";
     } else {
@@ -60,9 +79,10 @@ export const updateUser = (req, res) => {
   }
 
   // d - Password validation and hashing
-  const passwordRegex =
-    /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
   if (password) {
+    // Check format
+    const passwordRegex =
+      /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
     if (!passwordRegex.test(password) || password.trim()?.length > 200) {
       errors.password = "Invalid password format or too long.";
     } else {

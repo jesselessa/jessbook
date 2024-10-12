@@ -4,10 +4,14 @@ import { Link } from "react-router-dom";
 import { makeRequest } from "../../utils/axios.js";
 import { toast } from "react-toastify";
 
+// Component
+import Loader from "../../components/loader/Loader.jsx";
+
 export default function RecoverAccount() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Loader
 
   // Check window object width for responsive design
   useEffect(() => {
@@ -21,13 +25,14 @@ export default function RecoverAccount() {
 
   // Handle inputs changes
   const handleChange = (e) => {
-    setError(""); 
+    setError("");
     setEmail(e.target.value);
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Enable loader
 
     try {
       // Call API to find account and send email
@@ -35,7 +40,7 @@ export default function RecoverAccount() {
       toast.success("A reset link has been sent to your email.");
 
       // Clear form and error message
-      setEmail(""); 
+      setEmail("");
       setError("");
     } catch (error) {
       setError(error.response?.data.message || error.message);
@@ -44,6 +49,8 @@ export default function RecoverAccount() {
       setTimeout(() => {
         setError("");
       }, 5000);
+    } finally {
+      setLoading(false); // Disable loader
     }
   };
 
@@ -58,15 +65,20 @@ export default function RecoverAccount() {
         <h1>Forgot your password&nbsp;?</h1>
 
         <form name="recover-form" onSubmit={handleSubmit}>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Enter your email"
-            value={email}
-            autoComplete="off"
-            onChange={handleChange}
-          />
+          <div className="input-group">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email"
+              value={email}
+              autoComplete="off"
+              style={{ width: !loading ? "100%" : "90%" }}
+              onChange={handleChange}
+            />
+
+            {loading && <Loader />}
+          </div>
 
           <button type="submit">Send a reset link</button>
         </form>
