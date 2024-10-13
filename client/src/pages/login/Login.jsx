@@ -2,6 +2,13 @@ import { useEffect, useContext, useState } from "react";
 import "./login.scss";
 import { Link, useNavigate } from "react-router-dom";
 
+// Component
+import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
+
+// Images
+import google from "../../assets/images/auth/google.png";
+import facebook from "../../assets/images/auth/facebook.png";
+
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
@@ -73,7 +80,7 @@ export default function Login() {
               Jessbook is a social media app that helps you stay connected with
               your family and friends.
             </p>
-            <span>Don't have any account ?</span>{" "}
+            <span>Don't have any account ?</span>&nbsp;
             <Link to="/register">
               <button> Register</button>
             </Link>
@@ -111,15 +118,52 @@ export default function Login() {
               onChange={handleChange}
             />
 
-            <button type="submit">Sign in</button>
+            {/* Buttons to connect to the app */}
+            <button type="submit" className="submit">
+              Sign in
+            </button>
+
+            <Link to="http://localhost:8080/auth/login/google">
+              <button type="button" className="google">
+                Connect with&nbsp;
+                {windowWidth <= 500 ? (
+                  <span>
+                    <LazyLoadImage src={google} alt="google" />{" "}
+                  </span>
+                ) : (
+                  <span>
+                    Google&nbsp;
+                    <LazyLoadImage src={google} alt="google" />{" "}
+                  </span>
+                )}
+              </button>
+            </Link>
+
+            <Link to="http://localhost:8080/auth/login/facebook">
+              <button type="button" className="facebook">
+                Connect with&nbsp;
+                {windowWidth <= 500 ? (
+                  <span>
+                    <LazyLoadImage src={facebook} alt="facebook" />{" "}
+                  </span>
+                ) : (
+                  <span>
+                    Facebook&nbsp;
+                    <LazyLoadImage src={facebook} alt="facebook" />{" "}
+                  </span>
+                )}
+              </button>
+            </Link>
 
             <Link to="/forgot-password">
-              <span>Forgot your password ?</span>
+              <span className="password">Forgot your password ?</span>
             </Link>
 
             {windowWidth <= 1150 && (
               <Link to="/register">
-                <button className="register-btn">Register</button>
+                <button type="button" className="register-btn">
+                  Register
+                </button>
               </Link>
             )}
           </form>

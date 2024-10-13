@@ -73,7 +73,6 @@
         &:hover {
           cursor: pointer;
         }
-
         &:active {
           transform: translateY(1px);
         }
@@ -108,15 +107,15 @@
           font-size: 1.6rem;
           background-color: transparent;
           border: none;
-          outline: none;
+          outline: none;          
+          &::placeholder {
+            color: themed("textColor");
+          }
 
           @media screen and (max-width: 800px) {
             display: none;
           }
 
-          &::placeholder {
-            color: themed("textColor");
-          }
         }
       }
     }
@@ -141,7 +140,6 @@
         border-radius: 50%;
         object-fit: cover;
         object-position: center;
-
         &:hover {
           cursor: pointer;
         }
@@ -152,7 +150,6 @@
         font-weight: bold;
         color: themed("iconColor");
         cursor: pointer;
-
         &:active {
         transform: translateY(1px);
         }

@@ -79,11 +79,9 @@
         border-radius: 0.5rem;
         transition: background-color 0.3s ease, transform 0.2s ease;
         cursor: pointer;
-
         &:hover {
           background-color: darken(teal, 5%);
         }
-
         &:active {
           transform: translateY(1px);
           background-color: darken(teal, 10%);
@@ -141,7 +139,6 @@
 
           .edit-btn {
             color: themed("textColorSoft");
-
             &:hover {
               cursor: pointer;
             }

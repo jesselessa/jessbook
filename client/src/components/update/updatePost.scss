@@ -123,11 +123,9 @@
         margin: auto;
         transition: background-color 0.3s ease, transform 0.2s ease;
         cursor: pointer;
-
         &:hover {
           background-color: darken(#5271ff, 5%);
         }
-
         &:active {
           transform: translateY(1px);
           background-color: darken(#5271ff, 10%);

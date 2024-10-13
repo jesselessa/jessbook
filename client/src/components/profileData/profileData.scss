@@ -185,11 +185,9 @@
             padding: 0.5rem 0.8rem;
             transition: background-color 0.3s ease, transform 0.2s ease;
             cursor: pointer;
-
             &:hover {
               background-color: darken(#ffd670, 10%);
             }
-
             &:active {
               transform: translateY(1px);
               background-color: darken(#ffd670, 20%);

@@ -18,7 +18,6 @@
         .img-container {
           width: 50px;
           height: 50px;
-
           &:hover {
             cursor: pointer;
           }
@@ -42,13 +41,12 @@
             font-size: 1.7rem;
             font-weight: bold;
             word-break: break-word;
+            &:hover {
+              cursor: pointer;
+            }
 
             @include small {
               font-size: 1.6rem;
-            }
-
-            &:hover {
-              cursor: pointer;
             }
           }
 
@@ -73,7 +71,6 @@
 
         .edit-btn {
           color: themed("textColorSoft");
-
           &:hover {
             cursor: pointer;
           }

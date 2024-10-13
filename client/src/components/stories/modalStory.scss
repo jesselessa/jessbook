@@ -96,11 +96,9 @@
           padding: 0.5rem 1rem;
           margin: auto;
           cursor: pointer;
-
           &:hover {
             background-color: darken(#f0544f, 10%);
           }
-
           &:active {
             transform: translateY(1px);
             background-color: darken(#f0544f, 20%);

@@ -1,7 +1,10 @@
 import { db } from "../utils/connect.js";
-import { sendEmail } from "../utils/sendEmail.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as FacebookStrategy } from "passport-facebook";
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const register = (req, res) => {
   const { firstName, lastName, email, password, confirmPswd } = req.body;
@@ -56,6 +59,7 @@ export const register = (req, res) => {
     const hashedPswd = bcrypt.hashSync(password.trim(), salt);
 
     // Store new user in database
+    // TODO - Add fromFacebook 'null', fromGoogle 'null' in table & change password to 'null'
     const insertQuery =
       "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `role`) VALUES (?)";
     const values = [
@@ -249,7 +253,7 @@ export const resetPassword = (req, res) => {
   // Check if token is present
   if (!token)
     return res.status(401).json({ message: "Invalid authentication." });
-  const secretKey = process.env.SECRET;
+  const secretKey = process.env.JWT_SECRET;
 
   try {
     // Decode token to get user ID
@@ -286,4 +290,99 @@ export const resetPassword = (req, res) => {
       .status(401)
       .json({ message: "Invalid authentication.", error: err });
   }
+};
+
+//* Connect via social networks with Passport
+//! When users log in via authentication providers such as Google or Facebook, their credentials (profile, email, etc.) are transmitted to our server. 'Strategies' are function which define how to handle these data.
+
+export const connectWithGoogle = () => {
+  // Set up Google OAuth strategy
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: `${process.env.API_URL}/auth/login/google/callback`,
+      },
+      (accessToken, refreshToken, profile, done) => {
+        const email = profile.emails[0].value;
+        const firstName = profile.name?.givenName || "Undefined"; // If available
+        const lastName = profile.name?.familyName || profile.displayName; // Family name or fullName
+
+
+        const selectQuery = `SELECT * FROM users WHERE email = ?`;
+
+        db.query(selectQuery, [email], (selectErr, data) => {
+          if (selectErr) return done(selectErr);
+
+          // If user exists, continue connection
+          if (data.length > 0) return done(null, data[0]);
+
+          // Otherwise, create a new user
+          const insertQuery = `INSERT INTO users (firstName, lastName, email, fromGoogle, role) VALUES (?)`;
+          const values = [firstName, lastName, email, 1, "user"];
+
+          db.query(insertQuery, [values], (insertError, insertData) => {
+            if (insertError) return done(insertError);
+
+            const newUser = {
+              id: insertData.insertId, // new user ID added in table
+              firstName,
+              lastName,
+              email,
+              fromGoogle: 1, //! Boolean not supported in MySQL (1 = true and 0 = false)
+              role: "user",
+            };
+            return done(null, newUser);
+          });
+        });
+      }
+    )
+  );
+};
+
+export const connectWithFacebook = () => {
+  // Set up Facebook OAuth strategy
+  passport.use(
+    new FacebookStrategy(
+      {
+        clientID: process.env.FACEBOOK_CLIENT_ID,
+        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+        callbackURL: `${process.env.API_URL}/auth/login/facebook/callback`,
+        profileFields: ["id", "emails", "name"], // Get required fields
+      },
+      (accessToken, refreshToken, profile, done) => {
+        const email = profile.emails[0].value;
+        const firstName = profile.name.givenName;
+        const lastName = profile.name.familyName;
+
+        const selectQuery = `SELECT * FROM users WHERE email = ?`;
+
+        db.query(selectQuery, [email], (selectErr, data) => {
+          if (selectErr) return done(selectErr);
+
+          // If user exists, continue connection
+          if (data.length > 0) return done(null, data[0]);
+
+          // Otherwise, create a new user
+          const insertQuery = `INSERT INTO users (firstName, lastName, email, fromFacebook, role) VALUES (?)`;
+          const values = [firstName, lastName, email, 1, "user"];
+
+          db.query(insertQuery, [values], (insertError, insertData) => {
+            if (insertError) return done(insertError);
+
+            const newUser = {
+              id: insertData.insertId,
+              firstName,
+              lastName,
+              email,
+              fromFacebook: 1,
+              role: "user",
+            };
+            return done(null, newUser);
+          });
+        });
+      }
+    )
+  );
 };

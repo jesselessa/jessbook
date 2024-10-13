@@ -69,7 +69,6 @@
           border-bottom: 0.1rem solid #8bd1e3;
           margin-top: 0.5rem;
           outline: none;
-
           &::placeholder {
             color: #08415c;
           }
@@ -96,11 +95,9 @@
           border-radius: 0.3rem;
           margin-top: 2rem;
           cursor: pointer;
-
           &:hover {
             background-color: darken(#ffd670, 10%);
           }
-
           &:active {
             transform: translateY(1px);
             background-color: darken(#ffd670, 20%);
