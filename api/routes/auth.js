@@ -1,6 +1,5 @@
 import express from "express";
 import passport from "passport";
-import jwt from "jsonwebtoken";
 
 // Controllers
 import {
@@ -9,12 +8,11 @@ import {
   recoverAccount,
   resetPassword,
   logout,
-  connectWithFacebook,
-  connectWithGoogle,
 } from "../controllers/auth.js";
 
 // Middlewares
-import { passportAuth } from "../middlewares/passportAuth.js";
+import { authenticateWithPassport } from "../middlewares/authenticateWithPassport.js";
+import { handleAuthSuccess } from "../middlewares/handleAuthSuccess.js";
 
 // Express router
 const router = express.Router();
@@ -27,21 +25,23 @@ router.post("/logout", logout);
 
 // Social media login routes
 router.get(
-  "/auth/login/google",
+  "/login/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
-);
+); // Send user to authentication provider : once user is authenticated, Google redirects the latter to our app at the specified callback URL.
 router.get(
-  "/auth/login/google/callback",
-  passportAuth("google"), // Handle authentication via Google
-  connectWithGoogle // Manage the rest (creation of new user, token, etc.)
+  "/login/google/callback",
+  authenticateWithPassport("google"),
+  handleAuthSuccess // Handle response after authentication
 );
-router.get(
-  "/auth/login/facebook",
-  passport.authenticate("facebook", { scope: ["email"] })
-);
-router.get(
-  "/auth/login/facebook/callback",
-  passportAuth("facebook"),
-  connectWithFacebook
-);
+
+// router.get(
+//   "/login/facebook",
+//   passport.authenticate("facebook", { scope: ["email"] })
+// );
+// router.get(
+//   "/login/facebook/callback",
+//   passportAuth("facebook"),
+//   handleAuthSuccess
+// );
+
 export default router;

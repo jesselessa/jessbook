@@ -5,7 +5,7 @@ export const isAdmin = (req, res, next) => {
 
   if (!token) return res.status(401).json("User not logged in.");
 
-  jwt.verify(token, process.env.SECRET, (error, userInfo) => {
+  jwt.verify(token, process.env.JWT_SECRET, (error, userInfo) => {
     if (error) return res.status(403).json({ message: "Invalid token." });
 
     if (userInfo.role !== "admin")

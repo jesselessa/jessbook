@@ -1,7 +1,8 @@
 import passport from "passport";
 
-// Handle authentication via a service web
-export const passportAuth = (strategy) => {
+// passport.authenticate(strategy, callback)(req, res, next); //! This function executes the middleware returned by 'passport.authenticate' passing it the 'req', 'res', and 'next' arguments to pursue request processing cycle.
+
+export const authenticateWithPassport = (strategy) => {
   return (req, res, next) => {
     passport.authenticate(strategy, (error, user, info) => {
       if (error) return next(error);
@@ -11,7 +12,7 @@ export const passportAuth = (strategy) => {
           .status(401)
           .json({ message: info?.message || "Authentication failed." });
 
-      req.user = user; 
+      req.user = user;
       next();
     })(req, res, next);
   };

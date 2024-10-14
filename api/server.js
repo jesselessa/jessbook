@@ -3,8 +3,10 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
+import passport from "passport";
 import { fileURLToPath } from "url";
-import { upload } from "./middlewares/upload.js";
+import { upload } from "./middlewares/upload.js"; // Multer configuration
+import { connectWithGoogle } from "./utils/configureAuthServiceStrategy.js"; // Import strategies for social login
 
 // Routes
 import authRoute from "./routes/auth.js";
@@ -50,6 +52,12 @@ app.post("/uploads", upload, (req, res) => {
   const file = req.file;
   res.status(200).json(file.filename);
 });
+
+// Initialize Passport
+app.use(passport.initialize());
+
+// Initialize Passport strategies
+connectWithGoogle();
 
 // API routes
 app.use("/auth", authRoute);
