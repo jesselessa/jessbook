@@ -13,14 +13,15 @@ export const handleAuthSuccess = (req, res) => {
     expiresIn: "7d",
   });
 
-  // Send token in a secured cookie
-  res.cookie("accessToken", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  const { password, ...otherInfo } = req.user;
 
-  // Redirect user to frontend
-  res.redirect(`${process.env.CLIENT_URL}`);
+  res
+    .cookie("accessToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    .status(201)
+    .json(otherInfo);
 };

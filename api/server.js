@@ -31,7 +31,7 @@ const app = express();
 
 // Handle HTTP header in response
 app.use((_req, res, next) => {
-  res.header("Access-Control-Allow-Credentials", true); //! Allow coookies or other authentication info such as tokens
+  res.header("Access-Control-Allow-Credentials", true); //! Allow cookies or other authentication info such as tokens
   next();
 });
 

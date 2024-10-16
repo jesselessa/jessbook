@@ -13,7 +13,7 @@ import facebook from "../../assets/images/auth/facebook.png";
 import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Login() {
-  const { login } = useContext(AuthContext);
+  const { login, connectViaAuthProvider } = useContext(AuthContext);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [inputsValues, setInputsValues] = useState({
     email: "",
@@ -66,6 +66,20 @@ export default function Login() {
       setTimeout(() => {
         setError("");
       }, 5000);
+    }
+  };
+
+  const connectViaOAuth = async (provider) => {
+    window.location.href = `http://localhost:8080/auth/login/${provider}`;
+
+    try {
+      await connectViaAuthProvider(provider);
+      navigate("/");
+    } catch (error) {
+      console.error(
+        `Error connecting with ${provider.charAt(0) + provider.slice(1)}`,
+        error
+      );
     }
   };
 
@@ -123,37 +137,45 @@ export default function Login() {
               Sign in
             </button>
 
-            <Link to="http://localhost:8080/auth/login/google">
-              <button type="button" className="google">
-                Connect with&nbsp;
-                {windowWidth <= 500 ? (
-                  <span>
-                    <LazyLoadImage src={google} alt="google" />{" "}
-                  </span>
-                ) : (
-                  <span>
-                    Google&nbsp;
-                    <LazyLoadImage src={google} alt="google" />{" "}
-                  </span>
-                )}
-              </button>
-            </Link>
+            {/* <Link to="http://localhost:8080/auth/login/google"> */}
+            <button
+              type="button"
+              className="google"
+              onClick={() => connectViaOAuth("google")}
+            >
+              Connect with&nbsp;
+              {windowWidth <= 500 ? (
+                <span>
+                  <LazyLoadImage src={google} alt="google" />{" "}
+                </span>
+              ) : (
+                <span>
+                  Google&nbsp;
+                  <LazyLoadImage src={google} alt="google" />{" "}
+                </span>
+              )}
+            </button>
+            {/* </Link> */}
 
-            <Link to="http://localhost:8080/auth/login/facebook">
-              <button type="button" className="facebook">
-                Connect with&nbsp;
-                {windowWidth <= 500 ? (
-                  <span>
-                    <LazyLoadImage src={facebook} alt="facebook" />{" "}
-                  </span>
-                ) : (
-                  <span>
-                    Facebook&nbsp;
-                    <LazyLoadImage src={facebook} alt="facebook" />{" "}
-                  </span>
-                )}
-              </button>
-            </Link>
+            {/* <Link to="http://localhost:8080/auth/login/facebook"> */}
+            <button
+              type="button"
+              className="facebook"
+              onClick={() => connectViaOAuth("facebook")}
+            >
+              Connect with&nbsp;
+              {windowWidth <= 500 ? (
+                <span>
+                  <LazyLoadImage src={facebook} alt="facebook" />{" "}
+                </span>
+              ) : (
+                <span>
+                  Facebook&nbsp;
+                  <LazyLoadImage src={facebook} alt="facebook" />{" "}
+                </span>
+              )}
+            </button>
+            {/* </Link> */}
 
             <Link to="/forgot-password">
               <span className="password">Forgot your password ?</span>
