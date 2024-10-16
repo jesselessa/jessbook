@@ -16,10 +16,11 @@ export const handleAuthSuccess = (req, res) => {
   // Send token in a secured cookie
   res.cookie("accessToken", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   // Redirect user to frontend
-  res.redirect(`${process.env.CLIENT_URL}/`);
+  res.redirect(`${process.env.CLIENT_URL}`);
 };

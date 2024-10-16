@@ -30,7 +30,11 @@ export default function UpdatePost({ post, setOpenUpdate }) {
       toast.success("Post updated.");
     },
 
-    onError: (error) => console.error("Error updating post:", error),
+    onError: (error) =>
+      console.error(
+        "Error updating post:",
+        error.response?.data || error.message
+      ),
   });
 
   const handleClick = async (e) => {

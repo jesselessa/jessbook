@@ -12,7 +12,10 @@ export default function Posts({ userId }) {
       const res = await makeRequest.get(`/posts?userId=${userId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching posts:", error);
+      console.error(
+        "Error fetching posts:",
+        error.response?.data || error.message
+      );
     }
   };
 

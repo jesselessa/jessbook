@@ -54,7 +54,7 @@ export const register = (req, res) => {
 
     // Hash password
     const salt = bcrypt.genSaltSync(10);
-    const hashedPswd = bcrypt.hashSync(password.trim(), salt);
+    const hashedPswd = bcrypt.hashSync(password?.trim(), salt);
 
     // Store new user in database
     // TODO - Add fromFacebook 'null', fromGoogle 'null' in table & change password to 'null'
@@ -81,7 +81,7 @@ export const register = (req, res) => {
 };
 
 export const login = (req, res) => {
-  const { email } = req.body; //! Cannot use 'password' variable here, otherwise, ReferenceError object : 'Cannot destructure password before initialization'
+  const { email } = req.body; //! Cannot use 'password' variable here, otherwise, ReferenceError object error : 'Cannot destructure password before initialization'
 
   if (email?.trim()?.length === 0 || req.body.password?.trim()?.length === 0)
     return res
@@ -140,6 +140,7 @@ export const login = (req, res) => {
 
 export const logout = (_req, res) => {
   //! Cookie options (such as 'httpOnly', 'secure', and 'sameSite') must be the same between creation and deletion
+
   return res
     .clearCookie("accessToken", {
       httpOnly: true,
@@ -289,5 +290,3 @@ export const resetPassword = (req, res) => {
       .json({ message: "Invalid authentication.", error: err });
   }
 };
-
-

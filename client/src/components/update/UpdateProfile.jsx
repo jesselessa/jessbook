@@ -77,7 +77,11 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       toast.success("Profile updated.");
     },
 
-    onError: (error) => console.error("Error updating profile:", error),
+    onError: (error) =>
+      console.error(
+        "Error updating profile:",
+        error.response?.data || error.message
+      ),
   });
 
   // Clear validation errors in form
@@ -103,10 +107,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
     }
 
-    if (
-      lastName?.trim()?.length < 1 ||
-      lastName?.trim()?.length > 35
-    ) {
+    if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35) {
       inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
     }
 

@@ -23,25 +23,26 @@ router.post("/recover-account", recoverAccount);
 router.post("/reset-password", resetPassword);
 router.post("/logout", logout);
 
-// Social media login routes
+// Google login routes
 router.get(
   "/login/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
-); // Send user to authentication provider : once user is authenticated, Google redirects the latter to our app at the specified callback URL.
+);
 router.get(
   "/login/google/callback",
   authenticateWithPassport("google"),
-  handleAuthSuccess // Handle response after authentication
+  handleAuthSuccess
 );
 
-// router.get(
-//   "/login/facebook",
-//   passport.authenticate("facebook", { scope: ["email"] })
-// );
-// router.get(
-//   "/login/facebook/callback",
-//   passportAuth("facebook"),
-//   handleAuthSuccess
-// );
+//Facebook login routes
+router.get(
+  "/login/facebook",
+  passport.authenticate("facebook", { scope: ["email"] })
+);
+router.get(
+  "/login/facebook/callback",
+  authenticateWithPassport("facebook"),
+  handleAuthSuccess
+);
 
 export default router;

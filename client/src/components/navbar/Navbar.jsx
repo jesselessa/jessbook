@@ -40,7 +40,7 @@ export default function Navbar() {
     window.scrollTo(0, 0);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     makeRequest.post("/auth/logout");
     navigate("/login");
   };

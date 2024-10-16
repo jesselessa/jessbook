@@ -20,7 +20,7 @@ export const addLike = (req, res) => {
   const q = "INSERT INTO likes (`userId`, `postId`) VALUES (?)";
   const values = [loggedInUserId, postId];
 
-  db.query(q, [values], (error, _data) => {
+  db.query(q, [values], (error, data) => {
     if (error)
       return res
         .status(500)

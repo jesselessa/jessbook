@@ -9,16 +9,19 @@ export const AuthContextProvider = ({ children }) => {
   );
 
   const login = async (inputsValues) => {
-    const res = await makeRequest.post(
-      `http://localhost:8080/auth/login`,
-      inputsValues
-    );
-    setCurrentUser(res.data); // User data fetched from API
+    try {
+      const res = await makeRequest.post(
+        `http://localhost:8080/auth/login`,
+        inputsValues
+      );
+      setCurrentUser(res.data); // User data fetched from API
+    } catch (error) {
+      console.error("Error during login process.");
+    }
   };
 
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(currentUser));
-    // Cannot store objects in localStorage, it has to be a string
+    if (currentUser) localStorage.setItem("user", JSON.stringify(currentUser)); // We don't want 'currentUser' to have the value 'null'
   }, [currentUser]);
 
   const value = { currentUser, setCurrentUser, login };

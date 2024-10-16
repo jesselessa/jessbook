@@ -7,4 +7,4 @@ export function addNonBreakingSpace(text) {
   return text;
 }
 
-// In JS a nbsp is 'U+00A0', whereas in HTML, '&nbsp;'
+// In JS, a nbsp is 'U+00A0', whereas in HTML, it's '&nbsp;'

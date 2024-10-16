@@ -22,7 +22,11 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
       toast.success("Comment updated.");
     },
 
-    onError: (error) => console.error("Error updating comment:", error),
+    onError: (error) =>
+      console.error(
+        "Error updating comment:",
+        error.response?.data || error.message
+      ),
   });
 
   const handleClick = async (e) => {

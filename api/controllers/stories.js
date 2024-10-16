@@ -1,5 +1,4 @@
 import { db } from "../utils/connect.js";
-import { isImage, isVideo } from "../utils/isFile.js";
 import moment from "moment";
 
 export const getStories = (req, res) => {
@@ -57,32 +56,18 @@ export const addStory = (req, res) => {
   const { file, desc } = req.body;
   const loggedInUserId = req.userInfo.id;
 
-  // 1 - Check if a file (image or video) is provided
-  if (!file)
+  // Check if a file (image or video) is provided
+  if (!file || file?.trim()?.length === 0)
     return res.status(400).json("You must provide either an image or a video.");
 
-  // 2 - Check file format
-  if (file) {
-    // Image
-    if (!isImage(file)) {
-      return res.status(400).json("Provide a valid image format.");
-    }
-    // Video
-    else if (!isVideo(file)) {
-      return res.status(400).json("Provide a valid video format.");
-    } else {
-      return res.status(400).json("Invalid request.");
-    }
-  }
-
-  // 3 - Validate description (optional&)
+  // Validate description (optional)
   if (desc?.trim()?.length > 45) {
     return res
       .status(400)
       .json("Description can't contain more than 45\u00A0characters.");
   }
 
-  // 4 - Delete current story if non expired before creating new one
+  // Delete current story if non expired before creating new one
   const deleteQuery = `
   DELETE FROM stories WHERE userId = ? AND expiresAt > NOW()
 `;
@@ -93,7 +78,7 @@ export const addStory = (req, res) => {
         .status(500)
         .json({ message: "Error deleting current story.", error: deleteErr });
 
-    // 5 - Create a new story
+    // Create a new story
     const currentDateTime = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
     const expirationDate = moment(Date.now())
       .add(24, "hours")

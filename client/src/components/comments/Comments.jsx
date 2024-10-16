@@ -72,7 +72,10 @@ export default function Comments({ postId }) {
       mutation.mutate({ desc: desc.trim(), postId });
       setDesc(""); // Reset form field
     } catch (error) {
-      console.error("Error creating comment:", error);
+      console.error(
+        "Error creating comment:",
+        error.response?.data || error.message
+      );
     }
   };
 
@@ -97,7 +100,10 @@ export default function Comments({ postId }) {
     try {
       deleteMutation.mutate(comment.id);
     } catch (error) {
-      console.error("Error deleting comment:", error);
+      console.error(
+        "Error deleting comment:",
+        error.response?.data || error.message
+      );
     }
   };
 

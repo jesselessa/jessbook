@@ -28,7 +28,10 @@ export default function Stories({ userId }) {
       const res = await makeRequest.get(`/stories?userId=${userId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching stories:", error);
+      console.error(
+        "Error fetching stories:",
+        error.response?.data || error.message
+      );
     }
   };
 

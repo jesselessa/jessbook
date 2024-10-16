@@ -6,7 +6,10 @@ import path from "path";
 import passport from "passport";
 import { fileURLToPath } from "url";
 import { upload } from "./middlewares/upload.js"; // Multer configuration
-import { connectWithGoogle } from "./utils/configureAuthServiceStrategy.js"; // Import strategies for social login
+import {
+  connectWithGoogle,
+  connectWithFacebook,
+} from "./middlewares/configureAuthServiceStrategy.js";
 
 // Routes
 import authRoute from "./routes/auth.js";
@@ -58,6 +61,7 @@ app.use(passport.initialize());
 
 // Initialize Passport strategies
 connectWithGoogle();
+connectWithFacebook();
 
 // API routes
 app.use("/auth", authRoute);

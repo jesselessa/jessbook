@@ -5,6 +5,9 @@ export const fetchPostComments = async (postId) => {
     const res = await makeRequest.get(`/comments?postId=${postId}`);
     return res.data;
   } catch (error) {
-    console.error("Error fetching comments:", error);
+    console.error(
+      "Error fetching comments:",
+      error.response?.data || error.message
+    );
   }
 };
