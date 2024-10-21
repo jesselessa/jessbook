@@ -85,10 +85,6 @@
         width: 100%;
       }
 
-      @include xsmall {
-        padding: 1rem 0.5rem;
-      }
-
       h1 {
         font-size: 4rem;
         color: teal;
@@ -197,6 +193,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
+
+            .fb-icon {
+              width: 28px;
+              height: 28px;
+            }
           }
         }
 

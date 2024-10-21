@@ -14,7 +14,7 @@ export const getComments = (req, res) => {
     if (error)
       return res
         .status(500)
-        .json({ message: "Error fetching comments.", error: error });
+        .json({ message: "Error fetching comments", error: error });
 
     return res.status(200).json(data);
   });
@@ -26,7 +26,7 @@ export const addComment = (req, res) => {
   const currentDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
   if (desc?.trim()?.length === 0) {
-    return res.status(400).json("Description cannot be empty.");
+    return res.status(400).json({ message: "Description cannot be empty." });
   }
 
   if (desc?.trim()?.length > 500)
@@ -42,9 +42,9 @@ export const addComment = (req, res) => {
     if (error)
       return res
         .status(500)
-        .json({ message: "Error creating comment.", error: error });
+        .json({ message: "Error creating comment", error: error });
 
-    return res.status(200).json("Comment created.");
+    return res.status(200).json({ message: "Comment created" });
   });
 };
 
@@ -54,12 +54,12 @@ export const updateComment = (req, res) => {
   const { desc } = req.body;
 
   if (desc?.trim()?.length === 0)
-    return res.status(400).json("No description to update.");
+    return res.status(400).json({ message: "No description to update" });
 
   if (desc?.trim()?.length > 500) {
     return res
       .status(400)
-      .json("Description cannot exceed 500\u00A0characters.");
+      .json({ message: "Description cannot exceed 500\u00A0characters." });
   }
 
   const q = "UPDATE comments SET `desc` = ? WHERE id = ? AND userId = ?";

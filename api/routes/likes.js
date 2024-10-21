@@ -4,7 +4,7 @@ import { authenticateUser } from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
-router.get("/", getLikes);
+router.get("/", authenticateUser, getLikes);
 router.post("/", authenticateUser, addLike);
 router.delete("/", authenticateUser, deleteLike);
 

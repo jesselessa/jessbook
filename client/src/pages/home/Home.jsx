@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-// Components and pages
+// Components
 import Navbar from "../../components/navbar/Navbar.jsx";
 import LeftBar from "../../components/leftBar/LeftBar.jsx";
 import RightBar from "../../components/rightBar/RightBar.jsx";

@@ -1,27 +1,32 @@
 import jwt from "jsonwebtoken";
 
-// Handle redirection and creation of JWT token after connection
 export const handleAuthSuccess = (req, res) => {
-  // Check if user is attached to Passport request
-  if (!req.user) {
-    return res.status(401).json({ message: "Authentication failed." });
-  }
+  if (!req.userInfo)
+    return res.status(401).json({ message: "Authentication failed" });
 
-  // Generate token from user ID
+  // Generate JWT token avec les informations de l'utilisateur
   const secretKey = process.env.JWT_SECRET;
-  const token = jwt.sign({ id: req.user.id }, secretKey, {
-    expiresIn: "7d",
-  });
+  let token;
 
-  const { password, ...otherInfo } = req.user;
+  // Set token content depending on user role
+  if (req.userInfo.role === "admin") {
+    token = jwt.sign({ id: req.userInfo.id, role: "admin" }, secretKey, {
+      expiresIn: "7d", // After delay, invalid token : user must reconnect
+    });
+  } else {
+    token = jwt.sign({ id: req.userInfo.id, role: "user" }, secretKey, {
+      expiresIn: "7d",
+    });
+  }
 
   res
     .cookie("accessToken", token, {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
     .status(201)
-    .json(otherInfo);
+    // Redirection to our frontend which handles connection with token
+    .redirect(`${process.env.CLIENT_URL}/auth-provider/callback`);
 };

@@ -3,9 +3,9 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
-import passport from "passport";
 import { fileURLToPath } from "url";
 import { upload } from "./middlewares/upload.js"; // Multer configuration
+import passport from "passport";
 import {
   connectWithGoogle,
   connectWithFacebook,
@@ -38,7 +38,7 @@ app.use((_req, res, next) => {
 // Handle Cross-Origin Resource Sharing (CORS) requests
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: [process.env.CLIENT_URL, process.env.API_URL],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow cookies
   })
@@ -77,8 +77,12 @@ app.use(express.static(path.join(__dirname, "../client/dist")));
 
 // Handle routes not defined by API
 app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+  res.status(404).json({ message: "Not found" });
 }); // Display Login page
+
+// app.get("*", (_req, res) => {
+//   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+// }); // Display Login page
 
 // Start server
 app.listen(PORT, (error) => {

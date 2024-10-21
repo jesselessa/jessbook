@@ -1,12 +1,21 @@
 import express from "express";
-import { getAllUsers, getUser, updateUser, deleteUser } from "../controllers/users.js";
+
+// Controllers
+import {
+  getAllUsers,
+  getUser,
+  updateUser,
+  deleteUser,
+} from "../controllers/users.js";
+
+// Middlewares
 import { authenticateUser } from "../middlewares/authenticateUser.js";
-import {isAdmin} from "../middlewares/isAdmin.js";
+import { isAdmin } from "../middlewares/isAdmin.js";
 
 const router = express.Router();
 
 router.get("/", isAdmin, getAllUsers);
-router.get("/:userId", getUser);
+router.get("/:userId", authenticateUser, getUser);
 router.put("/", authenticateUser, updateUser);
 router.delete("/", authenticateUser, deleteUser);
 

@@ -1,3 +1,9 @@
+//! SASS DEPRECIATION WARNINGS :
+//! - darken() => use 'color.scale()' or 'color.adjust()', ex: 'color.scale($color, $lightness: -19.921875%)' or 'color.adjust($color, $lightness: -5%)'
+//! - global built-in functions will be removed in Dart Sass 3.0. => use 'map.merge' or 'map.get' instead
+//! - @import rules will be removed in Dart Sass 3.0.0.
+//! - the legacy JS API will be removed in Dart Sass 2.0.0.
+
 *,
 ::before,
 ::after {
@@ -46,7 +52,7 @@ $themes: (
   ),
 );
 
-// Create dark/light mode function
+// Create dark/light mode functions
 @mixin themify($themes) {
   @each $theme, $map in $themes {
     .theme-#{$theme} & {

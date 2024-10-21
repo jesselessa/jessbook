@@ -3,13 +3,14 @@ import jwt from "jsonwebtoken";
 export const isAdmin = (req, res, next) => {
   const token = req.cookies.accessToken;
 
-  if (!token) return res.status(401).json("User not logged in.");
+  if (!token)
+    return res.status(401).json({ message: "User not authenticated" });
 
-  jwt.verify(token, process.env.JWT_SECRET, (error, userInfo) => {
-    if (error) return res.status(403).json({ message: "Invalid token." });
+  jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
+    if (error) return res.status(403).json({ message: "Invalid token" });
 
-    if (userInfo.role !== "admin")
-      return res.status(403).json({ message: "Access denied." });
+    if (decoded.role !== "admin")
+      return res.status(403).json({ message: "Access denied" });
 
     next();
   });

@@ -7,6 +7,7 @@ export const findOrCreateOAuthUser = (
   done,
   fromOAuthProvider
 ) => {
+  // Check if user exists in database
   const selectQuery = "SELECT * FROM users WHERE email = ?";
   db.query(selectQuery, [email], (err, data) => {
     if (err) return done(err);
@@ -16,7 +17,7 @@ export const findOrCreateOAuthUser = (
     // Insert new user
     const insertQuery =
       "INSERT INTO users (firstName, lastName, email, role, fromGoogle) VALUES (?)";
-    const values = [firstName, lastName, email, "user", 1]; //! MySQL doesn't support Boolean, alternative : 1 = true and 0 = false
+    const values = [firstName, lastName, email, "user", fromOAuthProvider]; //! MySQL doesn't support Boolean, alternative : 1 = true and 0 = false
 
     db.query(insertQuery, [values], (insertErr, insertData) => {
       if (insertErr) return done(insertErr);
@@ -26,7 +27,7 @@ export const findOrCreateOAuthUser = (
         firstName,
         lastName,
         email,
-        fromGoogle: 1,
+        fromOAuthProvider,
         role: "user",
       };
       return done(null, newUser);

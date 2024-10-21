@@ -2,7 +2,6 @@ import { db } from "../utils/connect.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../utils/sendEmail.js";
-import { findOrCreateOAuthUser } from "../utils/findOrCreateOAuthUser.js";
 
 export const register = (req, res) => {
   const { firstName, lastName, email, password, confirmPswd } = req.body;
@@ -13,7 +12,7 @@ export const register = (req, res) => {
   db.query(selectQuery, [email], (selectErr, data) => {
     if (selectErr)
       return res.status(500).json({
-        message: "Error fetching user data.",
+        message: "Error fetching user data",
         error: selectErr,
       });
 
@@ -36,7 +35,7 @@ export const register = (req, res) => {
     // Check email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email?.trim()) || email?.trim()?.length > 320)
-      errors.email = "Invalid email.";
+      errors.email = "Enter a valid email format.";
 
     // Check password
     const passwordRegex =
@@ -57,25 +56,25 @@ export const register = (req, res) => {
     const hashedPswd = bcrypt.hashSync(password?.trim(), salt);
 
     // Store new user in database
-    // TODO - Add fromFacebook 'null', fromGoogle 'null' in table & change password to 'null'
     const insertQuery =
-      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `role`) VALUES (?)";
+      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `fromOAuthProvider`,`role`) VALUES (?)";
     const values = [
       firstName.trim(),
       lastName.trim(),
       email.trim(),
       hashedPswd,
+      "None",
       "user",
     ];
 
     db.query(insertQuery, [values], (insertErr, _data) => {
       if (insertErr)
         return res.status(500).json({
-          message: "Error creating new user.",
+          message: "Error creating new user",
           error: insertErr,
         });
 
-      return res.status(201).json({ message: "New user created." });
+      return res.status(201).json({ message: "New user created" });
     });
   });
 };
@@ -94,24 +93,24 @@ export const login = (req, res) => {
   db.query(q, [email], (error, data) => {
     if (error)
       return res.status(500).json({
-        message: "Error fetching user data.",
+        message: "Error fetching user data",
         error: error,
       });
 
     // Check if user exists
     if (data.length === 0)
-      return res.status(404).json({ message: "Invalid email or password." });
+      return res.status(404).json({ message: "Invalid email or password" });
 
     // Compare passwords with bcrypt
     const checkPswd = bcrypt.compareSync(req.body.password, data[0].password); //! 'data[0]' represents the query result (user) = an array with one entry
     if (!checkPswd)
-      return res.status(401).json({ message: "Invalid email or password." });
+      return res.status(401).json({ message: "Invalid email or password" });
 
     // If passord is correct, generate a token with JWT
     const secretKey = process.env.JWT_SECRET;
     let token;
 
-    // Check user role to set token content
+    // Check user role to set token info (payload)
     if (data[0].role === "admin") {
       token = jwt.sign({ id: data[0].id, role: "admin" }, secretKey, {
         expiresIn: "7d", // After delay, invalid token : user must reconnect
@@ -125,16 +124,34 @@ export const login = (req, res) => {
     // Remove password before sending user data
     const { password, ...otherInfo } = data[0];
 
-    // Store token in a cookie named 'accessToken' with value of 'token' and send it in response
+    // Set token in cookie
     return res
       .cookie("accessToken", token, {
         httpOnly: true, // Prevent scripts from accessing cookie (XSS protection)
-        secure: true, // Ensure cookies are only sent over HTTPS connections in production
+        secure: true, // Ensure cookies are only sent over HTTPS connections
         sameSite: "none", // Allow cross-site access
         maxAge: 7 * 24 * 60 * 60 * 1000, // 'maxAge' in milliseconds, must match token expiration date
       })
       .status(201)
       .json(otherInfo);
+  });
+};
+
+export const connectWithToken = (req, res) => {
+  const loggedInUserId = req.userInfo.id; // Get user ID from token
+  const q = "SELECT * FROM users WHERE id = ?";
+
+  db.query(q, [loggedInUserId], (error, data) => {
+    if (error)
+      return res
+        .status(500)
+        .json({ message: "Error fetching user data", error: error });
+
+    if (data.length === 0)
+      return res.status(404).json({ message: "User not found" });
+
+    const { password, ...otherInfo } = data[0];
+    return res.status(200).json(otherInfo);
   });
 };
 
@@ -148,7 +165,7 @@ export const logout = (_req, res) => {
       sameSite: "none",
     })
     .status(200)
-    .json({ message: "User logged out." });
+    .json({ message: "User logged out" });
 };
 
 export const recoverAccount = (req, res) => {
@@ -158,7 +175,7 @@ export const recoverAccount = (req, res) => {
     // Check email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim()) || email.trim().length > 320)
-      return res.status(401).json({ message: "Invalid email." });
+      return res.status(401).json({ message: "Invalid email" });
 
     // Find user by mail
     const q = "SELECT * FROM users WHERE email = ?";
@@ -166,7 +183,7 @@ export const recoverAccount = (req, res) => {
     db.query(q, [email.trim()], async (error, data) => {
       if (error)
         return res.status(500).json({
-          message: "Error fetching user data.",
+          message: "Error fetching user data",
           error: error,
         });
 
@@ -214,7 +231,7 @@ export const recoverAccount = (req, res) => {
         });
       } catch (err) {
         return res.status(500).json({
-          message: "Error sending email.",
+          message: "Error sending email",
           error: err,
         });
       }
@@ -251,7 +268,7 @@ export const resetPassword = (req, res) => {
 
   // Check if token is present
   if (!token)
-    return res.status(401).json({ message: "Invalid authentication." });
+    return res.status(401).json({ message: "Invalid authentication" });
   const secretKey = process.env.JWT_SECRET;
 
   try {
@@ -268,7 +285,7 @@ export const resetPassword = (req, res) => {
     db.query(q, [hashedPswd, decoded.id], (error, _data) => {
       if (error)
         return res.status(500).json({
-          message: "Error updating password.",
+          message: "Error updating password",
           error: error,
         });
 
@@ -287,6 +304,6 @@ export const resetPassword = (req, res) => {
     // Invalid or expired token
     return res
       .status(401)
-      .json({ message: "Invalid authentication.", error: err });
+      .json({ message: "Invalid authentication", error: err });
   }
 };

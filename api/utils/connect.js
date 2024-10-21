@@ -1,4 +1,3 @@
-import "dotenv/config";
 import mysql from "mysql";
 
 // Configure database
@@ -10,6 +9,6 @@ export const db = mysql.createConnection({
 });
 
 db.connect((error) => {
-  if (error) throw new Error(error);
+  if (error) throw new Error(error.message);
   console.log("Database connected to server");
 });

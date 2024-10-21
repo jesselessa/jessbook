@@ -8,7 +8,7 @@ import { authenticateUser } from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
-router.get("/", getRelationships);
+router.get("/", authenticateUser, getRelationships);
 router.post("/", authenticateUser, addRelationship);
 router.delete("/", authenticateUser, deleteRelationship);
 

@@ -1,12 +1,12 @@
 import { createContext, useState, useEffect } from "react";
-export const AuthContext = createContext();
 import { makeRequest } from "../utils/axios.js";
-import { connectWithFacebook } from "../../../api/middlewares/configureAuthServiceStrategy.js";
+
+export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const storedUser = localStorage.getItem("user");
   const [currentUser, setCurrentUser] = useState(
-    storedUser ? JSON.parse(storedUser) : null
+    storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null
   );
 
   const login = async (inputsValues) => {
@@ -15,30 +15,42 @@ export const AuthContextProvider = ({ children }) => {
         `http://localhost:8080/auth/login`,
         inputsValues
       );
-      setCurrentUser(res.data); // User data fetched from API
+      // Update 'currentUser' with data fetched from API and store them in localStorage
+      setCurrentUser(res.data);
+      localStorage.setItem("user", JSON.stringify(res.data));
     } catch (error) {
-      console.error("Error during login process.");
+      console.error(
+        "Error during login process:",
+        error.response?.data || error.message
+      );
     }
   };
 
-  const connectViaAuthProvider = async (provider) => {
+  const connectWithToken = async () => {
     try {
-      const res = await makeRequest.get(
-        `http://localhost:8080/auth/login/${provider}/callback`
+      const res = await makeRequest.post(
+        "http://localhost:8080/auth/connect-with-token"
       );
       setCurrentUser(res.data);
     } catch (error) {
       console.error(
-        `Error connecting with ${provider.charAt(0) + provider.slice(1)}`
+        "Error connecting with token:",
+        error.response?.data || error.message
       );
     }
   };
 
+  // Ensure user data stored in 'currentUser' are always synchronized with localStorage, therefore available even after reloading or re-opening the app
   useEffect(() => {
-    if (currentUser) localStorage.setItem("user", JSON.stringify(currentUser));
+    localStorage.setItem("user", JSON.stringify(currentUser));
   }, [currentUser]);
 
-  const value = { currentUser, setCurrentUser, login, connectViaAuthProvider };
+  const values = {
+    currentUser,
+    setCurrentUser,
+    login,
+    connectWithToken,
+  };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
 };
