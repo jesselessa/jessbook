@@ -44,10 +44,10 @@ You can see a live demo of the project [here](https://).
 
 ## Main features
 
-- Users authentication and registration.
+- Access application by creating an account or logging in via social networks.
 - Allow users to reset their password.
-- Enable user to create, update or delete posts/comments.
-- Enable user to create and delete stories.
+- Enable users to create, update or delete posts/comments.
+- Enable users to create and delete stories.
 - Facilitate interactions between users with features such as "like" and "follow"/"unfollow".
 - User interface supporting both dark and light themes.
 
