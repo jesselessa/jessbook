@@ -6,7 +6,7 @@ import { sendEmail } from "../utils/sendEmail.js";
 export const register = (req, res) => {
   const { firstName, lastName, email, password, confirmPswd } = req.body;
 
-  // Find user in database by mail
+  // Find user in database by email
   const selectQuery = "SELECT * FROM users WHERE email = ?";
 
   db.query(selectQuery, [email], (selectErr, data) => {
@@ -138,7 +138,7 @@ export const login = (req, res) => {
 };
 
 export const connectWithToken = (req, res) => {
-  const loggedInUserId = req.userInfo.id; // Get user ID from token
+  const loggedInUserId = req.user.id; // Get user ID from token
   const q = "SELECT * FROM users WHERE id = ?";
 
   db.query(q, [loggedInUserId], (error, data) => {
@@ -165,7 +165,7 @@ export const logout = (_req, res) => {
       sameSite: "none",
     })
     .status(200)
-    .json({ message: "User logged out" });
+    .json({ message: "User has logged out" });
 };
 
 export const recoverAccount = (req, res) => {

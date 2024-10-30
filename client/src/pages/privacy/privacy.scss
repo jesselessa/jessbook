@@ -1,0 +1,28 @@
+@import "../../style.scss";
+
+.privacy {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f6f3f3;
+  padding: 1rem;
+
+  @include xsmall {
+    padding: 0.5rem;
+  }
+
+  .logo {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #08415c;
+    cursor: pointer;
+  }
+
+  h1 {
+    color: #08415c;
+  }
+}

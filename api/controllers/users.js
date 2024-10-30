@@ -47,7 +47,7 @@ export const getUser = (req, res) => {
 export const updateUser = (req, res) => {
   const { firstName, lastName, email, password, profilePic, coverPic, city } =
     req.body;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
   const updatedFields = [];
   const values = []; // Values for SQL parameters
 
@@ -157,7 +157,7 @@ export const updateUser = (req, res) => {
 };
 
 export const deleteUser = (req, res) => {
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
   const q = "DELETE FROM users WHERE `id` = ?";
 
   db.query(q, [loggedInUserId], (error, data) => {

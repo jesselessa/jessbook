@@ -3,7 +3,7 @@ import moment from "moment";
 
 export const getStories = (req, res) => {
   const userId = req.query.userId;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
 
   // Delete former stories even non expired before getting new ones //! In large-scale projects, better use a cron job to reduce loading time of SQL query
   const deleteQuery = "DELETE FROM stories WHERE expiresAt <= NOW()";
@@ -54,7 +54,7 @@ export const getStories = (req, res) => {
 
 export const addStory = (req, res) => {
   const { file, desc } = req.body;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
 
   // Check if a file (image or video) is provided
   if (!file || file?.trim()?.length === 0)
@@ -108,7 +108,7 @@ export const addStory = (req, res) => {
 
 export const deleteStory = (req, res) => {
   const storyId = req.params.storyId;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
 
   const q = "DELETE FROM stories WHERE id = ? AND userId = ?";
 

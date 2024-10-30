@@ -4,7 +4,7 @@ import moment from "moment";
 
 export const getPosts = (req, res) => {
   const userId = req.query.userId;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
 
   // Get user posts + followed users posts
   const q =
@@ -41,7 +41,7 @@ export const getPosts = (req, res) => {
 
 export const addPost = (req, res) => {
   const { desc, img } = req.body;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
   const currentDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
   // Validate description
@@ -77,7 +77,7 @@ export const addPost = (req, res) => {
 export const updatePost = (req, res) => {
   const { desc, img } = req.body;
   const postId = req.params.postId;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
 
   const updatedFields = [];
   const values = [];
@@ -127,7 +127,7 @@ export const updatePost = (req, res) => {
 
 export const deletePost = (req, res) => {
   const postId = req.params.postId;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
 
   const q = "DELETE FROM posts WHERE id = ? AND userId = ?";
 

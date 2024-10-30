@@ -1,21 +1,34 @@
 import jwt from "jsonwebtoken";
 
 export const handleAuthSuccess = (req, res) => {
-  if (!req.userInfo)
+  if (!req.user)
     return res.status(401).json({ message: "Authentication failed" });
 
-  // Generate JWT token avec les informations de l'utilisateur
+  // Generate a secret key
   const secretKey = process.env.JWT_SECRET;
+  if (!secretKey) {
+    return res
+      .status(500)
+      .json({ message: "Server error: Missing JWT secret key" });
+  }
+
+  // Set JWT token payload depending on user role
   let token;
 
-  // Set token content depending on user role
-  if (req.userInfo.role === "admin") {
-    token = jwt.sign({ id: req.userInfo.id, role: "admin" }, secretKey, {
-      expiresIn: "7d", // After delay, invalid token : user must reconnect
-    });
-  } else {
-    token = jwt.sign({ id: req.userInfo.id, role: "user" }, secretKey, {
-      expiresIn: "7d",
+  try {
+    if (req.user.role === "admin") {
+      token = jwt.sign({ id: req.user.id, role: "admin" }, secretKey, {
+        expiresIn: "7d",
+      });
+    } else {
+      token = jwt.sign({ id: req.user.id, role: "user" }, secretKey, {
+        expiresIn: "7d",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error: Failed to generate JWT token",
+      error: error,
     });
   }
 
@@ -24,9 +37,9 @@ export const handleAuthSuccess = (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expires in days
     })
     .status(201)
-    // Redirection to our frontend which handles connection with token
+    // Redirection to frontend after authentication
     .redirect(`${process.env.CLIENT_URL}/auth-provider/callback`);
 };

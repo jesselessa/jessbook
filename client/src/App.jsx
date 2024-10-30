@@ -12,6 +12,8 @@ import AuthCallback from "./pages/authCallback/AuthCallback.jsx";
 import Register from "./pages/register/Register.jsx";
 import ForgotPassword from "./pages/forgotPassword/ForgotPassword.jsx";
 import ResetPassword from "./pages/resetPassword/ResetPassword.jsx";
+import Privacy from "./pages/privacy/Privacy.jsx";
+import TermsOfUse from "./pages/termsOfUse/TermsOfUse.jsx";
 
 // Context
 import { AuthContext } from "./contexts/authContext.jsx";
@@ -48,7 +50,11 @@ function App() {
     },
     {
       path: "/auth-provider/callback",
-      element: <AuthCallback />,
+      element: (
+        <ProtectedRoute>
+          <AuthCallback />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/forgot-password",
@@ -61,6 +67,22 @@ function App() {
     {
       path: "/register",
       element: <Register />,
+    },
+    {
+      path: "/privacy",
+      element: (
+        <ProtectedRoute>
+          <Privacy />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/terms-of-use",
+      element: (
+        <ProtectedRoute>
+          <TermsOfUse />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "*",

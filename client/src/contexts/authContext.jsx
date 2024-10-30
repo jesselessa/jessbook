@@ -19,10 +19,7 @@ export const AuthContextProvider = ({ children }) => {
       setCurrentUser(res.data);
       localStorage.setItem("user", JSON.stringify(res.data));
     } catch (error) {
-      console.error(
-        "Error during login process:",
-        error.response?.data || error.message
-      );
+      throw error; // Propagate the error to the calling component
     }
   };
 
@@ -32,11 +29,9 @@ export const AuthContextProvider = ({ children }) => {
         "http://localhost:8080/auth/connect-with-token"
       );
       setCurrentUser(res.data);
+      localStorage.setItem("user", JSON.stringify(res.data));
     } catch (error) {
-      console.error(
-        "Error connecting with token:",
-        error.response?.data || error.message
-      );
+      throw error;
     }
   };
 

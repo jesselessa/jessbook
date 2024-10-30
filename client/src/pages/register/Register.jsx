@@ -115,7 +115,6 @@ export default function Register() {
         navigate("/login");
       }, 3000);
     } catch (error) {
-      console.error("Register API error", error);
       // Handle API errors
       setError(error.response?.data.message || error.message);
 

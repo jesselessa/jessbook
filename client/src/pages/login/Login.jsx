@@ -70,7 +70,7 @@ export default function Login() {
     }
   };
 
-  const connectViaAuthProvider = async (provider) => {
+  const connectViaAuthProvider = (provider) => {
     window.location.href = `http://localhost:8080/auth/login/${provider}`;
   };
 
@@ -102,7 +102,6 @@ export default function Login() {
           <form name="login-form" onSubmit={handleSubmit}>
             {/* Handle error from API */}
             {error && <span className="error-msg">{error}</span>}
-
             <input
               type="email"
               id="email"

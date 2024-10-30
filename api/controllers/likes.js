@@ -14,7 +14,7 @@ export const getLikes = (req, res) => {
 };
 
 export const addLike = (req, res) => {
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
   const postId = req.body.postId;
 
   const q = "INSERT INTO likes (`userId`, `postId`) VALUES (?)";
@@ -30,7 +30,7 @@ export const addLike = (req, res) => {
 };
 
 export const deleteLike = (req, res) => {
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
   const postId = req.query.postId;
 
   const q = "DELETE FROM likes WHERE userId = ? AND postId = ?";

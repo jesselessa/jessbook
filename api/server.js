@@ -75,14 +75,9 @@ app.use("/stories", storiesRoute);
 // Serve static files for our front end (after Vite build)
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// Handle routes not defined by API
 app.get("*", (_req, res) => {
-  res.status(404).json({ message: "Not found" });
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 }); // Display Login page
-
-// app.get("*", (_req, res) => {
-//   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-// }); // Display Login page
 
 // Start server
 app.listen(PORT, (error) => {

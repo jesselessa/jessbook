@@ -22,7 +22,7 @@ export const getComments = (req, res) => {
 
 export const addComment = (req, res) => {
   const { desc, postId } = req.body;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
   const currentDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
   if (desc?.trim()?.length === 0) {
@@ -50,7 +50,7 @@ export const addComment = (req, res) => {
 
 export const updateComment = (req, res) => {
   const commentId = req.params.commentId;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
   const { desc } = req.body;
 
   if (desc?.trim()?.length === 0)
@@ -76,7 +76,7 @@ export const updateComment = (req, res) => {
 
 export const deleteComment = (req, res) => {
   const commentId = req.params.commentId;
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
 
   const q = "DELETE FROM comments WHERE id = ? AND userId = ?";
 

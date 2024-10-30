@@ -17,7 +17,7 @@ export const getRelationships = (req, res) => {
 };
 
 export const addRelationship = (req, res) => {
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
   const followedUserId = req.body.userId;
 
   const q = "INSERT INTO relationships(`followerId`, `followedId`) VALUES (?)";
@@ -33,7 +33,7 @@ export const addRelationship = (req, res) => {
 };
 
 export const deleteRelationship = (req, res) => {
-  const loggedInUserId = req.userInfo.id;
+  const loggedInUserId = req.user.id;
   const followedUserId = req.query.userId;
 
   const q = "DELETE FROM relationships WHERE followerId = ? AND followedId = ?";
