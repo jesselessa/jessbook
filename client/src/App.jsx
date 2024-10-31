@@ -49,12 +49,8 @@ function App() {
       element: <Login />,
     },
     {
-      path: "/auth-provider/callback",
-      element: (
-        <ProtectedRoute>
-          <AuthCallback />
-        </ProtectedRoute>
-      ),
+      path: "/login/auth-provider/callback",
+      element: <AuthCallback />,
     },
     {
       path: "/forgot-password",
@@ -70,19 +66,11 @@ function App() {
     },
     {
       path: "/privacy",
-      element: (
-        <ProtectedRoute>
-          <Privacy />
-        </ProtectedRoute>
-      ),
+      element: <Privacy />,
     },
     {
       path: "/terms-of-use",
-      element: (
-        <ProtectedRoute>
-          <TermsOfUse />
-        </ProtectedRoute>
-      ),
+      element: <TermsOfUse />,
     },
     {
       path: "*",

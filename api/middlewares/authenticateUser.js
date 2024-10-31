@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 export const authenticateUser = (req, res, next) => {
   const token = req.cookies.accessToken;
-  
+
   if (!token)
     return res.status(401).json({ message: "User not authenticated" });
 
@@ -13,7 +13,7 @@ export const authenticateUser = (req, res, next) => {
         .status(401)
         .json({ message: "Invalid or expired token", error: error });
 
-    req.user = decoded; // Store token info in req.user //TODO
+    req.user = decoded; // Store token info in req.user
 
     next(); // Next step (protected route)
   });

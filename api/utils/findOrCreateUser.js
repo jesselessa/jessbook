@@ -1,11 +1,11 @@
-import { db } from "../utils/connect.js";
+import { db } from "./connect.js";
 
-export const findOrCreateOAuthUser = (
+export const findOrCreateUser = (
   email,
   firstName,
   lastName,
   done,
-  fromOAuthProvider
+  fromAuthProvider
 ) => {
   // Check if user exists in database
   const selectQuery = "SELECT * FROM users WHERE email = ?";
@@ -16,8 +16,8 @@ export const findOrCreateOAuthUser = (
 
     // Insert new user
     const insertQuery =
-      "INSERT INTO users (firstName, lastName, email, role, fromGoogle) VALUES (?)";
-    const values = [firstName, lastName, email, "user", fromOAuthProvider]; //! MySQL doesn't support Boolean, alternative : 1 = true and 0 = false
+      "INSERT INTO users (`firstName`, `lastName`, `email`, `fromAuthProvider`, `role`) VALUES (?)";
+    const values = [firstName, lastName, email, fromAuthProvider, "user"];
 
     db.query(insertQuery, [values], (insertErr, insertData) => {
       if (insertErr) return done(insertErr);
@@ -27,7 +27,7 @@ export const findOrCreateOAuthUser = (
         firstName,
         lastName,
         email,
-        fromOAuthProvider,
+        fromAuthProvider,
         role: "user",
       };
       return done(null, newUser);

@@ -62,11 +62,6 @@ export default function Login() {
       navigate("/");
     } catch (error) {
       setError(error.response?.data.message || error.message);
-
-      // Clear error message after 5 seconds
-      setTimeout(() => {
-        setError("");
-      }, 5000);
     }
   };
 

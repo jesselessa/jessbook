@@ -6,11 +6,10 @@ export const handleAuthSuccess = (req, res) => {
 
   // Generate a secret key
   const secretKey = process.env.JWT_SECRET;
-  if (!secretKey) {
+  if (!secretKey)
     return res
       .status(500)
       .json({ message: "Server error: Missing JWT secret key" });
-  }
 
   // Set JWT token payload depending on user role
   let token;
@@ -35,11 +34,12 @@ export const handleAuthSuccess = (req, res) => {
   res
     .cookie("accessToken", token, {
       httpOnly: true,
+
       secure: true,
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expires in days
     })
     .status(201)
     // Redirection to frontend after authentication
-    .redirect(`${process.env.CLIENT_URL}/auth-provider/callback`);
+    .redirect(`${process.env.CLIENT_URL}/login/auth-provider/callback`);
 };

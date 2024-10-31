@@ -1,7 +1,7 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
-import { findOrCreateOAuthUser } from "../utils/findOrCreateOAuthUser.js";
+import { findOrCreateUser } from "../utils/findOrCreateUser.js";
 
 //! When users log in via authentication providers such as Google or Facebook, their credentials (profile, email, etc.) are transmitted to our server. 'Strategies' are functions which define how to handle these data
 
@@ -21,7 +21,7 @@ export const connectWithGoogle = () => {
         // console.log("Google User Profile:", profile);
 
         // If not already present in database, create a new user
-        findOrCreateOAuthUser(email, firstName, lastName, done, "Google");
+        findOrCreateUser(email, firstName, lastName, done, "Google");
       }
     )
   );
@@ -43,7 +43,7 @@ export const connectWithFacebook = () => {
         const lastName = profile.name?.familyName || "Undefined";
         // console.log("Facebook User Profile:", profile);
 
-        findOrCreateOAuthUser(email, firstName, lastName, done, "Facebook");
+        findOrCreateUser(email, firstName, lastName, done, "Facebook");
       }
     )
   );

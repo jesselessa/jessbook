@@ -57,13 +57,13 @@ export const register = (req, res) => {
 
     // Store new user in database
     const insertQuery =
-      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `fromOAuthProvider`,`role`) VALUES (?)";
+      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `fromAuthProvider`,`role`) VALUES (?)";
     const values = [
       firstName.trim(),
       lastName.trim(),
       email.trim(),
       hashedPswd,
-      "None",
+      "No",
       "user",
     ];
 

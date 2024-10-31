@@ -13,8 +13,7 @@ export const isAdmin = (req, res, next) => {
     if (decoded.role !== "admin")
       return res.status(403).json({ message: "Access denied" });
 
-    req.user = decoded; //TODO
-
+    req.user = decoded;
     next();
   });
 };

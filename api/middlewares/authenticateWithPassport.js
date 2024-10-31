@@ -5,15 +5,12 @@ import passport from "passport";
 export const authenticateWithPassport = (strategy) => {
   return (req, res, next) => {
     passport.authenticate(strategy, (error, user, info) => {
-      if (error) {
+      if (error)
         return res.status(500).json({
           success: false,
           message: "An error occurred during authentication with Passport.",
-          error: error.message,
+          error: error,
         });
-      }
-
-      // if (error) return next(error);
 
       if (!user)
         return res.status(401).json({
