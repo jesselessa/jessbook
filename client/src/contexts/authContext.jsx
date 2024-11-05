@@ -19,7 +19,7 @@ export const AuthContextProvider = ({ children }) => {
       setCurrentUser(res.data);
       localStorage.setItem("user", JSON.stringify(res.data));
     } catch (error) {
-      throw error; // Propagate the error to the calling component
+      throw error; // Propagate error to calling component
     }
   };
 

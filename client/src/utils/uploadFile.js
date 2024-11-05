@@ -8,9 +8,7 @@ export const uploadFile = async (file) => {
     const res = await makeRequest.post("/uploads", formData);
     return res.data; // Returns file name
   } catch (error) {
-    console.error(
-      "An unknown error occurred while uploading file:",
-      error.message
-    );
+    throw error; // Propagate error without modifying it
+  }
   }
 };
