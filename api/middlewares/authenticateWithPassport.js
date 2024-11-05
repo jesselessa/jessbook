@@ -7,7 +7,6 @@ export const authenticateWithPassport = (strategy) => {
     passport.authenticate(strategy, (error, user, info) => {
       if (error)
         return res.status(500).json({
-          success: false,
           message: "An error occurred during authentication with Passport.",
           error: error,
         });

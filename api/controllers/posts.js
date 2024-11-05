@@ -25,15 +25,15 @@ export const getPosts = (req, res) => {
   // DESC = most recent posts displayed first
   //! `p.userId IN (...)` checks whether the user who created a post (p.userId) is in a list of specific IDs (result from subquery)
 
-  // Define values for SQL parameters
   const values =
     userId !== "undefined" ? [userId] : [loggedInUserId, loggedInUserId];
 
   db.query(q, values, (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error fetching posts.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while fetching posts.",
+        error: error,
+      });
 
     return res.status(200).json(data);
   });
@@ -53,24 +53,25 @@ export const addPost = (req, res) => {
       .status(400)
       .json("Description cannot exceed 1000\u00A0characters.");
 
-  // 2 - Validate image (optional)
+  // Validate image
   if (img) {
     if (!isImage(img))
       return res.status(400).json("Provide a valid image format.");
   }
 
-  // 3 - Create a new post
+  // Create a new post
   const q =
     "INSERT INTO posts (`desc`, `img`, `userId`, `createdAt`) VALUES (?)";
   const values = [desc.trim(), img, loggedInUserId, currentDateTime];
 
   db.query(q, [values], (error, _data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error creating post.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while creating post.",
+        error: error,
+      });
 
-    return res.status(200).json("Post created.");
+    return res.status(201).json("Post created");
   });
 };
 
@@ -82,9 +83,9 @@ export const updatePost = (req, res) => {
   const updatedFields = [];
   const values = [];
 
-  // 1 - Validate description
+  // Validate description
   if (desc?.trim()?.length === 0)
-    return res.status(400).json("No description to update.");
+    return res.status(400).json("No description to update");
 
   if (desc?.trim()?.length > 1000) {
     return res
@@ -107,7 +108,7 @@ export const updatePost = (req, res) => {
 
   // 3 - No field to update
   if (updatedFields.length === 0)
-    return res.status(400).json("No field to update.");
+    return res.status(400).json("No field to update");
 
   const q = `UPDATE posts SET ${updatedFields.join(
     ", "
@@ -117,11 +118,12 @@ export const updatePost = (req, res) => {
 
   db.query(q, values, (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error updating post.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while updating post.",
+        error: error,
+      });
 
-    if (data.affectedRows > 0) return res.status(200).json("Post updated.");
+    if (data.affectedRows > 0) return res.status(200).json("Post updated");
   });
 };
 
@@ -133,10 +135,11 @@ export const deletePost = (req, res) => {
 
   db.query(q, [postId, loggedInUserId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error deleting post.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while deleting post.",
+        error: error,
+      });
 
-    if (data.affectedRows > 0) return res.status(200).json("Post deleted.");
+    if (data.affectedRows > 0) return res.status(200).json("Post deleted");
   });
 };

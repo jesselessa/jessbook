@@ -6,9 +6,11 @@ export const getLikes = (req, res) => {
 
   db.query(q, [postId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error fetching likes.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while fetching likes on post.",
+        error: error,
+      });
+
     return res.status(200).json(data.map((like) => like.userId));
   });
 };
@@ -22,10 +24,12 @@ export const addLike = (req, res) => {
 
   db.query(q, [values], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error adding like.", error: error });
-    if (data.affectedRows > 0) return res.status(200).json("Post liked.");
+      return res.status(500).json({
+        message: "An unknown error occurred while adding like on post.",
+        error: error,
+      });
+
+    if (data.affectedRows > 0) return res.status(201).json("Post liked");
   });
 };
 
@@ -37,10 +41,11 @@ export const deleteLike = (req, res) => {
 
   db.query(q, [loggedInUserId, postId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error deleting like.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while deleting like on post.",
+        error: error,
+      });
 
-    if (data.affectedRows > 0) return res.status(200).json("Post unliked.");
+    if (data.affectedRows > 0) return res.status(200).json("Post unliked");
   });
 };

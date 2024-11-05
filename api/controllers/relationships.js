@@ -6,9 +6,10 @@ export const getRelationships = (req, res) => {
 
   db.query(q, [followerUserId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error fetching relationships.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while fetching relationships.",
+        error: error,
+      });
 
     return res
       .status(200)
@@ -25,10 +26,12 @@ export const addRelationship = (req, res) => {
 
   db.query(q, [values], (error, _data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error creating relationship.", error: error });
-    return res.status(200).json("User followed.");
+      return res.status(500).json({
+        message: "An unknown error occurred while creating relationship.",
+        error: error,
+      });
+
+    return res.status(201).json("User followed");
   });
 };
 
@@ -40,12 +43,11 @@ export const deleteRelationship = (req, res) => {
 
   db.query(q, [loggedInUserId, followedUserId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error deleting relationship.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while deleting relationship.",
+        error: error,
+      });
 
-    if (data.affectedRows > 0) return res.status(200).json("User unfollowed.");
-
-    return res.status(403).json("You are not allowed to unfollow this user.");
+    if (data.affectedRows > 0) return res.status(200).json("User unfollowed");
   });
 };

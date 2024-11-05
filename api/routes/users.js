@@ -1,14 +1,10 @@
 import express from "express";
-
-// Controllers
 import {
   getAllUsers,
   getUser,
   updateUser,
   deleteUser,
 } from "../controllers/users.js";
-
-// Middlewares
 import { authenticateUser } from "../middlewares/authenticateUser.js";
 import { isAdmin } from "../middlewares/isAdmin.js";
 

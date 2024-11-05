@@ -21,7 +21,7 @@ const router = express.Router();
 
 router.post("/register", register);
 router.post("/login", login);
-router.post("/connect-with-token", authenticateUser, connectWithToken); // Connect with token
+router.post("/connect-with-token", authenticateUser, connectWithToken);
 router.post("/recover-account", recoverAccount);
 router.post("/reset-password", resetPassword);
 router.post("/logout", logout);

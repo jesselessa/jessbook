@@ -6,8 +6,8 @@ export const fetchPostComments = async (postId) => {
     return res.data;
   } catch (error) {
     console.error(
-      "Error fetching comments:",
-      error.response?.data || error.message
+      "An unknown error occured while fetching post comments:",
+      error.response?.data.message || error.message
     );
   }
 };

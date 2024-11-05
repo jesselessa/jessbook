@@ -2,14 +2,12 @@ import jwt from "jsonwebtoken";
 
 export const handleAuthSuccess = (req, res) => {
   if (!req.user)
-    return res.status(401).json({ message: "Authentication failed" });
+    return res.status(401).json({ message: "Authentication failed." });
 
   // Generate a secret key
   const secretKey = process.env.JWT_SECRET;
   if (!secretKey)
-    return res
-      .status(500)
-      .json({ message: "Server error: Missing JWT secret key" });
+    return res.status(500).json({ message: "Missing JWT secret key" }); //! Error 500 because problem of configuration server side
 
   // Set JWT token payload depending on user role
   let token;
@@ -26,7 +24,7 @@ export const handleAuthSuccess = (req, res) => {
     }
   } catch (error) {
     return res.status(500).json({
-      message: "Server error: Failed to generate JWT token",
+      message: "An unknown error occurred while generating JWT token.",
       error: error,
     });
   }
@@ -34,10 +32,9 @@ export const handleAuthSuccess = (req, res) => {
   res
     .cookie("accessToken", token, {
       httpOnly: true,
-
       secure: true,
       sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expires in days
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
     .status(201)
     // Redirection to frontend after authentication

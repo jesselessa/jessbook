@@ -1,4 +1,5 @@
 import { db } from "../utils/connect.js";
+import { isImage, isVideo } from "../utils/isFile.js";
 import moment from "moment";
 
 export const getStories = (req, res) => {
@@ -11,7 +12,7 @@ export const getStories = (req, res) => {
   db.query(deleteQuery, (deleteErr, _data) => {
     if (deleteErr)
       return res.json({
-        message: "Error deleting former stories.",
+        message: "An unknown error occurred while deleting former stories.",
         error: deleteErr,
       });
   });
@@ -44,9 +45,10 @@ export const getStories = (req, res) => {
 
   db.query(selectQuery, values, (selectErr, data) => {
     if (selectErr)
-      return res
-        .status(500)
-        .json({ message: "Error fetching stories.", error: selectErr });
+      return res.status(500).json({
+        message: "An unknown error occurred while fetching stories.",
+        error: selectErr,
+      });
 
     return res.status(200).json(data);
   });
@@ -58,14 +60,24 @@ export const addStory = (req, res) => {
 
   // Check if a file (image or video) is provided
   if (!file || file?.trim()?.length === 0)
-    return res.status(400).json("You must provide either an image or a video.");
+    return res
+      .status(400)
+      .json("You must provide either an image or a video file.");
 
-  // Validate description (optional)
-  if (desc?.trim()?.length > 45) {
+  // Validate file format
+
+  if (file) {
+    if (!isImage(file) && !isVideo(file))
+      return res
+        .status(400)
+        .json("You must provide a valid image or video format.");
+  }
+
+  // Validate description
+  if (desc?.trim()?.length > 45)
     return res
       .status(400)
       .json("Description can't contain more than 45\u00A0characters.");
-  }
 
   // Delete current story if non expired before creating new one
   const deleteQuery = `
@@ -74,9 +86,10 @@ export const addStory = (req, res) => {
 
   db.query(deleteQuery, [loggedInUserId], (deleteErr) => {
     if (deleteErr)
-      return res
-        .status(500)
-        .json({ message: "Error deleting current story.", error: deleteErr });
+      return res.status(500).json({
+        message: "An unknown error occurred while deleting current story.",
+        error: deleteErr,
+      });
 
     // Create a new story
     const currentDateTime = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
@@ -97,11 +110,12 @@ export const addStory = (req, res) => {
 
     db.query(insertQuery, [values], (insertErr, _data) => {
       if (insertErr)
-        return res
-          .status(500)
-          .json({ message: "Error creating new story.", error: insertErr });
+        return res.status(500).json({
+          message: "An unknown error occurred while creating new story.",
+          error: insertErr,
+        });
 
-      return res.status(200).json("New story created.");
+      return res.status(201).json("New story created");
     });
   });
 };
@@ -114,10 +128,11 @@ export const deleteStory = (req, res) => {
 
   db.query(q, [storyId, loggedInUserId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error deleting story.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while deleting story.",
+        error: error,
+      });
 
-    if (data.affectedRows > 0) return res.status(200).json("Story deleted.");
+    if (data.affectedRows > 0) return res.status(200).json("Story deleted");
   });
 };

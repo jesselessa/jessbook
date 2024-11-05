@@ -14,6 +14,7 @@ export const isAdmin = (req, res, next) => {
       return res.status(403).json({ message: "Access denied" });
 
     req.user = decoded;
+
     next();
   });
 };

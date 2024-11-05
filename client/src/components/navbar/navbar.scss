@@ -19,7 +19,7 @@
       justify-content: center;
     }
 
-    @media screen and (max-width: 350px) {
+    @include xsmall {
       padding: 1rem 0.5rem;
     }
 
@@ -29,12 +29,8 @@
       align-items: center;
       gap: 2.5rem;
 
-      @include xsmall {
-        gap: 1.5rem;
-      }
-
-      @media screen and (max-width: 350px) {
-        gap: 1.2rem;
+      @include small {
+        gap: 2rem;
       }
 
       a {
@@ -89,16 +85,8 @@
         margin-right: 2.5rem;
 
         @include small {
-          margin-right: 2.5rem;
+          margin-right: 2rem;
           justify-content: center;
-        }
-
-        @include xsmall {
-          margin-right: 1.5rem;
-        }
-
-        @media screen and (max-width: 350px) {
-          margin-right: 1rem;
         }
 
         input {
@@ -107,7 +95,7 @@
           font-size: 1.6rem;
           background-color: transparent;
           border: none;
-          outline: none;          
+          outline: none;
           &::placeholder {
             color: themed("textColor");
           }
@@ -115,7 +103,6 @@
           @media screen and (max-width: 800px) {
             display: none;
           }
-
         }
       }
     }
@@ -151,7 +138,7 @@
         color: themed("iconColor");
         cursor: pointer;
         &:active {
-        transform: translateY(1px);
+          transform: translateY(1px);
         }
       }
     }
@@ -165,16 +152,12 @@
       }
 
       @include small {
-        margin-right: 1.5rem; // Space between notif and burger icons
+        margin-right: 2rem; // Space between notif and burger icons
       }
 
-      @include xsmall {
-        gap: 1.5rem;
-      }
-
-      @media screen and (max-width: 350px) {
-        gap: 1rem;
-        margin-right: 1rem;
+      @include small {
+        gap: 2rem;
+        margin-right: 2rem;
       }
 
       a {

@@ -9,8 +9,8 @@ export const uploadFile = async (file) => {
     return res.data; // Returns file name
   } catch (error) {
     console.error(
-      "Error uploading file:",
-      error.response?.data || error.message
+      "An unknown error occurred while uploading file:",
+      error.message
     );
   }
 };

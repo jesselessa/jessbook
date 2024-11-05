@@ -12,7 +12,7 @@ export const register = (req, res) => {
   db.query(selectQuery, [email], (selectErr, data) => {
     if (selectErr)
       return res.status(500).json({
-        message: "Error fetching user data",
+        message: "An unknown error occurred while fetching user data.",
         error: selectErr,
       });
 
@@ -32,12 +32,12 @@ export const register = (req, res) => {
     if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35)
       errors.lastName = "Enter a name between 1 and 35\u00A0characters.";
 
-    // Check email
+    // Check email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email?.trim()) || email?.trim()?.length > 320)
       errors.email = "Enter a valid email format.";
 
-    // Check password
+    // Check password format
     const passwordRegex =
       /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
     if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200)
@@ -65,12 +65,12 @@ export const register = (req, res) => {
       hashedPswd,
       "No",
       "user",
-    ];
+    ]; // Values for SQL parameters
 
     db.query(insertQuery, [values], (insertErr, _data) => {
       if (insertErr)
         return res.status(500).json({
-          message: "Error creating new user",
+          message: "An unknown error occurred while creating new user.",
           error: insertErr,
         });
 
@@ -87,13 +87,13 @@ export const login = (req, res) => {
       .status(400)
       .json({ message: "Please, fill in all required fields." });
 
-  // Find user in database by mail
+  // Find user by email
   const q = `SELECT * FROM users WHERE email = ?`;
 
   db.query(q, [email], (error, data) => {
     if (error)
       return res.status(500).json({
-        message: "Error fetching user data",
+        message: "An unknown error occurred while fetching user data.",
         error: error,
       });
 
@@ -110,7 +110,7 @@ export const login = (req, res) => {
     const secretKey = process.env.JWT_SECRET;
     let token;
 
-    // Check user role to set token info (payload)
+    // Set token info (payload) depending on user role
     if (data[0].role === "admin") {
       token = jwt.sign({ id: data[0].id, role: "admin" }, secretKey, {
         expiresIn: "7d", // After delay, invalid token : user must reconnect
@@ -143,9 +143,10 @@ export const connectWithToken = (req, res) => {
 
   db.query(q, [loggedInUserId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error fetching user data", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while fetching user data.",
+        error: error,
+      });
 
     if (data.length === 0)
       return res.status(404).json({ message: "User not found" });
@@ -165,7 +166,7 @@ export const logout = (_req, res) => {
       sameSite: "none",
     })
     .status(200)
-    .json({ message: "User has logged out" });
+    .json({ message: "User is logged out." });
 };
 
 export const recoverAccount = (req, res) => {
@@ -177,13 +178,13 @@ export const recoverAccount = (req, res) => {
     if (!emailRegex.test(email.trim()) || email.trim().length > 320)
       return res.status(401).json({ message: "Invalid email" });
 
-    // Find user by mail
+    // Find user by email
     const q = "SELECT * FROM users WHERE email = ?";
 
     db.query(q, [email.trim()], async (error, data) => {
       if (error)
         return res.status(500).json({
-          message: "Error fetching user data",
+          message: "An unknown error occurred while fetching user data.",
           error: error,
         });
 
@@ -231,7 +232,7 @@ export const recoverAccount = (req, res) => {
         });
       } catch (err) {
         return res.status(500).json({
-          message: "Error sending email",
+          message: "An unknown error occurred while sending email.",
           error: err,
         });
       }
@@ -285,7 +286,7 @@ export const resetPassword = (req, res) => {
     db.query(q, [hashedPswd, decoded.id], (error, _data) => {
       if (error)
         return res.status(500).json({
-          message: "Error updating password",
+          message: "An unknown error occurred while updating password.",
           error: error,
         });
 

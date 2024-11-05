@@ -12,9 +12,10 @@ export const getComments = (req, res) => {
 
   db.query(q, [postId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error fetching comments", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while fetching post comments.",
+        error: error,
+      });
 
     return res.status(200).json(data);
   });
@@ -40,11 +41,12 @@ export const addComment = (req, res) => {
 
   db.query(q, [values], (error, _data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error creating comment", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while creating comment.",
+        error: error,
+      });
 
-    return res.status(200).json({ message: "Comment created" });
+    return res.status(201).json({ message: "Comment created" });
   });
 };
 
@@ -66,11 +68,12 @@ export const updateComment = (req, res) => {
 
   db.query(q, [desc, commentId, loggedInUserId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error updating comment.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while updating comment.",
+        error: error,
+      });
 
-    if (data.affectedRows > 0) return res.status(200).json("Comment updated.");
+    if (data.affectedRows > 0) return res.status(200).json("Comment updated");
   });
 };
 
@@ -82,10 +85,11 @@ export const deleteComment = (req, res) => {
 
   db.query(q, [commentId, loggedInUserId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error deleting comment.", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while deleting comment.",
+        error: error,
+      });
 
-    if (data.affectedRows > 0) return res.status(200).json("Comment deleted.");
+    if (data.affectedRows > 0) return res.status(200).json("Comment deleted");
   });
 };

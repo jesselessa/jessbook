@@ -10,9 +10,10 @@ export const getAllUsers = (req, res) => {
 
   db.query(q, (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error fetching all users data", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while fetching all users data.",
+        error: error,
+      });
 
     // Exclude password from users data
     const users = data.map((user) => {
@@ -30,14 +31,15 @@ export const getUser = (req, res) => {
 
   db.query(q, [userId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error fetching user data", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while fetching user data.",
+        error: error,
+      });
 
     if (data.length === 0)
       return res.status(404).json({ message: "User not found" });
 
-    if (data.length) {
+    if (data.length > 0) {
       const { password, ...otherInfo } = data[0];
       return res.status(200).json(otherInfo);
     }
@@ -49,7 +51,7 @@ export const updateUser = (req, res) => {
     req.body;
   const loggedInUserId = req.user.id;
   const updatedFields = [];
-  const values = []; // Values for SQL parameters
+  const values = [];
 
   // Check validation conditions
   let errors = {};
@@ -71,24 +73,27 @@ export const updateUser = (req, res) => {
       values.push(lastName.trim());
     }
   }
+
   if (email) {
     // Check format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!emailRegex.test(email.trim()) || email.trim().length > 320) {
-      errors.email = "Invalid email format or too long";
+      errors.email = "Invalid email format";
     } else {
       updatedFields.push("`email` = ?");
       values.push(email.trim());
     }
   }
 
-  // d - Password validation and hashing
+  // Password validation and hashing
   if (password) {
     // Check format
     const passwordRegex =
       /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
+
     if (!passwordRegex.test(password) || password.trim()?.length > 200) {
-      errors.password = "Invalid password format or too long";
+      errors.password = "Invalid password format";
     } else {
       // Hash password before updating it
       const salt = bcrypt.genSaltSync(10);
@@ -107,7 +112,7 @@ export const updateUser = (req, res) => {
     }
   }
 
-  // f - Cover picture (optional)
+  // Cover picture
   if (coverPic) {
     if (!isImage(coverPic)) {
       errors.coverPic = "Invalid cover picture format";
@@ -117,10 +122,10 @@ export const updateUser = (req, res) => {
     }
   }
 
-  // g - City (optional)
+  // City
   if (city) {
     if (city.trim().length > 85) {
-      errors.city = "Enter a valid city name";
+      errors.city = "Enter a valid city name.";
     } else {
       updatedFields.push("`city` = ?");
       values.push(city.trim());
@@ -146,13 +151,12 @@ export const updateUser = (req, res) => {
 
   db.query(q, values, (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error updating user data", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while updating user data.",
+        error: error,
+      });
 
     if (data.affectedRows > 0) return res.status(200).json("User data updated");
-
-    return res.status(403).json("User can only delete their own profile");
   });
 };
 
@@ -162,9 +166,10 @@ export const deleteUser = (req, res) => {
 
   db.query(q, [loggedInUserId], (error, data) => {
     if (error)
-      return res
-        .status(500)
-        .json({ message: "Error deleting user", error: error });
+      return res.status(500).json({
+        message: "An unknown error occurred while deleting user account.",
+        error: error,
+      });
 
     if (data.affectedRows > 0) return res.status(200).json("User deleted");
   });
