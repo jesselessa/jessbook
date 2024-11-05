@@ -10,5 +10,4 @@ export const uploadFile = async (file) => {
   } catch (error) {
     throw error; // Propagate error without modifying it
   }
-  }
 };

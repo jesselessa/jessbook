@@ -33,11 +33,7 @@ export default function CreateStory({ setOpenCreateStory }) {
       toast.success("Story published.");
     },
 
-    onError: (error) =>
-      console.error(
-        "Error creating story:",
-        error.response?.data || error.message
-      ),
+    onError: (error) => console.error("Error creating story:", error),
   });
 
   const handleClick = async (e) => {

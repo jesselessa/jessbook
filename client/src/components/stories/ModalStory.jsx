@@ -35,10 +35,7 @@ export default function ModalStory({ story, setOpenModal }) {
       deleteMutation.mutate(story.id);
       setOpenModal(false); // Close modal after submission
     } catch (error) {
-      console.error(
-        "Error deleting story:",
-        error.response?.data || error.message
-      );
+      console.error("Error deleting story:", error);
     }
   };
 

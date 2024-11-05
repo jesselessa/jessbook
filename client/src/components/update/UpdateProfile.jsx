@@ -77,11 +77,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
       toast.success("Profile updated.");
     },
 
-    onError: (error) =>
-      console.error(
-        "Error updating profile:",
-        error.response?.data || error.message
-      ),
+    onError: (error) => console.error("Error updating profile:", error),
   });
 
   // Clear validation errors in form

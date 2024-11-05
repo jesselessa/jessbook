@@ -53,10 +53,7 @@ export default function Post({ post }) {
       const res = await makeRequest.get(`/likes?postId=${post.id}`);
       return res.data;
     } catch (error) {
-      console.error(
-        "Error fetching post likes:",
-        error.response?.data || error.message
-      );
+      console.error("Error fetching post likes:", error);
     }
   };
 
@@ -82,10 +79,7 @@ export default function Post({ post }) {
     try {
       handleLikesMutation.mutate(likes?.includes(currentUser?.id));
     } catch (error) {
-      console.error(
-        "Error adding or removing like:",
-        error.response?.data || error.message
-      );
+      console.error("Error adding or removing like:", error);
     }
   };
 
@@ -104,10 +98,7 @@ export default function Post({ post }) {
     try {
       deleteMutation.mutate(post.id);
     } catch (error) {
-      console.error(
-        "Error deleting post:",
-        error.response?.data || error.message
-      );
+      console.error("Error deleting post:", error);
     }
   };
 

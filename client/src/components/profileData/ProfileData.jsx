@@ -38,10 +38,7 @@ export default function ProfileData() {
       const res = await makeRequest.get(`/users/${userId}`);
       return res.data;
     } catch (error) {
-      console.error(
-        "Error fetching user data:",
-        error.response?.data || error.message
-      );
+      console.error("Error fetching user data:", error);
     }
   };
 
@@ -57,10 +54,7 @@ export default function ProfileData() {
       const res = await makeRequest.get(`/relationships?followedId=${userId}`);
       return res.data;
     } catch (error) {
-      console.error(
-        "Error fetching relationships data:",
-        error.response?.data || error.message
-      );
+      console.error("Error fetching relationships data:", error);
     }
   };
 
@@ -87,10 +81,7 @@ export default function ProfileData() {
     try {
       mutation.mutate(relationshipsData?.includes(currentUser?.id));
     } catch (error) {
-      console.error(
-        "Error creating or deleting relationship:",
-        error.response?.data || error.message
-      );
+      console.error("Error creating or deleting relationship:", error);
     }
   };
 

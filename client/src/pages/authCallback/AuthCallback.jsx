@@ -35,10 +35,7 @@ export default function AuthCallback() {
         await connectWithToken();
         navigate("/");
       } catch (error) {
-        console.error(
-          "Error connecting with token:",
-          error.response?.data.message || error.message
-        );
+        console.error("Error connecting with token:", error);
         navigate("/login");
       } finally {
         setLoading(false);
