@@ -48,6 +48,8 @@
         span {
           font-size: 1.4rem;
           font-weight: bold;
+          line-height: 1;
+          word-break: break-word; // Long names not overflowing div
         }
       }
 
