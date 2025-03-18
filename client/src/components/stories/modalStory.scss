@@ -1,4 +1,5 @@
-@import "../../style.scss";
+@use "../../style.scss";
+@use "sass:color";
 
 .modalStory {
   position: fixed;
@@ -25,7 +26,7 @@
     overflow: hidden;
     padding: 1rem;
 
-    @include small {
+    @include style.small {
       top: 2rem;
       width: 95%;
     }
@@ -99,14 +100,14 @@
           margin: auto;
           cursor: pointer;
           &:hover {
-            background-color: darken(#f0544f, 10%);
+            background-color: color.scale(#f0544f, $lightness: -10%);
           }
           &:active {
             transform: translateY(1px);
-            background-color: darken(#f0544f, 20%);
+            background-color: color.scale(#f0544f, $lightness: -20%);
           }
 
-          @include small {
+          @include style.small {
             margin: auto;
           }
         }

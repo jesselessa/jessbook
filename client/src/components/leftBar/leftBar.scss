@@ -1,21 +1,21 @@
-@import "../../style.scss";
+@use "../../style.scss";
 
 .leftBar {
-  @include themify($themes) {
+  @include style.themify(style.$themes) {
     position: sticky;
     top: 70px;
     width: 20vw;
     min-height: calc(100vh - 70px);
-    background-color: themed("bg");
-    color: themed("logo");
+    background-color: style.themed("bg");
+    color: style.themed("logo");
     padding: 1rem 1rem 2rem 1rem;
 
-    @include tablet {
+    @include style.tablet {
       display: none;
     }
 
     a {
-      color: themed("logo");
+      color: style.themed("logo");
     }
 
     .main-info {
@@ -76,7 +76,7 @@
 
       h3 {
         font-size: 1.5rem;
-        color: themed("textColorSoft");
+        color: style.themed("textColorSoft");
       }
 
       .item {
@@ -103,7 +103,7 @@
 
       h3 {
         font-size: 1.5rem;
-        color: themed("textColorSoft");
+        color: style.themed("textColorSoft");
       }
 
       .item {
@@ -124,7 +124,7 @@
     }
 
     hr {
-      border-top: 0.1rem solid themed("hr");
+      border-top: 0.1rem solid style.themed("hr");
       margin: 1.5rem 0;
     }
   }

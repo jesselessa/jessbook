@@ -1,7 +1,7 @@
-@import "../../style.scss";
+@use "../../style.scss";
 
 .loader-container {
-  @include themify($themes) {
+  @include style.themify(style.$themes) {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,15 +13,15 @@
       width: 100%;
       height: 100%;
       border: 4px solid rgba(0, 0, 0, 0.1);
-      border-left-color: themed("textColor");
+      border-left-color: style.themed("textColor");
       border-radius: 50%;
 
-      @include keyframes(spin) {
+      @include style.keyframes(spin) {
         to {
           transform: rotate(360deg);
         }
       }
-      @include animate(spin, 1s, linear, infinite);
+      @include style.animate(spin, 1s, linear, infinite);
     }
   }
 }

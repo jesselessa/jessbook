@@ -1,4 +1,5 @@
-@import "../../style.scss";
+@use "../../style.scss";
+@use "sass:color";
 
 .login {
   min-height: 100vh;
@@ -9,7 +10,7 @@
   background: #8bd1e3;
   padding: 1rem;
 
-  @include medium {
+  @include style.medium {
     background: linear-gradient(rgba(2, 81, 81, 0.7), rgba(2, 81, 81, 0.7)),
       url("../../assets/images/auth/friends.webp") no-repeat center/cover;
   }
@@ -32,7 +33,7 @@
         url("../../assets/images/auth/friends.webp") no-repeat center/cover;
       padding: 1rem 1.5rem;
 
-      @include medium {
+      @include style.medium {
         display: none;
       }
 
@@ -40,7 +41,7 @@
         font-size: 4rem;
         text-align: center;
 
-        @include xsmall {
+        @include style.xsmall {
           font-size: 3rem;
         }
       }
@@ -81,7 +82,7 @@
       background-color: white;
       padding: 1rem 1.5rem;
 
-      @include medium {
+      @include style.medium {
         width: 100%;
       }
 
@@ -89,7 +90,7 @@
         font-size: 4rem;
         color: teal;
 
-        @include xsmall {
+        @include style.xsmall {
           font-size: 3rem;
         }
       }
@@ -147,11 +148,11 @@
           color: teal;
           background-color: #ffd670;
           &:hover {
-            background-color: darken(#ffd670, 10%);
+            background-color: color.scale(#ffd670, $lightness: -10%);
           }
           &:active {
             transform: translateY(1px);
-            background-color: darken(#ffd670, 20%);
+            background-color: color.scale(#ffd670, $lightness: -20%);
           }
         }
 
@@ -162,11 +163,11 @@
           background-color: #f2f2f2;
           border: 0.1rem solid #757575;
           &:hover {
-            background-color: darken(#f2f2f2, 10%);
+            background-color: color.scale(#f2f2f2, $lightness: -10%);
           }
           &:active {
             transform: translateY(1px);
-            background-color: darken(#f2f2f2, 20%);
+            background-color: color.scale(#f2f2f2, $lightness: -20%);
           }
 
           span {
@@ -182,11 +183,11 @@
           color: white;
           background-color: #3b5998;
           &:hover {
-            background-color: darken(#3b5998, 5%);
+            background-color: color.scale(#3b5998, $lightness: -5%);
           }
           &:active {
             transform: translateY(1px);
-            background-color: darken(#3b5998, 10%);
+            background-color: color.scale(#3b5998, $lightness: -10%);
           }
 
           span {

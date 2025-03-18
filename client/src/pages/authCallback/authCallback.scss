@@ -1,4 +1,4 @@
-@import "../../style.scss";
+@use "../../style.scss";
 
 .authCallback {
   min-height: 100vh;
@@ -8,7 +8,7 @@
   background: #f6f3f3;
   padding: 1rem;
 
-  @include xsmall {
+  @include style.xsmall {
     padding: 0.5rem;
   }
 
@@ -30,12 +30,12 @@
     height: 40px;
     margin: auto;
 
-    @include small {
+    @include style.small {
       width: 35px;
       height: 35px;
     }
 
-    @include xsmall {
+    @include style.xsmall {
       width: 30px;
       height: 30px;
     }
@@ -47,12 +47,12 @@
       border-left-color: #08415c;
       border-radius: 50%;
 
-      @include keyframes(spin) {
+      @include style.keyframes(spin) {
         to {
           transform: rotate(360deg);
         }
       }
-      @include animate(spin, 1s, linear, infinite);
+      @include style.animate(spin, 1s, linear, infinite);
     }
   }
 }

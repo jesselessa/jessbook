@@ -1,14 +1,14 @@
-@import "../../style.scss";
+@use "../../style.scss";
 
 .posts {
-  @include themify($themes) {
+  @include style.themify(style.$themes) {
     display: flex;
     flex-direction: column;
     font-size: 1.6rem;
-    color: themed("textColor");
+    color: style.themed("textColor");
     gap: 1.5rem;
 
-    @include small {
+    @include style.small { 
       font-size: 1.5rem;
     }
   }

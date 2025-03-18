@@ -1,26 +1,27 @@
-@import "../../style.scss";
+@use "../../style.scss";
+@use "sass:color";
 
 .profileData {
-  @include themify($themes) {
+  @include style.themify(style.$themes) {
     position: sticky;
     top: 70px;
     width: 50vw;
     min-height: calc(100vh - 70px); // 70px = navbar height
     font-size: 1.6rem;
-    color: themed("textColor");
-    background-color: themed("bgSoft");
+    color: style.themed("textColor");
+    background-color: style.themed("bgSoft");
     overflow-y: auto;
     padding: 0 1rem 2rem 1rem;
 
-    @include medium {
+    @include style.medium {
       width: 80vw;
     }
 
-    @include tablet {
+    @include style.tablet {
       width: 100vw;
     }
 
-    @include small {
+    @include style.small {
       font-size: 1.5rem;
     }
 
@@ -55,7 +56,7 @@
           height: 170px;
           z-index: 90;
 
-          @include small {
+          @include style.small {
             width: 150px;
             height: 150px;
           }
@@ -67,7 +68,7 @@
             object-fit: cover;
             object-position: center;
 
-            @include small {
+            @include style.small {
               width: 150px;
               height: 150px;
             }
@@ -80,19 +81,19 @@
         width: 100%;
         height: 280px;
         max-height: 280px;
-        color: themed("textColor");
-        background-color: themed("bg");
+        color: style.themed("textColor");
+        background-color: style.themed("bg");
         border-bottom-left-radius: 1rem;
         border-bottom-right-radius: 1rem;
         box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
         padding: 1rem;
 
-        @include small {
+        @include style.small {
           padding: 0.5rem;
         }
 
         a {
-          color: themed("textColorSoft");
+          color: style.themed("textColorSoft");
         }
 
         .friends-contact {
@@ -106,7 +107,7 @@
             font-size: 1.5rem;
             gap: 1rem;
 
-            @include small {
+            @include style.small {
               gap: 0.5rem;
               margin-left: 0.5rem;
             }
@@ -123,7 +124,7 @@
             align-items: center;
             gap: 0.5rem;
 
-            @include small {
+            @include style.small {
               gap: 0;
             }
           }
@@ -144,7 +145,7 @@
           gap: 1.5rem;
           padding: 1rem;
 
-          @include small {
+          @include style.small {
             height: calc(280px - 75px); // 75px = 1/2 of profile pic
             gap: 1rem;
             padding: 0.5rem;
@@ -167,7 +168,7 @@
             word-break: break-word;
             gap: 0.3rem;
 
-            @include small {
+            @include style.small {
               width: 100%;
             }
           }
@@ -186,11 +187,11 @@
             transition: background-color 0.3s ease, transform 0.2s ease;
             cursor: pointer;
             &:hover {
-              background-color: darken(#ffd670, 10%);
+              background-color: color.scale(#ffd670, $lightness: -10%);
             }
             &:active {
               transform: translateY(1px);
-              background-color: darken(#ffd670, 20%);
+              background-color: color.scale(#ffd670, $lightness: -20%);
             }
           }
         }

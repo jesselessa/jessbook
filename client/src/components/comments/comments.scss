@@ -1,10 +1,11 @@
-@import "../../style.scss";
+@use "../../style.scss";
+@use "sass:color";
 
 .comments {
-  @include themify($themes) {
+  @include style.themify(style.$themes) {
     display: flex;
     flex-direction: column;
-    color: themed("textColor");
+    color: style.themed("textColor");
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;
     gap: 1.5rem;
@@ -28,13 +29,14 @@
           object-position: center;
         }
       }
+
       .input-group {
         display: flex;
         align-items: center;
         position: relative;
         width: calc(100% - 140px); // 100px (button) + 40px (image)
 
-        @include small {
+        @include style.small {
           width: calc(100% - 40px); // 40px = image
         }
 
@@ -43,15 +45,15 @@
           width: 100%;
           font-size: 1.6rem;
           padding: 1rem;
-          border: 0.1rem solid themed("color");
+          border: 0.1rem solid style.themed("color");
           border-radius: 0.5rem;
           outline: none;
 
-          @include small {
+          @include style.small {
             padding: 0.5rem 3rem 0.5rem 0.5rem;
           }
 
-          @include xsmall {
+          @include style.xsmall {
             font-size: 1.5rem;
           }
         }
@@ -62,7 +64,7 @@
           right: 5px;
           cursor: pointer;
 
-          @include small {
+          @include style.small {
             display: block;
           }
         }
@@ -79,15 +81,17 @@
         border-radius: 0.5rem;
         transition: background-color 0.3s ease, transform 0.2s ease;
         cursor: pointer;
+
         &:hover {
-          background-color: darken(teal, 5%);
-        }
-        &:active {
-          transform: translateY(1px);
-          background-color: darken(teal, 10%);
+          background-color: color.scale(teal, $lightness: -5%);
         }
 
-        @include small {
+        &:active {
+          transform: translateY(1px);
+          background-color: color.scale(teal, $lightness: -10%);
+        }
+
+        @include style.small {
           display: none;
         }
       }
@@ -126,7 +130,7 @@
         justify-content: space-between;
         align-items: flex-end;
         font-size: 1.3rem;
-        color: themed("textColorSoft");
+        color: style.themed("textColorSoft");
         gap: 1rem;
 
         .edit-buttons {
@@ -138,12 +142,12 @@
           }
 
           .edit-btn {
-            color: themed("textColorSoft");
+            color: style.themed("textColorSoft");
             &:hover {
               cursor: pointer;
             }
 
-            @include xsmall {
+            @include style.xsmall {
               font-size: 24px;
             }
           }

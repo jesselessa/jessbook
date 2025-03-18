@@ -1,9 +1,9 @@
-//! SASS DEPRECIATION WARNINGS :
-//! - darken() => use 'color.scale()' or 'color.adjust()', ex: 'color.scale($color, $lightness: -19.921875%)' or 'color.adjust($color, $lightness: -5%)'
-//! - global built-in functions will be removed in Dart Sass 3.0. => use 'map.merge' or 'map.get' instead
-//! - @import rules will be removed in Dart Sass 3.0.0.
-//! - the legacy JS API will be removed in Dart Sass 2.0.0.
+// Import the modules 'map' to use map functions
+@use "sass:map";
 
+$theme-map: null; //! Replaces former use of '!global' to declare a new variable, which is deprecated
+
+// Reset CSS
 *,
 ::before,
 ::after {
@@ -12,6 +12,7 @@
   box-sizing: border-box;
 }
 
+// Set base font size for rem units
 html {
   font-size: 62.5%;
 }
@@ -24,7 +25,7 @@ a {
   text-decoration: none;
 }
 
-// Create dark/light mode variables
+// Define dark/light mode variables
 $themes: (
   light: (
     iconColor: black,
@@ -52,14 +53,17 @@ $themes: (
   ),
 );
 
-// Create dark/light mode functions
+// Mixin to generate theme-specific styles (dark/light mode functions)
 @mixin themify($themes) {
   @each $theme, $map in $themes {
     .theme-#{$theme} & {
-      $theme-map: () !global;
+      $theme-map: (
+
+      ) !global; //! Otherwise, as $theme-map is defined locally in a scope block, themed($key) wouldn't be able to access it
+
       @each $key, $submap in $map {
-        $value: map-get(map-get($themes, $theme), "#{$key}");
-        $theme-map: map-merge(
+        $value: map.get($map, $key);
+        $theme-map: map.merge(
           $theme-map,
           (
             $key: $value,
@@ -67,16 +71,16 @@ $themes: (
         ) !global;
       }
       @content;
-      $theme-map: null !global;
     }
   }
 }
 
+// Function to retrieve themed values
 @function themed($key) {
-  @return map-get($theme-map, $key);
+  @return map.get($theme-map, $key);
 }
 
-// Media queries
+// Media query mixins for responsive design
 @mixin medium {
   @media (max-width: 1150px) {
     @content;
@@ -101,7 +105,7 @@ $themes: (
   }
 }
 
-// Handle animations
+// Mixins for handling animations
 @mixin keyframes($name) {
   @keyframes #{$name} {
     @content;
@@ -109,5 +113,8 @@ $themes: (
 }
 
 @mixin animate($animation, $duration, $method, $times) {
-  animation: $animation $duration $method $times;
+  & {
+    // Update for Sass 2024+
+    animation: $animation $duration $method $times;
+  }
 }

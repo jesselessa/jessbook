@@ -1,8 +1,8 @@
-@import "../../style.scss";
+@use "../../style.scss";
 
 .post {
-  @include themify($themes) {
-    background-color: themed("bg");
+  @include style.themify(style.$themes) {
+    background-color: style.themed("bg");
     box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
     border-radius: 1rem;
 
@@ -37,7 +37,7 @@
           gap: 0.5rem;
 
           .name {
-            color: themed("textColor");
+            color: style.themed("textColor");
             font-size: 1.7rem;
             font-weight: bold;
             word-break: break-word;
@@ -45,16 +45,16 @@
               cursor: pointer;
             }
 
-            @include small {
+            @include style.small {
               font-size: 1.6rem;
             }
           }
 
           .date {
-            color: themed("textColorSoft");
+            color: style.themed("textColorSoft");
             font-size: 1.4rem;
 
-            @include small {
+            @include style.small {
               font-size: 1.3rem;
             }
           }
@@ -70,12 +70,12 @@
         }
 
         .edit-btn {
-          color: themed("textColorSoft");
+          color: style.themed("textColorSoft");
           &:hover {
             cursor: pointer;
           }
 
-          @include xsmall {
+          @include style.xsmall {
             font-size: 24px;
           }
         }
@@ -83,14 +83,14 @@
     }
 
     .content {
-      color: themed("textColor");
+      color: style.themed("textColor");
 
       p {
         font-size: 1.6rem;
         word-break: break-word;
         padding: 1rem;
 
-        @include small {
+        @include style.small {
           font-size: 1.5rem;
         }
       }
@@ -108,7 +108,7 @@
       justify-content: space-around;
       align-items: center;
       padding: 1rem;
-      color: themed("textColorSoft");
+      color: style.themed("textColorSoft");
 
       .item {
         display: flex;
@@ -117,13 +117,13 @@
         gap: 0.5rem;
         cursor: pointer;
 
-        @include small {
+        @include style.small {
           font-size: 1.3rem;
           gap: 0.3rem;
         }
 
         span {
-          @include small {
+          @include style.small {
             display: none;
           }
         }

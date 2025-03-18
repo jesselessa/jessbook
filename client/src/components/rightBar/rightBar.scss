@@ -1,31 +1,31 @@
-@import "../../style.scss";
+@use "../../style.scss";
 
 .rightBar {
-  @include themify($themes) {
+  @include style.themify(style.$themes) {
     position: sticky;
     top: 70px;
     width: 30vw;
     min-height: calc(100vh - 70px); // 70px = navbar height
     display: flex;
     flex-direction: column;
-    background-color: themed(bgSoft);
+    background-color: style.themed("bgSoft");
     gap: 1.5rem;
     padding: 1rem 1rem 2rem 1rem;
     z-index: -1; // RightBar below update forms
 
-    @include medium {
+    @include style.medium {
       display: none;
     }
 
     .birthdays {
-      background-color: themed(bg);
+      background-color: style.themed("bg");
       border-radius: 0.5rem;
       box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
       padding: 1rem;
 
       h3 {
         font-size: 1.6rem;
-        color: themed("textColorSoft");
+        color: style.themed("textColorSoft");
         margin-bottom: 1rem;
       }
 
@@ -41,11 +41,11 @@
 
         p {
           font-size: 1.4rem;
-          color: themed("textColorSoft");
+          color: style.themed("textColorSoft");
 
           span {
             font-weight: bold;
-            color: themed("textColor");
+            color: style.themed("textColor");
           }
         }
       }
@@ -54,7 +54,7 @@
     .activities {
       display: flex;
       flex-direction: column;
-      background-color: themed(bg);
+      background-color: style.themed("bg");
       border-radius: 0.5rem;
       box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
       gap: 1rem;
@@ -62,7 +62,7 @@
 
       h3 {
         font-size: 1.6rem;
-        color: themed("textColorSoft");
+        color: style.themed("textColorSoft");
       }
 
       .activity {
@@ -94,12 +94,12 @@
 
           p {
             font-size: 1.3rem;
-            color: themed("textColorSoft");
+            color: style.themed("textColorSoft");
 
             span {
               font-size: 1.4rem;
               font-weight: bold;
-              color: themed("textColor");
+              color: style.themed("textColor");
               max-width: 100%;
             }
           }
@@ -108,21 +108,21 @@
         .time {
           width: 30%;
           font-size: 1.3rem;
-          color: themed("textColorSoft");
+          color: style.themed("textColorSoft");
           align-self: flex-start;
         }
       }
     }
 
     .online {
-      background-color: themed(bg);
+      background-color: style.themed("bg");
       border-radius: 0.5rem;
       box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
       padding: 1rem;
 
       h3 {
         font-size: 1.6rem;
-        color: themed("textColorSoft");
+        color: style.themed("textColorSoft");
         margin-bottom: 1rem;
       }
 
@@ -164,7 +164,7 @@
           span {
             font-size: 1.4rem;
             font-weight: bold;
-            color: themed("textColor");
+            color: style.themed("textColor");
           }
         }
       }

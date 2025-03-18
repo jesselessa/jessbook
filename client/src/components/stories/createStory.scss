@@ -1,4 +1,5 @@
-@import "../../style.scss";
+@use "../../style.scss";
+@use "sass:color";
 
 .createStory {
   position: fixed;
@@ -26,11 +27,11 @@
     box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
     padding: 1rem;
 
-    @include small {
+    @include style.small {
       width: 95%;
     }
 
-    @include xsmall {
+    @include style.xsmall {
       padding: 0.5rem;
     }
 
@@ -50,7 +51,7 @@
         justify-content: center;
         gap: 1rem;
 
-        @include xsmall {
+        @include style.xsmall {
           gap: 0.7rem;
         }
 
@@ -74,14 +75,14 @@
           transition: background-color 0.3s ease, transform 0.2s ease;
           cursor: pointer;
           &:hover {
-            background-color: darken(#ffd670, 10%);
+            background-color: color.scale(#ffd670, $lightness: -10%);
           }
           &:active {
             transform: translateY(1px);
-            background-color: darken(#ffd670, 20%);
+            background-color: color.scale(#ffd670, $lightness: -20%);
           }
 
-          @include xsmall {
+          @include style.xsmall {
             width: 230px;
           }
         }
@@ -125,13 +126,14 @@
         transition: background-color 0.3s ease, transform 0.2s ease;
         cursor: pointer;
         &:hover {
-          background-color: darken(#5271ff, 5%);
+          background-color: color.scale(#5271ff, $lightness: -5%);
         }
         &:active {
           transform: translateY(1px);
-          background-color: darken(#5271ff, 10%);
+          background-color: color.scale(#5271ff, $lightness: -10%);
         }
-        @include small {
+        
+        @include style.small {
           padding: 0.8rem;
         }
       }

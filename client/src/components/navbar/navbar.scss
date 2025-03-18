@@ -1,7 +1,7 @@
-@import "../../style.scss";
+@use "../../style.scss";
 
 .navbar {
-  @include themify($themes) {
+  @include style.themify(style.$themes) {
     position: sticky;
     top: 0;
     height: 70px;
@@ -9,17 +9,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: themed("iconColor");
-    background-color: themed("navBg");
+    color: style.themed("iconColor");
+    background-color: style.themed("navBg");
     padding: 1rem 2rem;
     z-index: 100;
 
-    @include small {
+    @include style.small {
       padding: 1rem;
       justify-content: center;
     }
 
-    @include xsmall {
+    @include style.xsmall {
       padding: 1rem 0.5rem;
     }
 
@@ -29,14 +29,14 @@
       align-items: center;
       gap: 2.5rem;
 
-      @include small {
+      @include style.small {
         gap: 2rem;
       }
 
       a {
-        color: themed("iconColor");
+        color: style.themed("iconColor");
         &:nth-child(1) {
-          @include small {
+          @include style.small {
             display: none;
           }
         }
@@ -45,11 +45,11 @@
       span {
         font-size: 2.2rem;
         font-weight: bold;
-        color: themed("logo");
+        color: style.themed("logo");
       }
 
       .logo {
-        @include small {
+        @include style.small {
           display: none;
         }
       }
@@ -57,7 +57,7 @@
       .logo-mob {
         display: none;
 
-        @include small {
+        @include style.small {
           display: block;
           position: absolute;
           left: 15px;
@@ -79,25 +79,25 @@
         align-items: center;
         gap: 1rem;
         background-color: transparent;
-        border: 0.2rem solid themed("border");
+        border: 0.2rem solid style.themed("border");
         border-radius: 0.5rem;
         padding: 0.5rem;
         margin-right: 2.5rem;
 
-        @include small {
+        @include style.small {
           margin-right: 2rem;
           justify-content: center;
         }
 
         input {
           width: 100%;
-          color: themed("textColor");
+          color: style.themed("textColor");
           font-size: 1.6rem;
           background-color: transparent;
           border: none;
           outline: none;
           &::placeholder {
-            color: themed("textColor");
+            color: style.themed("textColor");
           }
 
           @media screen and (max-width: 800px) {
@@ -113,12 +113,12 @@
       align-items: center;
       gap: 2.5rem;
 
-      @include medium {
+      @include style.medium {
         display: none;
       }
 
       a {
-        color: themed("iconColor");
+        color: style.themed("iconColor");
       }
 
       img {
@@ -135,7 +135,7 @@
       span {
         font-size: 1.5rem;
         font-weight: bold;
-        color: themed("iconColor");
+        color: style.themed("iconColor");
         cursor: pointer;
         &:active {
           transform: translateY(1px);
@@ -146,28 +146,28 @@
     .right-mob {
       display: none;
 
-      @include medium {
+      @include style.medium {
         display: flex;
         gap: 2.5rem;
       }
 
-      @include small {
+      @include style.small {
         margin-right: 2rem; // Space between notif and burger icons
       }
 
-      @include small {
+      @include style.small {
         gap: 2rem;
         margin-right: 2rem;
       }
 
       a {
-        color: themed("iconColor");
+        color: style.themed("iconColor");
       }
 
       .burger {
         cursor: pointer;
 
-        @include small {
+        @include style.small {
           position: absolute;
           right: 10px;
         }
@@ -180,12 +180,12 @@
         padding: 2rem 1rem;
         width: 30vw;
         height: auto;
-        background-color: themed("bg");
+        background-color: style.themed("bg");
         font-size: 1.6rem;
         font-weight: bold;
-        color: themed("logo");
+        color: style.themed("logo");
 
-        @include small {
+        @include style.small {
           width: 100vw;
         }
 
@@ -196,7 +196,7 @@
         }
 
         hr {
-          border-top: 0.1rem solid themed("hr");
+          border-top: 0.1rem solid style.themed("hr");
           margin: 2rem 0;
         }
       }

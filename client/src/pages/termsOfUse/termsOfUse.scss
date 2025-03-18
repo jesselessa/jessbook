@@ -1,4 +1,4 @@
-@import "../../style.scss";
+@use "../../style.scss";
 
 .termsOfUse {
   min-height: 100vh;
@@ -8,7 +8,7 @@
   background: #f6f3f3;
   padding: 1rem;
 
-  @include xsmall {
+  @include style.xsmall {
     padding: 0.5rem;
   }
 

@@ -1,7 +1,7 @@
-@import "../../style.scss";
+@use "../../style.scss";
 
 .stories {
-  @include themify($themes) {
+  @include style.themify(style.$themes) {
     display: flex;
     justify-content: space-between;
     height: 220px;
@@ -13,7 +13,7 @@
       display: flex;
       width: 100%;
       height: 100%;
-      background-color: themed("bg");
+      background-color: style.themed("bg");
       border-radius: 1rem;
       overflow-x: auto;
       gap: 1rem;
@@ -24,11 +24,11 @@
 
       .msg {
         font-size: 1.6rem;
-        color: themed("textColor");
+        color: style.themed("textColor");
         text-align: center;
         margin: auto;
 
-        @include small {
+        @include style.small {
           font-size: 1.5rem;
         }
       }

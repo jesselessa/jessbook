@@ -1,24 +1,24 @@
-@import "../../style.scss";
+@use "../../style.scss";
 
 .timeline {
-  @include themify($themes) {
+  @include style.themify(style.$themes) {
     position: sticky;
     top: 70px;
     width: 50vw;
     min-height: calc(100vh - 70px); // 70px = navbar height
-    background-color: themed("bgSoft");
+    background-color: style.themed("bgSoft");
     padding: 1rem 1rem 2rem 2rem;
 
-    @include medium {
+    @include style.medium {
       width: 80vw;
       padding: 2rem;
     }
 
-    @include tablet {
+    @include style.tablet {
       width: 100vw;
     }
 
-    @include small {
+    @include style.small {
       padding: 2rem 1rem;
     }
   }

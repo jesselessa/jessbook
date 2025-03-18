@@ -1,4 +1,5 @@
-@import "../../style.scss";
+@use "../../style.scss";
+@use "sass:color";
 
 .register {
   min-height: 100vh;
@@ -9,7 +10,7 @@
   background: #8bd1e3;
   padding: 1rem;
 
-  @include medium {
+  @include style.medium {
     background: linear-gradient(rgba(2, 81, 81, 0.7), rgba(2, 81, 81, 0.7)),
       url("../../assets/images/auth/family.webp") no-repeat center/cover;
   }
@@ -21,7 +22,7 @@
     border-radius: 1rem;
     overflow: hidden;
 
-    @include medium {
+    @include style.medium {
       width: 550px;
       min-height: 550px;
     }
@@ -34,11 +35,11 @@
       background-color: white;
       padding: 1rem 1.5rem;
 
-      @include medium {
+      @include style.medium {
         width: 100%;
       }
 
-      @include xsmall {
+      @include style.xsmall {
         padding: 1rem;
       }
 
@@ -46,7 +47,7 @@
         font-size: 4rem;
         color: teal;
 
-        @include medium {
+        @include style.medium {
           font-size: 3rem;
         }
       }
@@ -57,7 +58,7 @@
         flex-direction: column;
         margin: auto;
 
-        @include xsmall {
+        @include style.xsmall {
           gap: 0.5rem;
         }
 
@@ -96,18 +97,24 @@
           margin-top: 2rem;
           cursor: pointer;
           &:hover {
-            background-color: darken(#ffd670, 10%);
+            background-color: color.scale(
+              #ffd670,
+              $lightness: -10%
+            ); // Correction
           }
           &:active {
             transform: translateY(1px);
-            background-color: darken(#ffd670, 20%);
+            background-color: color.scale(
+              #ffd670,
+              $lightness: -20%
+            ); // Correction
           }
 
-          @include medium {
+          @include style.medium {
             margin: 2rem 0;
           }
 
-          @include xsmall {
+          @include style.xsmall {
             margin: 1.5rem 0;
           }
         }
@@ -133,7 +140,7 @@
         url("../../assets/images/auth/family.webp") no-repeat center/cover;
       padding: 1rem;
 
-      @include medium {
+      @include style.medium {
         display: none;
       }
 
