@@ -14,7 +14,7 @@ import Overlay from "../overlay/Overlay.jsx";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 export default function UpdatePost({ post, setOpenUpdate }) {
-  const [newDesc, setNewDesc] = useState(post.desc);
+  const [newText, setNewText] = useState(post.text);
   const [newImg, setNewImg] = useState(null);
 
   const queryClient = useQueryClient();
@@ -37,7 +37,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     e.preventDefault();
 
     // Check if post has been modified
-    const isDescModified = newDesc?.trim() !== post.desc?.trim();
+    const isDescModified = newText?.trim() !== post.text?.trim();
     const isImageModified = newImg !== null;
 
     if (!isDescModified && !isImageModified) {
@@ -46,13 +46,13 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     }
 
     // Check if description is empty
-    if (newDesc?.trim()?.length === 0) {
+    if (newText?.trim()?.length === 0) {
       toast.error("You must add a description to your post.");
       return;
     }
 
     // Check post length
-    if (newDesc?.trim()?.length > 1000) {
+    if (newText?.trim()?.length > 1000) {
       toast.error("Your post can't contain more than 1000\u00A0characters.");
       return;
     }
@@ -60,7 +60,7 @@ export default function UpdatePost({ post, setOpenUpdate }) {
     // Prepare updated data
     const updatedPost = {
       ...post,
-      desc: newDesc.trim(),
+      text: newText.trim(),
     };
 
     // If an image is selected, upload it and update post
@@ -118,15 +118,15 @@ export default function UpdatePost({ post, setOpenUpdate }) {
               </div>
             </div>
 
-            <label htmlFor="new-desc">Add a new text</label>
+            <label htmlFor="new-text">Add a new text</label>
             <textarea
-              id="new-desc"
-              name="new-desc"
+              id="new-text"
+              name="new-text"
               rows={8}
               placeholder="Write a text..."
               maxLength={1000}
-              value={newDesc}
-              onChange={(e) => setNewDesc(e.target.value)}
+              value={newText}
+              onChange={(e) => setNewText(e.target.value)}
             />
 
             <button className="submit" onClick={handleClick}>

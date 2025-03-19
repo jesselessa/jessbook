@@ -24,7 +24,7 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Comments({ postId }) {
   const { currentUser } = useContext(AuthContext);
-  const [desc, setDesc] = useState("");
+  const [text, setText] = useState("");
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
 
@@ -57,20 +57,20 @@ export default function Comments({ postId }) {
 
     try {
       // Check comment length
-      if (desc?.trim()?.length === 0) {
+      if (text?.trim()?.length === 0) {
         toast.error("You must add a text to your comment.");
         return;
       }
 
-      if (desc?.trim()?.length > 500) {
+      if (text?.trim()?.length > 500) {
         toast.error(
           "Your comment can't contain more than 500\u00A0characters."
         );
         return;
       }
 
-      mutation.mutate({ desc: desc.trim(), postId });
-      setDesc(""); // Reset form field
+      mutation.mutate({ text: text.trim(), postId });
+      setText(""); // Reset form field
     } catch (error) {
       console.error("Error creating comment:", error);
     }
@@ -121,9 +121,9 @@ export default function Comments({ postId }) {
             name="text"
             placeholder="Write a comment..."
             maxLength={500}
-            value={desc}
+            value={text}
             autoComplete="off"
-            onChange={(e) => setDesc(e.target.value)}
+            onChange={(e) => setText(e.target.value)}
           />
           <SendOutlinedIcon
             className="send"
@@ -155,7 +155,7 @@ export default function Comments({ postId }) {
                 <h3>
                   {comment?.firstName} {comment?.lastName}
                 </h3>
-                <p>{addNonBreakingSpace(comment?.desc)}</p>
+                <p>{addNonBreakingSpace(comment?.text)}</p>
               </div>
               <div className="buttons-time">
                 {currentUser?.id === comment?.userId && (

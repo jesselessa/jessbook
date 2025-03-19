@@ -61,7 +61,7 @@ export default function ModalStory({ story, setOpenModal }) {
         </div>
 
         <div className="info-container">
-          <h1>{addNonBreakingSpace(story.desc)}</h1>
+          <h1>{addNonBreakingSpace(story.text)}</h1>
 
           <div className="story-details">
             <div className="story-edit-info">

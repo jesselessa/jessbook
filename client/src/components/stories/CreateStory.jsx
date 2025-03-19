@@ -17,7 +17,7 @@ const isVideo = (fileType) => {
 
 export default function CreateStory({ setOpenCreateStory }) {
   const [file, setFile] = useState(null);
-  const [desc, setDesc] = useState("");
+  const [text, setText] = useState("");
   const [fileURL, setFileURL] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });
 
@@ -49,7 +49,7 @@ export default function CreateStory({ setOpenCreateStory }) {
     }
 
     // Check description length if present
-    if (desc?.trim()?.length > 45) {
+    if (text?.trim()?.length > 45) {
       setError({
         isError: true,
         message: "Description can't contain more than 100\u00A0characters.",
@@ -61,7 +61,7 @@ export default function CreateStory({ setOpenCreateStory }) {
     const newFile = file ? await uploadFile(file) : null;
 
     // Trigger mutation to update database
-    mutation.mutate({ file: newFile, desc: desc.trim() });
+    mutation.mutate({ file: newFile, text: text.trim() });
 
     setOpenCreateStory(false); // Close form
     setFile(null); // Reset file state to release URL resource
@@ -145,17 +145,17 @@ export default function CreateStory({ setOpenCreateStory }) {
             )}
           </div>
 
-          <label className="desc-label" htmlFor="desc">
+          <label className="text-label" htmlFor="text">
             Add a text
           </label>
           <textarea
-            id="desc"
-            name="desc"
+            id="text"
+            name="text"
             rows={3}
             maxLength={45}
-            placeholder="You can add a short description to your story."
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
+            placeholder="You can add a short text to your story."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
           />
 
           <button type="submit" onClick={handleClick}>

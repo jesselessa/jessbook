@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import Overlay from "../overlay/Overlay.jsx";
 
 export default function UpdateComment({ comment, setOpenUpdate }) {
-  const [desc, setDesc] = useState(comment.desc);
+  const [text, setText] = useState(comment.text);
 
   const queryClient = useQueryClient();
 
@@ -29,18 +29,18 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
     e.preventDefault();
 
     // Check if comment has been modified
-    if (desc?.trim() === comment.desc?.trim()) {
+    if (text?.trim() === comment.text?.trim()) {
       toast.info("No changes detected.");
       return;
     }
 
     // Check comment length
-    if (desc?.trim()?.length === 0) {
+    if (text?.trim()?.length === 0) {
       toast.error("You must add a text to your comment.");
       return;
     }
 
-    if (desc?.trim()?.length > 500) {
+    if (text?.trim()?.length > 500) {
       toast.error("Your comment can't contain more than 500\u00A0characters.");
       return;
     }
@@ -48,7 +48,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
     // Prepare updated data
     const updatedComment = {
       ...comment,
-      desc: desc.trim(),
+      text: text.trim(),
     };
 
     // Trigger mutation to update database
@@ -70,8 +70,8 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
               rows={5}
               placeholder="Write a text..."
               maxLength={500}
-              value={desc}
-              onChange={(e) => setDesc(e.target.value)}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
             />
 
             <button className="update-btn" onClick={handleClick}>
