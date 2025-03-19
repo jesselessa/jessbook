@@ -105,7 +105,10 @@ export default function Register() {
 
     // 2 - If successful validation, continue process and call API
     try {
-      await axios.post(`http://localhost:8080/auth/register`, inputsValues);
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/register`,
+        inputsValues
+      );
       toast.success("Successful registration.");
 
       clearForm();

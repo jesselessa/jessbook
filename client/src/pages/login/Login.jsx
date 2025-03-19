@@ -66,7 +66,9 @@ export default function Login() {
   };
 
   const connectViaAuthProvider = (provider) => {
-    window.location.href = `http://localhost:8080/auth/login/${provider}`;
+    window.location.href = `${
+      import.meta.env.VITE_API_URL
+    }/auth/login/${provider}`;
   };
 
   return (

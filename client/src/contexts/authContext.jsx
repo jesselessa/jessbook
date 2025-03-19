@@ -12,7 +12,7 @@ export const AuthContextProvider = ({ children }) => {
   const login = async (inputsValues) => {
     try {
       const res = await makeRequest.post(
-        `http://localhost:8080/auth/login`,
+        `${import.meta.env.VITE_API_URL}/auth/login`,
         inputsValues
       );
       // Update 'currentUser' with data fetched from API and store them in localStorage
@@ -26,7 +26,7 @@ export const AuthContextProvider = ({ children }) => {
   const connectWithToken = async () => {
     try {
       const res = await makeRequest.post(
-        "http://localhost:8080/auth/connect-with-token"
+        `${import.meta.env.VITE_API_URL}/auth/connect-with-token`
       );
       setCurrentUser(res.data);
       localStorage.setItem("user", JSON.stringify(res.data));

@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import "./authCallback.scss";
 import { useNavigate, Link } from "react-router-dom";
-import { makeRequest } from "../../utils/axios.js";
 
 // Component
 import Loader from "../../components/loader/Loader.jsx";

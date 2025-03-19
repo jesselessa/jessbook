@@ -51,7 +51,7 @@ app.use(express.json()); //! JSON data transformed into a JS object accessible i
 app.use(cookieParser()); //! Cookies content accessible via 'req.cookies' and 'req.signedCookies'
 
 // Upload files via 'upload' middleware configured with Multer
-app.post("/uploads", upload, (req, res) => {
+app.post("/api/uploads", upload, (req, res) => {
   const file = req.file;
   res.status(200).json(file.filename);
 });
@@ -64,13 +64,13 @@ connectWithGoogle();
 connectWithFacebook();
 
 // API routes
-app.use("/auth", authRoute);
-app.use("/users", usersRoute);
-app.use("/posts", postsRoute);
-app.use("/comments", commentsRoute);
-app.use("/likes", likesRoute);
-app.use("/relationships", relationshipsRoute);
-app.use("/stories", storiesRoute);
+app.use("/api/auth", authRoute);
+app.use("/api/users", usersRoute);
+app.use("/api/posts", postsRoute);
+app.use("/api/comments", commentsRoute);
+app.use("/api/likes", likesRoute);
+app.use("/api/relationships", relationshipsRoute);
+app.use("/api/stories", storiesRoute);
 
 // Serve static files for our front end (after Vite build)
 app.use(express.static(path.join(__dirname, "../client/dist")));
@@ -82,5 +82,5 @@ app.get("*", (_req, res) => {
 // Start server
 app.listen(PORT, (error) => {
   if (error) console.log(error);
-  console.log(`Server listening at ${process.env.API_URL}`);
+  console.log(`Server listening on port ${process.env.PORT}`);
 });
