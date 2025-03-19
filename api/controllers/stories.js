@@ -55,7 +55,7 @@ export const getStories = (req, res) => {
 };
 
 export const addStory = (req, res) => {
-  const { file, desc } = req.body;
+  const { file, text } = req.body;
   const loggedInUserId = req.user.id;
 
   // Check if a file (image or video) is provided
@@ -74,7 +74,7 @@ export const addStory = (req, res) => {
   }
 
   // Validate description
-  if (desc?.trim()?.length > 45)
+  if (text?.trim()?.length > 45)
     return res
       .status(400)
       .json("Description can't contain more than 45\u00A0characters.");
@@ -98,11 +98,11 @@ export const addStory = (req, res) => {
       .format("YYYY-MM-DD HH:mm:ss");
 
     const insertQuery =
-      "INSERT INTO stories(`file`, `desc`, `userId`,`createdAt`, `expiresAt`) VALUES (?)";
+      "INSERT INTO stories(`file`, `text`, `userId`,`createdAt`, `expiresAt`) VALUES (?)";
 
     const values = [
       file,
-      desc?.trim(),
+      text?.trim(),
       loggedInUserId,
       currentDateTime,
       expirationDate,

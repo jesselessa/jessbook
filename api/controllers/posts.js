@@ -40,15 +40,15 @@ export const getPosts = (req, res) => {
 };
 
 export const addPost = (req, res) => {
-  const { desc, img } = req.body;
+  const { text, img } = req.body;
   const loggedInUserId = req.user.id;
   const currentDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
   // Validate description
-  if (desc?.trim()?.length === 0)
+  if (text?.trim()?.length === 0)
     return res.status(400).json("Description cannot be empty.");
 
-  if (desc?.trim()?.length > 1000)
+  if (text?.trim()?.length > 1000)
     return res
       .status(400)
       .json("Description cannot exceed 1000\u00A0characters.");
@@ -61,8 +61,8 @@ export const addPost = (req, res) => {
 
   // Create a new post
   const q =
-    "INSERT INTO posts (`desc`, `img`, `userId`, `createdAt`) VALUES (?)";
-  const values = [desc.trim(), img, loggedInUserId, currentDateTime];
+    "INSERT INTO posts (`text`, `img`, `userId`, `createdAt`) VALUES (?)";
+  const values = [text.trim(), img, loggedInUserId, currentDateTime];
 
   db.query(q, [values], (error, _data) => {
     if (error)
@@ -76,7 +76,7 @@ export const addPost = (req, res) => {
 };
 
 export const updatePost = (req, res) => {
-  const { desc, img } = req.body;
+  const { text, img } = req.body;
   const postId = req.params.postId;
   const loggedInUserId = req.user.id;
 
@@ -84,16 +84,16 @@ export const updatePost = (req, res) => {
   const values = [];
 
   // Validate description
-  if (desc?.trim()?.length === 0)
+  if (text?.trim()?.length === 0)
     return res.status(400).json("No description to update");
 
-  if (desc?.trim()?.length > 1000) {
+  if (text?.trim()?.length > 1000) {
     return res
       .status(400)
       .json("Description cannot exceed 1000\u00A0characters.");
   } else {
-    updatedFields.push("`desc` = ?");
-    values.push(desc.trim());
+    updatedFields.push("`text` = ?");
+    values.push(text.trim());
   }
 
   // 2 - Validate image (optional)

@@ -22,22 +22,22 @@ export const getComments = (req, res) => {
 };
 
 export const addComment = (req, res) => {
-  const { desc, postId } = req.body;
+  const { text, postId } = req.body;
   const loggedInUserId = req.user.id;
   const currentDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
-  if (desc?.trim()?.length === 0) {
+  if (text?.trim()?.length === 0) {
     return res.status(400).json({ message: "Description cannot be empty." });
   }
 
-  if (desc?.trim()?.length > 500)
+  if (text?.trim()?.length > 500)
     return res
       .status(400)
       .json("Description cannot exceed 500\u00A0characters.");
 
   const q =
-    "INSERT INTO comments (`desc`, `userId`, `postId`, `createdAt`) VALUES (?)";
-  const values = [desc.trim(), loggedInUserId, postId, currentDateTime];
+    "INSERT INTO comments (`text`, `userId`, `postId`, `createdAt`) VALUES (?)";
+  const values = [text.trim(), loggedInUserId, postId, currentDateTime];
 
   db.query(q, [values], (error, _data) => {
     if (error)
@@ -53,20 +53,20 @@ export const addComment = (req, res) => {
 export const updateComment = (req, res) => {
   const commentId = req.params.commentId;
   const loggedInUserId = req.user.id;
-  const { desc } = req.body;
+  const { text } = req.body;
 
-  if (desc?.trim()?.length === 0)
+  if (text?.trim()?.length === 0)
     return res.status(400).json({ message: "No description to update" });
 
-  if (desc?.trim()?.length > 500) {
+  if (text?.trim()?.length > 500) {
     return res
       .status(400)
       .json({ message: "Description cannot exceed 500\u00A0characters." });
   }
 
-  const q = "UPDATE comments SET `desc` = ? WHERE id = ? AND userId = ?";
+  const q = "UPDATE comments SET `text` = ? WHERE id = ? AND userId = ?";
 
-  db.query(q, [desc, commentId, loggedInUserId], (error, data) => {
+  db.query(q, [text, commentId, loggedInUserId], (error, data) => {
     if (error)
       return res.status(500).json({
         message: "An unknown error occurred while updating comment.",
