@@ -15,7 +15,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 export default function UpdatePost({ post, setOpenUpdate }) {
   const [newText, setNewText] = useState(post.text);
-  const [newImg, setNewImg] = useState(null);
+  const [newImg, setNewImg] = useState(null); // Image selected or not
 
   const queryClient = useQueryClient();
 

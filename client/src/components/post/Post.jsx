@@ -140,7 +140,9 @@ export default function Post({ post }) {
       </div>
 
       <div className="content">
-        <p>{addNonBreakingSpace(post.text)}</p>
+        {/* Text */}
+        <p>{addNonBreakingSpace(post.text)}</p>        
+        {/* Image (optional) */}
         {post.img && <LazyLoadImage src={`/uploads/${post.img}`} alt="post" />}
       </div>
 

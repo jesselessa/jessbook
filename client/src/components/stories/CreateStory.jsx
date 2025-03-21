@@ -16,7 +16,7 @@ const isVideo = (fileType) => {
 };
 
 export default function CreateStory({ setOpenCreateStory }) {
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState(null); // File present or not
   const [text, setText] = useState("");
   const [fileURL, setFileURL] = useState("");
   const [error, setError] = useState({ isError: false, message: "" });

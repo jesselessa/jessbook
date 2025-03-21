@@ -23,8 +23,8 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function UpdateProfile({ user, setOpenUpdate }) {
   const { setCurrentUser } = useContext(AuthContext);
-  const [cover, setCover] = useState(null);
-  const [profile, setProfile] = useState(null);
+  const [cover, setCover] = useState(null); // Cover pic present or not
+  const [profile, setProfile] = useState(null); // Profile pic present or not
   const [fields, setFields] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
