@@ -55,7 +55,6 @@ export const register = (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPswd = bcrypt.hashSync(password?.trim(), salt);
 
-    // Store new user in database
     const insertQuery =
       "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `fromAuthProvider`,`role`) VALUES (?)";
     const values = [
@@ -67,12 +66,30 @@ export const register = (req, res) => {
       "user",
     ]; // Values for SQL parameters
 
-    db.query(insertQuery, [values], (insertErr, _data) => {
+    const insertRelationshipQuery =
+      "INSERT INTO relationships (followerId, followedId) VALUES (?)";
+
+    // Store new user in database
+    db.query(insertQuery, [values], (insertErr, insertData) => {
       if (insertErr)
         return res.status(500).json({
           message: "An unknown error occurred while creating new user.",
           error: insertErr,
         });
+
+      // Insert admin as first relationship followed by new user
+      db.query(
+        insertRelationshipQuery,
+        [[insertData.insertId, 1]],
+        (insertErr, insertData) => {
+          if (insertErr)
+            return res.status(500).json({
+              message:
+                "An unknown error occurred while adding administrator to relationships.",
+              error: insertErr.message,
+            });
+        }
+      );
 
       return res.status(201).json({ message: "New user created" });
     });
