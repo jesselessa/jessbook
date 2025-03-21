@@ -1,8 +1,9 @@
 {
   "name": "jessbook",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "Jessbook, the new social media app that helps you stay connected with your family and friends",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
