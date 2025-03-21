@@ -1,26 +1,22 @@
-import { db } from "../utils/connect.js";
+import { db, executeQuery } from "../utils/connect.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../utils/sendEmail.js";
 
-export const register = (req, res) => {
+export const register = async (req, res) => {
   const { firstName, lastName, email, password, confirmPswd } = req.body;
 
-  // Find user in database by email
-  const selectQuery = "SELECT * FROM users WHERE email = ?";
-
-  db.query(selectQuery, [email], (selectErr, data) => {
-    if (selectErr)
-      return res.status(500).json({
-        message: "An unknown error occurred while fetching user data.",
-        error: selectErr,
-      });
+  try {
+    // Find user in database by email
+    const selectQuery = "SELECT * FROM users WHERE email = ?";
+    const data = await executeQuery(selectQuery, [email]);
 
     // Check if user exists
-    if (data.length > 0)
+    if (data.length > 0) {
       return res.status(409).json({
         message: "An account with this email address already exists.",
       });
+    }
 
     // If user doesn't exist, validate request body values
     let errors = {};
@@ -56,7 +52,7 @@ export const register = (req, res) => {
     const hashedPswd = bcrypt.hashSync(password?.trim(), salt);
 
     const insertQuery =
-      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `fromAuthProvider`,`role`) VALUES (?)";
+      "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `fromAuthProvider`,`role`) VALUES (?, ?, ?, ?, ?, ?)";
     const values = [
       firstName.trim(),
       lastName.trim(),
@@ -64,73 +60,59 @@ export const register = (req, res) => {
       hashedPswd,
       "No",
       "user",
-    ]; // Values for SQL parameters
+    ];
 
     const insertRelationshipQuery =
-      "INSERT INTO relationships (followerId, followedId) VALUES (?)";
+      "INSERT INTO relationships (followerId, followedId) VALUES (?, ?)";
 
     // Store new user in database
-    db.query(insertQuery, [values], (insertErr, insertData) => {
-      if (insertErr)
-        return res.status(500).json({
-          message: "An unknown error occurred while creating new user.",
-          error: insertErr,
-        });
+    const insertData = await executeQuery(insertQuery, values);
 
-      // Insert admin as first relationship followed by new user
-      db.query(
-        insertRelationshipQuery,
-        [[insertData.insertId, 1]],
-        (insertErr, insertData) => {
-          if (insertErr)
-            return res.status(500).json({
-              message:
-                "An unknown error occurred while adding administrator to relationships.",
-              error: insertErr.message,
-            });
-        }
-      );
+    // Insert admin as first relationship followed by new user
+    await executeQuery(insertRelationshipQuery, [insertData.insertId, 1]);
 
-      return res.status(201).json({ message: "New user created" });
+    return res.status(201).json({ message: "New user created" });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred.",
+      error: error.message,
     });
-  });
+  }
 };
 
-export const login = (req, res) => {
-  const { email } = req.body; //! Cannot use 'password' variable here, otherwise, ReferenceError object error : 'Cannot destructure password before initialization'
+export const login = async (req, res) => {
+  const { email, password } = req.body;
 
-  if (email?.trim()?.length === 0 || req.body.password?.trim()?.length === 0)
+  if (!email?.trim() || !password?.trim()) {
     return res
       .status(400)
       .json({ message: "Please, fill in all required fields." });
+  }
 
-  // Find user by email
-  const q = `SELECT * FROM users WHERE email = ?`;
-
-  db.query(q, [email], (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while fetching user data.",
-        error: error,
-      });
+  try {
+    // Find user by email
+    const q = "SELECT * FROM users WHERE email = ?";
+    const data = await executeQuery(q, [email]);
 
     // Check if user exists
-    if (data.length === 0)
+    if (data.length === 0) {
       return res.status(404).json({ message: "Invalid email or password" });
+    }
 
     // Compare passwords with bcrypt
-    const checkPswd = bcrypt.compareSync(req.body.password, data[0].password); //! 'data[0]' represents the query result (user) = an array with one entry
-    if (!checkPswd)
+    const checkPswd = bcrypt.compareSync(password, data[0].password);
+    if (!checkPswd) {
       return res.status(401).json({ message: "Invalid email or password" });
+    }
 
-    // If passord is correct, generate a token with JWT
+    // If password is correct, generate a token with JWT
     const secretKey = process.env.JWT_SECRET;
     let token;
 
     // Set token info (payload) depending on user role
     if (data[0].role === "admin") {
       token = jwt.sign({ id: data[0].id, role: "admin" }, secretKey, {
-        expiresIn: "7d", // After delay, invalid token : user must reconnect
+        expiresIn: "7d", // After delay, invalid token: user must reconnect
       });
     } else {
       token = jwt.sign({ id: data[0].id, role: "user" }, secretKey, {
@@ -139,7 +121,7 @@ export const login = (req, res) => {
     }
 
     // Remove password before sending user data
-    const { password, ...otherInfo } = data[0];
+    const { password: userPassword, ...otherInfo } = data[0];
 
     // Set token in cookie
     return res
@@ -151,31 +133,36 @@ export const login = (req, res) => {
       })
       .status(201)
       .json(otherInfo);
-  });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred.",
+      error: error.message,
+    });
+  }
 };
 
-export const connectWithToken = (req, res) => {
+export const connectWithToken = async (req, res) => {
   const loggedInUserId = req.user.id; // Get user ID from token
-  const q = "SELECT * FROM users WHERE id = ?";
+  try {
+    const q = "SELECT * FROM users WHERE id = ?";
+    const data = await executeQuery(q, [loggedInUserId]);
 
-  db.query(q, [loggedInUserId], (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while fetching user data.",
-        error: error,
-      });
-
-    if (data.length === 0)
+    if (data.length === 0) {
       return res.status(404).json({ message: "User not found" });
+    }
 
-    const { password, ...otherInfo } = data[0];
+    const { password: userPassword, ...otherInfo } = data[0];
     return res.status(200).json(otherInfo);
-  });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred.",
+      error: error.message,
+    });
+  }
 };
 
 export const logout = (_req, res) => {
-  //! Cookie options (such as 'httpOnly', 'secure', and 'sameSite') must be the same between creation and deletion
-
+  // Cookie options (such as 'httpOnly', 'secure', and 'sameSite') must be the same between creation and deletion
   return res
     .clearCookie("accessToken", {
       httpOnly: true,
@@ -186,30 +173,27 @@ export const logout = (_req, res) => {
     .json({ message: "User is logged out." });
 };
 
-export const recoverAccount = (req, res) => {
+export const recoverAccount = async (req, res) => {
   const { email } = req.body;
 
   if (email?.trim()?.length > 0) {
     // Check email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim()) || email.trim().length > 320)
+    if (!emailRegex.test(email.trim()) || email.trim().length > 320) {
       return res.status(401).json({ message: "Invalid email" });
+    }
 
-    // Find user by email
-    const q = "SELECT * FROM users WHERE email = ?";
-
-    db.query(q, [email.trim()], async (error, data) => {
-      if (error)
-        return res.status(500).json({
-          message: "An unknown error occurred while fetching user data.",
-          error: error,
-        });
+    try {
+      // Find user by email
+      const q = "SELECT * FROM users WHERE email = ?";
+      const data = await executeQuery(q, [email.trim()]);
 
       // Check if user exists
-      if (data.length === 0)
+      if (data.length === 0) {
         return res.status(404).json({
           message: "There is no account associated with this email address.",
         });
+      }
 
       // If user exists, generate a token
       const secretKey = process.env.JWT_SECRET;
@@ -231,62 +215,64 @@ export const recoverAccount = (req, res) => {
         .status(201);
 
       // Send email with Nodemailer
-      try {
-        await sendEmail({
-          to: email,
-          subject: "Jessbook - Reset your password",
-          html: `<div style="padding: 10px">
-                  <p>Click the link below to reset your password\u00A0:</p>
-                  <a href="${resetLink}" target="_blank" style="font-weight: bold; color: #008080">
-                    Change my password
-                  </a>
-                  <p style="margin-top: 10px; font-weight: bold">This link will expire in 1 hour.</p>
-                </div>`,
-        });
+      await sendEmail({
+        to: email,
+        subject: "Jessbook - Reset your password",
+        html: `<div style="padding: 10px">
+                            <p>Click the link below to reset your password\u00A0:</p>
+                            <a href="${resetLink}" target="_blank" style="font-weight: bold; color: #008080">
+                              Change my password
+                            </a>
+                            <p style="margin-top: 10px; font-weight: bold">This link will expire in 1 hour.</p>
+                          </div>`,
+      });
 
-        return res.status(200).json({
-          message: "A link to reset your password has been sent to your email.",
-        });
-      } catch (err) {
-        return res.status(500).json({
-          message: "An unknown error occurred while sending email.",
-          error: err,
-        });
-      }
-    });
+      return res.status(200).json({
+        message: "A link to reset your password has been sent to your email.",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: "An unknown error occurred.",
+        error: error.message,
+      });
+    }
   } else {
     return res.status(400).json({ message: "Please, provide an email." });
   }
 };
 
-export const resetPassword = (req, res) => {
+export const resetPassword = async (req, res) => {
   const { password, confirmPswd } = req.body;
   const token = req.cookies.resetToken; // Get token from cookie
 
   // Check if password is provided
-  if (password?.trim()?.length === 0 || confirmPswd?.trim()?.length === 0)
+  if (!password?.trim() || !confirmPswd?.trim()) {
     return res
       .status(400)
       .json({ message: "Please, fill in all required fields." });
+  }
 
   // Check password format
   const passwordRegex =
     /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
-  if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200)
+  if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200) {
     return res.status(401).json({
       message:
         "Password must be between 6 and 200\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.",
     });
+  }
 
   // Check if passwords match
-  if (password?.trim() !== confirmPswd?.trim())
+  if (password?.trim() !== confirmPswd?.trim()) {
     return res
       .status(401)
       .json({ message: "Confirmation password does not match." });
+  }
 
   // Check if token is present
-  if (!token)
+  if (!token) {
     return res.status(401).json({ message: "Invalid authentication" });
+  }
   const secretKey = process.env.JWT_SECRET;
 
   try {
@@ -299,29 +285,22 @@ export const resetPassword = (req, res) => {
 
     // Update password in database
     const q = "UPDATE users SET password = ? WHERE id = ?";
+    await executeQuery(q, [hashedPswd, decoded.id]);
 
-    db.query(q, [hashedPswd, decoded.id], (error, _data) => {
-      if (error)
-        return res.status(500).json({
-          message: "An unknown error occurred while updating password.",
-          error: error,
-        });
-
-      // Clear 'resetToken' cookie after password has been reset to make token only usable once
-      res.clearCookie("resetToken", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      });
-
-      return res
-        .status(200)
-        .json({ message: "Your password has been successfully reset." });
+    // Clear 'resetToken' cookie after password has been reset to make token only usable once
+    res.clearCookie("resetToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
     });
-  } catch (err) {
+
+    return res
+      .status(200)
+      .json({ message: "Your password has been successfully reset." });
+  } catch (error) {
     // Invalid or expired token
     return res
       .status(401)
-      .json({ message: "Invalid authentication", error: err });
+      .json({ message: "Invalid authentication", error: error.message });
   }
 };

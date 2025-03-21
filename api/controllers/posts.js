@@ -1,8 +1,8 @@
-import { db } from "../utils/connect.js";
+import { db, executeQuery } from "../utils/connect.js";
 import { isImage } from "../utils/isFile.js";
 import moment from "moment";
 
-export const getPosts = (req, res) => {
+export const getPosts = async (req, res) => {
   const userId = req.query.userId;
   const loggedInUserId = req.user.id;
 
@@ -10,72 +10,73 @@ export const getPosts = (req, res) => {
   const q =
     userId !== "undefined"
       ? `SELECT p.*, u.id AS userId, firstName, lastName, profilePic 
-     FROM posts AS p 
-     JOIN users AS u ON (u.id = p.userId) 
-     WHERE p.userId = ? 
-     ORDER BY p.createdAt DESC`
+             FROM posts AS p 
+             JOIN users AS u ON (u.id = p.userId) 
+             WHERE p.userId = ? 
+             ORDER BY p.createdAt DESC`
       : `
-     SELECT p.*, u.id AS userId, firstName, lastName, profilePic 
-     FROM posts AS p
-     JOIN users AS u ON (u.id = p.userId)
-     WHERE p.userId = ? 
-     OR p.userId IN (SELECT followedId 
-     FROM relationships WHERE followerId = ?)
-     ORDER BY p.createdAt DESC`;
+             SELECT p.*, u.id AS userId, firstName, lastName, profilePic 
+             FROM posts AS p
+             JOIN users AS u ON (u.id = p.userId)
+             WHERE p.userId = ? 
+             OR p.userId IN (SELECT followedId 
+             FROM relationships WHERE followerId = ?)
+             ORDER BY p.createdAt DESC`;
   // DESC = most recent posts displayed first
   //! `p.userId IN (...)` checks whether the user who created a post (p.userId) is in a list of specific IDs (result from subquery)
 
   const values =
     userId !== "undefined" ? [userId] : [loggedInUserId, loggedInUserId];
 
-  db.query(q, values, (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while fetching posts.",
-        error: error,
-      });
-
+  try {
+    const data = await executeQuery(q, values);
     return res.status(200).json(data);
-  });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while fetching posts.",
+      error: error.message,
+    });
+  }
 };
 
-export const addPost = (req, res) => {
+export const addPost = async (req, res) => {
   const { text, img } = req.body;
   const loggedInUserId = req.user.id;
   const currentDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
   // Validate description
-  if (text?.trim()?.length === 0)
+  if (text?.trim()?.length === 0) {
     return res.status(400).json("Description cannot be empty.");
+  }
 
-  if (text?.trim()?.length > 1000)
+  if (text?.trim()?.length > 1000) {
     return res
       .status(400)
       .json("Description cannot exceed 1000\u00A0characters.");
+  }
 
   // Validate image
-  if (img) {
-    if (!isImage(img))
-      return res.status(400).json("Provide a valid image format.");
+  if (img && !isImage(img)) {
+    return res.status(400).json("Provide a valid image format.");
   }
 
   // Create a new post
   const q =
-    "INSERT INTO posts (`text`, `img`, `userId`, `createdAt`) VALUES (?)";
+    "INSERT INTO posts (`text`, `img`, `userId`, `createdAt`) VALUES (?, ?, ?, ?)";
   const values = [text.trim(), img, loggedInUserId, currentDateTime];
 
-  db.query(q, [values], (error, _data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while creating post.",
-        error: error,
-      });
-
+  try {
+    await executeQuery(q, values);
     return res.status(201).json("Post created");
-  });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while creating post.",
+      error: error.message,
+    });
+  }
 };
 
-export const updatePost = (req, res) => {
+export const updatePost = async (req, res) => {
   const { text, img } = req.body;
   const postId = req.params.postId;
   const loggedInUserId = req.user.id;
@@ -84,8 +85,9 @@ export const updatePost = (req, res) => {
   const values = [];
 
   // Validate description
-  if (text?.trim()?.length === 0)
+  if (text?.trim()?.length === 0) {
     return res.status(400).json("No description to update");
+  }
 
   if (text?.trim()?.length > 1000) {
     return res
@@ -97,18 +99,17 @@ export const updatePost = (req, res) => {
   }
 
   // 2 - Validate image (optional)
-  if (img) {
-    if (!isImage(img)) {
-      return res.status(400).json("Provide a valid image format.");
-    } else {
-      updatedFields.push("`img` = ?");
-      values.push(img);
-    }
+  if (img && !isImage(img)) {
+    return res.status(400).json("Provide a valid image format.");
+  } else if (img) {
+    updatedFields.push("`img` = ?");
+    values.push(img);
   }
 
   // 3 - No field to update
-  if (updatedFields.length === 0)
+  if (updatedFields.length === 0) {
     return res.status(400).json("No field to update");
+  }
 
   const q = `UPDATE posts SET ${updatedFields.join(
     ", "
@@ -116,30 +117,34 @@ export const updatePost = (req, res) => {
 
   values.push(postId, loggedInUserId);
 
-  db.query(q, values, (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while updating post.",
-        error: error,
-      });
-
-    if (data.affectedRows > 0) return res.status(200).json("Post updated");
-  });
+  try {
+    const data = await executeQuery(q, values);
+    if (data.affectedRows > 0) {
+      return res.status(200).json("Post updated");
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while updating post.",
+      error: error.message,
+    });
+  }
 };
 
-export const deletePost = (req, res) => {
+export const deletePost = async (req, res) => {
   const postId = req.params.postId;
   const loggedInUserId = req.user.id;
 
   const q = "DELETE FROM posts WHERE id = ? AND userId = ?";
 
-  db.query(q, [postId, loggedInUserId], (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while deleting post.",
-        error: error,
-      });
-
-    if (data.affectedRows > 0) return res.status(200).json("Post deleted");
-  });
+  try {
+    const data = await executeQuery(q, [postId, loggedInUserId]);
+    if (data.affectedRows > 0) {
+      return res.status(200).json("Post deleted");
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while deleting post.",
+      error: error.message,
+    });
+  }
 };

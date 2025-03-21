@@ -1,19 +1,13 @@
-import { db } from "../utils/connect.js";
+import { db, executeQuery } from "../utils/connect.js";
 import { isImage } from "../utils/isFile.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 
 //! In MySQL, when no results are found with a SELECT query, the 'data' variable will contain an empty array '[]', which is considered a truthy value. Therefore, to check if data really exists, we use 'if(data.length > 0)' and not 'if(data)', the latter always returning 'true'
 
-export const getAllUsers = (req, res) => {
-  const q = "SELECT * FROM users";
-
-  db.query(q, (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while fetching all users data.",
-        error: error,
-      });
+export const getAllUsers = async (req, res) => {
+  try {
+    const q = "SELECT * FROM users";
+    const data = await executeQuery(q);
 
     // Exclude password from users data
     const users = data.map((user) => {
@@ -22,31 +16,35 @@ export const getAllUsers = (req, res) => {
     });
 
     return res.status(200).json(users);
-  });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while fetching all users data.",
+      error: error.message,
+    });
+  }
 };
 
-export const getUser = (req, res) => {
+export const getUser = async (req, res) => {
   const userId = req.params.userId;
-  const q = "SELECT * FROM users WHERE id = ?";
+  try {
+    const q = "SELECT * FROM users WHERE id = ?";
+    const data = await executeQuery(q, [userId]);
 
-  db.query(q, [userId], (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while fetching user data.",
-        error: error,
-      });
-
-    if (data.length === 0)
+    if (data.length === 0) {
       return res.status(404).json({ message: "User not found" });
-
-    if (data.length > 0) {
-      const { password, ...otherInfo } = data[0];
-      return res.status(200).json(otherInfo);
     }
-  });
+
+    const { password, ...otherInfo } = data[0];
+    return res.status(200).json(otherInfo);
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while fetching user data.",
+      error: error.message,
+    });
+  }
 };
 
-export const updateUser = (req, res) => {
+export const updateUser = async (req, res) => {
   const { firstName, lastName, email, password, profilePic, coverPic, city } =
     req.body;
   const loggedInUserId = req.user.id;
@@ -133,44 +131,50 @@ export const updateUser = (req, res) => {
   }
 
   // If there are validation errors, return them
-  if (Object.keys(errors).length > 0)
+  if (Object.keys(errors).length > 0) {
     return res.status(400).json({ validationErrors: errors });
+  }
 
   // If no fields to update
-  if (updatedFields.length === 0)
+  if (updatedFields.length === 0) {
     return res.status(400).json("No field to update");
+  }
 
   values.push(loggedInUserId);
 
-  // Update database
-  const q = `
-    UPDATE users
-    SET ${updatedFields.join(", ")}
-    WHERE id = ?
-  `;
+  try {
+    // Update database
+    const q = `
+          UPDATE users
+          SET ${updatedFields.join(", ")}
+          WHERE id = ?
+        `;
+    const data = await executeQuery(q, values);
 
-  db.query(q, values, (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while updating user data.",
-        error: error,
-      });
-
-    if (data.affectedRows > 0) return res.status(200).json("User data updated");
-  });
+    if (data.affectedRows > 0) {
+      return res.status(200).json("User data updated");
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while updating user data.",
+      error: error.message,
+    });
+  }
 };
 
-export const deleteUser = (req, res) => {
+export const deleteUser = async (req, res) => {
   const loggedInUserId = req.user.id;
-  const q = "DELETE FROM users WHERE `id` = ?";
+  try {
+    const q = "DELETE FROM users WHERE `id` = ?";
+    const data = await executeQuery(q, [loggedInUserId]);
 
-  db.query(q, [loggedInUserId], (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while deleting user account.",
-        error: error,
-      });
-
-    if (data.affectedRows > 0) return res.status(200).json("User deleted");
-  });
+    if (data.affectedRows > 0) {
+      return res.status(200).json("User deleted");
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while deleting user account.",
+      error: error.message,
+    });
+  }
 };

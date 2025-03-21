@@ -1,27 +1,27 @@
-import { db } from "../utils/connect.js";
+import { db, executeQuery } from "../utils/connect.js";
 import moment from "moment";
 
-export const getComments = (req, res) => {
+export const getComments = async (req, res) => {
   const postId = req.query.postId;
 
   const q = `SELECT c.*, u.id AS userId, firstName, lastName, profilePic 
-  FROM comments AS c 
-  JOIN users AS u ON (u.id = c.userId)
-  WHERE c.postId = ? 
-  ORDER BY c.createdAt DESC`;
+                 FROM comments AS c 
+                 JOIN users AS u ON (u.id = c.userId)
+                 WHERE c.postId = ? 
+                 ORDER BY c.createdAt DESC`;
 
-  db.query(q, [postId], (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while fetching post comments.",
-        error: error,
-      });
-
+  try {
+    const data = await executeQuery(q, [postId]);
     return res.status(200).json(data);
-  });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while fetching post comments.",
+      error: error.message,
+    });
+  }
 };
 
-export const addComment = (req, res) => {
+export const addComment = async (req, res) => {
   const { text, postId } = req.body;
   const loggedInUserId = req.user.id;
   const currentDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -30,33 +30,35 @@ export const addComment = (req, res) => {
     return res.status(400).json({ message: "Description cannot be empty." });
   }
 
-  if (text?.trim()?.length > 500)
+  if (text?.trim()?.length > 500) {
     return res
       .status(400)
       .json("Description cannot exceed 500\u00A0characters.");
+  }
 
   const q =
-    "INSERT INTO comments (`text`, `userId`, `postId`, `createdAt`) VALUES (?)";
+    "INSERT INTO comments (`text`, `userId`, `postId`, `createdAt`) VALUES (?, ?, ?, ?)";
   const values = [text.trim(), loggedInUserId, postId, currentDateTime];
 
-  db.query(q, [values], (error, _data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while creating comment.",
-        error: error,
-      });
-
+  try {
+    await executeQuery(q, values);
     return res.status(201).json({ message: "Comment created" });
-  });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while creating comment.",
+      error: error.message,
+    });
+  }
 };
 
-export const updateComment = (req, res) => {
+export const updateComment = async (req, res) => {
   const commentId = req.params.commentId;
   const loggedInUserId = req.user.id;
   const { text } = req.body;
 
-  if (text?.trim()?.length === 0)
+  if (text?.trim()?.length === 0) {
     return res.status(400).json({ message: "No description to update" });
+  }
 
   if (text?.trim()?.length > 500) {
     return res
@@ -66,30 +68,34 @@ export const updateComment = (req, res) => {
 
   const q = "UPDATE comments SET `text` = ? WHERE id = ? AND userId = ?";
 
-  db.query(q, [text, commentId, loggedInUserId], (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while updating comment.",
-        error: error,
-      });
-
-    if (data.affectedRows > 0) return res.status(200).json("Comment updated");
-  });
+  try {
+    const data = await executeQuery(q, [text, commentId, loggedInUserId]);
+    if (data.affectedRows > 0) {
+      return res.status(200).json("Comment updated");
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while updating comment.",
+      error: error.message,
+    });
+  }
 };
 
-export const deleteComment = (req, res) => {
+export const deleteComment = async (req, res) => {
   const commentId = req.params.commentId;
   const loggedInUserId = req.user.id;
 
   const q = "DELETE FROM comments WHERE id = ? AND userId = ?";
 
-  db.query(q, [commentId, loggedInUserId], (error, data) => {
-    if (error)
-      return res.status(500).json({
-        message: "An unknown error occurred while deleting comment.",
-        error: error,
-      });
-
-    if (data.affectedRows > 0) return res.status(200).json("Comment deleted");
-  });
+  try {
+    const data = await executeQuery(q, [commentId, loggedInUserId]);
+    if (data.affectedRows > 0) {
+      return res.status(200).json("Comment deleted");
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "An unknown error occurred while deleting comment.",
+      error: error.message,
+    });
+  }
 };
