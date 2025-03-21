@@ -38,7 +38,25 @@ app.use((_req, res, next) => {
 // Handle Cross-Origin Resource Sharing (CORS) requests
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL, process.env.API_URL],
+    origin: function (origin, callback) {
+      //* Define an array of allowed URLs to access the API
+      const allowedOrigins = [process.env.CLIENT_URL, process.env.API_URL];
+      // const allowedOrigins = [
+      //   "https://www.social-media.jesselessa.dev",
+      //   "https://social-media.jesselessa.dev",
+      //   "https://www.social-media.jesselessa.dev/api",
+      //   "https://social-media.jesselessa.dev/api",
+      // ];
+      //* Check if the origin is in the allowedOrigins array
+      //* If the origin is not provided (e.g., for same-origin requests), allow it
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        // Allow the request by calling the callback with null (no error) and true (allow)
+        callback(null, true);
+      } else {
+        // Deny the request by calling the callback with an error and false
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow cookies
   })
@@ -79,8 +97,11 @@ app.get("*", (_req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 }); // Display Login page
 
-// Start server
+// Start server and launch database
 app.listen(PORT, (error) => {
-  if (error) console.log(error);
-  console.log(`Server listening on port ${process.env.PORT}`);
+  if (error) {
+    console.error(error);
+  } else {
+    console.log(`Server listening on port ${process.env.PORT}`);
+  }
 });
