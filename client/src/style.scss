@@ -1,7 +1,5 @@
-// Import the modules 'map' to use map functions
+// Import the module 'map' to use map functions
 @use "sass:map";
-
-$theme-map: null; //! Replaces former use of '!global' to declare a new variable, which is deprecated
 
 // Reset CSS
 *,
@@ -57,9 +55,8 @@ $themes: (
 @mixin themify($themes) {
   @each $theme, $map in $themes {
     .theme-#{$theme} & {
-      $theme-map: (
-
-      ) !global; //! Otherwise, as $theme-map is defined locally in a scope block, themed($key) wouldn't be able to access it
+      $theme-map: () !global;
+      // The '!global' flag is used to declare a new variable in the global scope, which can be accessed outside the mixin (so that 'themed($key)' can access it) //! This is deprecated in Sass 1.33.0, and will be an error in Sass 2.0.0.
 
       @each $key, $submap in $map {
         $value: map.get($map, $key);
