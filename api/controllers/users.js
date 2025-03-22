@@ -1,6 +1,12 @@
 import { db, executeQuery } from "../utils/connect.js";
 import { isImage } from "../utils/isFile.js";
 import bcrypt from "bcryptjs";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 //! In MySQL, when no results are found with a SELECT query, the 'data' variable will contain an empty array '[]', which is considered a truthy value. Therefore, to check if data really exists, we use 'if(data.length > 0)' and not 'if(data)', the latter always returning 'true'
 
@@ -54,6 +60,7 @@ export const updateUser = async (req, res) => {
   // Check validation conditions
   let errors = {};
 
+  // Name validation
   if (firstName) {
     if (firstName.trim().length < 2 || firstName.trim().length > 35) {
       errors.firstName = "First name must be between 2 and 35\u00A0characters.";
@@ -72,10 +79,9 @@ export const updateUser = async (req, res) => {
     }
   }
 
+  // Email validation
   if (email) {
-    // Check format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     if (!emailRegex.test(email.trim()) || email.trim().length > 320) {
       errors.email = "Invalid email format";
     } else {
@@ -86,7 +92,6 @@ export const updateUser = async (req, res) => {
 
   // Password validation and hashing
   if (password) {
-    // Check format
     const passwordRegex =
       /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
 
@@ -101,20 +106,95 @@ export const updateUser = async (req, res) => {
     }
   }
 
+  // // Profile picture
+  // if (profilePic) {
+  //   if (!isImage(profilePic)) {
+  //     errors.profilePic = "Invalid profile picture format";
+  //   } else {
+  //     updatedFields.push("`profilePic` = ?");
+  //     values.push(profilePic);
+  //   }
+  // }
+
+  // // Cover picture
+  // if (coverPic) {
+  //   if (!isImage(coverPic)) {
+  //     errors.coverPic = "Invalid cover picture format";
+  //   } else {
+  //     updatedFields.push("`coverPic` = ?");
+  //     values.push(coverPic);
+  //   }
+  // }
+
   if (profilePic) {
     if (!isImage(profilePic)) {
       errors.profilePic = "Invalid profile picture format";
     } else {
+      // Retrieve old profile picture name.
+      const oldUserData = await executeQuery(
+        "SELECT profilePic FROM users WHERE id = ?",
+        [loggedInUserId]
+      );
+
+      // Check if an old picture exists and is different from the new one.
+      if (
+        oldUserData.length > 0 &&
+        oldUserData[0].profilePic &&
+        oldUserData[0].profilePic !== profilePic
+      ) {
+        try {
+          // Delete old picture.
+          fs.unlinkSync(
+            path.join(
+              __dirname,
+              "../../client/uploads",
+              oldUserData[0].profilePic
+            )
+          );
+          console.log("Old profile picture deleted");
+        } catch (err) {
+          console.error("Error deleting old profile picture:", err);
+          // Do not block update if deletion fails.
+        }
+      }
+
       updatedFields.push("`profilePic` = ?");
       values.push(profilePic);
     }
   }
 
-  // Cover picture
   if (coverPic) {
     if (!isImage(coverPic)) {
       errors.coverPic = "Invalid cover picture format";
     } else {
+      // Retrieve old cover picture name.
+      const oldUserData = await executeQuery(
+        "SELECT coverPic FROM users WHERE id = ?",
+        [loggedInUserId]
+      );
+
+      // Check if an old picture exists and is different from the new one.
+      if (
+        oldUserData.length > 0 &&
+        oldUserData[0].coverPic &&
+        oldUserData[0].coverPic !== coverPic
+      ) {
+        try {
+          // Delete old picture.
+          fs.unlinkSync(
+            path.join(
+              __dirname,
+              "../../client/uploads",
+              oldUserData[0].coverPic
+            )
+          );
+          console.log("Old cover picture deleted.");
+        } catch (err) {
+          console.error("Error deleting old cover picture:", err);
+          // Do not block update if deletion fails.
+        }
+      }
+
       updatedFields.push("`coverPic` = ?");
       values.push(coverPic);
     }
@@ -165,6 +245,44 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   const loggedInUserId = req.user.id;
   try {
+    // Retrieve profile and cover picture names before deleting user.
+    const userData = await executeQuery(
+      "SELECT profilePic, coverPic FROM users WHERE id = ?",
+      [loggedInUserId]
+    );
+
+    // Delete pictures if they exist
+    if (userData.length > 0) {
+      if (userData[0].profilePic) {
+        try {
+          fs.unlinkSync(
+            path.join(__dirname, "../../client/uploads", userData[0].profilePic)
+          );
+          console.log("Old profile picture deleted on user deletion.");
+        } catch (err) {
+          console.error(
+            "Error deleting old profile picture on user deletion:",
+            err
+          );
+        }
+      }
+
+      if (userData[0].coverPic) {
+        try {
+          fs.unlinkSync(
+            path.join(__dirname, "../../client/uploads", userData[0].coverPic)
+          );
+          console.log("Old cover picture deleted on user deletion.");
+        } catch (err) {
+          console.error(
+            "Error deleting old cover picture on user deletion:",
+            err
+          );
+        }
+      }
+    }
+
+    // Delete user from database
     const q = "DELETE FROM users WHERE `id` = ?";
     const data = await executeQuery(q, [loggedInUserId]);
 
@@ -178,3 +296,20 @@ export const deleteUser = async (req, res) => {
     });
   }
 };
+
+// export const deleteUser = async (req, res) => {
+//   const loggedInUserId = req.user.id;
+//   try {
+//     const q = "DELETE FROM users WHERE `id` = ?";
+//     const data = await executeQuery(q, [loggedInUserId]);
+
+//     if (data.affectedRows > 0) {
+//       return res.status(200).json("User deleted");
+//     }
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "An unknown error occurred while deleting user account.",
+//       error: error.message,
+//     });
+//   }
+// };

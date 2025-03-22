@@ -23,8 +23,8 @@ import storiesRoute from "./routes/stories.js";
 const PORT = process.env.PORT;
 
 // Get __dirname equivalent in ES module mode
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
 
 // Create server with Express
 const app = express();
@@ -89,6 +89,9 @@ app.use("/api/comments", commentsRoute);
 app.use("/api/likes", likesRoute);
 app.use("/api/relationships", relationshipsRoute);
 app.use("/api/stories", storiesRoute);
+
+// Serve "uploads" folder as static files
+app.use("/uploads", express.static(path.join(__dirname, "../client/uploads"))); //! Must be placed before 'app.get("*", ...)' which serves our React app, otherwise, requests for "/uploads" will be intercepted by the latter
 
 // Serve static files for our front end (after Vite build)
 app.use(express.static(path.join(__dirname, "../client/dist")));
