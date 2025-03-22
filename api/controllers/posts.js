@@ -1,6 +1,12 @@
 import { db, executeQuery } from "../utils/connect.js";
 import { isImage } from "../utils/isFile.js";
 import moment from "moment";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const getPosts = async (req, res) => {
   const userId = req.query.userId;
@@ -90,23 +96,43 @@ export const updatePost = async (req, res) => {
   }
 
   if (text?.trim()?.length > 1000) {
-    return res
-      .status(400)
-      .json("Description cannot exceed 1000\u00A0characters.");
+    return res.status(400).json("Description cannot exceed 1000 characters.");
   } else {
     updatedFields.push("`text` = ?");
     values.push(text.trim());
   }
 
-  // 2 - Validate image (optional)
+  // Validate image (optional)
   if (img && !isImage(img)) {
     return res.status(400).json("Provide a valid image format.");
   } else if (img) {
+    // Retrieve old image name
+    const oldPostData = await executeQuery(
+      "SELECT img FROM posts WHERE id = ? AND userId = ?",
+      [postId, loggedInUserId]
+    );
+
+    // Delete old image if exists and is different from the new one
+    if (
+      oldPostData.length > 0 &&
+      oldPostData[0].img &&
+      oldPostData[0].img !== img
+    ) {
+      try {
+        fs.unlinkSync(
+          path.join(__dirname, "../../client/uploads", oldPostData[0].img)
+        );
+        console.log("Old post image deleted");
+      } catch (err) {
+        console.error("Error deleting old post image:", err);
+      }
+    }
+
     updatedFields.push("`img` = ?");
     values.push(img);
   }
 
-  // 3 - No field to update
+  // No field to update
   if (updatedFields.length === 0) {
     return res.status(400).json("No field to update");
   }
@@ -114,7 +140,6 @@ export const updatePost = async (req, res) => {
   const q = `UPDATE posts SET ${updatedFields.join(
     ", "
   )} WHERE id = ? AND userId = ?`;
-
   values.push(postId, loggedInUserId);
 
   try {
@@ -130,14 +155,87 @@ export const updatePost = async (req, res) => {
   }
 };
 
+// export const updatePost = async (req, res) => {
+//   const { text, img } = req.body;
+//   const postId = req.params.postId;
+//   const loggedInUserId = req.user.id;
+
+//   const updatedFields = [];
+//   const values = [];
+
+//   // Validate description
+//   if (text?.trim()?.length === 0) {
+//     return res.status(400).json("No description to update");
+//   }
+
+//   if (text?.trim()?.length > 1000) {
+//     return res
+//       .status(400)
+//       .json("Description cannot exceed 1000\u00A0characters.");
+//   } else {
+//     updatedFields.push("`text` = ?");
+//     values.push(text.trim());
+//   }
+
+//   // 2 - Validate image (optional)
+//   if (img && !isImage(img)) {
+//     return res.status(400).json("Provide a valid image format.");
+//   } else if (img) {
+//     updatedFields.push("`img` = ?");
+//     values.push(img);
+//   }
+
+//   // 3 - No field to update
+//   if (updatedFields.length === 0) {
+//     return res.status(400).json("No field to update");
+//   }
+
+//   const q = `UPDATE posts SET ${updatedFields.join(
+//     ", "
+//   )} WHERE id = ? AND userId = ?`;
+
+//   values.push(postId, loggedInUserId);
+
+//   try {
+//     const data = await executeQuery(q, values);
+//     if (data.affectedRows > 0) {
+//       return res.status(200).json("Post updated");
+//     }
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "An unknown error occurred while updating post.",
+//       error: error.message,
+//     });
+//   }
+// };
+
 export const deletePost = async (req, res) => {
   const postId = req.params.postId;
   const loggedInUserId = req.user.id;
 
-  const q = "DELETE FROM posts WHERE id = ? AND userId = ?";
-
   try {
+    // Retrieve post image name before deleting post.
+    const postData = await executeQuery(
+      "SELECT img FROM posts WHERE id = ? AND userId = ?",
+      [postId, loggedInUserId]
+    );
+
+    // Delete post image if it exists.
+    if (postData.length > 0 && postData[0].img) {
+      try {
+        fs.unlinkSync(
+          path.join(__dirname, "../../client/uploads", postData[0].img)
+        );
+        console.log("Post image deleted.");
+      } catch (err) {
+        console.error("Error deleting post image:", err);
+      }
+    }
+
+    // Delete post from database.
+    const q = "DELETE FROM posts WHERE id = ? AND userId = ?";
     const data = await executeQuery(q, [postId, loggedInUserId]);
+
     if (data.affectedRows > 0) {
       return res.status(200).json("Post deleted");
     }
@@ -148,3 +246,22 @@ export const deletePost = async (req, res) => {
     });
   }
 };
+
+// export const deletePost = async (req, res) => {
+//   const postId = req.params.postId;
+//   const loggedInUserId = req.user.id;
+
+//   const q = "DELETE FROM posts WHERE id = ? AND userId = ?";
+
+//   try {
+//     const data = await executeQuery(q, [postId, loggedInUserId]);
+//     if (data.affectedRows > 0) {
+//       return res.status(200).json("Post deleted");
+//     }
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "An unknown error occurred while deleting post.",
+//       error: error.message,
+//     });
+//   }
+// };

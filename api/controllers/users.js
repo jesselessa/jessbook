@@ -245,14 +245,17 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   const loggedInUserId = req.user.id;
   try {
-    // Retrieve profile, cover, and story file names before deleting user
+    // Retrieve profile, cover, story and post image files names before deleting user
     const userData = await executeQuery(
       "SELECT profilePic, coverPic FROM users WHERE id = ?",
       [loggedInUserId]
     );
-
     const storyData = await executeQuery(
       "SELECT file FROM stories WHERE userId = ?",
+      [loggedInUserId]
+    );
+    const postData = await executeQuery(
+      "SELECT img FROM posts WHERE userId = ?",
       [loggedInUserId]
     );
 
@@ -283,6 +286,25 @@ export const deleteUser = async (req, res) => {
             "Error deleting old cover picture on user deletion:",
             err
           );
+        }
+      }
+    }
+
+    // Delete post images if they exist
+    if (postData.length > 0) {
+      for (const post of postData) {
+        if (post.img) {
+          try {
+            fs.unlinkSync(
+              path.join(__dirname, "../../client/uploads", post.img)
+            );
+            console.log(`Post image ${post.img} deleted on user deletion`);
+          } catch (err) {
+            console.error(
+              `Error deleting post image ${post.img} on user deletion:`,
+              err
+            );
+          }
         }
       }
     }
