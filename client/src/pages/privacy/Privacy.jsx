@@ -17,8 +17,8 @@ export default function Privacy() {
 
   return (
     <div className="privacy">
-      {/* Logo */}
-      <Link to="/login">
+      {/* Logo - Back to Login page*/}
+      <Link to="/">
         <span className="logo">{windowWidth <= 425 ? "j" : "jessbook"}</span>
       </Link>
 

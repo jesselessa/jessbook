@@ -59,7 +59,7 @@ export default function Login() {
       setError("");
 
       // Navigate to homepage
-      navigate("/");
+      navigate("/home");
     } catch (error) {
       setError(error.response?.data.message || error.message);
     }

@@ -115,7 +115,7 @@ export default function Register() {
 
       // Navigate to Login page
       setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 3000);
     } catch (error) {
       // Handle API errors
@@ -209,7 +209,7 @@ export default function Register() {
             {windowWidth <= 1150 && (
               <p className="login-msg">
                 Have an account ?{" "}
-                <Link to="/login">
+                <Link to="/">
                   <span>Login</span>
                 </Link>
               </p>
@@ -226,7 +226,7 @@ export default function Register() {
               your family and friends.
             </p>
             <span>Have an account ?</span>{" "}
-            <Link to="/login">
+            <Link to="/">
               <button>Login</button>
             </Link>
           </div>

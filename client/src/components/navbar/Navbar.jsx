@@ -42,7 +42,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     makeRequest.post("/auth/logout");
-    navigate("/login");
+    navigate("/"); // Redirect to login page
   };
 
   const toggleMenu = () => setBurgerClicked((prevState) => !prevState);
@@ -51,15 +51,15 @@ export default function Navbar() {
     <div className="navbar" role="navigation">
       <div className="left">
         {/* Logo */}
-        <Link to="/">
+        <Link to="/home">
           <span className="logo">jessbook</span>
         </Link>
         {/* Logo tablet and mobile */}
-        <Link to="/">
+        <Link to="/home">
           <span className="logo-mob">j</span>
         </Link>
         {/* Main icons */}
-        <Link to="/">
+        <Link to="/home">
           <HomeOutlinedIcon sx={{ fontSize: "30px" }} />
         </Link>
         {darkMode ? (

@@ -48,7 +48,7 @@ export default function ResetPassword() {
       clearForm();
 
       setTimeout(() => {
-        navigate("/login");
+        navigate("/"); // Redirect to login page
       }, 3000);
     } catch (error) {
       setError(error.response?.data.message || error.message);
@@ -62,8 +62,8 @@ export default function ResetPassword() {
 
   return (
     <div className="resetPassword">
-      {/* Logo */}
-      <Link to="/login">
+      {/* Logo - Back to Login page */}
+      <Link to="/">
         <span className="logo">{windowWidth <= 425 ? "j" : "jessbook"}</span>
       </Link>
 
@@ -95,7 +95,7 @@ export default function ResetPassword() {
           <button type="submit">Change password</button>
         </form>
 
-        <Link to="/login">
+        <Link to="/">
           <span className="login-btn">Go back to Login page</span>
         </Link>
       </div>

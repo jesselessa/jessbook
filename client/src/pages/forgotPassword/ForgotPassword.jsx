@@ -56,8 +56,8 @@ export default function RecoverAccount() {
 
   return (
     <div className="forgotPassword">
-      {/* Logo */}
-      <Link to="/login">
+      {/* Logo - Back to Login page */}
+      <Link to="/">
         <span className="logo">{windowWidth <= 425 ? "j" : "jessbook"}</span>
       </Link>
 
@@ -85,7 +85,7 @@ export default function RecoverAccount() {
 
         {error && <span className="error-msg">{error}</span>}
 
-        <Link to="/login">
+        <Link to="/">
           <span>Go back to Login page</span>
         </Link>
       </div>

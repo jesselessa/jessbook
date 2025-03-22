@@ -32,10 +32,10 @@ export default function AuthCallback() {
 
       try {
         await connectWithToken();
-        navigate("/");
+        navigate("/home");
       } catch (error) {
         console.error("Error connecting with token:", error);
-        navigate("/login");
+        navigate("/"); // Redirect to login page
       } finally {
         setLoading(false);
       }
@@ -46,8 +46,8 @@ export default function AuthCallback() {
 
   return (
     <div className="authCallback">
-      {/* Logo */}
-      <Link to="/login">
+      {/* Logo - Back to Login page */}
+      <Link to="/">
         <span className="logo">{windowWidth <= 425 ? "j" : "jessbook"}</span>
       </Link>
 
