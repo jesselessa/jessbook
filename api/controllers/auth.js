@@ -12,11 +12,10 @@ export const register = async (req, res) => {
     const data = await executeQuery(selectQuery, [email]);
 
     // Check if user exists
-    if (data.length > 0) {
+    if (data.length > 0)
       return res.status(409).json({
         message: "An account with this email address already exists.",
       });
-    }
 
     // If user doesn't exist, validate request body values
     let errors = {};
@@ -67,9 +66,19 @@ export const register = async (req, res) => {
 
     // Store new user in database
     const insertData = await executeQuery(insertQuery, values);
+    const newUserId = insertData.insertId;
+
+    // Find admin ID based on role
+    const adminQuery = "SELECT id FROM users WHERE role = 'admin'";
+    const adminData = await executeQuery(adminQuery);
+
+    if (adminData.length === 0)
+      return res.status(404).json({ message: "Admin not found" });
+
+    const adminId = adminData[0].id;
 
     // Insert admin as first relationship followed by new user
-    await executeQuery(insertRelationshipQuery, [insertData.insertId, 1]);
+    await executeQuery(insertRelationshipQuery, [newUserId, adminId]);
 
     return res.status(201).json({ message: "New user created" });
   } catch (error) {
