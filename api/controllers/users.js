@@ -130,20 +130,20 @@ export const updateUser = async (req, res) => {
     if (!isImage(profilePic)) {
       errors.profilePic = "Invalid profile picture format";
     } else {
-      // Retrieve old profile picture name.
+      // Retrieve old profile picture name
       const oldUserData = await executeQuery(
         "SELECT profilePic FROM users WHERE id = ?",
         [loggedInUserId]
       );
 
-      // Check if an old picture exists and is different from the new one.
+      // Check if an old picture exists and is different from the new one
       if (
         oldUserData.length > 0 &&
         oldUserData[0].profilePic &&
         oldUserData[0].profilePic !== profilePic
       ) {
         try {
-          // Delete old picture.
+          // Delete old picture
           fs.unlinkSync(
             path.join(
               __dirname,
@@ -154,7 +154,7 @@ export const updateUser = async (req, res) => {
           console.log("Old profile picture deleted");
         } catch (err) {
           console.error("Error deleting old profile picture:", err);
-          // Do not block update if deletion fails.
+          // Do not block update if deletion fails
         }
       }
 
@@ -167,20 +167,20 @@ export const updateUser = async (req, res) => {
     if (!isImage(coverPic)) {
       errors.coverPic = "Invalid cover picture format";
     } else {
-      // Retrieve old cover picture name.
+      // Retrieve old cover picture name
       const oldUserData = await executeQuery(
         "SELECT coverPic FROM users WHERE id = ?",
         [loggedInUserId]
       );
 
-      // Check if an old picture exists and is different from the new one.
+      // Check if an old picture exists and is different from the new one
       if (
         oldUserData.length > 0 &&
         oldUserData[0].coverPic &&
         oldUserData[0].coverPic !== coverPic
       ) {
         try {
-          // Delete old picture.
+          // Delete old picture
           fs.unlinkSync(
             path.join(
               __dirname,
@@ -191,7 +191,7 @@ export const updateUser = async (req, res) => {
           console.log("Old cover picture deleted.");
         } catch (err) {
           console.error("Error deleting old cover picture:", err);
-          // Do not block update if deletion fails.
+          // Do not block update if deletion fails
         }
       }
 
@@ -245,20 +245,25 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   const loggedInUserId = req.user.id;
   try {
-    // Retrieve profile and cover picture names before deleting user.
+    // Retrieve profile, cover, and story file names before deleting user
     const userData = await executeQuery(
       "SELECT profilePic, coverPic FROM users WHERE id = ?",
       [loggedInUserId]
     );
 
-    // Delete pictures if they exist
+    const storyData = await executeQuery(
+      "SELECT file FROM stories WHERE userId = ?",
+      [loggedInUserId]
+    );
+
+    // Delete profile and cover pictures if they exist
     if (userData.length > 0) {
       if (userData[0].profilePic) {
         try {
           fs.unlinkSync(
             path.join(__dirname, "../../client/uploads", userData[0].profilePic)
           );
-          console.log("Old profile picture deleted on user deletion.");
+          console.log("Old profile picture deleted on user deletion");
         } catch (err) {
           console.error(
             "Error deleting old profile picture on user deletion:",
@@ -272,7 +277,7 @@ export const deleteUser = async (req, res) => {
           fs.unlinkSync(
             path.join(__dirname, "../../client/uploads", userData[0].coverPic)
           );
-          console.log("Old cover picture deleted on user deletion.");
+          console.log("Old cover picture deleted on user deletion");
         } catch (err) {
           console.error(
             "Error deleting old cover picture on user deletion:",
@@ -282,7 +287,26 @@ export const deleteUser = async (req, res) => {
       }
     }
 
-    // Delete user from database
+    // Delete story files if they exist
+    if (storyData.length > 0) {
+      for (const story of storyData) {
+        if (story.file) {
+          try {
+            fs.unlinkSync(
+              path.join(__dirname, "../../client/uploads", story.file)
+            );
+            console.log(`Story file ${story.file} deleted on user deletion`);
+          } catch (err) {
+            console.error(
+              `Error deleting story file ${story.file} on user deletion:`,
+              err
+            );
+          }
+        }
+      }
+    }
+
+    // Delete user from database.
     const q = "DELETE FROM users WHERE `id` = ?";
     const data = await executeQuery(q, [loggedInUserId]);
 

@@ -1,6 +1,12 @@
 import { db, executeQuery } from "../utils/connect.js";
 import { isImage, isVideo } from "../utils/isFile.js";
 import moment from "moment";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const getStories = async (req, res) => {
   const userId = req.query.userId;
@@ -110,10 +116,29 @@ export const deleteStory = async (req, res) => {
   const storyId = req.params.storyId;
   const loggedInUserId = req.user.id;
 
-  const q = "DELETE FROM stories WHERE id = ? AND userId = ?";
-
   try {
+    // Retrieve story file name before deleting story
+    const storyData = await executeQuery(
+      "SELECT file FROM stories WHERE id = ? AND userId = ?",
+      [storyId, loggedInUserId]
+    );
+
+    // Delete story file if it exists
+    if (storyData.length > 0 && storyData[0].file) {
+      try {
+        fs.unlinkSync(
+          path.join(__dirname, "../../client/uploads", storyData[0].file)
+        );
+        console.log(`Story file ${storyData[0].file} deleted.`);
+      } catch (err) {
+        console.error(`Error deleting story file ${storyData[0].file}:`, err);
+      }
+    }
+
+    // Delete story from database
+    const q = "DELETE FROM stories WHERE id = ? AND userId = ?";
     const data = await executeQuery(q, [storyId, loggedInUserId]);
+
     if (data.affectedRows > 0) {
       return res.status(200).json("Story deleted");
     }
@@ -124,3 +149,22 @@ export const deleteStory = async (req, res) => {
     });
   }
 };
+
+// export const deleteStory = async (req, res) => {
+//   const storyId = req.params.storyId;
+//   const loggedInUserId = req.user.id;
+
+//   const q = "DELETE FROM stories WHERE id = ? AND userId = ?";
+
+//   try {
+//     const data = await executeQuery(q, [storyId, loggedInUserId]);
+//     if (data.affectedRows > 0) {
+//       return res.status(200).json("Story deleted");
+//     }
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "An unknown error occurred while deleting story.",
+//       error: error.message,
+//     });
+//   }
+// };
