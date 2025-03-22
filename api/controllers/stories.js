@@ -123,7 +123,7 @@ export const deleteStory = async (req, res) => {
       [storyId, loggedInUserId]
     );
 
-    // Delete story file from "uploads" folder if it exists
+    // Check if a story file exists before deleting it from "uploads" folder
     if (storyData.length > 0 && storyData[0].file) {
       try {
         fs.unlinkSync(

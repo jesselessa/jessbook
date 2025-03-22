@@ -112,13 +112,14 @@ export const updatePost = async (req, res) => {
       [postId, loggedInUserId]
     );
 
-    // Delete old image from "uploads" folder if it exists and is different from the new one
+    // Check if an old image exists and is different from the new one
     if (
       oldPostData.length > 0 &&
       oldPostData[0].img &&
       oldPostData[0].img !== img
     ) {
       try {
+        // Delete old image from "uploads" folder
         fs.unlinkSync(
           path.join(__dirname, "../../client/uploads", oldPostData[0].img)
         );

@@ -106,26 +106,6 @@ export const updateUser = async (req, res) => {
     }
   }
 
-  // // Profile picture
-  // if (profilePic) {
-  //   if (!isImage(profilePic)) {
-  //     errors.profilePic = "Invalid profile picture format";
-  //   } else {
-  //     updatedFields.push("`profilePic` = ?");
-  //     values.push(profilePic);
-  //   }
-  // }
-
-  // // Cover picture
-  // if (coverPic) {
-  //   if (!isImage(coverPic)) {
-  //     errors.coverPic = "Invalid cover picture format";
-  //   } else {
-  //     updatedFields.push("`coverPic` = ?");
-  //     values.push(coverPic);
-  //   }
-  // }
-
   if (profilePic) {
     if (!isImage(profilePic)) {
       errors.profilePic = "Invalid profile picture format";
@@ -143,7 +123,7 @@ export const updateUser = async (req, res) => {
         oldUserData[0].profilePic !== profilePic
       ) {
         try {
-          // Delete old picture
+          // Delete old picture from "uploads" folder
           fs.unlinkSync(
             path.join(
               __dirname,
@@ -259,10 +239,11 @@ export const deleteUser = async (req, res) => {
       [loggedInUserId]
     );
 
-    // Delete profile and cover pictures if they exist
+    // Check if profile and cover pictures exist
     if (userData.length > 0) {
       if (userData[0].profilePic) {
         try {
+          // Delete profile and cover pictures from "uploads" foder
           fs.unlinkSync(
             path.join(__dirname, "../../client/uploads", userData[0].profilePic)
           );
@@ -328,7 +309,7 @@ export const deleteUser = async (req, res) => {
       }
     }
 
-    // Delete user from database.
+    // Delete user from database
     const q = "DELETE FROM users WHERE `id` = ?";
     const data = await executeQuery(q, [loggedInUserId]);
 
@@ -342,20 +323,3 @@ export const deleteUser = async (req, res) => {
     });
   }
 };
-
-// export const deleteUser = async (req, res) => {
-//   const loggedInUserId = req.user.id;
-//   try {
-//     const q = "DELETE FROM users WHERE `id` = ?";
-//     const data = await executeQuery(q, [loggedInUserId]);
-
-//     if (data.affectedRows > 0) {
-//       return res.status(200).json("User deleted");
-//     }
-//   } catch (error) {
-//     return res.status(500).json({
-//       message: "An unknown error occurred while deleting user account.",
-//       error: error.message,
-//     });
-//   }
-// };
