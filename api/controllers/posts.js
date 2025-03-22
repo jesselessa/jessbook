@@ -112,7 +112,7 @@ export const updatePost = async (req, res) => {
       [postId, loggedInUserId]
     );
 
-    // Delete old image if exists and is different from the new one
+    // Delete old image from "uploads" folder if it exists and is different from the new one
     if (
       oldPostData.length > 0 &&
       oldPostData[0].img &&
@@ -155,72 +155,18 @@ export const updatePost = async (req, res) => {
   }
 };
 
-// export const updatePost = async (req, res) => {
-//   const { text, img } = req.body;
-//   const postId = req.params.postId;
-//   const loggedInUserId = req.user.id;
-
-//   const updatedFields = [];
-//   const values = [];
-
-//   // Validate description
-//   if (text?.trim()?.length === 0) {
-//     return res.status(400).json("No description to update");
-//   }
-
-//   if (text?.trim()?.length > 1000) {
-//     return res
-//       .status(400)
-//       .json("Description cannot exceed 1000\u00A0characters.");
-//   } else {
-//     updatedFields.push("`text` = ?");
-//     values.push(text.trim());
-//   }
-
-//   // 2 - Validate image (optional)
-//   if (img && !isImage(img)) {
-//     return res.status(400).json("Provide a valid image format.");
-//   } else if (img) {
-//     updatedFields.push("`img` = ?");
-//     values.push(img);
-//   }
-
-//   // 3 - No field to update
-//   if (updatedFields.length === 0) {
-//     return res.status(400).json("No field to update");
-//   }
-
-//   const q = `UPDATE posts SET ${updatedFields.join(
-//     ", "
-//   )} WHERE id = ? AND userId = ?`;
-
-//   values.push(postId, loggedInUserId);
-
-//   try {
-//     const data = await executeQuery(q, values);
-//     if (data.affectedRows > 0) {
-//       return res.status(200).json("Post updated");
-//     }
-//   } catch (error) {
-//     return res.status(500).json({
-//       message: "An unknown error occurred while updating post.",
-//       error: error.message,
-//     });
-//   }
-// };
-
 export const deletePost = async (req, res) => {
   const postId = req.params.postId;
   const loggedInUserId = req.user.id;
 
   try {
-    // Retrieve post image name before deleting post.
+    // Retrieve post image name before deleting post
     const postData = await executeQuery(
       "SELECT img FROM posts WHERE id = ? AND userId = ?",
       [postId, loggedInUserId]
     );
 
-    // Delete post image if it exists.
+    // Delete post image from "uploads" folder if it exists
     if (postData.length > 0 && postData[0].img) {
       try {
         fs.unlinkSync(
@@ -232,7 +178,7 @@ export const deletePost = async (req, res) => {
       }
     }
 
-    // Delete post from database.
+    // Delete post from database
     const q = "DELETE FROM posts WHERE id = ? AND userId = ?";
     const data = await executeQuery(q, [postId, loggedInUserId]);
 
@@ -246,22 +192,3 @@ export const deletePost = async (req, res) => {
     });
   }
 };
-
-// export const deletePost = async (req, res) => {
-//   const postId = req.params.postId;
-//   const loggedInUserId = req.user.id;
-
-//   const q = "DELETE FROM posts WHERE id = ? AND userId = ?";
-
-//   try {
-//     const data = await executeQuery(q, [postId, loggedInUserId]);
-//     if (data.affectedRows > 0) {
-//       return res.status(200).json("Post deleted");
-//     }
-//   } catch (error) {
-//     return res.status(500).json({
-//       message: "An unknown error occurred while deleting post.",
-//       error: error.message,
-//     });
-//   }
-// };

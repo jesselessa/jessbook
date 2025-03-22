@@ -123,7 +123,7 @@ export const deleteStory = async (req, res) => {
       [storyId, loggedInUserId]
     );
 
-    // Delete story file if it exists
+    // Delete story file from "uploads" folder if it exists
     if (storyData.length > 0 && storyData[0].file) {
       try {
         fs.unlinkSync(
@@ -149,22 +149,3 @@ export const deleteStory = async (req, res) => {
     });
   }
 };
-
-// export const deleteStory = async (req, res) => {
-//   const storyId = req.params.storyId;
-//   const loggedInUserId = req.user.id;
-
-//   const q = "DELETE FROM stories WHERE id = ? AND userId = ?";
-
-//   try {
-//     const data = await executeQuery(q, [storyId, loggedInUserId]);
-//     if (data.affectedRows > 0) {
-//       return res.status(200).json("Story deleted");
-//     }
-//   } catch (error) {
-//     return res.status(500).json({
-//       message: "An unknown error occurred while deleting story.",
-//       error: error.message,
-//     });
-//   }
-// };
