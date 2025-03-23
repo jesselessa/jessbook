@@ -19,7 +19,7 @@ Jessbook is a social media application inspired from Facebook and Twitter that a
 
 ## Demo
 
-You can see a live demo of the project [here](https://social-media.jesselessa.dev).
+You can see a live demo of the project [here](https://www.social-media.jesselessa.dev).
 
 ## Stack
 
