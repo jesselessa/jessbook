@@ -118,7 +118,6 @@ export default function Login() {
               autoComplete="off"
               onChange={handleChange}
             />
-
             {/* Buttons to connect to the app */}
             <button type="submit" className="submit">
               Sign in
@@ -142,7 +141,9 @@ export default function Login() {
               )}
             </button>
 
-            <button
+            {/* Facebook button - Uncomment later */}
+
+            {/* <button
               type="button"
               className="facebook"
               onClick={() => connectViaAuthProvider("facebook")}
@@ -166,7 +167,7 @@ export default function Login() {
                   />
                 </span>
               )}
-            </button>
+            </button> */}
 
             <Link to="/forgot-password">
               <span className="password">Forgot your password ?</span>
