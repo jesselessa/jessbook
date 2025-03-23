@@ -122,11 +122,11 @@ export const updateUser = async (req, res) => {
         oldUserData[0].profilePic !== profilePic
       ) {
         try {
-          // Delete old picture from "uploads" folder
+          // Delete old picture from server in "uploads" folder
           fs.unlinkSync(
             path.join(
               __dirname,
-              "../../client/uploads",
+              "../../client/public/uploads",
               oldUserData[0].profilePic
             )
           );
@@ -163,7 +163,7 @@ export const updateUser = async (req, res) => {
           fs.unlinkSync(
             path.join(
               __dirname,
-              "../../client/uploads",
+              "../../client/public/uploads",
               oldUserData[0].coverPic
             )
           );
@@ -238,13 +238,21 @@ export const deleteUser = async (req, res) => {
     if (userData.length > 0) {
       if (userData[0].profilePic) {
         fs.unlinkSync(
-          path.join(__dirname, "../../client/uploads", userData[0].profilePic)
+          path.join(
+            __dirname,
+            "../../client/public/uploads",
+            userData[0].profilePic
+          )
         );
         console.log(`File deleted: ${userData[0].profilePic}`);
       }
       if (userData[0].coverPic) {
         fs.unlinkSync(
-          path.join(__dirname, "../../client/uploads", userData[0].coverPic)
+          path.join(
+            __dirname,
+            "../../client/public/uploads",
+            userData[0].coverPic
+          )
         );
         console.log(`File deleted: ${userData[0].coverPic}`);
       }
@@ -254,7 +262,9 @@ export const deleteUser = async (req, res) => {
     if (postData.length > 0) {
       for (const post of postData) {
         if (post.img) {
-          fs.unlinkSync(path.join(__dirname, "../../client/uploads", post.img));
+          fs.unlinkSync(
+            path.join(__dirname, "../../client/public/uploads", post.img)
+          );
           console.log(`File deleted: ${post.img}`);
         }
       }
@@ -263,7 +273,7 @@ export const deleteUser = async (req, res) => {
     // Delete story file if it exists
     if (storyData.length > 0 && storyData[0].file) {
       fs.unlinkSync(
-        path.join(__dirname, "../../client/uploads", storyData[0].file)
+        path.join(__dirname, "../../client/public/uploads", storyData[0].file)
       );
       console.log(`File deleted: ${storyData[0].file}`);
     }

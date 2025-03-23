@@ -115,9 +115,13 @@ export const updatePost = async (req, res) => {
       oldPostData[0].img !== img
     ) {
       try {
-        // Delete old image from "uploads" folder
+        // Delete old image from server in "uploads" folder
         fs.unlinkSync(
-          path.join(__dirname, "../../client/uploads", oldPostData[0].img)
+          path.join(
+            __dirname,
+            "../../client/public/uploads",
+            oldPostData[0].img
+          )
         );
         console.log("Old post image deleted");
       } catch (err) {
@@ -160,11 +164,12 @@ export const deletePost = async (req, res) => {
       [postId, loggedInUserId]
     );
 
-    // Delete post image from "uploads" folder if it exists
+    // Check if a post image exists
     if (postData.length > 0 && postData[0].img) {
       try {
+        // Deleting post image from server in "uploads" folder
         fs.unlinkSync(
-          path.join(__dirname, "../../client/uploads", postData[0].img)
+          path.join(__dirname, "../../client/public/uploads", postData[0].img)
         );
         console.log("Post image deleted.");
       } catch (err) {
