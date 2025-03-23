@@ -26,15 +26,13 @@ export const addComment = async (req, res) => {
   const loggedInUserId = req.user.id;
   const currentDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
-  if (text?.trim()?.length === 0) {
+  if (text?.trim()?.length === 0)
     return res.status(400).json({ message: "Description cannot be empty." });
-  }
 
-  if (text?.trim()?.length > 500) {
+  if (text?.trim()?.length > 500)
     return res
       .status(400)
       .json("Description cannot exceed 500\u00A0characters.");
-  }
 
   const q =
     "INSERT INTO comments (`text`, `userId`, `postId`, `createdAt`) VALUES (?, ?, ?, ?)";
@@ -42,6 +40,7 @@ export const addComment = async (req, res) => {
 
   try {
     await executeQuery(q, values);
+
     return res.status(201).json({ message: "Comment created" });
   } catch (error) {
     return res.status(500).json({
@@ -56,23 +55,19 @@ export const updateComment = async (req, res) => {
   const loggedInUserId = req.user.id;
   const { text } = req.body;
 
-  if (text?.trim()?.length === 0) {
+  if (text?.trim()?.length === 0)
     return res.status(400).json({ message: "No description to update" });
-  }
 
-  if (text?.trim()?.length > 500) {
+  if (text?.trim()?.length > 500)
     return res
       .status(400)
       .json({ message: "Description cannot exceed 500\u00A0characters." });
-  }
 
   const q = "UPDATE comments SET `text` = ? WHERE id = ? AND userId = ?";
 
   try {
     const data = await executeQuery(q, [text, commentId, loggedInUserId]);
-    if (data.affectedRows > 0) {
-      return res.status(200).json("Comment updated");
-    }
+    if (data.affectedRows > 0) return res.status(200).json("Comment updated");
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while updating comment.",
@@ -89,9 +84,7 @@ export const deleteComment = async (req, res) => {
 
   try {
     const data = await executeQuery(q, [commentId, loggedInUserId]);
-    if (data.affectedRows > 0) {
-      return res.status(200).json("Comment deleted");
-    }
+    if (data.affectedRows > 0) return res.status(200).json("Comment deleted");
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while deleting comment.",

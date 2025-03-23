@@ -5,7 +5,7 @@ export const getLikes = async (req, res) => {
   const q = "SELECT userId FROM likes WHERE postId = ?";
 
   try {
-    const data = await executeQuery(q, [postId]);
+    const data = await executeQuery(q, [postId]);    
     return res.status(200).json(data.map((like) => like.userId));
   } catch (error) {
     return res.status(500).json({
@@ -24,9 +24,7 @@ export const addLike = async (req, res) => {
 
   try {
     const data = await executeQuery(q, values);
-    if (data.affectedRows > 0) {
-      return res.status(201).json("Post liked");
-    }
+    if (data.affectedRows > 0) return res.status(201).json("Post liked");
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while adding like on post.",
@@ -43,9 +41,7 @@ export const deleteLike = async (req, res) => {
 
   try {
     const data = await executeQuery(q, [loggedInUserId, postId]);
-    if (data.affectedRows > 0) {
-      return res.status(200).json("Post unliked");
-    }
+    if (data.affectedRows > 0) return res.status(200).json("Post unliked");
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while deleting like on post.",

@@ -51,20 +51,17 @@ export const addPost = async (req, res) => {
   const currentDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
   // Validate description
-  if (text?.trim()?.length === 0) {
+  if (text?.trim()?.length === 0)
     return res.status(400).json("Description cannot be empty.");
-  }
 
-  if (text?.trim()?.length > 1000) {
+  if (text?.trim()?.length > 1000)
     return res
       .status(400)
       .json("Description cannot exceed 1000\u00A0characters.");
-  }
 
   // Validate image
-  if (img && !isImage(img)) {
+  if (img && !isImage(img))
     return res.status(400).json("Provide a valid image format.");
-  }
 
   // Create a new post
   const q =
@@ -91,9 +88,8 @@ export const updatePost = async (req, res) => {
   const values = [];
 
   // Validate description
-  if (text?.trim()?.length === 0) {
+  if (text?.trim()?.length === 0)
     return res.status(400).json("No description to update");
-  }
 
   if (text?.trim()?.length > 1000) {
     return res.status(400).json("Description cannot exceed 1000 characters.");
@@ -134,9 +130,8 @@ export const updatePost = async (req, res) => {
   }
 
   // No field to update
-  if (updatedFields.length === 0) {
+  if (updatedFields.length === 0)
     return res.status(400).json("No field to update");
-  }
 
   const q = `UPDATE posts SET ${updatedFields.join(
     ", "
@@ -145,9 +140,7 @@ export const updatePost = async (req, res) => {
 
   try {
     const data = await executeQuery(q, values);
-    if (data.affectedRows > 0) {
-      return res.status(200).json("Post updated");
-    }
+    if (data.affectedRows > 0) return res.status(200).json("Post updated");
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while updating post.",
@@ -183,9 +176,7 @@ export const deletePost = async (req, res) => {
     const q = "DELETE FROM posts WHERE id = ? AND userId = ?";
     const data = await executeQuery(q, [postId, loggedInUserId]);
 
-    if (data.affectedRows > 0) {
-      return res.status(200).json("Post deleted");
-    }
+    if (data.affectedRows > 0) return res.status(200).json("Post deleted");
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while deleting post.",

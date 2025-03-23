@@ -92,11 +92,10 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email?.trim() || !password?.trim()) {
+  if (!email?.trim() || !password?.trim())
     return res
       .status(400)
       .json({ message: "Please, fill in all required fields." });
-  }
 
   try {
     // Find user by email
@@ -104,15 +103,13 @@ export const login = async (req, res) => {
     const data = await executeQuery(q, [email]);
 
     // Check if user exists
-    if (data.length === 0) {
+    if (data.length === 0)
       return res.status(404).json({ message: "Invalid email or password" });
-    }
 
     // Compare passwords with bcrypt
     const checkPswd = bcrypt.compareSync(password, data[0].password);
-    if (!checkPswd) {
+    if (!checkPswd)
       return res.status(401).json({ message: "Invalid email or password" });
-    }
 
     // If password is correct, generate a token with JWT
     const secretKey = process.env.JWT_SECRET;
@@ -156,9 +153,8 @@ export const connectWithToken = async (req, res) => {
     const q = "SELECT * FROM users WHERE id = ?";
     const data = await executeQuery(q, [loggedInUserId]);
 
-    if (data.length === 0) {
+    if (data.length === 0)
       return res.status(404).json({ message: "User not found" });
-    }
 
     const { password: userPassword, ...otherInfo } = data[0];
     return res.status(200).json(otherInfo);
@@ -171,7 +167,7 @@ export const connectWithToken = async (req, res) => {
 };
 
 export const logout = (_req, res) => {
-  // Cookie options (such as 'httpOnly', 'secure', and 'sameSite') must be the same between creation and deletion
+  //! Cookie options (such as 'httpOnly', 'secure', and 'sameSite') must be the same between creation and deletion
   return res
     .clearCookie("accessToken", {
       httpOnly: true,
@@ -198,11 +194,10 @@ export const recoverAccount = async (req, res) => {
       const data = await executeQuery(q, [email.trim()]);
 
       // Check if user exists
-      if (data.length === 0) {
+      if (data.length === 0)
         return res.status(404).json({
           message: "There is no account associated with this email address.",
         });
-      }
 
       // If user exists, generate a token
       const secretKey = process.env.JWT_SECRET;
@@ -255,33 +250,30 @@ export const resetPassword = async (req, res) => {
   const token = req.cookies.resetToken; // Get token from cookie
 
   // Check if password is provided
-  if (!password?.trim() || !confirmPswd?.trim()) {
+  if (!password?.trim() || !confirmPswd?.trim())
     return res
       .status(400)
       .json({ message: "Please, fill in all required fields." });
-  }
 
   // Check password format
   const passwordRegex =
     /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
-  if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200) {
+  if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200)
     return res.status(401).json({
       message:
         "Password must be between 6 and 200\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.",
     });
-  }
 
   // Check if passwords match
-  if (password?.trim() !== confirmPswd?.trim()) {
+  if (password?.trim() !== confirmPswd?.trim())
     return res
       .status(401)
       .json({ message: "Confirmation password does not match." });
-  }
 
   // Check if token is present
-  if (!token) {
+  if (!token)
     return res.status(401).json({ message: "Invalid authentication" });
-  }
+
   const secretKey = process.env.JWT_SECRET;
 
   try {

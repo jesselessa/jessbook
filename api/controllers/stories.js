@@ -58,25 +58,22 @@ export const addStory = async (req, res) => {
   const loggedInUserId = req.user.id;
 
   // Check if a file (image or video) is provided
-  if (!file || file?.trim()?.length === 0) {
+  if (!file || file?.trim()?.length === 0)
     return res
       .status(400)
       .json("You must provide either an image or a video file.");
-  }
 
   // Validate file format
-  if (file && !isImage(file) && !isVideo(file)) {
+  if (file && !isImage(file) && !isVideo(file))
     return res
       .status(400)
       .json("You must provide a valid image or video format.");
-  }
 
   // Validate description
-  if (text?.trim()?.length > 45) {
+  if (text?.trim()?.length > 45)
     return res
       .status(400)
       .json("Description can't contain more than 45\u00A0characters.");
-  }
 
   try {
     // Delete current story if non expired before creating new one
@@ -103,6 +100,7 @@ export const addStory = async (req, res) => {
     ];
 
     await executeQuery(insertQuery, values);
+
     return res.status(201).json("New story created");
   } catch (error) {
     return res.status(500).json({
@@ -139,9 +137,7 @@ export const deleteStory = async (req, res) => {
     const q = "DELETE FROM stories WHERE id = ? AND userId = ?";
     const data = await executeQuery(q, [storyId, loggedInUserId]);
 
-    if (data.affectedRows > 0) {
-      return res.status(200).json("Story deleted");
-    }
+    if (data.affectedRows > 0) return res.status(200).json("Story deleted");
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while deleting story.",

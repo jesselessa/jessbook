@@ -36,9 +36,8 @@ export const getUser = async (req, res) => {
     const q = "SELECT * FROM users WHERE id = ?";
     const data = await executeQuery(q, [userId]);
 
-    if (data.length === 0) {
+    if (data.length === 0)
       return res.status(404).json({ message: "User not found" });
-    }
 
     const { password, ...otherInfo } = data[0];
     return res.status(200).json(otherInfo);
@@ -191,14 +190,12 @@ export const updateUser = async (req, res) => {
   }
 
   // If there are validation errors, return them
-  if (Object.keys(errors).length > 0) {
+  if (Object.keys(errors).length > 0)
     return res.status(400).json({ validationErrors: errors });
-  }
 
   // If no fields to update
-  if (updatedFields.length === 0) {
+  if (updatedFields.length === 0)
     return res.status(400).json("No field to update");
-  }
 
   values.push(loggedInUserId);
 
@@ -211,9 +208,7 @@ export const updateUser = async (req, res) => {
         `;
     const data = await executeQuery(q, values);
 
-    if (data.affectedRows > 0) {
-      return res.status(200).json("User data updated");
-    }
+    if (data.affectedRows > 0) return res.status(200).json("User data updated");
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while updating user data.",
@@ -239,35 +234,19 @@ export const deleteUser = async (req, res) => {
       [loggedInUserId]
     );
 
-    // Check if profile and cover pictures exist
+    // Delete profile and cover pictures if they exist
     if (userData.length > 0) {
       if (userData[0].profilePic) {
-        try {
-          // Delete profile and cover pictures from "uploads" foder
-          fs.unlinkSync(
-            path.join(__dirname, "../../client/uploads", userData[0].profilePic)
-          );
-          console.log("Old profile picture deleted on user deletion");
-        } catch (err) {
-          console.error(
-            "Error deleting old profile picture on user deletion:",
-            err
-          );
-        }
+        fs.unlinkSync(
+          path.join(__dirname, "../../client/uploads", userData[0].profilePic)
+        );
+        console.log(`File deleted: ${userData[0].profilePic}`);
       }
-
       if (userData[0].coverPic) {
-        try {
-          fs.unlinkSync(
-            path.join(__dirname, "../../client/uploads", userData[0].coverPic)
-          );
-          console.log("Old cover picture deleted on user deletion");
-        } catch (err) {
-          console.error(
-            "Error deleting old cover picture on user deletion:",
-            err
-          );
-        }
+        fs.unlinkSync(
+          path.join(__dirname, "../../client/uploads", userData[0].coverPic)
+        );
+        console.log(`File deleted: ${userData[0].coverPic}`);
       }
     }
 
@@ -275,47 +254,25 @@ export const deleteUser = async (req, res) => {
     if (postData.length > 0) {
       for (const post of postData) {
         if (post.img) {
-          try {
-            fs.unlinkSync(
-              path.join(__dirname, "../../client/uploads", post.img)
-            );
-            console.log(`Post image ${post.img} deleted on user deletion`);
-          } catch (err) {
-            console.error(
-              `Error deleting post image ${post.img} on user deletion:`,
-              err
-            );
-          }
+          fs.unlinkSync(path.join(__dirname, "../../client/uploads", post.img));
+          console.log(`File deleted: ${post.img}`);
         }
       }
     }
 
-    // Delete story files if they exist
-    if (storyData.length > 0) {
-      for (const story of storyData) {
-        if (story.file) {
-          try {
-            fs.unlinkSync(
-              path.join(__dirname, "../../client/uploads", story.file)
-            );
-            console.log(`Story file ${story.file} deleted on user deletion`);
-          } catch (err) {
-            console.error(
-              `Error deleting story file ${story.file} on user deletion:`,
-              err
-            );
-          }
-        }
-      }
+    // Delete story file if it exists
+    if (storyData.length > 0 && storyData[0].file) {
+      fs.unlinkSync(
+        path.join(__dirname, "../../client/uploads", storyData[0].file)
+      );
+      console.log(`File deleted: ${storyData[0].file}`);
     }
 
     // Delete user from database
     const q = "DELETE FROM users WHERE `id` = ?";
     const data = await executeQuery(q, [loggedInUserId]);
 
-    if (data.affectedRows > 0) {
-      return res.status(200).json("User deleted");
-    }
+    if (data.affectedRows > 0) return res.status(200).json("User deleted");
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while deleting user account.",

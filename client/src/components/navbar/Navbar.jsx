@@ -41,8 +41,12 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
-    makeRequest.post("/auth/logout");
-    navigate("/"); // Redirect to login page
+    try {
+      await makeRequest.post("/auth/logout");
+      navigate("/"); // Redirect to login page
+    } catch (error) {
+      console.error("Error in handleLogout:", error.message);
+    }
   };
 
   const toggleMenu = () => setBurgerClicked((prevState) => !prevState);

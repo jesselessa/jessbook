@@ -5,7 +5,8 @@ export const getRelationships = async (req, res) => {
   const q = "SELECT followerId FROM relationships WHERE followedId = ?";
 
   try {
-    const data = await executeQuery(q, [followerUserId]);
+    const data = await executeQuery(q, [followerUserId]);    
+    
     return res
       .status(200)
       .json(data.map((relationship) => relationship.followerId));
@@ -44,9 +45,7 @@ export const deleteRelationship = async (req, res) => {
 
   try {
     const data = await executeQuery(q, [loggedInUserId, followedUserId]);
-    if (data.affectedRows > 0) {
-      return res.status(200).json("User unfollowed");
-    }
+    if (data.affectedRows > 0) return res.status(200).json("User unfollowed");
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while deleting relationship.",
