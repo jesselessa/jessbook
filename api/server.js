@@ -41,12 +41,6 @@ app.use(
     origin: function (origin, callback) {
       //* Define an array of allowed URLs to access the API
       const allowedOrigins = [process.env.CLIENT_URL, process.env.API_URL];
-      // const allowedOrigins = [
-      //   "https://www.social-media.jesselessa.dev",
-      //   "https://social-media.jesselessa.dev",
-      //   "https://www.social-media.jesselessa.dev/api",
-      //   "https://social-media.jesselessa.dev/api",
-      // ];
       //* Check if the origin is in the allowedOrigins array
       //* If the origin is not provided (e.g., for same-origin requests), allow it
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
