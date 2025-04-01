@@ -38,19 +38,7 @@ app.use((_req, res, next) => {
 // Handle Cross-Origin Resource Sharing (CORS) requests
 app.use(
   cors({
-    origin: function (origin, callback) {
-      //* Define an array of allowed URLs to access the API
-      const allowedOrigins = [process.env.CLIENT_URL, process.env.API_URL];
-      //* Check if the origin is in the allowedOrigins array
-      //* If the origin is not provided (e.g., for same-origin requests), allow it
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        // Allow the request by calling the callback with null (no error) and true (allow)
-        callback(null, true);
-      } else {
-        // Deny the request by calling the callback with an error and false
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: [process.env.CLIENT_URL, process.env.API_URL],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow cookies
   })
