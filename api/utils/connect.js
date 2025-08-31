@@ -16,18 +16,18 @@ export async function executeQuery(query, values = []) {
     return rows;
   } catch (error) {
     console.error("Error executing query:", error);
-    throw error; // Propagate the error for further handling
+    throw error; // Re-throw error to handle it in calling function
   }
 }
 
-// Optional: Log connection success (or failure) only on app start.
+// Optional - Log connection success (or failure) only on app start
 async function testConnection() {
   try {
     const connection = await db.getConnection();
-    console.log("Database connected to server");
+    console.log("✅ Database connected to server");
     connection.release(); // Release the connection back to the pool
   } catch (error) {
-    console.error("Database connection failed:", error);
+    console.error("❌ Database connection failed:", error);
   }
 }
 

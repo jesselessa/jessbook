@@ -88,8 +88,8 @@ app.get("*", (_req, res) => {
 // Start server and launch database
 app.listen(PORT, (error) => {
   if (error) {
-    console.error(error);
+    console.error("❌ Error connecting to server:", error);
   } else {
-    console.log(`Server listening on port ${process.env.PORT}`);
+    console.log(`✅ Server running on port ${process.env.PORT}`);
   }
 });

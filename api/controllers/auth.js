@@ -1,55 +1,57 @@
-import { db, executeQuery } from "../utils/connect.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { executeQuery } from "../utils/connect.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
 export const register = async (req, res) => {
   const { firstName, lastName, email, password, confirmPswd } = req.body;
 
   try {
-    // Find user in database by email
+    // 1 - Check if user already exists in the database by email
     const selectQuery = "SELECT * FROM users WHERE email = ?";
     const data = await executeQuery(selectQuery, [email]);
 
-    // Check if user exists
     if (data.length > 0)
       return res.status(409).json({
         message: "An account with this email address already exists.",
       });
 
-    // If user doesn't exist, validate request body values
+    // 2 - If user does not exist, start validating input values
     let errors = {};
 
-    // Check name
+    // 3 - Validate first name length
     if (firstName?.trim()?.length < 2 || firstName?.trim()?.length > 35)
-      errors.firstName = "Enter a name between 2 and 35\u00A0characters.";
+      errors.firstName = "Enter a name between 2 and 35 characters.";
 
+    // 4 - Validate last name length
     if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35)
-      errors.lastName = "Enter a name between 1 and 35\u00A0characters.";
+      errors.lastName = "Enter a name between 1 and 35 characters.";
 
-    // Check email format
+    // 5 - Validate email format using regex and check max length
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email?.trim()) || email?.trim()?.length > 320)
       errors.email = "Enter a valid email format.";
 
-    // Check password format
+    // 6 - Validate password using regex
     const passwordRegex =
       /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
     if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200)
       errors.password =
-        "Password must be between 6 and 200\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.";
+        "Password must be between 6 and 200 characters, including at least 1 number and 1 symbol.";
 
-    // Check if passwords match
+    // 7 - Check if password and confirmation password match
     if (password?.trim() !== confirmPswd?.trim())
       errors.confirmPswd = "Confirmation password does not match.";
 
+    // 8 - If there are any validation errors, return them
     if (Object.keys(errors).length > 0)
       return res.status(401).json({ errors: errors });
 
-    // Hash password
+    // 9 - Hash password using bcrypt (with salt rounds = 10)
     const salt = bcrypt.genSaltSync(10);
     const hashedPswd = bcrypt.hashSync(password?.trim(), salt);
 
+    // 10 - Insert new user into the database with default role = "user"
     const insertQuery =
       "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `fromAuthProvider`,`role`) VALUES (?, ?, ?, ?, ?, ?)";
     const values = [
@@ -57,18 +59,18 @@ export const register = async (req, res) => {
       lastName.trim(),
       email.trim(),
       hashedPswd,
-      "No",
+      "No", // Indicates the user is not from a third-party authentication provider
       "user",
     ];
 
+    const insertData = await executeQuery(insertQuery, values);
+    const newUserId = insertData.insertId; // Get the ID of newly created user
+
+    // 11 - Automatically add admin as new user first relationship
     const insertRelationshipQuery =
       "INSERT INTO relationships (followerId, followedId) VALUES (?, ?)";
 
-    // Store new user in database
-    const insertData = await executeQuery(insertQuery, values);
-    const newUserId = insertData.insertId;
-
-    // Find admin ID based on role
+    // 12 - Find admin user ID (role = 'admin') in database
     const adminQuery = "SELECT id FROM users WHERE role = 'admin'";
     const adminData = await executeQuery(adminQuery);
 
@@ -77,11 +79,13 @@ export const register = async (req, res) => {
 
     const adminId = adminData[0].id;
 
-    // Insert admin as first relationship followed by new user
+    // 13 - Insert the relationship (new user follows admin)
     await executeQuery(insertRelationshipQuery, [newUserId, adminId]);
 
+    // 14 - Return success response
     return res.status(201).json({ message: "New user created" });
   } catch (error) {
+    // Catch any unexpected errors
     return res.status(500).json({
       message: "An unknown error occurred.",
       error: error.message,
@@ -92,33 +96,34 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
+  // 1 - Validate that both email and password are provided
   if (!email?.trim() || !password?.trim())
     return res
       .status(400)
       .json({ message: "Please, fill in all required fields." });
 
   try {
-    // Find user by email
+    // 2 - Find user by email in the database
     const q = "SELECT * FROM users WHERE email = ?";
     const data = await executeQuery(q, [email]);
 
-    // Check if user exists
+    // 3 - If user does not exist, return error
     if (data.length === 0)
       return res.status(404).json({ message: "Invalid email or password" });
 
-    // Compare passwords with bcrypt
+    // 4 - Compare provided password with hashed password stored in DB
     const checkPswd = bcrypt.compareSync(password, data[0].password);
     if (!checkPswd)
       return res.status(401).json({ message: "Invalid email or password" });
 
-    // If password is correct, generate a token with JWT
+    // 5 - If password is correct, generate a JWT token
     const secretKey = process.env.JWT_SECRET;
     let token;
 
-    // Set token info (payload) depending on user role
+    // 6 - Set token payload based on user role (admin or regular user)
     if (data[0].role === "admin") {
       token = jwt.sign({ id: data[0].id, role: "admin" }, secretKey, {
-        expiresIn: "7d", // After delay, invalid token: user must reconnect
+        expiresIn: "7d", // Token will expire in 7 days
       });
     } else {
       token = jwt.sign({ id: data[0].id, role: "user" }, secretKey, {
@@ -126,20 +131,21 @@ export const login = async (req, res) => {
       });
     }
 
-    // Remove password before sending user data
+    // 7 - Remove password field from the response for security
     const { password: userPassword, ...otherInfo } = data[0];
 
-    // Set token in cookie
+    // 8 - Send JWT token in an HTTP-only cookie for better security
     return res
       .cookie("accessToken", token, {
-        httpOnly: true, // Prevent scripts from accessing cookie (XSS protection)
-        secure: true, // Ensure cookies are only sent over HTTPS connections
-        sameSite: "none", // Allow cross-site access
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 'maxAge' in milliseconds, must match token expiration date
+        httpOnly: true, // Prevent client-side JavaScript access
+        secure: true, // Only allow cookie over HTTPS
+        sameSite: "none", // Allow cross-site requests
+        maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expires in 7 days (must match token expiration)
       })
       .status(201)
       .json(otherInfo);
   } catch (error) {
+    // Catch unexpected errors
     return res.status(500).json({
       message: "An unknown error occurred.",
       error: error.message,
@@ -181,67 +187,67 @@ export const logout = (_req, res) => {
 export const recoverAccount = async (req, res) => {
   const { email } = req.body;
 
-  if (email?.trim()?.length > 0) {
-    // Check email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim()) || email.trim().length > 320) {
-      return res.status(401).json({ message: "Invalid email" });
-    }
+  // 1 - Check if email is provided
+  if (!email?.trim()?.length)
+    return res.status(400).json({ message: "Please, provide an email." });
 
-    try {
-      // Find user by email
-      const q = "SELECT * FROM users WHERE email = ?";
-      const data = await executeQuery(q, [email.trim()]);
+  // 2 - Validate email format with regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.trim()) || email.trim().length > 320)
+    return res.status(401).json({ message: "Invalid email format." });
 
-      // Check if user exists
-      if (data.length === 0)
-        return res.status(404).json({
-          message: "There is no account associated with this email address.",
-        });
+  try {
+    // 3 - Check if user exists in database by email
+    const q = "SELECT * FROM users WHERE email = ?";
+    const data = await executeQuery(q, [email.trim()]);
 
-      // If user exists, generate a token
-      const secretKey = process.env.JWT_SECRET;
-      const token = jwt.sign({ id: data[0].id }, secretKey, {
-        expiresIn: "1h",
+    if (data.length === 0)
+      return res.status(404).json({
+        message: "There is no account associated with this email address.",
       });
 
-      // Create a password reset link
-      const resetLink = `${process.env.CLIENT_URL}/reset-password`;
+    // 4 - Generate a JWT token for password reset
+    const secretKey = process.env.JWT_SECRET;
+    const token = jwt.sign({ id: data[0].id }, secretKey, { expiresIn: "1h" });
 
-      // Set token in cookie
-      res
-        .cookie("resetToken", token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-          maxAge: 3600000, // 1 hour = 1(h) * 60(min) * 60(s) * 1000(ms)
-        })
-        .status(201);
+    // 5 - Build reset password link
+    const resetLink = `${process.env.CLIENT_URL}/reset-password`;
 
-      // Send email with Nodemailer
-      await sendEmail({
-        to: email,
-        subject: "Jessbook - Reset your password",
-        html: `<div style="font-family: Arial, sans-serif; padding: 10px;">
-                  <h3 style="font-weight: bold;">Click the link below to reset your password:</h3>
-                    <a href="${resetLink}" target="_blank" style="font-size: 16px; font-weight: bold; color: #008080">
-                      Change my password
-                    </a>
-                  <p style="font-size: 16px; margin-top: 15px;">This link can only be used once and will expire in 1 hour.</p>
-                </div>`,
-      });
+    // 6 - Send email for password reset
+    await sendEmail({
+      to: email,
+      subject: "Jessbook - Reset your password",
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 10px;">
+          <h3 style="font-weight: bold;">Click the link below to reset your password:</h3>
+          <a href="${resetLink}" target="_blank" style="font-size: 16px; font-weight: bold; color: #008080">
+            Change my password
+          </a>
+          <p style="font-size: 16px; margin-top: 15px;">
+            This link can only be used once and will expire in 1 hour.
+          </p>
+        </div>
+      `,
+    });
 
-      return res.status(200).json({
+    // 7 - Set a secure cookie with the token
+    return res
+      .cookie("resetToken", token, {
+        httpOnly: true,
+        sameSite: "none",
+        maxAge: 3600000, // 1 hour = 1(h) * 60(min) * 60(s) * 1000(ms)
+      })
+      .status(200)
+      .json({
         message: "A link to reset your password has been sent to your email.",
       });
-    } catch (error) {
-      return res.status(500).json({
-        message: "An unknown error occurred.",
-        error: error.message,
-      });
-    }
-  } else {
-    return res.status(400).json({ message: "Please, provide an email." });
+  } catch (error) {
+    // Catch unexpected errors
+    console.error("Error in recoverAccount:", error);
+    return res.status(500).json({
+      message: "An unknown error occurred.",
+      error: error.message,
+    });
   }
 };
 
@@ -249,57 +255,62 @@ export const resetPassword = async (req, res) => {
   const { password, confirmPswd } = req.body;
   const token = req.cookies.resetToken; // Get token from cookie
 
-  // Check if password is provided
-  if (!password?.trim() || !confirmPswd?.trim())
+  // 1. Check if both password fields are provided
+  if (!password?.trim() || !confirmPswd?.trim()) {
     return res
       .status(400)
       .json({ message: "Please, fill in all required fields." });
+  }
 
-  // Check password format
+  // 2. Validate password format (must include at least one number and one symbol, 6+ characters)
   const passwordRegex =
     /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
-  if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200)
+  if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200) {
     return res.status(401).json({
       message:
-        "Password must be between 6 and 200\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.",
+        "Password must be between 6 and 200 characters, including at least 1 number and 1 symbol.",
     });
+  }
 
-  // Check if passwords match
-  if (password?.trim() !== confirmPswd?.trim())
+  // 3. Check if both passwords match
+  if (password?.trim() !== confirmPswd?.trim()) {
     return res
       .status(401)
       .json({ message: "Confirmation password does not match." });
+  }
 
-  // Check if token is present
-  if (!token)
+  // 4. Ensure reset token exists in cookies
+  if (!token) {
     return res.status(401).json({ message: "Invalid authentication" });
+  }
 
   const secretKey = process.env.JWT_SECRET;
 
   try {
-    // Decode token to get user ID
+    // 5. Verify token and decode user ID
     const decoded = jwt.verify(token, secretKey);
 
-    // Hash new password
+    // 6. Hash the new password using bcrypt
     const salt = bcrypt.genSaltSync(10);
     const hashedPswd = bcrypt.hashSync(password?.trim(), salt);
 
-    // Update password in database
+    // 7. Update the user's password in the database
     const q = "UPDATE users SET password = ? WHERE id = ?";
     await executeQuery(q, [hashedPswd, decoded.id]);
 
-    // Clear 'resetToken' cookie after password has been reset to make token only usable once
+    // 8. Clear the resetToken cookie so the token can't be reused
     res.clearCookie("resetToken", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      httpOnly: true, // Protect against XSS
+      secure: true, // Only send over HTTPS
+      sameSite: "none", // Allow cross-site requests (for frontend hosted separately)
     });
 
+    // 9. Send success response
     return res
       .status(200)
       .json({ message: "Your password has been successfully reset." });
   } catch (error) {
-    // Invalid or expired token
+    // Token invalid or expired
     return res
       .status(401)
       .json({ message: "Invalid authentication", error: error.message });
