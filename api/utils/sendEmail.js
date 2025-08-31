@@ -1,21 +1,17 @@
 import { createTransport } from "nodemailer";
 
 export const sendEmail = async (options) => {
-  const transporter = createTransport({
-    host: process.env.SERVICE_HOST,
-    port: 587,
-    secure: false,
+  // Nodemailer transporter configuration with Gmail 2-step verification required in production
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
     auth: {
-      user: process.env.SERVICE_USER,
-      pass: process.env.SERVICE_PSWD,
-    },
-    tls: {
-      rejectUnauthorized: false,
+      user: "jessica.elessa@gmail.com",
+      pass: process.env.GOOGLE_APP_PASSWORD, // 2-step verification
     },
   });
 
   const mailOptions = {
-    from: process.env.SERVICE_USER,
+    from: "jessica.elessa@gmail.com", // Service and user email can't be hidden anymore using an environment variable
     to: options.to,
     subject: options.subject,
     html: options.html,

@@ -222,13 +222,13 @@ export const recoverAccount = async (req, res) => {
       await sendEmail({
         to: email,
         subject: "Jessbook - Reset your password",
-        html: `<div style="padding: 10px">
-                            <p>Click the link below to reset your password\u00A0:</p>
-                            <a href="${resetLink}" target="_blank" style="font-weight: bold; color: #008080">
-                              Change my password
-                            </a>
-                            <p style="margin-top: 10px; font-weight: bold">This link will expire in 1 hour.</p>
-                          </div>`,
+        html: `<div style="font-family: Arial, sans-serif; padding: 10px;">
+                  <h3 style="font-weight: bold;">Click the link below to reset your password:</h3>
+                    <a href="${resetLink}" target="_blank" style="font-size: 16px; font-weight: bold; color: #008080">
+                      Change my password
+                    </a>
+                  <p style="font-size: 16px; margin-top: 15px;">This link can only be used once and will expire in 1 hour.</p>
+                </div>`,
       });
 
       return res.status(200).json({
