@@ -123,7 +123,7 @@ export const login = async (req, res) => {
     // 6 - Set token payload based on user role (admin or regular user)
     if (data[0].role === "admin") {
       token = jwt.sign({ id: data[0].id, role: "admin" }, secretKey, {
-        expiresIn: "7d", // Token will expire in 7 days
+        expiresIn: "7d", // Token expires in 7 days
       });
     } else {
       token = jwt.sign({ id: data[0].id, role: "user" }, secretKey, {
@@ -138,9 +138,9 @@ export const login = async (req, res) => {
     return res
       .cookie("accessToken", token, {
         httpOnly: true, // Prevent client-side JavaScript access
-        secure: true, // Only allow cookie over HTTPS
-        sameSite: "none", // Allow cross-site requests
-        maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expires in 7 days (must match token expiration)
+        secure: process.env.NODE_ENV === "production", // Only send over HTTPS in prod
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Allow cross-site requests in prod ("lax" for others such as dev)
+        maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie expires in 7 days
       })
       .status(201)
       .json(otherInfo);
@@ -177,8 +177,8 @@ export const logout = (_req, res) => {
   return res
     .clearCookie("accessToken", {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     })
     .status(200)
     .json({ message: "User is logged out." });
@@ -206,7 +206,7 @@ export const recoverAccount = async (req, res) => {
         message: "There is no account associated with this email address.",
       });
 
-    // 4 - Generate a JWT token for password reset
+    // 4 - Generate a JWT token for password reset (expires in 1h)
     const secretKey = process.env.JWT_SECRET;
     const token = jwt.sign({ id: data[0].id }, secretKey, { expiresIn: "1h" });
 
@@ -234,7 +234,8 @@ export const recoverAccount = async (req, res) => {
     return res
       .cookie("resetToken", token, {
         httpOnly: true,
-        sameSite: "none",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         maxAge: 3600000, // 1 hour = 1(h) * 60(min) * 60(s) * 1000(ms)
       })
       .status(200)
@@ -255,62 +256,68 @@ export const resetPassword = async (req, res) => {
   const { password, confirmPswd } = req.body;
   const token = req.cookies.resetToken; // Get token from cookie
 
-  // 1. Check if both password fields are provided
+  console.log("ResetPassword called. Token received:", token);
+
+  // 1 - Validate password fields
   if (!password?.trim() || !confirmPswd?.trim()) {
+    console.log("Validation error: Missing fields");
     return res
       .status(400)
       .json({ message: "Please, fill in all required fields." });
   }
 
-  // 2. Validate password format (must include at least one number and one symbol, 6+ characters)
   const passwordRegex =
     /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
   if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200) {
+    console.log("Validation error: Invalid password format");
     return res.status(401).json({
       message:
         "Password must be between 6 and 200 characters, including at least 1 number and 1 symbol.",
     });
   }
 
-  // 3. Check if both passwords match
   if (password?.trim() !== confirmPswd?.trim()) {
+    console.log("Validation error: Passwords do not match");
     return res
       .status(401)
       .json({ message: "Confirmation password does not match." });
   }
 
-  // 4. Ensure reset token exists in cookies
   if (!token) {
+    console.log("Token missing in cookies");
     return res.status(401).json({ message: "Invalid authentication" });
   }
 
   const secretKey = process.env.JWT_SECRET;
 
   try {
-    // 5. Verify token and decode user ID
+    // 2 - Verify token
     const decoded = jwt.verify(token, secretKey);
+    console.log("Token verified. User ID:", decoded.id);
 
-    // 6. Hash the new password using bcrypt
+    // 3 - Hash password
     const salt = bcrypt.genSaltSync(10);
-    const hashedPswd = bcrypt.hashSync(password?.trim(), salt);
+    const hashedPswd = bcrypt.hashSync(password.trim(), salt);
 
-    // 7. Update the user's password in the database
+    // 4 - Update database
     const q = "UPDATE users SET password = ? WHERE id = ?";
     await executeQuery(q, [hashedPswd, decoded.id]);
+    console.log("Password updated in DB");
 
-    // 8. Clear the resetToken cookie so the token can't be reused
+    // 5 - Clear cookie only after successful update
     res.clearCookie("resetToken", {
-      httpOnly: true, // Protect against XSS
-      secure: true, // Only send over HTTPS
-      sameSite: "none", // Allow cross-site requests (for frontend hosted separately)
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
-    // 9. Send success response
+    console.log("Reset token cookie cleared successfully");
+
     return res
       .status(200)
       .json({ message: "Your password has been successfully reset." });
   } catch (error) {
-    // Token invalid or expired
+    console.log("Error verifying token:", error.message);
     return res
       .status(401)
       .json({ message: "Invalid authentication", error: error.message });
