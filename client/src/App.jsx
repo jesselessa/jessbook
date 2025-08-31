@@ -83,7 +83,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <ToastContainer autoClose={1500} />
+      <ToastContainer autoClose={1500} style={{ fontSize: "1.6rem" }} />
     </QueryClientProvider>
   );
 }
