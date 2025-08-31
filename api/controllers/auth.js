@@ -219,12 +219,12 @@ export const recoverAccount = async (req, res) => {
       subject: "Jessbook - Reset your password",
       html: `
         <div style="font-family: Arial, sans-serif; padding: 10px;">
-          <h3 style="font-weight: bold;">Click the link below to reset your password:</h3>
+          <h2 style="font-weight: bold;">Jessbook - Reset your password:</h2>
           <a href="${resetLink}" target="_blank" style="font-size: 16px; font-weight: bold; color: #008080">
-            Change my password
+            Click here to change your password
           </a>
           <p style="font-size: 16px; margin-top: 15px;">
-            This link can only be used once and will expire in 1 hour.
+            This link will expire in 1 hour.
           </p>
         </div>
       `,
