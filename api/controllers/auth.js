@@ -219,7 +219,7 @@ export const recoverAccount = async (req, res) => {
       subject: "Jessbook - Reset your password",
       html: `
         <div style="font-family: Arial, sans-serif; padding: 10px;">
-          <h2 style="font-weight: bold;">Jessbook - Reset your password:</h2>
+          <h2 style="font-weight: bold;">Reset your Jessbook password</h2>
           <a href="${resetLink}" target="_blank" style="font-size: 16px; font-weight: bold; color: #008080">
             Click here to change your password
           </a>

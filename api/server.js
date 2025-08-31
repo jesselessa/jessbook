@@ -29,18 +29,26 @@ export const __dirname = path.dirname(__filename);
 // Create server with Express
 const app = express();
 
-// Handle HTTP header in response
-app.use((_req, res, next) => {
-  res.header("Access-Control-Allow-Credentials", true); //! Allow cookies or other authentication info such as tokens
+// Dynamic CORS headers middleware
+const allowedOrigins = [process.env.CLIENT_URL, process.env.API_URL];
+
+app.use((req, res, next) => {
+  //! req.headers.origin = the origin (protocol + domain + port) from which the request originated
+  if (allowedOrigins.includes(req.headers.origin))
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+
+  res.header("Access-Control-Allow-Credentials", "true"); // Allow cookies and credentials
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
 
-// Handle Cross-Origin Resource Sharing (CORS) requests
+// CORS middleware kept for standard handling
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL, process.env.API_URL],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // Allow cookies
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
   })
 );
 
@@ -58,8 +66,6 @@ app.post("/api/uploads", upload, (req, res) => {
 
 // Initialize Passport
 app.use(passport.initialize());
-
-// Initialize Passport strategies
 connectWithGoogle();
 connectWithFacebook();
 
@@ -78,14 +84,14 @@ app.use(
   express.static(path.join(__dirname, "../client/public/uploads"))
 ); //! Must be placed before 'app.get("*", ...)' which serves our React app, otherwise, requests for "/uploads" will be intercepted by the latter
 
-// Serve static files for our front end (after Vite build)
+// Serve front-end static files
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
 app.get("*", (_req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 }); // Display Login page
 
-// Start server and launch database
+// Start server
 app.listen(PORT, (error) => {
   if (error) {
     console.error("❌ Error connecting to server:", error);
