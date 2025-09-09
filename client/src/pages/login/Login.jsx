@@ -1,7 +1,6 @@
 import { useEffect, useContext, useState } from "react";
 import "./login.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { makeRequest } from "../../utils/axios.js";
 
 // Component
 import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
