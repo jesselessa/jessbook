@@ -10,6 +10,9 @@ import {
   connectWithGoogle,
   connectWithFacebook,
 } from "./middlewares/configureAuthServiceStrategy.js";
+import history from "connect-history-api-fallback";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 // Routes
 import authRoute from "./routes/auth.js";
@@ -22,33 +25,23 @@ import storiesRoute from "./routes/stories.js";
 
 const PORT = process.env.PORT;
 
-// Get __dirname equivalent in ES module mode
+// Resolve __dirname for ES modules
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
 // Create server with Express
 const app = express();
 
-// Dynamic CORS headers middleware
-const allowedOrigins = [process.env.CLIENT_URL, process.env.API_URL];
+// Secure HTTP headers
+app.use(helmet());
 
-app.use((req, res, next) => {
-  //! req.headers.origin = the origin (protocol + domain + port) from which the request originated
-  if (allowedOrigins.includes(req.headers.origin))
-    res.header("Access-Control-Allow-Origin", req.headers.origin);
-
-  res.header("Access-Control-Allow-Credentials", "true"); // Allow cookies and credentials
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
-
-// CORS middleware kept for standard handling
+// Use CORS middleware
+const allowedOrigins = [process.env.CLIENT_URL];
 app.use(
   cors({
     origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
+    credentials: true, // Allow cookies
   })
 );
 
@@ -69,6 +62,15 @@ app.use(passport.initialize());
 connectWithGoogle();
 connectWithFacebook();
 
+// Limit the rate of requests for every route
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests by IP every 15 minutes
+  message: "Too many requests from this IP, please try again after 15 minutes.",
+});
+// Middleware applied to every route beginning with "/api"
+app.use("/api/", apiLimiter);
+
 // API routes
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
@@ -84,12 +86,18 @@ app.use(
   express.static(path.join(__dirname, "../client/public/uploads"))
 ); //! Must be placed before 'app.get("*", ...)' which serves our React app, otherwise, requests for "/uploads" will be intercepted by the latter
 
-// Serve front-end static files
-app.use(express.static(path.join(__dirname, "../client/dist")));
+// Production setup for static files
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client/dist")));
 
-app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-}); // Display Login page
+  // Handle client-side routing for Single-Page Applications (SPA)
+  app.use(history({ verbose: true }));
+
+  // Serve the SPA's index.html for unknown routes server side
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+  });
+}
 
 // Start server
 app.listen(PORT, (error) => {
