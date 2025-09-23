@@ -1,4 +1,4 @@
-import { db, executeQuery } from "../utils/connect.js";
+import { db, executeQuery } from "../db/connect.js";
 import { isImage } from "../utils/isFile.js";
 import moment from "moment";
 import fs from "fs";

@@ -1,4 +1,4 @@
-import { db, executeQuery } from "./connect.js";
+import { db, executeQuery } from "../db/connect.js";
 
 export const findOrCreateUser = async (
   email,

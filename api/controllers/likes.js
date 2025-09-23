@@ -1,11 +1,11 @@
-import { db, executeQuery } from "../utils/connect.js";
+import { db, executeQuery } from "../db/connect.js";
 
 export const getLikes = async (req, res) => {
   const postId = req.query.postId;
   const q = "SELECT userId FROM likes WHERE postId = ?";
 
   try {
-    const data = await executeQuery(q, [postId]);    
+    const data = await executeQuery(q, [postId]);
     return res.status(200).json(data.map((like) => like.userId));
   } catch (error) {
     return res.status(500).json({

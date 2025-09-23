@@ -1,4 +1,4 @@
-import { db, executeQuery } from "../utils/connect.js";
+import { db, executeQuery } from "../db/connect.js";
 import moment from "moment";
 
 export const getComments = async (req, res) => {

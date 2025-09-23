@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { executeQuery } from "../utils/connect.js";
+import { executeQuery } from "../db/connect.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
 export const register = async (req, res) => {

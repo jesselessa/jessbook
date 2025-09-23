@@ -4,12 +4,13 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import { upload } from "./middlewares/upload.js"; // Multer configuration
 import passport from "passport";
+import { upload } from "./middlewares/upload.js"; // Multer configuration
 import {
   connectWithGoogle,
   connectWithFacebook,
 } from "./middlewares/configureAuthServiceStrategy.js";
+import { connectDB } from "./db/connect.js";
 import history from "connect-history-api-fallback";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -100,10 +101,15 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // Start server
-app.listen(PORT, (error) => {
-  if (error) {
-    console.error("❌ Error connecting to server:", error);
-  } else {
-    console.log(`✅ Server running on port ${process.env.PORT}`);
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`✅ Server is listening on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Failed to start server:", error);
+    process.exit(1);
   }
-});
+};
+startServer();

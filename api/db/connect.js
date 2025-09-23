@@ -20,8 +20,8 @@ export async function executeQuery(query, values = []) {
   }
 }
 
-// Optional - Log connection success (or failure) only on app start
-async function testConnection() {
+// Log connection success (or failure) only on app start
+export const connectDB = async () => {
   try {
     const connection = await db.getConnection();
     console.log("✅ Database connected to server");
@@ -29,6 +29,4 @@ async function testConnection() {
   } catch (error) {
     console.error("❌ Database connection failed:", error);
   }
-}
-
-testConnection();
+};

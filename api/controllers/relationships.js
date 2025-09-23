@@ -1,12 +1,12 @@
-import { db, executeQuery } from "../utils/connect.js";
+import { db, executeQuery } from "../db/connect.js";
 
 export const getRelationships = async (req, res) => {
   const followerUserId = req.query.followedId;
   const q = "SELECT followerId FROM relationships WHERE followedId = ?";
 
   try {
-    const data = await executeQuery(q, [followerUserId]);    
-    
+    const data = await executeQuery(q, [followerUserId]);
+
     return res
       .status(200)
       .json(data.map((relationship) => relationship.followerId));
