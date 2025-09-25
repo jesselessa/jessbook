@@ -33,8 +33,17 @@ export const __dirname = path.dirname(__filename);
 // Create server with Express
 const app = express();
 
-// Secure HTTP headers
+// Use Helmet defaults to set a variety of security headers
 app.use(helmet());
+// Override the default Content Security Policy (CSP) with a custom configuration
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: true, // Use the default CSP directives
+    directives: {
+      "img-src": ["'self'", "https:", "data:"], // Allow images from the same origin, HTTPS URLs, and data URIs
+    },
+  })
+);
 
 // Use CORS middleware
 const allowedOrigins = [process.env.CLIENT_URL];
@@ -89,10 +98,9 @@ app.use(
 
 // Production setup for static files
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
-
-  // Handle client-side routing for Single-Page Applications (SPA)
+  // Handle client-side routing for SPA before static files
   app.use(history({ verbose: true }));
+  app.use(express.static(path.join(__dirname, "../client/dist")));
 
   // Serve the SPA's index.html for unknown routes server side
   app.get("*", (req, res) => {
