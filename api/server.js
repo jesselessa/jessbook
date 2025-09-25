@@ -61,12 +61,6 @@ app.use(express.json()); //! JSON data transformed into a JS object accessible i
 // Parse cookies from incoming requests
 app.use(cookieParser()); //! Cookies content accessible via 'req.cookies' and 'req.signedCookies'
 
-// Upload files via 'upload' middleware configured with Multer
-app.post("/api/uploads", upload, (req, res) => {
-  const file = req.file;
-  res.status(200).json(file.filename);
-});
-
 // Initialize Passport
 app.use(passport.initialize());
 connectWithGoogle();
@@ -90,6 +84,12 @@ app.use("/api/likes", likesRoute);
 app.use("/api/relationships", relationshipsRoute);
 app.use("/api/stories", storiesRoute);
 
+// Upload files via 'upload' middleware configured with Multer
+app.post("/api/uploads", upload, (req, res) => {
+  const file = req.file;
+  res.status(200).json(file.filename);
+});
+
 // Serve "uploads" folder as static files
 app.use(
   "/uploads",
@@ -98,9 +98,10 @@ app.use(
 
 // Production setup for static files
 if (process.env.NODE_ENV === "production") {
-  // Handle client-side routing for SPA before static files
-  app.use(history({ verbose: true }));
   app.use(express.static(path.join(__dirname, "../client/dist")));
+
+  // Handle client-side routing for Single-Page Applications (SPA)
+  app.use(history({ verbose: true }));
 
   // Serve the SPA's index.html for unknown routes server side
   app.get("*", (req, res) => {
@@ -109,6 +110,8 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // Global error handler
+// This middleware is crucial for handling all uncaught errors, preventing the server from crashing
+// It should always be placed at the end of our middleware chain
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res
