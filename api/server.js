@@ -83,9 +83,8 @@ app.use("/api/comments", commentsRoute);
 app.use("/api/likes", likesRoute);
 app.use("/api/relationships", relationshipsRoute);
 app.use("/api/stories", storiesRoute);
-
-// Upload files via 'upload' middleware configured with Multer
 app.post("/api/uploads", upload, (req, res) => {
+  // Upload files with Multer
   const file = req.file;
   res.status(200).json(file.filename);
 });
@@ -94,7 +93,7 @@ app.post("/api/uploads", upload, (req, res) => {
 app.use(
   "/uploads",
   express.static(path.join(__dirname, "../client/public/uploads"))
-); //! Must be placed before 'app.get("*", ...)' which serves our React app, otherwise, requests for "/uploads" will be intercepted by the latter
+);
 
 // Production setup for static files
 if (process.env.NODE_ENV === "production") {

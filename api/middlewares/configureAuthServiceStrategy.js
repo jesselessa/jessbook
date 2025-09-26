@@ -1,9 +1,17 @@
+/*
+ * configureAuthServiceStrategy.js defines and configures how our server will interact with third-party authentication services like Google and Facebook, by using the Passport.js library
+
+ * Its sole function is to call passport.use() to initialize and register the authentication 'strategies'
+
+ * A 'strategy' is the method or mechanism that Passport uses to verify a user's identity
+ */
+
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import { findOrCreateUser } from "../utils/findOrCreateUser.js";
 
-//! When users log in via authentication providers such as Google or Facebook, their credentials (profile, email, etc.) are transmitted to our server. 'Strategies' are functions which define how to handle these data
+//! The callbackURL is the URL to which Google/Facebook sends the authorization code. It must be our server.
 
 // Configure Google strategy
 export const connectWithGoogle = () => {
