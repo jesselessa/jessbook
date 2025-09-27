@@ -13,7 +13,6 @@ import {
 import { connectDB } from "./db/connect.js";
 import history from "connect-history-api-fallback";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit";
 
 // Routes
 import authRoute from "./routes/auth.js";
@@ -40,7 +39,11 @@ app.use(
   helmet.contentSecurityPolicy({
     useDefaults: true, // Use the default CSP directives
     directives: {
-      "img-src": ["'self'", "https:", "data:", "blob:"], // Allow images from the same origin, HTTPS URLs, data URIs, AND blob: URIs (used for client-side image previews before upload)
+      // Allow images (previews) from the same origin, HTTPS, data, AND blob: URIs
+      "img-src": ["'self'", "https:", "data:", "blob:"],
+
+      // Allow media (videos/sounds) from the same domain AND blob: URLs
+      "media-src": ["'self'", "blob:"],
     },
   })
 );
@@ -65,15 +68,6 @@ app.use(cookieParser()); //! Cookies content accessible via 'req.cookies' and 'r
 app.use(passport.initialize());
 connectWithGoogle();
 connectWithFacebook();
-
-// Limit the rate of requests for every route
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requests by IP every 15 minutes
-  message: "Too many requests from this IP, please try again after 15 minutes.",
-});
-// Middleware applied to every route beginning with "/api"
-app.use("/api/", apiLimiter);
 
 // API routes
 app.use("/api/auth", authRoute);
