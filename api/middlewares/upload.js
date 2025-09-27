@@ -18,4 +18,10 @@ const storage = multer.diskStorage({
 });
 
 // Initialize upload middleware
-export const upload = multer({ storage: storage }).single("file");
+export const upload = multer({
+  storage: storage,
+  // Size limit (50 Mo)
+  limits: {
+    fileSize: 50 * 1024 * 1024,
+  },
+}).single("file");
