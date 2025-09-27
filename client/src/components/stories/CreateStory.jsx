@@ -29,6 +29,8 @@ const MAX_DURATION_SECONDS = 60;
 
 // Component to load video metadata and check its duration
 const VideoDurationChecker = ({ fileURL, onDurationCheck }) => {
+  // onDurationCheck is a callback function passed from parent (CreateStory) to child (VideoDurationChecker)
+  // In this component that actually loads the video, it returns the result of its check (success or failure, along with the exact duration) to the parent component, which manages the global state
   return (
     // We use a hidden <video> element to trigger metadata loading
     <video
