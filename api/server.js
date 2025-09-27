@@ -40,7 +40,7 @@ app.use(
   helmet.contentSecurityPolicy({
     useDefaults: true, // Use the default CSP directives
     directives: {
-      "img-src": ["'self'", "https:", "data:"], // Allow images from the same origin, HTTPS URLs, and data URIs
+      "img-src": ["'self'", "https:", "data:", "blob:"], // Allow images from the same origin, HTTPS URLs, data URIs, AND blob: URIs (used for client-side image previews before upload)
     },
   })
 );
