@@ -248,15 +248,10 @@ export default function CreateStory({ setOpenCreateStory }) {
                     </div>
                   ) : (
                     // LARGE SCREEN: Show actual video preview
-                    <video
-                      controls
-                      autoPlay
-                      muted
-                      className="story-video-preview"
-                    >
+                    <video controls autoPlay muted>
                       {/* Use the local fileURL for immediate client-side preview */}
-                      <source src={fileURL} type={file.type} />                 
-                      Your browser doesn't support video preview.          
+                      <source src={fileURL} type={file.type} />
+                      Your browser doesn't support video preview.
                     </video>
                   )
                 ) : (
