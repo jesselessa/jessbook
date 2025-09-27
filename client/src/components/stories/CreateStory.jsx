@@ -81,6 +81,16 @@ export default function CreateStory({ setOpenCreateStory }) {
 
         video.src = filePath;
 
+        video.addEventListener("error", (e) => {
+          console.error("Error loading video metadata:", e);
+          setError({
+            isError: true,
+            message: "Error while loading video. Try another format.",
+          });
+          setFile(null);
+          setFileURL("");
+        });
+
         video.addEventListener("loadedmetadata", () => {
           // 'loadedmetadata' event is fired when metadata has been loaded
           if (video.duration > 60) {
