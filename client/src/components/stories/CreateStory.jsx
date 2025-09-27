@@ -248,15 +248,19 @@ export default function CreateStory({ setOpenCreateStory }) {
                     </div>
                   ) : (
                     // LARGE SCREEN: Show actual video preview
-                    <video controls autoPlay muted>
-                      {/* Use the local fileURL for immediate client-side preview */}
-                      <source src={fileURL} type={file.type} />
-                      Your browser doesn't support video preview.
-                    </video>
+                    <div className="video-container">
+                      <video controls autoPlay muted>
+                        {/* Use the local fileURL for immediate client-side preview */}
+                        <source src={fileURL} type={file.type} />
+                        Your browser doesn't support video preview.
+                      </video>
+                    </div>
                   )
                 ) : (
                   // Image Preview
-                  <LazyLoadImage src={fileURL} alt="story preview" />
+                  <div className="img-container">
+                    <LazyLoadImage src={fileURL} alt="story preview" />
+                  </div>
                 )}
               </div>
             )}
