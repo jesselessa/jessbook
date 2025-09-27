@@ -84,7 +84,7 @@ export default function Stories({ userId }) {
                   <video>
                     <source
                       src={`/uploads/${story?.file}`}
-                      // If it's a MOV extension (iOS), we use quicktime as MIME type
+                      // If it's a MOV extension (iOS), use quicktime as MIME type
                       type={
                         story?.file.toLowerCase().endsWith(".mov")
                           ? "video/quicktime"
