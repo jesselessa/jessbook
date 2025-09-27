@@ -69,49 +69,47 @@ export default function CreateStory({ setOpenCreateStory }) {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    const filePath = URL.createObjectURL(selectedFile);
+    const filePath = URL.createObjectURL(selectedFile); // Reset error message every time file changes
 
-    // Reset error message everytime file changes
     setError({ isError: false, message: "" });
 
-    // Check video duration
     if (selectedFile) {
       if (isVideo(selectedFile.type)) {
-        const video = document.createElement("video");
+        // 1 - Trigger immediate preview to fix mobile blocking issues
+        // This displays the video while the metadata validation runs asynchronously
+        setFile(selectedFile);
+        setFileURL(filePath);
 
+        const video = document.createElement("video");
         video.src = filePath;
 
-        video.addEventListener("error", (e) => {
-          console.error("Error loading video metadata:", e);
+        // 2 - Start asynchronous duration validation (non-blocking)
+        // Handle loading errors if metadata cannot be read
+        video.addEventListener("error", () => {
           setError({
             isError: true,
-            message: "Error while loading video. Try another format.",
+            message:
+              "Error loading video file metadata. Please try a different format.",
           });
           setFile(null);
           setFileURL("");
         });
 
         video.addEventListener("loadedmetadata", () => {
-          // 'loadedmetadata' event is fired when metadata has been loaded
+          // Check duration after metadata is loaded
           if (video.duration > 60) {
-            // Unvalid video
+            // Invalid video : reject the file after initial display
             setError({
               isError: true,
               message: "Video duration can't exceed 60\u00A0seconds.",
             });
-
             setFile(null); // Unselect file
-            setFileURL(""); // No URL for preview
-
-            return;
-          } else {
-            // Valid video
-            setFile(selectedFile);
-            setFileURL(filePath);
+            setFileURL(""); // Clear URL to remove preview
           }
+          // If valid, the file is already set in step 1
         });
       } else {
-        // If uploaded file is an image, store it and update its URL
+        // If the uploaded file is an image, store it and update its URL for preview
         setFile(selectedFile);
         setFileURL(filePath);
       }
