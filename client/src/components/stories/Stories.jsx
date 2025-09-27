@@ -1,4 +1,11 @@
-import { useContext, useState } from "react";
+//***************************** Stories.jsx *********************************
+//* Displays user and friends' stories with optimized video thumbnails based on screen size
+// - local file on user's device
+// - thumbnail must be generated client-side from the local file (blob URL)
+// - tools needed : JavaScript/Canvas API or custom librairies
+//****************************************************************************
+
+import { useContext, useState, useEffect } from "react";
 import "./stories.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -20,9 +27,24 @@ export default function Stories({ userId }) {
   const { currentUser } = useContext(AuthContext);
   const [openCreateStory, setOpenCreateStory] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [selectedStory, setSelectedStory] = useState(null);
+  const [selectedStory, setSelectedStory] = useState(null); // State to detect small screen size (e.g., mobile)
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 600);
 
-  // Get stories
+  // Hook to detect screen resize and update isSmallScreen state
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 600);
+    };
+    // Set up the event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // Get stories data
   const fetchStories = async () => {
     try {
       const res = await makeRequest.get(`/stories?userId=${userId}`);
@@ -38,6 +60,7 @@ export default function Stories({ userId }) {
     data: stories,
   } = useQuery({ queryKey: ["stories", userId], queryFn: fetchStories });
 
+  // Handler to open the modal with the selected story
   const handleClick = (story) => {
     setSelectedStory(story);
     setOpenModal((prevState) => !prevState);
@@ -46,8 +69,9 @@ export default function Stories({ userId }) {
   return (
     <>
       <div className="stories">
-        {/* Add a story */}
+        {/* Stories wrapper */}
         <div className="stories-wrapper">
+          {/* "Create a story" entry point */}
           <div className="story">
             <LazyLoadImage
               src={
@@ -65,7 +89,7 @@ export default function Stories({ userId }) {
             </button>
           </div>
 
-          {/* Friends' stories */}
+          {/* Display user and friends' stories */}
           {error ? (
             <span className="msg">Something went wrong</span>
           ) : isLoading ? (
@@ -73,6 +97,7 @@ export default function Stories({ userId }) {
           ) : stories?.length === 0 ? (
             <span className="msg">No story to show yet.</span>
           ) : (
+            // Map through and display all available stories
             stories?.map((story) => (
               <div
                 className="story"
@@ -81,22 +106,31 @@ export default function Stories({ userId }) {
                 style={{ cursor: "pointer" }}
               >
                 {isVideo(story?.file) ? (
-                  <video>
-                    <source
+                  // CONDITIONAL VIDEO RENDERING
+                  isSmallScreen ? (
+                    // SMALL SCREEN: Show only a thumbnail/image to save resources
+                    <LazyLoadImage
                       src={`/uploads/${story?.file}`}
-                      // If it's a MOV extension (iOS), use quicktime as MIME type
-                      type={
-                        story?.file.toLowerCase().endsWith(".mov")
-                          ? "video/quicktime"
-                          : `video/${story?.file.split(".").pop()}`
-                      }
+                      alt="story video thumbnail"
                     />
-                    Your browser doesn't support video.
-                  </video>
+                  ) : (
+                    // LARGE SCREEN: Show video tag (muted and loop for non-intrusive preview)
+                    <video muted loop>
+                      <source
+                        src={`/uploads/${story?.file}`} // If it's a MOV extension (iOS), use quicktime as MIME type for compatibility
+                        type={
+                          story?.file.toLowerCase().endsWith(".mov")
+                            ? "video/quicktime"
+                            : `video/${story?.file.split(".").pop()}`
+                        }
+                      />
+                      Your browser doesn't support video.
+                    </video>
+                  )
                 ) : (
+                  // Image story
                   <LazyLoadImage src={`/uploads/${story?.file}`} alt="story" />
                 )}
-
                 <span>
                   {story?.firstName} {story?.lastName}
                 </span>
@@ -106,10 +140,10 @@ export default function Stories({ userId }) {
         </div>
       </div>
 
+      {/* Modals for creation and viewing */}
       {openCreateStory && (
         <CreateStory setOpenCreateStory={setOpenCreateStory} />
       )}
-
       {openModal && (
         <ModalStory story={selectedStory} setOpenModal={setOpenModal} />
       )}

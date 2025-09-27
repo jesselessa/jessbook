@@ -1,3 +1,7 @@
+//**************************** ModalStory.jsx ********************************
+// Displays a single story in a modal, handling image/video viewing and deletion
+//****************************************************************************
+
 import { useContext } from "react";
 import "./modalStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
@@ -19,7 +23,7 @@ export default function ModalStory({ story, setOpenModal }) {
 
   const queryClient = useQueryClient();
 
-  // Delete a story
+  // Mutation to delete a story
   const deleteMutation = useMutation({
     mutationFn: () => makeRequest.delete(`/stories/${story.id}`),
 
@@ -30,6 +34,7 @@ export default function ModalStory({ story, setOpenModal }) {
     },
   });
 
+  // Handler for deleting the story
   const handleDelete = () => {
     try {
       deleteMutation.mutate(story.id);
@@ -48,6 +53,7 @@ export default function ModalStory({ story, setOpenModal }) {
 
         <div className="img-container">
           {isVideo(story.file) ? (
+            // Full size video player
             <video controls autoPlay>
               <source
                 src={`/uploads/${story?.file}`}
@@ -61,6 +67,7 @@ export default function ModalStory({ story, setOpenModal }) {
               Your browser doesn't support video.
             </video>
           ) : (
+            // Full size image viewer
             <LazyLoadImage src={`/uploads/${story.file}`} alt="story" />
           )}
         </div>
@@ -75,7 +82,7 @@ export default function ModalStory({ story, setOpenModal }) {
               </p>
               <p>Created {moment(story.createdAt).fromNow()}</p>
             </div>
-
+            {/* Delete button visible only to the story owner */}
             {currentUser?.id === story.userId && (
               <button className="delete" onClick={() => handleDelete(story.id)}>
                 Delete

@@ -1,4 +1,13 @@
-import { useState } from "react";
+//************************** CreateStory.jsx ******************************
+//* File currently being selected
+// - file already uploaded on the server
+// - server can be configured to generate a thumbnail and make it available
+// - no tool needed : the server manages/stores the thumbnail
+
+//* Client-side video duration check implemented
+//*************************************************************************
+
+import { useState, useEffect } from "react";
 import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -15,15 +24,58 @@ const isVideo = (fileType) => {
   return /^video\//i.test(fileType);
 };
 
+// Maximum allowed video duration (in seconds, must match backend validation)
+const MAX_DURATION_SECONDS = 60;
+
+// Component to load video metadata and check its duration
+const VideoDurationChecker = ({ fileURL, onDurationCheck }) => {
+  return (
+    // We use a hidden <video> element to trigger metadata loading
+    <video
+      src={fileURL} // We set height/width to 0 and hide it to prevent rendering issues
+      style={{
+        position: "absolute",
+        opacity: 0,
+        pointerEvents: "none",
+        width: 0,
+        height: 0,
+      }}
+      onLoadedMetadata={(e) => {
+        const duration = e.target.duration;
+        const isValid = duration <= MAX_DURATION_SECONDS;
+        onDurationCheck(isValid, duration);
+      }}
+    />
+  );
+};
+
 export default function CreateStory({ setOpenCreateStory }) {
   const [file, setFile] = useState(null); // File present or not
-  const [text, setText] = useState("");
-  const [fileURL, setFileURL] = useState("");
+  const [text, setText] = useState(""); // Story description text
+  const [fileURL, setFileURL] = useState(""); // Local URL for file preview (URL.createObjectURL)
   const [error, setError] = useState({ isError: false, message: "" });
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 600);
+  const [tempVideoFile, setTempVideoFile] = useState(null); // Holds video while duration is checked
+  const [isCheckingDuration, setIsCheckingDuration] = useState(false); // Loading state
+  const [videoDuration, setVideoDuration] = useState(null); // Stores final duration (if valid)
 
   const queryClient = useQueryClient();
 
-  // Create a new story
+  // Hook to detect screen resize and update isSmallScreen state
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 600);
+    };
+    // Set up the event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // Mutation to create a story
   const mutation = useMutation({
     mutationFn: (newStory) => makeRequest.post("/stories", newStory),
 
@@ -39,61 +91,125 @@ export default function CreateStory({ setOpenCreateStory }) {
   const handleClick = async (e) => {
     e.preventDefault();
 
-    // Check if image or video selected
+    // 1 - Check if duration check is still pending
+    if (isCheckingDuration) {
+      setError({
+        isError: true,
+        message: "Please wait for video duration check to complete.",
+      });
+      return;
+    }
+
+    // 2 - Check if a file is actually selected (passed validation)
     if (!file) {
       setError({
         isError: true,
-        message: "You can't edit a story without an image or a video.",
+        message: "You must select an image or a video file.",
       });
       return;
     }
 
-    // Check description length if present
+    // 3 - Check description length
     if (text?.trim()?.length > 45) {
       setError({
         isError: true,
-        message: "Description can't contain more than 100\u00A0characters.",
+        message: "Description can't contain more than 45\u00A0characters.",
       });
       return;
     }
 
-    // Upload new file if present
+    // If it's a video, ensure client-side validation passed (redundant but safe)
+    if (isVideo(file.type) && videoDuration > MAX_DURATION_SECONDS) {
+      setError({
+        isError: true,
+        message: `Video duration (${videoDuration.toFixed(
+          1
+        )}s) exceeds the 60 seconds limit.`,
+      });
+      return;
+    }
+
+    // Upload the valid file to the server
     const newFile = file ? await uploadFile(file) : null;
 
     // Trigger mutation to update database
     mutation.mutate({ file: newFile, text: text.trim() });
 
-    setOpenCreateStory(false); // Close form
-    setFile(null); // Reset file state to release URL resource
+    // Reset states after successful submission
+    setOpenCreateStory(false);
+    setFile(null);
   };
 
+  // Handler for the result of the video duration check
+  const handleDurationCheck = (isValid, duration) => {
+    setIsCheckingDuration(false);
+
+    // Clean up the temporary URL immediately after metadata is loaded
+    URL.revokeObjectURL(fileURL);
+
+    if (isValid) {
+      // SUCCESS: Store the file in the actual 'file' state and the duration
+      setFile(tempVideoFile);
+      setVideoDuration(duration);
+      setFileURL(URL.createObjectURL(tempVideoFile)); // Recreate URL for preview if needed
+    } else {
+      // ERROR: Show error message
+      setError({
+        isError: true,
+        message: `Video duration (${duration.toFixed(
+          1
+        )}s) exceeds the 60 seconds limit.`,
+      });
+
+      // Clear all file states related to the invalid file
+      setFile(null);
+      setVideoDuration(null);
+      setFileURL("");
+    }
+
+    setTempVideoFile(null); // Clear temp state regardless of outcome
+  };
+
+  // Handler when a file is selected
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    const filePath = URL.createObjectURL(selectedFile); // Reset error message every time file changes
 
+    // Reset all states for a new selection
     setError({ isError: false, message: "" });
+    setFile(null);
+    setFileURL("");
+    setVideoDuration(null);
 
     if (selectedFile) {
+      const filePath = URL.createObjectURL(selectedFile); // Temp URL for checker
+
       if (isVideo(selectedFile.type)) {
-        // If it's a video, store it and update its URL for preview
-        setFile(selectedFile);
-        setFileURL(filePath);
+        // VIDEO: Store file temporarily, set temp URL, and start duration check
+        setIsCheckingDuration(true);
+        setTempVideoFile(selectedFile);
+        setFileURL(filePath); // This URL will be used by the hidden checker component
       } else {
-        // If it's an image, store it and update its URL for preview
+        // IMAGE: Store file and set URL immediately (no duration check needed)
         setFile(selectedFile);
         setFileURL(filePath);
       }
     }
   };
 
-  // Release URL resource to prevent memory leaks
+  // Custom hook to release the local URL resource when component unmounts or file changes to prevent memory leaks
   useCleanUpFileURL(file);
 
   return (
     <div className="createStory">
       <div className="wrapper">
         <h1>Create a story</h1>
-
+        {/* RENDER THE DURATION CHECKER IF A TEMP VIDEO EXISTS */}       
+        {tempVideoFile && isCheckingDuration && (
+          <VideoDurationChecker
+            fileURL={fileURL}
+            onDurationCheck={handleDurationCheck}
+          />
+        )}
         <form name="story-form">
           {/* Add an image or a video */}
           <div className="input-group">
@@ -102,30 +218,52 @@ export default function CreateStory({ setOpenCreateStory }) {
               id="story-file"
               name="story-file"
               accept="image/*, video/*"
-              onChange={handleFileChange}
+              onChange={handleFileChange} // Disable input while checking duration
+              disabled={isCheckingDuration}
             />
             <label className="file-label" htmlFor="story-file">
               Add an image or a&nbsp;video
             </label>
-
-            {file && (
-              <div className="img-container">
-                {/* Create a video or an image preview */}
-                {isVideo(file.type) ? (
+            {/* Show preview if a file is successfully loaded or if checking duration is active */}
+            {(file || isCheckingDuration) && (
+              <div className="file-container">
+                {/* Create a video or an image preview */}     
+                {isCheckingDuration ? (
+                  // Display loading state while checking duration
                   <div className="video-placeholder">
-                    <p>
-                      ✅ Video selected
-                      <br />
-                      <span>(Preview unavailable)</span>
-                    </p>
+                    <p>⏳ Checking video duration...</p>   
                   </div>
+                ) : isVideo(file?.type) ? (
+                  // Video selected AND validated
+                  isSmallScreen ? (
+                    // SMALL SCREEN: Show placeholder with duration
+                    <div className="video-placeholder">
+                      <p>
+                        ✅ Video Selected ({videoDuration?.toFixed(1)}s)
+                        <br />
+                        <span>(Preview unavailable on small screens)</span>
+                      </p>
+                    </div>
+                  ) : (
+                    // LARGE SCREEN: Show actual video preview
+                    <video
+                      controls
+                      autoPlay
+                      muted
+                      className="story-video-preview"
+                    >
+                      {/* Use the local fileURL for immediate client-side preview */}
+                      <source src={fileURL} type={file.type} />                 
+                      Your browser doesn't support video preview.          
+                    </video>
+                  )
                 ) : (
+                  // Image Preview
                   <LazyLoadImage src={fileURL} alt="story preview" />
                 )}
               </div>
             )}
           </div>
-
           <label className="text-label" htmlFor="text">
             Add a text
           </label>
@@ -139,19 +277,20 @@ export default function CreateStory({ setOpenCreateStory }) {
             onChange={(e) => setText(e.target.value)}
           />
 
-          <button type="submit" onClick={handleClick}>
-            Publish
+          <button
+            type="submit"
+            onClick={handleClick} // Disable if checking duration is active or no file has passed validation
+            disabled={isCheckingDuration || !file}
+          >
+            {isCheckingDuration ? "Checking Duration..." : "Publish"}
           </button>
         </form>
-
-        {/* Error message */}
-        {error.isError && <span className="error-msg">{error.message}</span>}
-
+        {/* Error message display */}
+        {error.isError && <span className="error-msg">{error.message}</span>}   
         <button className="close" onClick={() => setOpenCreateStory(false)}>
           X
         </button>
       </div>
-
       <Overlay />
     </div>
   );
