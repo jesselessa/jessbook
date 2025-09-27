@@ -50,14 +50,15 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 1rem;
+        gap: 2rem;
+        margin-bottom: 1rem;
 
         #story-file {
           display: none;
         }
 
         .file-label {
-          width: 60%;
+          width: 220px;
           display: inline-flex;
           justify-content: center;
           align-items: center;
@@ -69,7 +70,6 @@
           background-color: #ffd670;
           border-radius: 0.3rem;
           padding: 0.5rem 0.8rem;
-          margin-bottom: 1rem;
           transition: background-color 0.3s ease, transform 0.2s ease;
           cursor: pointer;
           &:hover {
@@ -86,7 +86,7 @@
         }
 
         .file-container {
-          width: 40%;
+          width: auto;
           display: flex;
           justify-content: center;
           align-items: center;
