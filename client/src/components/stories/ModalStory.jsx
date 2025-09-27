@@ -50,8 +50,13 @@ export default function ModalStory({ story, setOpenModal }) {
           {isVideo(story.file) ? (
             <video controls autoPlay>
               <source
-                src={`/uploads/${story.file}`}
-                type={`video/${story.file.split(".").pop()}`}
+                src={`/uploads/${story?.file}`}
+                // If it's a MOV extension (iOS), we use quicktime as MIME type
+                type={
+                  story?.file.toLowerCase().endsWith(".mov")
+                    ? "video/quicktime"
+                    : `video/${story?.file.split(".").pop()}`
+                }
               />
               Your browser doesn't support video.
             </video>
