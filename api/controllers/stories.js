@@ -4,9 +4,22 @@ import moment from "moment";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import ffmpeg from "fluent-ffmpeg";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Get video story duration in seconds (Promise-based)
+const getVideoDuration = (videoPath) => {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(videoPath, (err, metadata) => {
+      if (err) return reject(err);
+
+      // Duration is stored in metadata.format.duration
+      resolve(metadata.format.duration);
+    });
+  });
+};
 
 export const getStories = async (req, res) => {
   const userId = req.query.userId;
@@ -46,6 +59,7 @@ export const getStories = async (req, res) => {
     const data = await executeQuery(selectQuery, values);
     return res.status(200).json(data);
   } catch (error) {
+    console.error("Error fetching stories:", error);
     return res.status(500).json({
       message: "An unknown error occurred while fetching stories.",
       error: error.message,
@@ -61,22 +75,52 @@ export const addStory = async (req, res) => {
   if (!file || file?.trim()?.length === 0)
     return res
       .status(400)
-      .json("You must provide either an image or a video file.");
+      .json({ message: "You must provide either an image or a video file." });
 
   // Validate file format
   if (file && !isImage(file) && !isVideo(file))
     return res
       .status(400)
-      .json("You must provide a valid image or video format.");
+      .json({ message: "You must provide a valid image or video format." });
 
   // Validate description
   if (text?.trim()?.length > 45)
-    return res
-      .status(400)
-      .json("Description can't contain more than 45\u00A0characters.");
+    return res.status(400).json({
+      message: "Description can't contain more than 45\u00A0characters.",
+    });
 
   try {
-    // Delete current story if non expired before creating new one
+    // START: SERVER-SIDE VIDEO DURATION VALIDATION (Fallback for client-side failure)
+    if (isVideo(file)) {
+      // 1 - Determine the full path of the uploaded file
+      const videoPath = path.join(
+        __dirname,
+        "../../client/public/uploads",
+        file
+      );
+
+      // 2. Check if the file exists on the server (for safety)
+      if (!fs.existsSync(videoPath)) {
+        return res
+          .status(404)
+          .json({ message: "Uploaded video file not found on server." });
+      }
+
+      // 3. Get video duration using ffprobe
+      const duration = await getVideoDuration(videoPath);
+
+      // 4. Apply the 60-second rule
+      if (duration > 60) {
+        // Delete the file to clean up the server storage
+        fs.unlinkSync(videoPath);
+        return res
+          .status(400)
+          .json({ message: "Video duration can't exceed 60\u00A0seconds." });
+      }
+    }
+    // END : SERVER-SIDE VIDEO DURATION VALIDATION
+
+    // Delete the current story if non expired before creating a new one
     const deleteQuery = `
           DELETE FROM stories WHERE userId = ? AND expiresAt > NOW()
         `;
@@ -101,10 +145,32 @@ export const addStory = async (req, res) => {
 
     await executeQuery(insertQuery, values);
 
-    return res.status(201).json("New story created");
+    return res.status(201).json({ message: "New story created" });
   } catch (error) {
+    console.error("Error creating a new story:", error);
+
+    // Handle potential errors from ffprobe (e.g., corrupt file or unsupported format)
+    if (error.message.includes("ffprobe")) {
+      // Attempt to delete the file uploaded by Multer, if duration check failed
+      try {
+        fs.unlinkSync(
+          path.join(__dirname, "../../client/public/uploads", file)
+        );
+      } catch (unlinkError) {
+        console.error(
+          "Failed to clean up file after ffprobe error:",
+          unlinkError
+        );
+      }
+
+      return res.status(400).json({
+        message:
+          "Could not process video file. It might be corrupt or in an unsupported format.",
+      });
+    }
+
     return res.status(500).json({
-      message: "An unknown error occurred while creating new story.",
+      message: "An unknown error occurred while creating a new story.",
       error: error.message,
     });
   }
@@ -138,8 +204,10 @@ export const deleteStory = async (req, res) => {
     const q = "DELETE FROM stories WHERE id = ? AND userId = ?";
     const data = await executeQuery(q, [storyId, loggedInUserId]);
 
-    if (data.affectedRows > 0) return res.status(200).json("Story deleted");
+    if (data.affectedRows > 0)
+      return res.status(200).json({ message: "Story deleted" });
   } catch (error) {
+    console.error("Error deleting story:", error);
     return res.status(500).json({
       message: "An unknown error occurred while deleting story.",
       error: error.message,

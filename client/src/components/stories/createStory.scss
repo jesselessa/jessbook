@@ -49,17 +49,15 @@
       .input-group {
         display: flex;
         justify-content: center;
+        align-items: center;
         gap: 1rem;
-
-        @include style.xsmall {
-          gap: 0.7rem;
-        }
 
         #story-file {
           display: none;
         }
 
         .file-label {
+          width: 60%;
           display: inline-flex;
           justify-content: center;
           align-items: center;
@@ -88,15 +86,31 @@
         }
 
         .img-container {
-          width: 50px;
-          height: 50px;
+          width: 40%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
 
           img,
           video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
+            width: 50px;
+            height: 50px;
+          }
+
+          .video-placeholder {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+
+            p {
+              font-size: 1.3rem;
+
+              span {
+                font-size: 1.2rem;
+              }
+            }
           }
         }
       }
@@ -132,7 +146,7 @@
           transform: translateY(1px);
           background-color: color.scale(#5271ff, $lightness: -10%);
         }
-        
+
         @include style.small {
           padding: 0.8rem;
         }
