@@ -51,10 +51,18 @@ const VideoDurationChecker = ({ fileURL, onDurationCheck }) => {
   );
 };
 
+//*----------------------------- Blob URL ---------------------------------
+// Blob URLs are dynamically generated URLs (Uniform Resource Locators) that allow access to binary data stored in a Blob (Binary Large OBject) object in JavaScript
+
+// A Blob object can contain data of various types, such as images, audio or video files, text, or any other type of binary data
+
+// It's a useful and flexible technique for manipulating pseudo-files in memory, which do not exist as such on a web server
+//*------------------------------------------------------------------------
+
 export default function CreateStory({ setOpenCreateStory }) {
   const [file, setFile] = useState(null); // File present or not
   const [text, setText] = useState(""); // Story description text
-  const [fileURL, setFileURL] = useState(""); // Local URL for file preview (URL.createObjectURL)
+  const [fileURL, setFileURL] = useState(""); // Local URL for file preview (URL.createObjectURL) => It's a Blob URL
   const [error, setError] = useState({ isError: false, message: "" });
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 600);
   const [tempVideoFile, setTempVideoFile] = useState(null); // Holds video while duration is checked
@@ -81,10 +89,18 @@ export default function CreateStory({ setOpenCreateStory }) {
   const mutation = useMutation({
     mutationFn: (newStory) => makeRequest.post("/stories", newStory),
 
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // "data" contains the response from the server
+      // The server response should contain the message and the new storyId
+      const newStoryId = data.storyId;
+
       // Invalidate and refetch
       queryClient.invalidateQueries(["stories"]);
       toast.success("Story published.");
+
+      // Reset states after successful submission
+      setOpenCreateStory(false);
+      setFile(null);
     },
 
     onError: (error) => console.error("Error creating story:", error),
@@ -120,7 +136,7 @@ export default function CreateStory({ setOpenCreateStory }) {
       return;
     }
 
-    // If it's a video, ensure client-side validation passed (redundant but safe)
+    // 4 - If it's a video, ensure client-side validation passed (redundant but safe)
     if (isVideo(file.type) && videoDuration > MAX_DURATION_SECONDS) {
       setError({
         isError: true,
@@ -131,18 +147,13 @@ export default function CreateStory({ setOpenCreateStory }) {
       return;
     }
 
-    // Upload the valid file to the server
-    const newFile = await uploadFile(file); // newFile is either a string (fileName.extension) or 'null'
+    // 5 - Only upload the valid file to the server
+    const newFile = await uploadFile(file);
+    if (!newFile) return; // Code stops here
+    // Note : newFile is a string ("fileName.extension")
 
-    // If upload failed or file was null, the code stops here
-    if (!newFile) return;
-
-    // Only proceed if newFile is valid in order to trigger a mutation to update database
+    // 6 - Trigger a mutation to update database
     mutation.mutate({ file: newFile, text: text.trim() });
-
-    // Reset states after successful submission
-    setOpenCreateStory(false);
-    setFile(null);
   };
 
   // Handler for the result of the video duration check
