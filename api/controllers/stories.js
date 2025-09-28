@@ -9,6 +9,9 @@ import ffmpeg from "fluent-ffmpeg";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Define a reliable path to the 'uploads' directory, based on our VPS structure (client/public/uploads)
+const UPLOADS_PATH = path.join(__dirname, "../../client/public/uploads");
+
 // Get video story duration in seconds (Promise-based)
 const getVideoDuration = (videoPath) => {
   return new Promise((resolve, reject) => {
@@ -22,39 +25,40 @@ const getVideoDuration = (videoPath) => {
 };
 
 export const getStories = async (req, res) => {
-  const userId = req.query.userId;
-  const loggedInUserId = req.user.id;
+  // targetUserId is the ID from the query param (if fetching a profile)
+  const targetUserId = req.query.userId;
+  const loggedInUserId = req.user.id; // Determine if we are fetching stories for a specific profile (where targetUserId is set and not the string "undefined")
+
+  const isFetchingProfileStories = targetUserId && targetUserId !== "undefined";
 
   try {
-    // Delete former stories even non expired before getting new ones //! In large-scale projects, better use a cron job to reduce loading time of SQL query
+    // Delete former stories even non expired before getting new ones
+    // In large-scale projects, better use a cron job to reduce loading time of SQL query
     const deleteQuery = "DELETE FROM stories WHERE expiresAt <= NOW()";
-    await executeQuery(deleteQuery);
+    await executeQuery(deleteQuery); // Get stories: either for a specific user profile (if isFetchingProfileStories is true) // or for the current user's feed (user's own story + followed users stories)
 
-    // Get user story + followed users stories
-    const selectQuery =
-      userId !== "undefined"
-        ? `SELECT s.*, u.id AS userId, firstName, lastName
-               FROM stories AS s 
-               JOIN users AS u ON (u.id = s.userId) 
-               WHERE s.userId = ? 
-               ORDER BY s.createdAt DESC`
-        : `
-               SELECT s.*, u.id as userId, firstName, lastName
-               FROM stories AS s
-               JOIN users AS u ON (u.id = s.userId)
-               WHERE s.userId = ? 
-               OR s.userId IN (SELECT followedId 
-               FROM relationships WHERE followerId = ?)
-               AND s.expiresAt > NOW()
-               ORDER BY
-                 CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
-                 s.createdAt DESC`;
-    // Logged-in user story displayed first, then most recent stories
+    const selectQuery = isFetchingProfileStories
+      ? `SELECT s.*, u.id AS userId, firstName, lastName
+               FROM stories AS s 
+               JOIN users AS u ON (u.id = s.userId) 
+               WHERE s.userId = ? 
+               ORDER BY s.createdAt DESC`
+      : `
+               SELECT s.*, u.id as userId, firstName, lastName
+               FROM stories AS s
+               JOIN users AS u ON (u.id = s.userId)
+               WHERE s.userId = ? 
+               OR s.userId IN (SELECT followedId 
+               FROM relationships WHERE followerId = ?)
+               AND s.expiresAt > NOW()
+               ORDER BY
+                 CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
+                 s.createdAt DESC`; // Logged-in user story displayed first, then most recent friends' stories
 
-    const values =
-      userId !== "undefined"
-        ? [userId]
-        : [loggedInUserId, loggedInUserId, loggedInUserId];
+    // Use the correct values based on the query type
+    const values = isFetchingProfileStories
+      ? [targetUserId]
+      : [loggedInUserId, loggedInUserId, loggedInUserId]; // Fixed the logic to prevent 'undefined' bind error
 
     const data = await executeQuery(selectQuery, values);
     return res.status(200).json(data);
@@ -93,23 +97,20 @@ export const addStory = async (req, res) => {
     // START: SERVER-SIDE VIDEO DURATION VALIDATION (Fallback for client-side failure)
     if (isVideo(file)) {
       // 1 - Determine the full path of the uploaded file
-      const videoPath = path.join(
-        __dirname,
-        "../../client/public/uploads",
-        file
-      );
+      // FIX: Using the predefined UPLOADS_PATH based on our 'client/public/uploads' structure
+      const videoPath = path.join(UPLOADS_PATH, file);
 
-      // 2. Check if the file exists on the server (for safety)
+      // 2 - Check if the file exists on the server (for safety)
       if (!fs.existsSync(videoPath)) {
         return res
           .status(404)
           .json({ message: "Uploaded video file not found on server." });
       }
 
-      // 3. Get video duration using ffprobe
+      // 3 - Get video duration using ffprobe
       const duration = await getVideoDuration(videoPath);
 
-      // 4. Apply the 60-second rule
+      // 4 - Apply the 60-second rule
       if (duration > 60) {
         // Delete the file to clean up the server storage
         fs.unlinkSync(videoPath);
@@ -118,12 +119,13 @@ export const addStory = async (req, res) => {
           .json({ message: "Video duration can't exceed 60\u00A0seconds." });
       }
     }
+
     // END : SERVER-SIDE VIDEO DURATION VALIDATION
 
     // Delete the current story if non expired before creating a new one
     const deleteQuery = `
-          DELETE FROM stories WHERE userId = ? AND expiresAt > NOW()
-        `;
+          DELETE FROM stories WHERE userId = ? AND expiresAt > NOW()
+        `;
     await executeQuery(deleteQuery, [loggedInUserId]);
 
     // Create a new story
@@ -153,9 +155,7 @@ export const addStory = async (req, res) => {
     if (error.message.includes("ffprobe")) {
       // Attempt to delete the file uploaded by Multer, if duration check failed
       try {
-        fs.unlinkSync(
-          path.join(__dirname, "../../client/public/uploads", file)
-        );
+        fs.unlinkSync(path.join(UPLOADS_PATH, file));
       } catch (unlinkError) {
         console.error(
           "Failed to clean up file after ffprobe error:",
@@ -191,9 +191,7 @@ export const deleteStory = async (req, res) => {
     if (storyData.length > 0 && storyData[0].file) {
       try {
         // Deleting story from server in "uploads" folder
-        fs.unlinkSync(
-          path.join(__dirname, "../../client/public/uploads", storyData[0].file)
-        );
+        fs.unlinkSync(path.join(UPLOADS_PATH, storyData[0].file));
         console.log(`Story file ${storyData[0].file} deleted.`);
       } catch (err) {
         console.error(`Error deleting story file ${storyData[0].file}:`, err);
