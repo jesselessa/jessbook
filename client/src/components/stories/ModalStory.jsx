@@ -6,7 +6,7 @@ import { useContext } from "react";
 import "./modalStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
-import { isVideo } from "../../utils/isVideo.js";
+import { isVideo } from "../../utils/isFile.js";
 import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import { toast } from "react-toastify";
 import moment from "moment";
@@ -51,11 +51,12 @@ export default function ModalStory({ story, setOpenModal }) {
           X
         </button>
 
-        <div className="img-container">
+        <div className="file-container">
           {isVideo(story.file) ? (
             // Full size video player
             <video controls autoPlay>
               <source
+                //! "uploads" is the public web path that is exposed and handled by our web server for static assets
                 src={`/uploads/${story?.file}`}
                 // If it's a MOV extension (iOS), use quicktime as MIME type
                 type={

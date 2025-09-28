@@ -1,5 +1,6 @@
 import { db, executeQuery } from "../db/connect.js";
 import { isImage, isVideo } from "../utils/isFile.js";
+import { generateThumbnail } from "../utils/generateThumbnail.js";
 import moment from "moment";
 import fs from "fs";
 import path from "path";
@@ -161,9 +162,37 @@ export const addStory = async (req, res) => {
       expirationDate,
     ];
 
-    await executeQuery(insertQuery, values);
+    // Execute insertion and get the new story ID
+    const result = await executeQuery(insertQuery, values);
+    // Retrieve the ID of the newly inserted row
+    const storyId = result?.insertId;
 
-    return res.status(201).json({ message: "New story created" });
+    // ------------------------------------------------------------
+    // START: THUMBNAIL GENERATION LOGIC
+    // ------------------------------------------------------------
+    if (isVideo(file) && storyId) {
+      // If it's a video and we successfully got the new ID
+      try {
+        // 1 - Generate the thumbnail using the original filename and the new story ID (the thumbnail will be stored as "/uploads/thumbnails/{storyId}.jpg")
+        await generateThumbnail(file, storyId);
+        // Note: We don't need to update the DB ; the frontend constructs the thumbnail path predictably
+      } catch (thumbnailError) {
+        // Log the error but don't stop the main process
+        // The story is created, but the thumbnail might be missing
+        console.warn(
+          "Warning: Thumbnail generation failed for story ID:",
+          storyId,
+          thumbnailError.message
+        );
+      }
+    }
+    // ------------------------------------------------------------
+    // END: THUMBNAIL GENERATION LOGIC
+    // ------------------------------------------------------------
+    return res.status(201).json({
+      message: "New story created and processed",
+      storyId: storyId, // Returning the ID can be useful for frontend caching
+    });
   } catch (error) {
     console.error("Error creating a new story:", error);
 

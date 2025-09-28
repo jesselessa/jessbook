@@ -19,7 +19,7 @@ import { toast } from "react-toastify";
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 import Overlay from "../overlay/Overlay.jsx";
 
-// Check if a file is a video based on its MIME type
+// Utility function to check if a file is a video based on its MIME type
 const isVideo = (fileType) => {
   return /^video\//i.test(fileType);
 };
@@ -132,7 +132,7 @@ export default function CreateStory({ setOpenCreateStory }) {
     }
 
     // Upload the valid file to the server
-    const newFile = await uploadFile(file); // newFile is a string "fileName.extension"
+    const newFile = await uploadFile(file); // newFile is either a string (fileName.extension) or 'null'
 
     // If upload failed or file was null, the code stops here
     if (!newFile) return;

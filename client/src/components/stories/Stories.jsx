@@ -1,7 +1,7 @@
 //***************************** Stories.jsx *********************************
 //* Displays user and friends' stories with optimized video thumbnails based on screen size
 // - local file on user's device
-// - thumbnail must be generated client-side from the local file (blob URL)
+// - thumbnail can be generated client-side from the local file (blob URL)
 // - tools needed : JavaScript/Canvas API or custom librairies
 //****************************************************************************
 
@@ -9,7 +9,7 @@ import { useContext, useState, useEffect } from "react";
 import "./stories.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
-import { isVideo } from "../../utils/isVideo.js";
+import { isImage, isVideo } from "../../utils/isFile.js";
 
 // Components
 import CreateStory from "./CreateStory.jsx";
@@ -76,7 +76,8 @@ export default function Stories({ userId }) {
             <LazyLoadImage
               src={
                 currentUser?.profilePic
-                  ? `/uploads/${currentUser.profilePic}`
+                  ? //! "uploads" is the public web path that is exposed and handled by our web server for static assets
+                    `/uploads/${currentUser.profilePic}`
                   : defaultProfile
               }
               alt="user"
@@ -115,7 +116,7 @@ export default function Stories({ userId }) {
                     />
                   ) : (
                     // LARGE SCREEN: Show video tag (muted and loop for non-intrusive preview)
-                    <video muted loop>
+                    <video controls poster>
                       <source
                         src={`/uploads/${story?.file}`} // If it's a MOV extension (iOS), use quicktime as MIME type for compatibility
                         type={
@@ -128,8 +129,13 @@ export default function Stories({ userId }) {
                     </video>
                   )
                 ) : (
-                  // Image story
-                  <LazyLoadImage src={`/uploads/${story?.file}`} alt="story" />
+                  isImage(story?.file) && (
+                    // Image story
+                    <LazyLoadImage
+                      src={`/uploads/${story?.file}`}
+                      alt="story"
+                    />
+                  )
                 )}
                 <span>
                   {story?.firstName} {story?.lastName}
