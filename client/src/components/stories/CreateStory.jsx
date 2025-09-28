@@ -278,11 +278,7 @@ export default function CreateStory({ setOpenCreateStory }) {
             onChange={(e) => setText(e.target.value)}
           />
 
-          <button
-            type="submit"
-            onClick={handleClick} // Disable if checking duration is active or no file has passed validation
-            disabled={isCheckingDuration || !file}
-          >
+          <button type="submit" onClick={handleClick}>
             {isCheckingDuration ? "Checking Duration..." : "Publish"}
           </button>
         </form>
