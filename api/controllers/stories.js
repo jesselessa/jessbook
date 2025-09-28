@@ -33,34 +33,46 @@ export const getStories = async (req, res) => {
   const isFetchingProfileStories = targetUserId && targetUserId !== "undefined";
 
   try {
-    // Delete former stories even non expired before getting new ones
+    // 1 - Delete former stories even non expired before getting new ones
     //! In large-scale projects, better use a cron job to reduce the loading time of a SQL query
     const deleteQuery = "DELETE FROM stories WHERE expiresAt <= NOW()";
     await executeQuery(deleteQuery);
 
-    // Get stories: either for a specific user profile (if isFetchingProfileStories is true) or for the current user's feed (user's own story + followed users stories)
-    const selectQuery = isFetchingProfileStories
-      ? `SELECT s.*, u.id AS userId, firstName, lastName
-               FROM stories AS s 
-               JOIN users AS u ON (u.id = s.userId) 
-               WHERE s.userId = ? 
-               ORDER BY s.createdAt DESC`
-      : `
-               SELECT s.*, u.id as userId, firstName, lastName
-               FROM stories AS s
-               JOIN users AS u ON (u.id = s.userId)
-               WHERE s.userId = ? 
-               OR s.userId IN (SELECT followedId 
-               FROM relationships WHERE followerId = ?)
-               AND s.expiresAt > NOW()
-               ORDER BY
-                 CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
-                 s.createdAt DESC`; // Logged-in user story displayed first, then most recent friends' stories
+    // 2 - Prepare the SQL query
 
-    // Use the correct values based on the query type
+    // Query for a specific user's profile
+    const profileQuery = `SELECT s.*, u.id AS userId, firstName, lastName
+                          FROM stories AS s 
+                          JOIN users AS u ON (u.id = s.userId) 
+                          WHERE s.userId = ? 
+                          ORDER BY s.createdAt DESC`;
+
+    // Query for the logged-in user's feed (user's own story + followed users stories)
+    const feedQuery = `
+        SELECT s.*, u.id as userId, firstName, lastName
+        FROM stories AS s
+        JOIN users AS u ON (u.id = s.userId)
+        WHERE s.userId = ? 
+        OR s.userId IN (SELECT followedId 
+        FROM relationships WHERE followerId = ?)
+        AND s.expiresAt > NOW()
+        ORDER BY
+          CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
+          s.createdAt DESC`; // Logged-in user story displayed first, then most recent friends' stories
+
+    // FIX : Clean the multi-line feed query to remove unwanted newlines, tabs, and spaces
+    // This resolves the "SQL syntax error" caused by template literals
+    const cleanedFeedQuery = feedQuery.replace(/\s+/g, " ").trim();
+
+    const selectQuery = isFetchingProfileStories
+      ? profileQuery
+      : cleanedFeedQuery; // Use the cleaned query for the feed
+
+    // Use the correct values array based on the query type
+    // FIX : Ensures 'values' never contains 'undefined', which caused the previous 500 error
     const values = isFetchingProfileStories
       ? [targetUserId]
-      : [loggedInUserId, loggedInUserId, loggedInUserId]; // Fixed the logic to prevent 'undefined' bind error
+      : [loggedInUserId, loggedInUserId, loggedInUserId];
 
     const data = await executeQuery(selectQuery, values);
     return res.status(200).json(data);
@@ -99,7 +111,7 @@ export const addStory = async (req, res) => {
     // START: SERVER-SIDE VIDEO DURATION VALIDATION (Fallback for client-side failure)
     if (isVideo(file)) {
       // 1 - Determine the full path of the uploaded file
-      // FIX: Using the predefined UPLOADS_PATH based on our VPS structure (client/public/uploads)
+      // We use the predefined UPLOADS_PATH based on our VPS structure (client/public/uploads)
       const videoPath = path.join(UPLOADS_PATH, file);
 
       // 2 - Check if the file exists on the server (for safety)
@@ -121,7 +133,6 @@ export const addStory = async (req, res) => {
           .json({ message: "Video duration can't exceed 60\u00A0seconds." });
       }
     }
-
     // END : SERVER-SIDE VIDEO DURATION VALIDATION
 
     // Delete the current story if non expired before creating a new one
@@ -209,7 +220,7 @@ export const deleteStory = async (req, res) => {
   } catch (error) {
     console.error("Error deleting story:", error);
     return res.status(500).json({
-      message: "An unknown error occurred while deleting story.",
+      message: "An unknown error occurred while deleting the story.",
       error: error.message,
     });
   }
