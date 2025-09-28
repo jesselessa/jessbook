@@ -27,16 +27,18 @@ const getVideoDuration = (videoPath) => {
 export const getStories = async (req, res) => {
   // targetUserId is the ID from the query param (if fetching a profile)
   const targetUserId = req.query.userId;
-  const loggedInUserId = req.user.id; // Determine if we are fetching stories for a specific profile (where targetUserId is set and not the string "undefined")
+  const loggedInUserId = req.user.id;
 
+  // Determine if we are fetching stories for a specific profile (where targetUserId is set and not the string "undefined")
   const isFetchingProfileStories = targetUserId && targetUserId !== "undefined";
 
   try {
     // Delete former stories even non expired before getting new ones
-    // In large-scale projects, better use a cron job to reduce loading time of SQL query
+    //! In large-scale projects, better use a cron job to reduce the loading time of a SQL query
     const deleteQuery = "DELETE FROM stories WHERE expiresAt <= NOW()";
-    await executeQuery(deleteQuery); // Get stories: either for a specific user profile (if isFetchingProfileStories is true) // or for the current user's feed (user's own story + followed users stories)
+    await executeQuery(deleteQuery);
 
+    // Get stories: either for a specific user profile (if isFetchingProfileStories is true) or for the current user's feed (user's own story + followed users stories)
     const selectQuery = isFetchingProfileStories
       ? `SELECT s.*, u.id AS userId, firstName, lastName
                FROM stories AS s 
@@ -97,7 +99,7 @@ export const addStory = async (req, res) => {
     // START: SERVER-SIDE VIDEO DURATION VALIDATION (Fallback for client-side failure)
     if (isVideo(file)) {
       // 1 - Determine the full path of the uploaded file
-      // FIX: Using the predefined UPLOADS_PATH based on our 'client/public/uploads' structure
+      // FIX: Using the predefined UPLOADS_PATH based on our VPS structure (client/public/uploads)
       const videoPath = path.join(UPLOADS_PATH, file);
 
       // 2 - Check if the file exists on the server (for safety)
@@ -192,7 +194,7 @@ export const deleteStory = async (req, res) => {
       try {
         // Deleting story from server in "uploads" folder
         fs.unlinkSync(path.join(UPLOADS_PATH, storyData[0].file));
-        console.log(`Story file ${storyData[0].file} deleted.`);
+        console.log(`Story file ${storyData[0].file} deleted`);
       } catch (err) {
         console.error(`Error deleting story file ${storyData[0].file}:`, err);
       }
