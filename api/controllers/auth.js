@@ -11,10 +11,11 @@ export const register = async (req, res) => {
     const selectQuery = "SELECT * FROM users WHERE email = ?";
     const data = await executeQuery(selectQuery, [email]);
 
-    if (data.length > 0)
+    if (data.length > 0) {
       return res.status(409).json({
         message: "An account with this email address already exists.",
       });
+    }
 
     // 2 - If user does not exist, start validating input values
     let errors = {};
@@ -35,9 +36,13 @@ export const register = async (req, res) => {
     // 6 - Validate password using regex
     const passwordRegex =
       /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
-    if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200)
+    if (
+      !passwordRegex.test(password?.trim()) ||
+      password?.trim()?.length > 200
+    ) {
       errors.password =
         "Password must be between 6 and 200 characters, including at least 1 number and 1 symbol.";
+    }
 
     // 7 - Check if password and confirmation password match
     if (password?.trim() !== confirmPswd?.trim())
@@ -97,10 +102,11 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
 
   // 1 - Validate that both email and password are provided
-  if (!email?.trim() || !password?.trim())
+  if (!email?.trim() || !password?.trim()) {
     return res
       .status(400)
       .json({ message: "Please, fill in all required fields." });
+  }
 
   try {
     // 2 - Find user by email in the database
@@ -201,10 +207,11 @@ export const recoverAccount = async (req, res) => {
     const q = "SELECT * FROM users WHERE email = ?";
     const data = await executeQuery(q, [email.trim()]);
 
-    if (data.length === 0)
+    if (data.length === 0) {
       return res.status(404).json({
         message: "There is no account associated with this email address.",
       });
+    }
 
     // 4 - Generate a JWT token for password reset (expires in 1h)
     const secretKey = process.env.JWT_SECRET;

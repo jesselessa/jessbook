@@ -88,13 +88,16 @@ export default function Register() {
     // c - Check password
     const passwordRegex =
       /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
-    if (!passwordRegex.test(password?.trim()) || password?.trim()?.length > 200)
+    if (
+      !passwordRegex.test(password?.trim()) ||
+      password?.trim()?.length > 200
+    ) {
       inputsErrors.password =
         "Password must be between 6 and 200\u00A0characters, including at least 1\u00A0number and 1\u00A0symbol.";
+    }
 
-    // d - Check confirmation password
+    // d - Check confirmation password (trim() removes whitespace from both sides of a string)
     if (password?.trim() !== confirmPswd?.trim())
-      // trim() removes whitespace from both sides of a string
       inputsErrors.confirmPswd = "Password does not match.";
 
     // e - If errors during validation, update state and stop process

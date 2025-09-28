@@ -29,10 +29,11 @@ export const addComment = async (req, res) => {
   if (text?.trim()?.length === 0)
     return res.status(400).json({ message: "Description cannot be empty." });
 
-  if (text?.trim()?.length > 500)
+  if (text?.trim()?.length > 500) {
     return res
       .status(400)
       .json("Description cannot exceed 500\u00A0characters.");
+  }
 
   const q =
     "INSERT INTO comments (`text`, `userId`, `postId`, `createdAt`) VALUES (?, ?, ?, ?)";
@@ -58,10 +59,11 @@ export const updateComment = async (req, res) => {
   if (text?.trim()?.length === 0)
     return res.status(400).json({ message: "No description to update" });
 
-  if (text?.trim()?.length > 500)
+  if (text?.trim()?.length > 500) {
     return res
       .status(400)
       .json({ message: "Description cannot exceed 500\u00A0characters." });
+  }
 
   const q = "UPDATE comments SET `text` = ? WHERE id = ? AND userId = ?";
 

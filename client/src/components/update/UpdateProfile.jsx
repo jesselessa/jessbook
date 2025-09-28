@@ -99,17 +99,14 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
 
     const { firstName, lastName, city } = fields;
 
-    if (firstName?.trim()?.length < 2 || firstName?.trim()?.length > 35) {
+    if (firstName?.trim()?.length < 2 || firstName?.trim()?.length > 35)
       inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
-    }
 
-    if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35) {
+    if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35)
       inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
-    }
 
-    if (city?.trim()?.length > 85) {
+    if (city?.trim()?.length > 85)
       inputsErrors.city = "Enter a valid city name.";
-    }
 
     // If errors during validation, update state and stop process
     if (Object.keys(inputsErrors).length > 0) {
@@ -126,7 +123,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     // Check if form fields or images have been modified
     const isAnyFieldModified = Object.keys(fields).some(
       (field) => fields[field] !== user[field]
-    ); //! Object.keys(object) returns an array with the object string-keyed property names
+    ); // Object.keys(object) returns an array with the object string-keyed property names
 
     const isCoverModified =
       cover && cover !== user.coverPic && user.coverPic !== defaultCover;

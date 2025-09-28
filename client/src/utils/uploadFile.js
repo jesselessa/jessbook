@@ -12,7 +12,8 @@ export const uploadFile = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await makeRequest.post("/uploads", formData); // If the request succeeds, return the file name string
+    const res = await makeRequest.post("/uploads", formData); 
+    // If the request succeeds, return the file name string
     return res.data;
   } catch (error) {
     // 1 - Log the failure for debugging

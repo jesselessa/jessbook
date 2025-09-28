@@ -54,10 +54,11 @@ export const addPost = async (req, res) => {
   if (text?.trim()?.length === 0)
     return res.status(400).json("Description cannot be empty.");
 
-  if (text?.trim()?.length > 1000)
+  if (text?.trim()?.length > 1000) {
     return res
       .status(400)
       .json("Description cannot exceed 1000\u00A0characters.");
+  }
 
   // Validate image
   if (img && !isImage(img))

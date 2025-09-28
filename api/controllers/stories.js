@@ -4,7 +4,8 @@ import moment from "moment";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import ffmpeg from "fluent-ffmpeg";
+import ffmpeg from "fluent-ffmpeg"; //! ⚠️ ffmpeg must also be installed on our VPS !!!
+// FFmpeg is a powerful, open-source software framework used for handling, converting, streaming, and playing multimedia files and streams
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +35,7 @@ export const getStories = async (req, res) => {
 
   try {
     // 1 - Delete former stories even non expired before getting new ones
-    //! In large-scale projects, better use a cron job to reduce the loading time of a SQL query
+    // Note : In large-scale projects, better use a cron job to reduce the loading time of a SQL query
     const deleteQuery = "DELETE FROM stories WHERE expiresAt <= NOW()";
     await executeQuery(deleteQuery);
 
@@ -47,7 +48,7 @@ export const getStories = async (req, res) => {
                           WHERE s.userId = ? 
                           ORDER BY s.createdAt DESC`;
 
-    // Query for the logged-in user's feed (user's own story + followed users stories)
+    // Query for the logged-in user's feed (user's own story + followed users' stories)
     const feedQuery = `
         SELECT s.*, u.id as userId, firstName, lastName
         FROM stories AS s
@@ -60,7 +61,7 @@ export const getStories = async (req, res) => {
           CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
           s.createdAt DESC`; // Logged-in user story displayed first, then most recent friends' stories
 
-    //! FIX : Clean ALL multi-line queries to remove unwanted newlines, tabs, and spaces, in order to resolve the "SQL syntax error" caused by the use of template literals => 
+    //! FIX : Clean ALL multi-line queries to remove unwanted newlines, tabs, and spaces, in order to resolve the "SQL syntax error" caused by the use of template literals (often used when the query is long and complex)
     // Solution : better use single/double quotes !!!
     const cleanedProfileQuery = profileQuery.replace(/\s+/g, " ").trim();
     const cleanedFeedQuery = feedQuery.replace(/\s+/g, " ").trim();
@@ -91,22 +92,24 @@ export const addStory = async (req, res) => {
   const loggedInUserId = req.user.id;
 
   // Check if a file (image or video) is provided
-  if (!file || file?.trim()?.length === 0)
+  if (!file || file?.trim()?.length === 0) {
     return res
       .status(400)
       .json({ message: "You must provide either an image or a video file." });
-
+  }
   // Validate file format
-  if (file && !isImage(file) && !isVideo(file))
+  if (file && !isImage(file) && !isVideo(file)) {
     return res
       .status(400)
       .json({ message: "You must provide a valid image or video format." });
+  }
 
   // Validate description
-  if (text?.trim()?.length > 45)
+  if (text?.trim()?.length > 45) {
     return res.status(400).json({
       message: "Description can't contain more than 45\u00A0characters.",
     });
+  }
 
   try {
     // START: SERVER-SIDE VIDEO DURATION VALIDATION (Fallback for client-side failure)
@@ -175,7 +178,7 @@ export const addStory = async (req, res) => {
           unlinkError
         );
       }
-
+      // The code that triggers the error below is the call to the getVideoDuration function (which uses ffprobe to read the video metadata)
       return res.status(400).json({
         message:
           "Could not process video file. It might be corrupt or in an unsupported format.",
