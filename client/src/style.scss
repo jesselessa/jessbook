@@ -102,6 +102,13 @@ $themes: (
   }
 }
 
+// Mixin for small screens in landscape mode (up to 600px width)
+@mixin small-landscape {
+  @media (max-width: 600px) and (orientation: landscape) {
+    @content;
+  }
+}
+
 // Mixins for handling animations
 @mixin keyframes($name) {
   @keyframes #{$name} {

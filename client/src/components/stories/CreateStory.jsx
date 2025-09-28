@@ -15,9 +15,8 @@ import { uploadFile } from "../../utils/uploadFile.js";
 import { useCleanUpFileURL } from "../../hooks/useCleanUpFileURL.js";
 import { toast } from "react-toastify";
 
-// Components
+// Component
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
-import Overlay from "../overlay/Overlay.jsx";
 
 // Utility function to check if a file is a video based on its MIME type
 const isVideo = (fileType) => {
@@ -302,7 +301,6 @@ export default function CreateStory({ setOpenCreateStory }) {
           X
         </button>
       </div>
-      <Overlay />
     </div>
   );
 }

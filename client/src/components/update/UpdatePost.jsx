@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 
 // Components
 import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
-import Overlay from "../overlay/Overlay.jsx";
 
 // Icon
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -139,8 +138,6 @@ export default function UpdatePost({ post, setOpenUpdate }) {
           </button>
         </div>
       </div>
-
-      <Overlay onClick={() => setOpenUpdate(false)} />
     </>
   );
 }

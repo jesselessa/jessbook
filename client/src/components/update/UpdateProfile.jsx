@@ -7,9 +7,8 @@ import { uploadFile } from "../../utils/uploadFile.js";
 import { useCleanUpFileURL } from "../../hooks/useCleanUpFileURL.js";
 import { toast } from "react-toastify";
 
-// Components
+// Component
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
-import Overlay from "../overlay/Overlay.jsx";
 
 // Icon
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -287,8 +286,6 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
           </button>
         </div>
       </div>
-
-      <Overlay />
     </>
   );
 }

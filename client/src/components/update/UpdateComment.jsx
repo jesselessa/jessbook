@@ -4,9 +4,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
 import { toast } from "react-toastify";
 
-// Component
-import Overlay from "../overlay/Overlay.jsx";
-
 export default function UpdateComment({ comment, setOpenUpdate }) {
   const [text, setText] = useState(comment.text);
 
@@ -84,8 +81,6 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
           </button>
         </div>
       </div>
-
-      <Overlay />
     </>
   );
 }

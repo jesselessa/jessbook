@@ -1,15 +1,18 @@
+// Syntax below means body has a class "overlay-active" and inside the latter, we target .App
+body.overlay-active .App {
+  display: none;
+}
+
 .overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.95);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1001;
+  text-align: center;
+  z-index: 9999;
 
   .overlay-msg {
     font-size: 1.8rem;

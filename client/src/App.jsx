@@ -15,6 +15,9 @@ import ResetPassword from "./pages/resetPassword/ResetPassword.jsx";
 import Privacy from "./pages/privacy/Privacy.jsx";
 import TermsOfUse from "./pages/termsOfUse/TermsOfUse.jsx";
 
+// Component
+import Overlay from "./components/overlay/Overlay.jsx";
+
 // Context
 import { AuthContext } from "./contexts/authContext.jsx";
 
@@ -81,10 +84,14 @@ function App() {
   const queryClient = new QueryClient();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <ToastContainer autoClose={1500} style={{ fontSize: "1.6rem" }} />
-    </QueryClientProvider>
+    <div className="App">
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <ToastContainer autoClose={1500} style={{ fontSize: "1.6rem" }} />
+      </QueryClientProvider>
+
+      <Overlay />
+    </div>
   );
 }
 

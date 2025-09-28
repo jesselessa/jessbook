@@ -13,7 +13,6 @@ import moment from "moment";
 
 // Components
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
-import Overlay from "../overlay/Overlay.jsx";
 
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
@@ -92,8 +91,6 @@ export default function ModalStory({ story, setOpenModal }) {
           </div>
         </div>
       </div>
-
-      <Overlay />
     </div>
   );
 }
