@@ -25,7 +25,7 @@
     overflow-y: auto;
     border-radius: 0.5rem;
     box-shadow: 0 0 1.5rem 0.1rem rgba(0, 0, 0, 0.1);
-    padding: 1rem;
+    padding: 1rem 2rem;
 
     @include style.small {
       width: 95%;
@@ -131,6 +131,10 @@
             }
           }
         }
+      }
+
+      .text-label {
+        font-size: 1.6rem;
       }
 
       .desc-label {
