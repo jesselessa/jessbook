@@ -60,13 +60,14 @@ export const getStories = async (req, res) => {
           CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
           s.createdAt DESC`; // Logged-in user story displayed first, then most recent friends' stories
 
-    // FIX : Clean the multi-line feed query to remove unwanted newlines, tabs, and spaces
-    // This resolves the "SQL syntax error" caused by template literals
+    //! FIX : Clean ALL multi-line queries to remove unwanted newlines, tabs, and spaces, in order to resolve the "SQL syntax error" caused by the use of template literals => 
+    // Solution : better use single/double quotes !!!
+    const cleanedProfileQuery = profileQuery.replace(/\s+/g, " ").trim();
     const cleanedFeedQuery = feedQuery.replace(/\s+/g, " ").trim();
 
     const selectQuery = isFetchingProfileStories
-      ? profileQuery
-      : cleanedFeedQuery; // Use the cleaned query for the feed
+      ? cleanedProfileQuery
+      : cleanedFeedQuery;
 
     // Use the correct values array based on the query type
     // FIX : Ensures 'values' never contains 'undefined', which caused the previous 500 error
@@ -136,9 +137,8 @@ export const addStory = async (req, res) => {
     // END : SERVER-SIDE VIDEO DURATION VALIDATION
 
     // Delete the current story if non expired before creating a new one
-    const deleteQuery = `
-          DELETE FROM stories WHERE userId = ? AND expiresAt > NOW()
-        `;
+    const deleteQuery =
+      "DELETE FROM stories WHERE userId = ? AND expiresAt > NOW()";
     await executeQuery(deleteQuery, [loggedInUserId]);
 
     // Create a new story
