@@ -53,17 +53,22 @@
         gap: 2rem;
         margin-bottom: 1rem;
 
+        @include style.small {
+          flex-direction: column;
+          gap: 0.7rem;
+        }
+
         #story-file {
           display: none;
         }
 
         .file-label {
           width: 220px;
+          height: 50px;
           display: inline-flex;
           justify-content: center;
           align-items: center;
           font-weight: bold;
-          height: 50px;
           font-size: 1.6rem;
           text-align: center;
           color: teal;
@@ -79,10 +84,6 @@
             transform: translateY(1px);
             background-color: color.scale(#ffd670, $lightness: -20%);
           }
-
-          @include style.xsmall {
-            width: 230px;
-          }
         }
 
         .file-container {
@@ -90,6 +91,11 @@
           display: flex;
           justify-content: center;
           align-items: center;
+
+          @include style.small {
+            width: 90%;
+            text-align: center;
+          }
 
           .img-container {
             width: 50px;
@@ -123,10 +129,10 @@
             text-align: center;
 
             p {
-              font-size: 1.3rem;
+              font-size: 1.4rem;
 
               span {
-                font-size: 1.2rem;
+                font-size: 1.3rem;
               }
             }
           }
@@ -178,6 +184,7 @@
     .error-msg {
       color: #f75252;
       font-size: 1.5rem;
+      text-align: center;
       margin-top: 1rem;
     }
 

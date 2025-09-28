@@ -142,7 +142,7 @@ export default function CreateStory({ setOpenCreateStory }) {
         isError: true,
         message: `Video duration (${videoDuration.toFixed(
           1
-        )}s) exceeds the 60 seconds limit.`,
+        )}s) exceeds the 60\u00A0seconds limit. Choose another file.`,
       });
       return;
     }
