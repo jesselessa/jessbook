@@ -132,9 +132,12 @@ export default function CreateStory({ setOpenCreateStory }) {
     }
 
     // Upload the valid file to the server
-    const newFile = file ? await uploadFile(file) : null;
+    const newFile = await uploadFile(file); // newFile is either "fileName.mp4" or 'null'
 
-    // Trigger mutation to update database
+    // If upload failed and returned null, the code stops here
+    if (!newFile) return;
+
+    // Only proceed if newFile (the filename string) is valid in order to trigger a mutation to update database
     mutation.mutate({ file: newFile, text: text.trim() });
 
     // Reset states after successful submission
