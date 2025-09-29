@@ -1,5 +1,5 @@
 //***************************** Stories.jsx *********************************
-// Displays current user's and friends' stories with optimized video thumbnails based on screen size
+// Displays current user's and followed users' stories with optimized video thumbnails based on screen size
 // - local file on user's device
 // - thumbnail can be generated client-side from the local file (blob URL)
 // - tools needed : JavaScript/Canvas API or custom librairies
@@ -75,7 +75,7 @@ export default function Stories({ userId }) {
             </button>
           </div>
 
-          {/* Display current user's and friends' stories */}
+          {/* Display current user's and followed users' stories */}
           {error ? (
             <span className="msg">Something went wrong</span>
           ) : isLoading ? (

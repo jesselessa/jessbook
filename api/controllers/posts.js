@@ -5,39 +5,63 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// Get __dirname equivalent in ES module mode
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Define a reliable path to the 'uploads' directory, based on our VPS structure (client/public/uploads)
+const UPLOADS_PATH = path.join(__dirname, "../../client/public/uploads");
+
 export const getPosts = async (req, res) => {
-  const userId = req.query.userId;
+  // targetUserId is the ID from the query param (if fetching a profile)
+  const targetUserId = req.query.userId;
   const loggedInUserId = req.user.id;
 
-  // Get user posts + followed users posts
-  const q =
-    userId !== "undefined"
-      ? `SELECT p.*, u.id AS userId, firstName, lastName, profilePic 
-             FROM posts AS p 
-             JOIN users AS u ON (u.id = p.userId) 
-             WHERE p.userId = ? 
-             ORDER BY p.createdAt DESC`
-      : `
-             SELECT p.*, u.id AS userId, firstName, lastName, profilePic 
-             FROM posts AS p
-             JOIN users AS u ON (u.id = p.userId)
-             WHERE p.userId = ? 
-             OR p.userId IN (SELECT followedId 
-             FROM relationships WHERE followerId = ?)
-             ORDER BY p.createdAt DESC`;
+  // Determine if we are fetching posts for a specific profile (where targetUserId is set and not the string "undefined")
+  const isFetchingProfilePosts = targetUserId && targetUserId !== "undefined";
+
+  // 1 - PREPARE THE SQL QUERY
+
+  // Query for a specific user's profile
+  const profileQuery = `SELECT p.*, u.id AS userId, firstName, lastName, profilePic 
+             FROM posts AS p 
+             JOIN users AS u ON (u.id = p.userId) 
+             WHERE p.userId = ? 
+             ORDER BY p.createdAt DESC`;
+
+  // Query for the logged-in user's feed (user's own posts + followed users' posts)
+  const feedQuery = `
+             SELECT p.*, u.id AS userId, firstName, lastName, profilePic 
+             FROM posts AS p
+             JOIN users AS u ON (u.id = p.userId)
+             WHERE p.userId = ? 
+             OR p.userId IN (SELECT followedId 
+             FROM relationships WHERE followerId = ?)
+             ORDER BY p.createdAt DESC`;
   // DESC = most recent posts displayed first
-  //! `p.userId IN (...)` checks whether the user who created a post (p.userId) is in a list of specific IDs (result from subquery)
+  //? `p.userId IN (...)` checks whether the user who created a post (p.userId) is in a list of specific IDs (result from subquery)
 
-  const values =
-    userId !== "undefined" ? [userId] : [loggedInUserId, loggedInUserId];
+  //! FIX: ⚠️ Clean ALL multi-line queries to remove unwanted newlines, tabs, and spaces, in order to resolve the "SQL syntax error" caused by the use of template literals (often used when the query is long and complex)
+  //! SQL recommendations to better use single/double quotes
+  const cleanedProfileQuery = profileQuery.replace(/\s+/g, " ").trim();
+  const cleanedFeedQuery = feedQuery.replace(/\s+/g, " ").trim();
 
+  const selectQuery = isFetchingProfilePosts
+    ? cleanedProfileQuery
+    : cleanedFeedQuery;
+
+  // Use the correct values array based on the query type
+  // FIX: Ensures 'values' never contains 'undefined', which caused previous 500 error messages
+  const values = isFetchingProfilePosts
+    ? [targetUserId]
+    : [loggedInUserId, loggedInUserId];
+
+  // 2 - EXECUTE THE QUERY
   try {
-    const data = await executeQuery(q, values);
+    const data = await executeQuery(selectQuery, values);
     return res.status(200).json(data);
   } catch (error) {
+    console.error("Error fetching posts:", error);
     return res.status(500).json({
       message: "An unknown error occurred while fetching posts.",
       error: error.message,
@@ -93,7 +117,9 @@ export const updatePost = async (req, res) => {
     return res.status(400).json("No description to update");
 
   if (text?.trim()?.length > 1000) {
-    return res.status(400).json("Description cannot exceed 1000 characters.");
+    return res
+      .status(400)
+      .json("Description cannot exceed 1000\u00A0characters.");
   } else {
     updatedFields.push("`text` = ?");
     values.push(text.trim());
@@ -103,13 +129,15 @@ export const updatePost = async (req, res) => {
   if (img && !isImage(img)) {
     return res.status(400).json("Provide a valid image format.");
   } else if (img) {
+    // If "img" is provided, it means we are either replacing the image or setting one for the first time
+
     // Retrieve old image name
     const oldPostData = await executeQuery(
       "SELECT img FROM posts WHERE id = ? AND userId = ?",
       [postId, loggedInUserId]
     );
 
-    // Check if an old image exists and is different from the new one
+    // Check if an old image exists and is being replaced by a different one
     if (
       oldPostData.length > 0 &&
       oldPostData[0].img &&
@@ -117,19 +145,14 @@ export const updatePost = async (req, res) => {
     ) {
       try {
         // Delete old image from server in "uploads" folder
-        fs.unlinkSync(
-          path.join(
-            __dirname,
-            "../../client/public/uploads",
-            oldPostData[0].img
-          )
-        );
+        fs.unlinkSync(path.join(UPLOADS_PATH, oldPostData[0].img));
         console.log("Old post image deleted");
       } catch (err) {
         console.error("Error deleting old post image:", err);
       }
     }
 
+    // Update the database reference to the new image file
     updatedFields.push("`img` = ?");
     values.push(img);
   }
@@ -168,10 +191,8 @@ export const deletePost = async (req, res) => {
     // Check if a post image exists
     if (postData.length > 0 && postData[0].img) {
       try {
-        // Deleting post image from server in "uploads" folder
-        fs.unlinkSync(
-          path.join(__dirname, "../../client/public/uploads", postData[0].img)
-        );
+        // Delete post image from server in "uploads" folder
+        fs.unlinkSync(path.join(UPLOADS_PATH, postData[0].img));
         console.log("Post image deleted.");
       } catch (err) {
         console.error("Error deleting post image:", err);
@@ -182,7 +203,13 @@ export const deletePost = async (req, res) => {
     const q = "DELETE FROM posts WHERE id = ? AND userId = ?";
     const data = await executeQuery(q, [postId, loggedInUserId]);
 
-    if (data.affectedRows > 0) return res.status(200).json("Post deleted");
+    if (data.affectedRows > 0) {
+      return res.status(200).json("Post deleted");
+    } else {
+      return res
+        .status(404)
+        .json({ message: "Post not found or unauthorized" });
+    }
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while deleting post.",

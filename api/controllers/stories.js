@@ -6,13 +6,11 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import ffmpeg from "fluent-ffmpeg"; //! ⚠️ ffmpeg must also be installed on our VPS !!!
-// FFmpeg is a powerful, open-source software framework used for handling, converting, streaming, and playing multimedia files and streams
+//? FFmpeg is a powerful, open-source software framework used for handling, converting, streaming, and playing multimedia files and streams
 
+// Get __dirname equivalent in ES module mode
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Define a reliable path to the 'uploads' directory, based on our VPS structure (client/public/uploads)
-const UPLOADS_PATH = path.join(__dirname, "../../client/public/uploads");
 
 // Get video story duration in seconds (Promise-based)
 const getVideoDuration = (videoPath) => {
@@ -60,10 +58,8 @@ export const getStories = async (req, res) => {
         AND s.expiresAt > NOW()
         ORDER BY
           CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
-          s.createdAt DESC`; // Logged-in user story displayed first, then most recent friends' stories
+          s.createdAt DESC`; // Logged-in user story displayed first, then most recent followed users' stories
 
-    //! FIX : Clean ALL multi-line queries to remove unwanted newlines, tabs, and spaces, in order to resolve the "SQL syntax error" caused by the use of template literals (often used when the query is long and complex)
-    // Solution : better use single/double quotes !!!
     const cleanedProfileQuery = profileQuery.replace(/\s+/g, " ").trim();
     const cleanedFeedQuery = feedQuery.replace(/\s+/g, " ").trim();
 
@@ -71,12 +67,11 @@ export const getStories = async (req, res) => {
       ? cleanedProfileQuery
       : cleanedFeedQuery;
 
-    // Use the correct values array based on the query type
-    // FIX : Ensures 'values' never contains 'undefined', which caused the previous 500 error
     const values = isFetchingProfileStories
       ? [targetUserId]
       : [loggedInUserId, loggedInUserId, loggedInUserId];
 
+    // 3 - Execute the SQL query
     const data = await executeQuery(selectQuery, values);
     return res.status(200).json(data);
   } catch (error) {
@@ -138,7 +133,7 @@ export const addStory = async (req, res) => {
           .json({ message: "Video duration can't exceed 60\u00A0seconds." });
       }
     }
-    // END : SERVER-SIDE VIDEO DURATION VALIDATION
+    //----- END: SERVER-SIDE VIDEO DURATION VALIDATION -----
 
     // Delete the current story if non expired before creating a new one
     const deleteQuery =
@@ -189,6 +184,7 @@ export const addStory = async (req, res) => {
     // ------------------------------------------------------------
     // END: THUMBNAIL GENERATION LOGIC
     // ------------------------------------------------------------
+
     return res.status(201).json({
       message: "New story created and processed",
       storyId: storyId, // Returning the ID can be useful for frontend caching
@@ -234,12 +230,35 @@ export const deleteStory = async (req, res) => {
 
     // Check if a story file exists
     if (storyData.length > 0 && storyData[0].file) {
+      const originalFileName = storyData[0].file;
+      const isVideoFile = isVideo(originalFileName);
+
       try {
-        // Deleting story from server in "uploads" folder
-        fs.unlinkSync(path.join(UPLOADS_PATH, storyData[0].file));
-        console.log(`Story file ${storyData[0].file} deleted`);
+        // 1 - Delete the main story file (image or video) from our server in "uploads" folder
+        fs.unlinkSync(path.join(UPLOADS_PATH, originalFileName));
+        console.log(`Story file ${originalFileName} deleted`);
       } catch (err) {
-        console.error(`Error deleting story file ${storyData[0].file}:`, err);
+        console.error(`Error deleting story file ${originalFileName}:`, err);
+      }
+
+      // 2 - If it was a video, delete the associated thumbnail
+      if (isVideoFile) {
+        // The thumbnail path is predictably constructed as "/uploads/thumbnails/{storyId}.jpg" (cf. generateThumbnail utility function)
+        const thumbnailPath = path.join(
+          UPLOADS_PATH,
+          "thumbnails",
+          `${storyId}.jpg`
+        );
+
+        try {
+          // Check if the thumbnail file exists before attempting deletion
+          if (fs.existsSync(thumbnailPath)) {
+            fs.unlinkSync(thumbnailPath);
+            console.log(`Thumbnail file for story ${storyId} deleted`);
+          }
+        } catch (err) {
+          console.error(`Error deleting thumbnail for story ${storyId}:`, err);
+        }
       }
     }
 
@@ -247,8 +266,14 @@ export const deleteStory = async (req, res) => {
     const q = "DELETE FROM stories WHERE id = ? AND userId = ?";
     const data = await executeQuery(q, [storyId, loggedInUserId]);
 
-    if (data.affectedRows > 0)
+    if (data.affectedRows > 0) {
       return res.status(200).json({ message: "Story deleted" });
+    } else {
+      // Handle case where story wasn't found or user wasn't authorized
+      return res
+        .status(404)
+        .json({ message: "Story not found or unauthorized" });
+    }
   } catch (error) {
     console.error("Error deleting story:", error);
     return res.status(500).json({
