@@ -1,11 +1,11 @@
 import "./loader.scss";
 
-const Loader = (
+const Loader = ({
   width = "40px",
   height = "40px",
   border = "4px solid rgba(0, 0, 0, 0.1)",
-  borderLeftColor = "#333"
-) => {
+  borderLeftColor = "#333",
+}) => {
   return (
     <div
       className="loader-container"
