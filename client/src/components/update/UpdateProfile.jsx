@@ -177,34 +177,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
 
           <form name="update-profile-form">
             <div className="files">
-              <div className="cover">
-                <span>Cover Picture</span>
-
-                <div className="img-container">
-                  <LazyLoadImage
-                    src={
-                      cover
-                        ? URL.createObjectURL(cover)
-                        : user.coverPic
-                        ? `/uploads/${user.coverPic}`
-                        : defaultCover
-                    }
-                    alt="cover"
-                  />
-                  <label htmlFor="selected-cover">
-                    <CloudUploadIcon className="icon" />
-                  </label>
-                </div>
-              </div>
-
-              <input
-                type="file"
-                id="selected-cover"
-                name="selected-cover"
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-
+              {/* Profile pic */}
               <div className="profile">
                 <span>Profile Picture</span>
 
@@ -233,6 +206,35 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
                 onChange={handleFileChange}
               />
             </div>
+
+            {/* Cover pic */}
+            <div className="cover">
+              <span>Cover Picture</span>
+
+              <div className="img-container">
+                <LazyLoadImage
+                  src={
+                    cover
+                      ? URL.createObjectURL(cover)
+                      : user.coverPic
+                      ? `/uploads/${user.coverPic}`
+                      : defaultCover
+                  }
+                  alt="cover"
+                />
+                <label htmlFor="selected-cover">
+                  <CloudUploadIcon className="icon" />
+                </label>
+              </div>
+            </div>
+
+            <input
+              type="file"
+              id="selected-cover"
+              name="selected-cover"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
 
             <label htmlFor="firstName">First name</label>
             <input

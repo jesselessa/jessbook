@@ -11,7 +11,7 @@
     background-color: style.themed("bgSoft");
     gap: 1.5rem;
     padding: 1rem 1rem 2rem 1rem;
-    z-index: -1; // RightBar below update forms
+    z-index: -1;
 
     @include style.medium {
       display: none;

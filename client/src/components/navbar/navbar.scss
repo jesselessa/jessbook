@@ -12,7 +12,7 @@
     color: style.themed("iconColor");
     background-color: style.themed("navBg");
     padding: 1rem 2rem;
-    z-index: 100;
+    z-index: -1;
 
     @include style.small {
       padding: 1rem;

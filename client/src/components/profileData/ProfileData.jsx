@@ -121,7 +121,7 @@ export default function ProfileData() {
                 <div className="friends">
                   <PeopleAltOutlinedIcon fontSize="large" />
                   {/* TODO - Update with data fetched from API */}
-                  <span>441 Friends</span>
+                  <span>441 Relations</span>
                 </div>
 
                 <div className="contact">

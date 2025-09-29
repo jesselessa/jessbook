@@ -54,7 +54,7 @@ export default function LeftBar() {
 
         <div className="item">
           <LazyLoadImage src={friends} alt="friends" />
-          <span>Friends</span>
+          <span>Relations</span>
         </div>
 
         <div className="item">

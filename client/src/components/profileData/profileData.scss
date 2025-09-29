@@ -12,6 +12,7 @@
     background-color: style.themed("bgSoft");
     overflow-y: auto;
     padding: 0 1rem 2rem 1rem;
+    z-index: -1;
 
     @include style.medium {
       width: 80vw;
@@ -142,12 +143,11 @@
           justify-content: center;
           align-items: center;
           text-align: center;
-          gap: 1.5rem;
+          gap: 2rem;
           padding: 1rem;
 
           @include style.small {
             height: calc(280px - 75px); // 75px = 1/2 of profile pic
-            gap: 1rem;
             padding: 0.5rem;
           }
 
