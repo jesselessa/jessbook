@@ -12,7 +12,6 @@
     background-color: style.themed("bgSoft");
     overflow-y: auto;
     padding: 0 1rem 2rem 1rem;
-    z-index: -1;
 
     @include style.medium {
       width: 80vw;

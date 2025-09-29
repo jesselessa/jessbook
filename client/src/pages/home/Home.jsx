@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <div className={`theme-${darkMode ? "dark" : "light"}`}>
       <Navbar />
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex", zIndex: -1 }}>
         <LeftBar />
         <Timeline />
         <RightBar />
