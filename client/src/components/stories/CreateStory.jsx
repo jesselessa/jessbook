@@ -16,8 +16,9 @@ import { isVideo, getMimeType } from "../../utils/isFile.js";
 import { useCleanUpFileURL } from "../../hooks/useCleanUpFileURL.js";
 import { toast } from "react-toastify";
 
-// Component
+// Components
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
+import Loader from "../loader/Loader.jsx";
 
 // Maximum allowed video duration (in seconds, must match backend validation)
 const MAX_DURATION_SECONDS = 60;
@@ -292,7 +293,16 @@ export default function CreateStory({ setOpenCreateStory }) {
           />
 
           <button type="submit" onClick={handleClick}>
-            {isCheckingDuration ? "Checking Duration..." : "Publish"}     
+            {isCheckingDuration ? (
+              <Loader
+                width="24px"
+                height="24px"
+                border="3px solid rgba(0, 0, 0, 0.1)"
+              />
+            ) : (
+              "Publish"
+            )}
+                 
           </button>
         </form>
         {/* Display error message */}

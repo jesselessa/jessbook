@@ -5,15 +5,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 40px;
-    height: 40px;
     margin: auto;
 
     .loader {
       width: 100%;
       height: 100%;
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-left-color: style.themed("textColor");
       border-radius: 50%;
 
       @include style.keyframes(spin) {
