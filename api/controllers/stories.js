@@ -12,6 +12,9 @@ import ffmpeg from "fluent-ffmpeg"; //! ⚠️ ffmpeg must also be installed on 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Define a reliable path to the 'uploads' directory, based on our VPS structure (client/public/uploads)
+const UPLOADS_PATH = path.join(__dirname, "../../client/public/uploads");
+
 // Get video story duration in seconds (Promise-based)
 const getVideoDuration = (videoPath) => {
   return new Promise((resolve, reject) => {
