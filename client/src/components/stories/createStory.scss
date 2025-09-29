@@ -57,6 +57,10 @@
           gap: 0.7rem;
         }
 
+        @include style.xsmall {
+          flex-direction: column;
+        }
+
         #story-file {
           display: none;
         }
@@ -83,10 +87,6 @@
             transform: translateY(1px);
             background-color: color.scale(#ffd670, $lightness: -20%);
           }
-
-          @include style.small {
-            flex: 1;
-          }
         }
 
         .file-container {
@@ -96,7 +96,6 @@
           align-items: center;
 
           @include style.small {
-            width: 90%;
             text-align: center;
           }
 
@@ -198,7 +197,7 @@
       font-size: 1.6rem;
       border: 0.1rem solid #f75252;
       border-radius: 0.5rem;
-      padding: 2rem;
+      padding: 1.5rem;
       margin-top: 1rem;
     }
 
