@@ -74,7 +74,7 @@ export const addPost = async (req, res) => {
   const loggedInUserId = req.user.id;
   const currentDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
-  // Validate description
+  // 1 - Validate description
   if (text?.trim()?.length === 0)
     return res.status(400).json("Description cannot be empty.");
 
@@ -84,11 +84,11 @@ export const addPost = async (req, res) => {
       .json("Description cannot exceed 1000\u00A0characters.");
   }
 
-  // Validate image
+  // 2 - Validate image (optional)
   if (img && !isImage(img))
     return res.status(400).json("Provide a valid image format.");
 
-  // Create a new post
+  // 3 - Execute the query
   const q =
     "INSERT INTO posts (`text`, `img`, `userId`, `createdAt`) VALUES (?, ?, ?, ?)";
   const values = [text.trim(), img, loggedInUserId, currentDateTime];
@@ -112,7 +112,7 @@ export const updatePost = async (req, res) => {
   const updatedFields = [];
   const values = [];
 
-  // Validate description
+  // 1 - Validate description
   if (text?.trim()?.length === 0)
     return res.status(400).json("No description to update");
 
@@ -125,7 +125,7 @@ export const updatePost = async (req, res) => {
     values.push(text.trim());
   }
 
-  // Validate image (optional)
+  // 2 - Validate image (optional)
   if (img && !isImage(img)) {
     return res.status(400).json("Provide a valid image format.");
   } else if (img) {
@@ -157,10 +157,11 @@ export const updatePost = async (req, res) => {
     values.push(img);
   }
 
-  // No field to update
+  // 3 - No field to update
   if (updatedFields.length === 0)
     return res.status(400).json("No field to update");
 
+  // 4 - Execute the query
   const q = `UPDATE posts SET ${updatedFields.join(
     ", "
   )} WHERE id = ? AND userId = ?`;
@@ -168,7 +169,12 @@ export const updatePost = async (req, res) => {
 
   try {
     const data = await executeQuery(q, values);
-    if (data.affectedRows > 0) return res.status(200).json("Post updated");
+    if (data.affectedRows > 0) {
+      return res.status(200).json("Post updated");
+    } else {
+      // No row was updated : either post doesn't exist or user is not authorized
+      return res.status(404).json("Post not found or unauthorized");
+    }
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while updating post.",

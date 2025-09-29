@@ -57,7 +57,7 @@ const VideoDurationChecker = ({ fileURL, onDurationCheck }) => {
 export default function CreateStory({ setOpenCreateStory }) {
   const [file, setFile] = useState(null); // File present or not
   const [text, setText] = useState(""); // Story description text
-  const [fileURL, setFileURL] = useState(""); // Local URL for file preview (URL.createObjectURL): It's a Blob URL
+  const [fileURL, setFileURL] = useState(""); // Local URL for file preview (URL.createObjectURL) : It's a Blob URL
   const [error, setError] = useState({ isError: false, message: "" });
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 600);
   const [tempVideoFile, setTempVideoFile] = useState(null); // Holds video while duration is checked
@@ -261,7 +261,7 @@ export default function CreateStory({ setOpenCreateStory }) {
                   ) : (
                     // LARGE SCREEN: Show actual video preview
                     <div className="video-container">
-                      <video>
+                      <video controls autoPlay muted>
                         <source src={fileURL} type={getMimeType(file.name)} />
                         Your browser doesn't support video preview.
                       </video>

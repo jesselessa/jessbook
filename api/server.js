@@ -69,7 +69,7 @@ app.use(passport.initialize());
 connectWithGoogle();
 connectWithFacebook();
 
-// API routes
+// API ROUTES
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/posts", postsRoute);
@@ -77,8 +77,8 @@ app.use("/api/comments", commentsRoute);
 app.use("/api/likes", likesRoute);
 app.use("/api/relationships", relationshipsRoute);
 app.use("/api/stories", storiesRoute);
+// Files uploaded with Multer
 app.post("/api/uploads", upload, (req, res) => {
-  // Upload files with Multer
   const file = req.file;
   res.status(200).json(file.filename);
 });

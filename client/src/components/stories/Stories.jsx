@@ -109,7 +109,7 @@ export default function Stories({ userId }) {
                   ) : (
                     isImage(story?.file) && (
                       // Use original image path
-                      <LazyLoadImage src={fileSrc} alt="story" />
+                      <LazyLoadImage src={thumbnailSrc} alt="story" />
                     )
                   )}
 
