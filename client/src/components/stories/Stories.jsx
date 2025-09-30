@@ -99,7 +99,7 @@ export default function Stories({ userId }) {
                 >
                   {/* 2 - DISPLAY FILE BASED ON ITS EXTENSION */}
                   {isVideo(story?.file) ? (
-                    <video muted loop poster={thumbnailSrc}>
+                    <video muted loop poster={thumbnailSrc} className="story-video">
                       <source
                         src={fileSrc} // Use original video path for playback
                         type={getMimeType(story?.file)}
@@ -109,7 +109,7 @@ export default function Stories({ userId }) {
                   ) : (
                     isImage(story?.file) && (
                       // Use original image path
-                      <LazyLoadImage src={thumbnailSrc} alt="story" />
+                      <LazyLoadImage className="story-img" src={thumbnailSrc} alt="story" />
                     )
                   )}
 
