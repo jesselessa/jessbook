@@ -35,8 +35,7 @@
 
       .story {
         position: relative;
-        min-width: 120px;
-        max-width: 120px;
+        width: 120px;
         height: 200px;
         max-height: 100%;
         overflow: hidden;
@@ -86,9 +85,10 @@
           transform: translate(-50%, -50%);
           width: 30px;
           height: 30px;
-          display: inline-flex;
-          align-items: center;
+          display: flex;
           justify-content: center;
+          align-items: center;
+          line-height: 1;
           background-color: #0275d8;
           color: white;
           font-size: 30px;
