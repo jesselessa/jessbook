@@ -53,7 +53,7 @@ export default function Publish() {
         userId: currentUser.id,
         text: newPost.text,
         img: newPost.img || null,
-        createdAt: moment(currentDate).fromNow(),
+        createdAt: currentDate,
       };
 
       // Optimistically update the post in cache
