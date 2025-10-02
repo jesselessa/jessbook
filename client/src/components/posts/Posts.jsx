@@ -7,7 +7,7 @@ import Post from "../post/Post.jsx";
 import Loader from "../loader/Loader.jsx";
 
 export default function Posts({ userId }) {
-  const getPosts = async () => {
+  const getPosts = async (userId) => {
     try {
       const res = await makeRequest.get(`/posts?userId=${userId}`);
       return res.data;
@@ -22,7 +22,7 @@ export default function Posts({ userId }) {
     data: posts,
   } = useQuery({
     queryKey: ["posts", userId],
-    queryFn: getPosts,
+    queryFn: () => getPosts(userId),
   });
 
   return (

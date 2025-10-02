@@ -96,12 +96,12 @@
           color: style.themed("textColorSoft");
         }
 
-        .friends-contact {
+        .relationships-contact {
           height: 30px;
           display: flex;
           justify-content: space-between;
 
-          .friends {
+          .relationships {
             display: flex;
             align-items: center;
             font-size: 1.5rem;
@@ -110,6 +110,17 @@
             @include style.small {
               gap: 0.5rem;
               margin-left: 0.5rem;
+
+              .followers {
+                .count {
+                  font-weight: 600;
+
+                  .error-count {
+                    font-weight: 600;
+                    color: #f75252;
+                  }
+                }
+              }
             }
 
             span {

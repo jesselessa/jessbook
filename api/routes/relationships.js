@@ -1,6 +1,7 @@
 import express from "express";
 import {
-  getRelationships,
+  getFollowers,
+  getFollowing,
   addRelationship,
   deleteRelationship,
 } from "../controllers/relationships.js";
@@ -8,7 +9,8 @@ import { authenticateUser } from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
-router.get("/", authenticateUser, getRelationships);
+router.get("/followers", authenticateUser, getFollowers);
+router.get("/following", authenticateUser, getFollowing);
 router.post("/", authenticateUser, addRelationship);
 router.delete("/", authenticateUser, deleteRelationship);
 

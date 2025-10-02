@@ -6,6 +6,8 @@ export const getLikes = async (req, res) => {
 
   try {
     const data = await executeQuery(q, [postId]);
+
+    // Returns an array of IDs of users who liked the post
     return res.status(200).json(data.map((like) => like.userId));
   } catch (error) {
     return res.status(500).json({

@@ -125,11 +125,13 @@
 
           .video-placeholder {
             width: 100%;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
 
             p {
               font-size: 1.5rem;
-
               span {
                 font-size: 1.4rem;
               }

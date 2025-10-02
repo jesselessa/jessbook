@@ -1,8 +1,5 @@
 //***************************** Stories.jsx *********************************
-// Displays current user's and followed users' stories with optimized video thumbnails based on screen size
-// - local file on user's device
-// - thumbnail can be generated client-side from the local file (blob URL)
-// - tools needed : JavaScript/Canvas API or custom librairies
+// Displays current user and people he follows's stories with optimized video thumbnails based on screen size
 //***************************************************************************
 
 import { useContext, useState } from "react";
@@ -29,6 +26,8 @@ export default function Stories({ userId }) {
   const [openModal, setOpenModal] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
 
+  const queryKey = ["stories", userId];
+
   // Get stories data
   const fetchStories = async () => {
     try {
@@ -43,7 +42,7 @@ export default function Stories({ userId }) {
     isLoading,
     error,
     data: stories,
-  } = useQuery({ queryKey: ["stories", userId], queryFn: fetchStories });
+  } = useQuery({ queryKey: queryKey, queryFn: fetchStories });
 
   // Handler to open the modal with the selected story
   const handleClick = (story) => {
@@ -99,7 +98,12 @@ export default function Stories({ userId }) {
                 >
                   {/* 2 - DISPLAY FILE BASED ON ITS EXTENSION */}
                   {isVideo(story?.file) ? (
-                    <video muted loop poster={thumbnailSrc} className="story-video">
+                    <video
+                      muted
+                      loop
+                      poster={thumbnailSrc}
+                      className="story-video"
+                    >
                       <source
                         src={fileSrc} // Use original video path for playback
                         type={getMimeType(story?.file)}
@@ -109,7 +113,11 @@ export default function Stories({ userId }) {
                   ) : (
                     isImage(story?.file) && (
                       // Use original image path
-                      <LazyLoadImage className="story-img" src={thumbnailSrc} alt="story" />
+                      <LazyLoadImage
+                        className="story-img"
+                        src={thumbnailSrc}
+                        alt="story"
+                      />
                     )
                   )}
 

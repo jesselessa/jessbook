@@ -10,6 +10,7 @@ export default function Timeline() {
     <div className="timeline">
       <Stories />
       <Publish />
+      {/* Cf. posts controllers backend: Posts has no prop 'userId', so it's undefined → Shows the current user's posts and those of people he follows */}
       <Posts />
     </div>
   );

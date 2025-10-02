@@ -145,7 +145,7 @@ export default function Navbar() {
             <Link to="#">
               <div className="item">
                 <GroupOutlinedIcon fontSize="large" />
-                <span>Friends</span>
+                <span>Relationships</span>
               </div>
             </Link>
 

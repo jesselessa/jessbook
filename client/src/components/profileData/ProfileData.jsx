@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import "./profileData.scss";
 import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { makeRequest } from "../../utils/axios.js";
 
 // Components
@@ -28,86 +29,171 @@ export default function ProfileData() {
   const { currentUser } = useContext(AuthContext);
   const [openUpdate, setOpenUpdate] = useState(false);
 
-  const { userId } = useParams();
-
+  const { userId } = useParams(); // ID of the displayed profile
   const queryClient = useQueryClient();
 
-  // Get user info
-  const fetchUserData = async () => {
+  // Get user's info
+  const fetchUserData = async (userId) => {
     try {
       const res = await makeRequest.get(`/users/${userId}`);
       return res.data;
     } catch (error) {
       console.error("Error fetching user data:", error);
+      toast.error(
+        "Error fetching user data: " +
+          (error.response?.data?.message || error.message)
+      );
     }
   };
 
   const {
     isLoading,
     error,
-    data: user,
-  } = useQuery({ queryKey: ["user", userId], queryFn: fetchUserData });
+    data: userData,
+  } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => fetchUserData(userId),
+  });
 
-  // Get user relationships
-  const fetchRelationships = async () => {
+  // Get user's followers
+  const getFollowers = async (userId) => {
     try {
-      const res = await makeRequest.get(`/relationships?followedId=${userId}`);
+      const res = await makeRequest.get(
+        `/relationships/followers?followedId=${userId}`
+      );
       return res.data;
     } catch (error) {
-      console.error("Error fetching relationships data:", error);
+      console.error("Error fetching user's followers:", error);
+      toast.error(
+        "Error fetching user's followers: " +
+          (error.response?.data?.message || error.message)
+      );
     }
   };
 
-  const { data: relationshipsData } = useQuery({
-    queryKey: ["relationships"],
-    queryFn: fetchRelationships,
+  const {
+    isLoading: isFollowersLoading,
+    error: isFollowersError,
+    data: followersData,
+  } = useQuery({
+    queryKey: ["followers", userId],
+    queryFn: () => getFollowers(userId),
   });
 
+  // Get relationships followed by user
+  const getFollowing = async (userId) => {
+    try {
+      const res = await makeRequest.get(
+        `/relationships/following?followerId=${userId}`
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching user's followed relationships:", error);
+      toast.error(
+        "Error fetching user's followed relationships: " +
+          (error.response?.data?.message || error.message)
+      );
+    }
+  };
+
+  const {
+    isLoading: isFollowingLoading,
+    error: isFollowingError,
+    data: followingData,
+  } = useQuery({
+    queryKey: ["following", userId],
+    queryFn: () => getFollowing(userId),
+  });
+
+  // Get number of followers/following
+  const followersCount = followersData?.length || 0;
+  const followingCount = followingData?.length || 0;
+
+  // Optimistic mutation to follow/unfollow a user (displayed profile = userId)
   const mutation = useMutation({
-    mutationFn: (following) => {
-      if (following) {
+    mutationFn: (isCurrentlyFollowing) => {
+      if (isCurrentlyFollowing) {
         return makeRequest.delete(`/relationships?userId=${userId}`);
       }
       return makeRequest.post("/relationships", { userId });
     },
 
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries(["relationships"]);
+    // 1. OnMutate (before the server response): Immediately update the cache
+    onMutate: async (isCurrentlyFollowing) => {
+      // 1A. Cancel any outgoing queries to avoid overwriting our optimistic update
+      await queryClient.cancelQueries(["followers", userId]);
+
+      // 1B. Snapshot the previous followers data to revert if mutation fails
+      const previousFollowers = queryClient.getQueryData(["followers", userId]); // Store the current state
+
+      // 1C. Optimistically update to the new value
+      queryClient.setQueryData(["followers", userId], (oldData) => {
+        if (!oldData) return []; // Fallback (our backend expects an array of IDs)
+        return isCurrentlyFollowing
+          ? oldData.filter((id) => id !== currentUser.id) // Remove current user from followers if unfollows
+          : [...oldData, currentUser.id]; // Add current user if follows
+      });
+
+      // Return context with previous data for rollback in case of error
+      return { previousFollowers };
+    },
+
+    // 2. onError (mutation failure): Rollback the optimistic update
+    onError: (error, _newData, context) => {
+      console.error("Error updating followers:", error);
+      toast.error(
+        "Error updating followers: " +
+          (error.response?.data?.message || error.message)
+      );
+
+      // Rollback on error
+      if (context?.previousFollowers) {
+        queryClient.setQueryData(
+          ["followers", userId],
+          context.previousFollowers
+        );
+      }
+    },
+
+    // 3. onSettled (either the mutation succeeds or fails): Refresh data
+    onSettled: () => {
+      queryClient.invalidateQueries(["followers", userId]);
     },
   });
 
+  const isCurrentlyFollowing = followersData?.includes(currentUser?.id);
   const handleFollow = () => {
-    try {
-      mutation.mutate(relationshipsData?.includes(currentUser?.id));
-    } catch (error) {
-      console.error("Error creating or deleting relationship:", error);
-    }
+    mutation.mutate(isCurrentlyFollowing);
   };
 
   return (
     <div className="profileData">
       {error ? (
-        "Something went wrong."
+        "Something wrong."
       ) : isLoading ? (
         <Loader />
       ) : (
         <>
           <div className="profile-container">
             <div className="images">
+              {/* Cover picture */}
               <LazyLoadImage
                 src={
-                  user?.coverPic ? `/uploads/${user?.coverPic}` : defaultCover
+                  // Image uploaded on server or default image
+                  userData?.coverPic
+                    ? `/uploads/${userData?.coverPic} `
+                    : defaultCover
                 }
                 className="cover"
                 alt="cover"
               />
 
+              {/* Profile picture */}
               <div className="img-container">
                 <LazyLoadImage
                   src={
-                    user?.profilePic
-                      ? `/uploads/${user?.profilePic}`
+                    userData?.profilePic
+                      ? `/uploads/${userData?.profilePic}`
                       : defaultProfile
                   }
                   className="profile-pic"
@@ -116,31 +202,45 @@ export default function ProfileData() {
               </div>
             </div>
 
+            {/* Followers/Following + Contact */}
             <div className="user-info">
-              <div className="friends-contact">
-                <div className="friends">
+              <div className="relationships-contact">
+                <div className="relationships">
                   <PeopleAltOutlinedIcon fontSize="large" />
-                  {/* TODO - Update with data fetched from API */}
-                  <span>441 Relations</span>
+                  <div className="followers">
+                    <span className="count">
+                      {isFollowersError ? (
+                        <span className="error-count">Error</span>
+                      ) : isFollowersLoading ? (
+                        "..."
+                      ) : (
+                        `${followersCount.toString()} ${
+                          followersData?.length > 1 ? "Followers" : "Follower"
+                        }`
+                      )}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="contact">
                   <EmailOutlinedIcon fontSize="large" />
-
                   <MoreVertIcon fontSize="large" />
                 </div>
               </div>
 
+              {/* User's main info */}
               <div className="main-info">
                 <h2>
-                  {user?.firstName} {user?.lastName}
+                  {userData?.firstName} {userData?.lastName}
                 </h2>
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{user?.city || "Non renseigné"}</span>
+                  <span>{userData?.city || "Non renseigné"}</span>
                 </div>
 
+                {/* Update button */}
+                {/* Note: 'userId'(param from the URL) is a string, whereas currentUser.id is a number → 2 ≠ types, therefore we have to convert the latter in string */}
                 {userId === String(currentUser?.id) ? (
                   <button
                     onClick={() => setOpenUpdate((prevState) => !prevState)}
@@ -149,9 +249,17 @@ export default function ProfileData() {
                   </button>
                 ) : (
                   <button onClick={handleFollow}>
-                    {relationshipsData?.includes(currentUser?.id)
-                      ? "Unfollow"
-                      : "Follow"}
+                    {mutation.isLoading ? (
+                      <Loader
+                        width="24px"
+                        height="24px"
+                        border="3px solid rgba(0, 0, 0, 0.1)"
+                      />
+                    ) : isCurrentlyFollowing ? (
+                      "Unfollow"
+                    ) : (
+                      "Follow"
+                    )}
                   </button>
                 )}
               </div>
@@ -160,12 +268,13 @@ export default function ProfileData() {
 
           {userId === String(currentUser?.id) && <Publish />}
 
+          {/* Cf. posts controllers backend: Posts has a prop userId which is defined (!== undefined) → Shows posts of user whose profile page is displayed  */}
           <Posts userId={userId} />
         </>
       )}
 
       {openUpdate && (
-        <UpdateProfile user={user} setOpenUpdate={setOpenUpdate} />
+        <UpdateProfile user={userData} setOpenUpdate={setOpenUpdate} />
       )}
     </div>
   );

@@ -7,11 +7,15 @@ import { fetchPostComments } from "../../utils/fetchPostComments.js";
 import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import moment from "moment";
 import { toast } from "react-toastify";
+import { debounce } from "lodash";
 
 // Components
 import Comments from "../comments/Comments.jsx";
 import UpdatePost from "../update/UpdatePost.jsx";
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
+
+// Image
+import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Icons
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
@@ -21,19 +25,15 @@ import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
-// Image
-import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
-
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
-  const [openUpdate, setOpenUpdate] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
 
   const navigate = useNavigate();
-
   const queryClient = useQueryClient();
 
   const navigateAndScrollTop = () => {
@@ -41,49 +41,83 @@ export default function Post({ post }) {
     window.scrollTo(0, 0);
   };
 
-  // Get comments
+  // Get post comments
   const { data: comments } = useQuery({
     queryKey: ["comments", post.id],
     queryFn: () => fetchPostComments(post.id),
   });
 
-  // Get likes
-  const fetchPostLikes = async () => {
+  // Get post likes
+  const fetchPostLikes = async (postId) => {
     try {
-      const res = await makeRequest.get(`/likes?postId=${post.id}`);
+      const res = await makeRequest.get(`/likes?postId=${postId}`);
       return res.data;
     } catch (error) {
       console.error("Error fetching post likes:", error);
+      toast.error(
+        "Error fetching post likes:",
+        error.response?.data?.message || error.message
+      );
     }
   };
 
-  const { data: likes } = useQuery({
+  // Query data for likes
+  const { data: postLikes } = useQuery({
     queryKey: ["likes", post.id],
-    queryFn: fetchPostLikes,
+    queryFn: () => fetchPostLikes(post.id),
   });
 
-  // Handle likes
-  const handleLikesMutation = useMutation({
-    mutationFn: (liked) => {
-      if (liked) return makeRequest.delete(`/likes?postId=${post.id}`);
+  // Likes/Comments counts
+  const likesCount = postLikes?.length || 0;
+  const commentsCount = comments?.length || 0;
+
+  // Optimistic mutation for current user's likes
+  const handleLikeMutation = useMutation({
+    mutationFn: (isPostLiked) => {
+      // If already liked → Remove like
+      if (isPostLiked) return makeRequest.delete(`/likes?postId=${post.id}`);
+      // If not liked → Add like
       return makeRequest.post("/likes", { postId: post.id });
     },
 
-    onSuccess: () => {
-      // Invalidate and refetch
+    // Before the request (mutationFn), cancel ongoing fetches and store state
+    onMutate: async (isPostLiked) => {
+      await queryClient.cancelQueries(["likes", post.id]);
+      const previousLikes = queryClient.getQueryData(["likes", post.id]); // Save snapshot
+
+      // Optimistically update cache
+      queryClient.setQueryData(["likes", post.id], (oldData = []) => {
+        //* oldData = [] : if oldPosts is undefined, it becomes an empty array on which can be used without any problem
+        if (isPostLiked) {
+          // If user had liked → remove their ID
+          return oldData.filter((id) => id !== currentUser.id);
+        } else {
+          // If user had not liked → add their ID
+          return [...oldData, currentUser.id];
+        }
+      });
+
+      return { previousLikes }; // Context for rollback
+    },
+
+    // If mutation fails → Rollback
+    onError: (err, _isPostLiked, context) => {
+      console.error("Error updating likes:", err);
+      toast.error(
+        "Error updating likes: " + (err.response?.data?.message || err.message)
+      );
+      if (context?.previousLikes) {
+        queryClient.setQueryData(["likes", post.id], context.previousLikes);
+      }
+    },
+
+    // Always refetch after mutation (server is source of truth)
+    onSettled: () => {
       queryClient.invalidateQueries(["likes", post.id]);
     },
   });
 
-  const handleLikes = () => {
-    try {
-      handleLikesMutation.mutate(likes?.includes(currentUser?.id));
-    } catch (error) {
-      console.error("Error adding or removing like:", error);
-    }
-  };
-
-  // Delete post
+  // Mutation to delete posts
   const deleteMutation = useMutation({
     mutationFn: (postId) => makeRequest.delete(`/posts/${postId}`),
 
@@ -92,14 +126,36 @@ export default function Post({ post }) {
       queryClient.invalidateQueries(["posts"]);
       toast.success("Post deleted.");
     },
+
+    onError: (error) => {
+      console.error("Error deleting post:", error);
+      toast.error(
+        "Error deleting post: " +
+          (error.response?.data?.message || error.message)
+      );
+    },
   });
 
+  const isPostLiked = postLikes?.includes(currentUser?.id) || false;
+
+  // Add a debounce mechanism to prevent excessive API calls if a user clicks multiple times rapidly on "❤️" ("Like" button)
+  const debouncedHandleLike = debounce(() => {
+    handleLikeMutation.mutate(isPostLiked);
+  }, 300);
+
+  useEffect(() => {
+    // Cleanup: Cancels debounce callbacks if the component is unmounted
+    return () => {
+      debouncedHandleLike.cancel();
+    };
+  }, []);
+
+  const handleLike = () => {
+    debouncedHandleLike();
+  };
+
   const handleDelete = (post) => {
-    try {
-      deleteMutation.mutate(post.id);
-    } catch (error) {
-      console.error("Error deleting post:", error);
-    }
+    deleteMutation.mutate(post.id);
   };
 
   return (
@@ -141,20 +197,20 @@ export default function Post({ post }) {
 
       <div className="content">
         {/* Text */}
-        <p>{addNonBreakingSpace(post.text)}</p>        
+        <p>{addNonBreakingSpace(post.text)}</p>
         {/* Image (optional) */}
         {post.img && <LazyLoadImage src={`/uploads/${post.img}`} alt="post" />}
       </div>
 
       <div className="interactions">
         <div className="item">
-          {likes?.includes(currentUser?.id) ? (
-            <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLikes} />
+          {isPostLiked ? (
+            <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLike} />
           ) : (
-            <FavoriteBorderOutlinedIcon onClick={handleLikes} />
+            <FavoriteBorderOutlinedIcon onClick={handleLike} />
           )}
-          {likes?.length > 0 && likes.length} {""}
-          <span>{likes?.length > 1 ? "Likes" : "Like"}</span>
+          {likesCount > 0 && likesCount} {""}
+          <span>{likesCount > 1 ? "Likes" : "Like"}</span>
         </div>
 
         <div
@@ -162,8 +218,8 @@ export default function Post({ post }) {
           onClick={() => setCommentsOpen((prevState) => !prevState)}
         >
           <TextsmsOutlinedIcon />
-          {comments?.length > 0 && comments?.length} {""}
-          <span>{comments?.length > 1 ? "Comments" : "Comment"}</span>
+          {commentsCount > 0 && commentsCount} {""}
+          <span>{commentsCount > 1 ? "Comments" : "Comment"}</span>
         </div>
 
         <div className="item">
@@ -174,7 +230,13 @@ export default function Post({ post }) {
 
       {commentsOpen && <Comments postId={post.id} />}
 
-      {openUpdate && <UpdatePost setOpenUpdate={setOpenUpdate} post={post} />}
+      {openUpdate && (
+        <UpdatePost
+          setOpenUpdate={setOpenUpdate}
+          post={post}
+          userId={post.userId}
+        />
+      )}
     </div>
   );
 }

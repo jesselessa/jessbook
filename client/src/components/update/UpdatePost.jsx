@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import "./updatePost.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -8,76 +8,131 @@ import { toast } from "react-toastify";
 
 // Components
 import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
+import Loader from "../../components/loader/Loader.jsx";
 
 // Icon
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
-export default function UpdatePost({ post, setOpenUpdate }) {
+export default function UpdatePost({ post, setOpenUpdate, userId }) {
   const [newText, setNewText] = useState(post.text);
-  const [newImg, setNewImg] = useState(null); // Image selected or not
+  const [newImg, setNewImg] = useState(null);
+  const fileInputRef = useRef(null);
 
   const queryClient = useQueryClient();
 
-  // Mutation to handle post update
+  // Generate a temporary   preview URL for selected file and clean up memory automatically
+  const newImgUrl = useCleanUpFileURL(newImg);
+
+  // Mutation to handle optimistic update for post
   const updateMutation = useMutation({
     mutationFn: (updatedPost) =>
       makeRequest.put(`/posts/${post.id}`, updatedPost),
 
+    // OnMutate → Before the request happens
+    onMutate: async (updatedPost) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries(["posts", userId]);
+
+      // Store current state
+      const previousPosts = queryClient.getQueryData(["posts", userId]);
+
+      // Optimistically update cache
+      //! ⚠️ Reminder: Don't merge an uncomplete optimistic object (e.g., if we only return 'text' and 'img', whereas 'posts' SQL table also contains other keys), in this case 'updatedPost', because it will overwrite our existing data => 💡 Only merge with the new one !!!
+      queryClient.setQueryData(["posts", userId], (oldPosts = []) => {
+        return oldPosts.map((p) =>
+          p.id === post.id
+            ? { ...p, text: updatedPost.text, img: updatedPost.img || p.img }
+            : p
+        );
+      });
+
+      // Context for rollback
+      return { previousPosts };
+    },
+
+    // OnError → Rollback to previous state
+    onError: (err, _updatedPost, context) => {
+      console.error("Error updating post:", err);
+      toast.error(
+        "Error updating post: " + (err.response?.data?.message || err.message)
+      );
+
+      if (context?.previousPosts) {
+        queryClient.setQueryData(["posts", userId], context.previousPosts);
+      }
+    },
+
+    // OnSuccess → Successful mutation
     onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries(["posts"]);
       toast.success("Post updated.");
     },
 
-    onError: (error) => console.error("Error updating post:", error),
+    // OnSettled → Either mutation succeeds or fails
+    onSettled: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["posts", userId]);
+
+      // Reset states
+      setOpenUpdate(false); // Close form
+      setNewImg(null); // Cleanup local state
+
+      // Reset input value in DOM
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    },
   });
 
-  const handleClick = async (e) => {
+  const isUpdating = updateMutation.isPending;
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if post has been modified
-    const isDescModified = newText?.trim() !== post.text?.trim();
-    const isImageModified = newImg !== null;
+    // Prevent multiple submissions
+    if (isUpdating) return;
 
-    if (!isDescModified && !isImageModified) {
+    // Check if post has been modified
+    const trimmedText = newText?.trim();
+    const hasTextChanged = trimmedText !== post.text?.trim();
+    const hasImageChanged = newImg !== null;
+
+    if (!hasTextChanged && !hasImageChanged) {
       toast.info("No changes detected.");
       return;
     }
 
     // Check if description is empty
-    if (newText?.trim()?.length === 0) {
+    if (!trimmedText) {
       toast.error("You must add a description to your post.");
       return;
     }
 
     // Check post length
-    if (newText?.trim()?.length > 1000) {
+    if (trimmedText.length > 1000) {
       toast.error("Your post can't contain more than 1000\u00A0characters.");
       return;
     }
 
-    // Prepare updated data
+    // Prepare updated post object
     const updatedPost = {
       ...post,
       text: newText.trim(),
     };
 
-    // If an image is selected, upload it and update post
-    if (newImg) {
-      const updatedImg = await uploadFile(newImg);
-      updatedPost.img = updatedImg;
+    // Upload new image if selected
+    if (hasImageChanged) {
+      try {
+        updatedPost.img = await uploadFile(newImg);
+      } catch (err) {
+        console.error("Error uploading image:", err);
+        toast.error(
+          "Error uploading image: " + (err.message || "Try again later.")
+        );
+        return; // Stop if image upload fails
+      }
     }
 
-    // Trigger mutation to update database
+    // Trigger mutation
     updateMutation.mutate(updatedPost);
-    setOpenUpdate(false); // Close form
-
-    // Reset image state to release URL resource
-    setNewImg(null);
   };
-
-  // Release URL resource to prevent memory leaks
-  useCleanUpFileURL(newImg);
 
   return (
     <>
@@ -85,17 +140,18 @@ export default function UpdatePost({ post, setOpenUpdate }) {
         <div className="wrapper">
           <h1>Update Your Post</h1>
 
-          <form name="update-post-form">
+          <form name="update-post-form" onSubmit={handleSubmit}>
             <div className="files">
               <div className="image">
                 <span>Choose an image</span>
                 <div className="img-container">
-                  {(newImg || post.img) && (
+                  {(newImgUrl || post.img) && (
                     <LazyLoadImage
                       src={
-                        newImg
-                          ? URL.createObjectURL(newImg)
-                          : `/uploads/${post.img}`
+                        newImgUrl
+                          ? // URL generated by the hook
+                            newImgUrl
+                          : `/uploads/${post.img}` // Existing image
                       }
                       alt="post preview"
                     />
@@ -112,6 +168,8 @@ export default function UpdatePost({ post, setOpenUpdate }) {
                     name="new-file"
                     accept="image/*"
                     onChange={(e) => setNewImg(e.target.files[0])}
+                    disabled={isUpdating}
+                    ref={fileInputRef}
                   />
                 </div>
               </div>
@@ -123,17 +181,29 @@ export default function UpdatePost({ post, setOpenUpdate }) {
               name="new-text"
               rows={8}
               placeholder="Write a text..."
-              maxLength={1000}
               value={newText}
               onChange={(e) => setNewText(e.target.value)}
+              disabled={isUpdating}
             />
 
-            <button className="submit" onClick={handleClick}>
-              Update
+            <button type="submit" className="submit" disabled={isUpdating}>
+              {isUpdating ? (
+                <Loader
+                  width="24px"
+                  height="24px"
+                  border="3px solid rgba(0, 0, 0, 0.1)"
+                />
+              ) : (
+                "Update"
+              )}
             </button>
           </form>
 
-          <button className="close" onClick={() => setOpenUpdate(false)}>
+          <button
+            className="close"
+            onClick={() => setOpenUpdate(false)}
+            disabled={isUpdating}
+          >
             X
           </button>
         </div>
