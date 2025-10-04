@@ -45,25 +45,30 @@ export default function Publish() {
     // OnMutate: Immediately update the cache before the server response
     onMutate: async (newPost) => {
       // Cancel any outgoing fetches for posts query to prevent conflicts
+      //? Reminder: cancelQueries(queryKey)
       await queryClient.cancelQueries(["posts"]); // Timeline + ProfileData
 
       // Store existing query cached data to revert if mutation fails
+      //? Reminder: getQueryData(queryKey)
       const previousPosts = queryClient.getQueryData(["posts", currentUser.id]);
 
       // Create an optimistic post
       //! Note: The optimistic object doesn't have to be identical to the SQL table → It just needs to be complete enough for our UI to display the correct state while waiting for the server response
       //! When the server responds, Tanstack Query reconciles the real data with the cache
+      const currentDate = new Date().toISOString();
 
       const optimisticPost = {
         id: crypto.randomUUID(), // Temporary ID (which will be updated with the real data from server)
         text: newPost.text,
         img: newPost.img,
-        createdAt: new Date().toISOString(), // YYYY-MM-DDTHH:mm:ss.sssZ
+        createdAt: currentDate, // YYYY-MM-DDTHH:mm:ss.sssZ
       };
 
       // Optimistically update user's post in cache
-      queryClient.setQueryData(["posts", currentUser.id], (oldPost) => [
-        ...(oldPost || []),
+      //? Reminder: setQueryData(queryKey, newData)
+      //! ⚠️ (oldPost = []) is initialized to an empty array if Tanstack Query has still nothing in cached, otherwise, it could return "undefined" with the error "Cannot read properties of undefined (reading 'Symbol.iterator"
+      queryClient.setQueryData(["posts", currentUser.id], (oldPost = []) => [
+        ...oldPost,
         optimisticPost,
       ]);
 

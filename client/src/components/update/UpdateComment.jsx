@@ -18,7 +18,7 @@ export default function UpdateComment({ comment, setIsOpen }) {
       makeRequest.put(`/comments/${comment.id}`, updatedComment),
 
     onMutate: async (updatedComment) => {
-      await queryClient.cancelQueries(["comments", comment.postId]);
+      await queryClient.cancelQueries(["comments"]);
       const previousComments = queryClient.getQueryData([
         "comments",
         comment.postId,
@@ -26,7 +26,6 @@ export default function UpdateComment({ comment, setIsOpen }) {
 
       // Optimistic update: replace the old comment with the new one
       //! ⚠️ Reminder: Don't merge an uncomplete optimistic object (e.g., if we only return 'text', whereas 'comments' SQL table also contains other keys), in this case 'updatedComment', because it will overwrite our existing data => 💡 Only merge with the new one !!!
-
       queryClient.setQueryData(["comments", comment.postId], (oldData) =>
         oldData?.map((c) =>
           c.id === comment.id ? { ...c, text: updatedComment.text } : c
@@ -37,11 +36,9 @@ export default function UpdateComment({ comment, setIsOpen }) {
     },
 
     onError: (error, _updatedComment, context) => {
-      // if (import.meta.env.DEV) {
-      //   console.error("Error updating comment:", error);
-      // }
-      console.error("Error updating comment:", error);
-
+      if (import.meta.env.DEV) {
+        console.error("Error updating comment:", error);
+      }
       toast.error("An error occured while updating comment.");
 
       if (context?.previousComments) {
@@ -54,11 +51,10 @@ export default function UpdateComment({ comment, setIsOpen }) {
 
     onSuccess: () => {
       toast.success("Comment updated.");
-      setIsOpen(false);
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries(["comments", comment.postId]);
+      queryClient.invalidateQueries(["comments"]);
     },
   });
 
@@ -68,7 +64,7 @@ export default function UpdateComment({ comment, setIsOpen }) {
     const trimmedText = text?.trim();
 
     // Check if comment has been modified
-    if (trimmedText === comment.text.trimmed()) {
+    if (trimmedText === comment.text.trim()) {
       toast.info("No changes detected.");
       return;
     }

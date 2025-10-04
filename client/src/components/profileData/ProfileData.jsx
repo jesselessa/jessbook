@@ -38,7 +38,6 @@ export default function ProfileData() {
       const res = await makeRequest.get(`/users/${userId}`);
       return res.data;
     } catch (error) {
-      //TODO - Uncomment and remove other log
       if (import.meta.env.DEV) {
         console.error("Error fetching user data:", error);
       }

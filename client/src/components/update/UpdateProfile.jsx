@@ -96,6 +96,9 @@ export default function UpdateProfile({ user, setIsOpen }) {
 
     // Rollback if mutation fails
     onError: (err, _updatedUser, context) => {
+      if (import.meta.env.DEV) console.error("Error updating profile:", err);
+      toast.error("An error occurred while updating your profile.");
+
       if (context?.previousUser)
         queryClient.setQueryData(
           ["user", currentUser.id],
@@ -106,15 +109,12 @@ export default function UpdateProfile({ user, setIsOpen }) {
           ["posts", currentUser.id],
           context.previousPosts
         );
-
-      if (import.meta.env.DEV) console.error("Error updating profile:", err);
-      toast.error("An error occurred while updating profile.");
     },
 
     // On success, display a message and navigate to profile page
     onSuccess: (_data, updatedUser) => {
       //? 'updatedUser' is the object that 'mutate' will pass to our 'mutationFn' (new user's data)
-      toast.success("Profile updated successfully.");
+      toast.success("Profile updated.");
       navigate(`/profile/${updatedUser.id}`);
     },
 

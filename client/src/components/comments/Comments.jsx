@@ -47,16 +47,18 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
 
     // OnMutate → Cancel ongoing queries and store existing query cached data
     onMutate: async (newComment) => {
-      await queryClient.cancelQueries(["comments", postId]);
+      await queryClient.cancelQueries(["comments"]);
       const previousComments = queryClient.getQueryData(["comments", postId]);
 
       // Create an optimistic comment
+      const currentDate = new Date().toISOString();
+
       const optimisticComment = {
         id: crypto.randomUUID(),
-        userId: currentUser.id,
         text: newComment.text,
+        userId: currentUser.id,
         postId: postId,
-        createdAt: new Date().toISOString(), // YYYY-MM-DDTHH:mm:ss.sssZ
+        createdAt: currentDate, // YYYY-MM-DDTHH:mm:ss.sssZ
       };
 
       // Optimistically update the post in cache
@@ -71,8 +73,7 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
 
     // OnError → Rollback to previous state
     onError: (err, _newComment, context) => {
-      console.error("Error creating comment:", err);
-      // if (import.meta.env.DEV) console.error("Error creating comment:", err);
+      if (import.meta.env.DEV) console.error("Error creating comment:", err);
       toast.error("An error occurred while creating comment.");
 
       if (context?.previousComments) {
@@ -89,9 +90,11 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     },
 
     // OnSettled → Refetch data and reset state
-    onSettled: () => {
-      queryClient.invalidateQueries(["comments", postId]);
+    onSettled: (_data, _error, newComment) => {
+      queryClient.invalidateQueries(["comments"]);
       setText("");
+
+      closeUpdate(newComment);
     },
   });
 
@@ -111,13 +114,21 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
       return;
     }
 
-    createMutation.mutate({ text: addNonBreakingSpace(trimmedText) });
+    createMutation.mutate({
+      text: addNonBreakingSpace(trimmedText),
+      postId,
+    });
   };
 
   // Open update form and store selected comment
-  const handleUpdate = (comment) => {
+  const openUpdate = (comment) => {
     setIsOpen(true);
     setSelectedComment(comment);
+  };
+
+  const closeUpdate = (comment) => {
+    setSelectedComment(comment);
+    setIsOpen(false);
   };
 
   // Delete comment
@@ -207,7 +218,7 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
                   <EditOutlinedIcon
                     className="edit-btn"
                     fontSize="large"
-                    onClick={() => handleUpdate(comment)}
+                    onClick={() => openUpdate(comment)}
                   />
                   <DeleteOutlineOutlinedIcon
                     className="edit-btn"

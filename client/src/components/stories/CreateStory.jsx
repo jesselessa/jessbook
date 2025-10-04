@@ -78,7 +78,7 @@ export default function CreateStory({ setOpenCreateStory }) {
     mutationFn: (newStory) => makeRequest.post("/stories", newStory),
 
     onMutate: async (newStory) => {
-      await queryClient.cancelQueries(["stories", currentUser.id]);
+      await queryClient.cancelQueries(["stories"]);
       const previousStories = queryClient.getQueryData([
         "stories",
         currentUser.id,
@@ -95,7 +95,7 @@ export default function CreateStory({ setOpenCreateStory }) {
         userId: currentUser.id,
         file: newStory.file,
         text: newStory.text,
-        createdAt: new Date().toISOString(),
+        createdAt: currentDate,
         expiresAt: expirationDate,
       };
 
