@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 
 /**
  * Creates a Blob URL for a given File/Blob object and revokes it on cleanup
- * @param {File | null} file - The File object (from input[type="file"]) to create a URL for.
+ * @param {File | null} file - The File object (from input[type="file"]) to create a URL for
  * @returns {string | null} - The temporary object URL string, or null
  */
 

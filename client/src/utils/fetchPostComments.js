@@ -7,16 +7,14 @@ export const fetchPostComments = async (postId) => {
     return res.data;
   } catch (error) {
     const errorMessage =
-      error.response?.data?.message ||
-      "An error occurred while fetching comments. Please try again later.";
-
+      "An unknown error occurred while fetching post comments.";
     toast.error(errorMessage);
 
     // Log error for debugging (development only)
-    if (process.env.NODE_ENV === "development")
+    if (import.meta.env.DEV) {
       console.error("Error fetching post comments:", error);
-
-    // Propagate error without modifying it
+    }
+    // Propagate error to the calling function
     throw error;
   }
 };

@@ -30,15 +30,15 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
-  const [commentsOpen, setCommentsOpen] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const navigateAndScrollTop = () => {
     navigate(`/profile/${post.userId}`);
-    window.scrollTo(0, 0);
+    window.scrollTo(0, 0); // Top of the page
   };
 
   // Get post comments
@@ -53,11 +53,10 @@ export default function Post({ post }) {
       const res = await makeRequest.get(`/likes?postId=${postId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching post likes:", error);
-      toast.error(
-        "Error fetching post likes:",
-        error.response?.data?.message || error.message
-      );
+      if (import.meta.env.DEV) {
+        console.error("Error fetching post likes:", error);
+      }
+      toast.error("An error occurred while fetching post likes.");
     }
   };
 
@@ -80,19 +79,19 @@ export default function Post({ post }) {
       return makeRequest.post("/likes", { postId: post.id });
     },
 
-    // Before the request (mutationFn), cancel ongoing fetches and store state
+    // Before the request (mutationFn), cancel ongoing fetches and store query cached data
     onMutate: async (isPostLiked) => {
       await queryClient.cancelQueries(["likes", post.id]);
-      const previousLikes = queryClient.getQueryData(["likes", post.id]); // Save snapshot
+      const previousLikes = queryClient.getQueryData(["likes", post.id]);
 
       // Optimistically update cache
       queryClient.setQueryData(["likes", post.id], (oldData = []) => {
-        //* oldData = [] : if oldPosts is undefined, it becomes an empty array on which can be used without any problem
+        //* oldData = [] : if oldPosts is undefined, it becomes an empty array that can be used without any problem
         if (isPostLiked) {
-          // If user had liked → remove their ID
+          // If user had liked → Remove their ID
           return oldData.filter((id) => id !== currentUser.id);
         } else {
-          // If user had not liked → add their ID
+          // If user had not liked → Add their ID
           return [...oldData, currentUser.id];
         }
       });
@@ -102,10 +101,9 @@ export default function Post({ post }) {
 
     // If mutation fails → Rollback
     onError: (err, _isPostLiked, context) => {
-      console.error("Error updating likes:", err);
-      toast.error(
-        "Error updating likes: " + (err.response?.data?.message || err.message)
-      );
+      if (import.meta.env.DEV) console.error("Error updating post likes:", err);
+      toast.error("An error occurred while updating post likes.");
+
       if (context?.previousLikes) {
         queryClient.setQueryData(["likes", post.id], context.previousLikes);
       }
@@ -128,11 +126,8 @@ export default function Post({ post }) {
     },
 
     onError: (error) => {
-      console.error("Error deleting post:", error);
-      toast.error(
-        "Error deleting post: " +
-          (error.response?.data?.message || error.message)
-      );
+      if (import.meta.env.DEV) console.error("Error deleting post:", error);
+      toast.error("An error occurred while deleting post.");
     },
   });
 
@@ -184,7 +179,7 @@ export default function Post({ post }) {
             <EditOutlinedIcon
               className="edit-btn"
               fontSize="large"
-              onClick={() => setOpenUpdate((prevState) => !prevState)}
+              onClick={() => setIsUpdateOpen(!isUpdateOpen)}
             />
             <DeleteOutlineOutlinedIcon
               className="edit-btn"
@@ -210,13 +205,10 @@ export default function Post({ post }) {
             <FavoriteBorderOutlinedIcon onClick={handleLike} />
           )}
           {likesCount > 0 && likesCount} {""}
-          <span>{likesCount > 1 ? "Likes" : "Like"}</span>
+          <span>{likesCount > 1 ? " Likes" : "Like"}</span>
         </div>
 
-        <div
-          className="item"
-          onClick={() => setCommentsOpen((prevState) => !prevState)}
-        >
+        <div className="item" onClick={() => setIsCommentsOpen(!isCommentsOpen)}>
           <TextsmsOutlinedIcon />
           {commentsCount > 0 && commentsCount} {""}
           <span>{commentsCount > 1 ? "Comments" : "Comment"}</span>
@@ -228,13 +220,19 @@ export default function Post({ post }) {
         </div>
       </div>
 
-      {commentsOpen && <Comments postId={post.id} />}
+      {isCommentsOpen && (
+        <Comments
+          postId={post.id}
+          isOpen={isCommentsOpen}
+          setIsOpen={setIsCommentsOpen}
+        />
+      )}
 
-      {openUpdate && (
+      {isUpdateOpen && (
         <UpdatePost
-          setOpenUpdate={setOpenUpdate}
           post={post}
           userId={post.userId}
+          setIsOpen={setIsUpdateOpen}
         />
       )}
     </div>

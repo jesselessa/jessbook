@@ -21,19 +21,17 @@ import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-export default function UpdateProfile({ user, setOpenUpdate }) {
+export default function UpdateProfile({ user, setIsOpen }) {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
   const fileInputRef = useRef(null);
 
-  // 'cover' and 'profile' are either null or File object (Blob) when selected
-  const [cover, setCover] = useState(null);
+  const [cover, setCover] = useState(null); // 'cover' and 'profile' are either null or File object (Blob) when selected
   const [profile, setProfile] = useState(null);
   const [fields, setFields] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
     city: user.city,
   });
-  // Errors from form
   const [validationErrors, setValidationErrors] = useState({
     firstName: "",
     lastName: "",
@@ -71,6 +69,8 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     onMutate: async (updatedUser) => {
       // Cancel any outgoing refetch
       await queryClient.cancelQueries(["user", currentUser.id]);
+      await queryClient.cancelQueries(["posts", currentUser.id]);
+
       // Store the current states
       const previousUser = queryClient.getQueryData(["user", currentUser.id]);
       const previousPosts = queryClient.getQueryData(["posts", currentUser.id]);
@@ -82,7 +82,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
         ...oldData,
         ...Object.fromEntries(
           // Only adds/overwrites new data
-          Object.entries(updatedUser) // Object.entries(updatedUser) transforms an oject into an array with key-value pairs
+          Object.entries(updatedUser) //? Object.entries(updatedUser) transforms an object into an array with key-value pairs
             .filter(([_key, value]) => value !== undefined) // We only keep defined values
         ),
       }));
@@ -107,27 +107,24 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
           context.previousPosts
         );
 
-      console.error("Error updating profile:", err);
-      toast.error(
-        "Error updating profile: " +
-          (err.response?.data?.message || err.message)
-      );
+      if (import.meta.env.DEV) console.error("Error updating profile:", err);
+      toast.error("An error occurred while updating profile.");
     },
 
     // On success, display a message and navigate to profile page
     onSuccess: (_data, updatedUser) => {
-      //? 'variables' is an object that 'mutate' will pass to our 'mutationFn' (in this case, the new user data)
+      //? 'updatedUser' is the object that 'mutate' will pass to our 'mutationFn' (new user's data)
       toast.success("Profile updated successfully.");
       navigate(`/profile/${updatedUser.id}`);
     },
 
     onSettled: () => {
-      // Invalidate and refetch user's query and dependent queries
+      // Invalidate and refetch user's query and dependent ones
       queryClient.invalidateQueries(["user", currentUser.id]);
-      queryClient.invalidateQueries({ queryKey: ["posts", currentUser.id] });
+      queryClient.invalidateQueries(["posts", currentUser.id]);
 
       // Reset states
-      setOpenUpdate(false);
+      setIsOpen(false); // Close form
       setCover(null);
       setProfile(null);
 
@@ -136,13 +133,19 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     },
   });
 
+  // Use 'updateMutation.isPending' for the global loading state
+  const isUpdating = updateMutation.isPending;
+  //? Note: 'isPending 'is a property automatically managed by the Tanstack Query useMutation hook
+  // When we call useMutation, the returned object contains several states, such as 'isPending' ('true' while mutationFn is running), 'isSuccess' ('true' if mutation success) or 'isError' ('true' if mutation failure)
+
   // Clear form validation errors
-  const clearValidationErrors = () =>
+  const clearValidationErrors = () => {
     setValidationErrors({
       firstName: "",
       lastName: "",
       city: "",
     });
+  };
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -203,11 +206,6 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
     // Trigger optimistic mutation
     updateMutation.mutate(updatedUser);
   };
-
-  // Use 'updateMutation.isPending' for the global loading state
-  //? 'isPending 'is a property automatically managed by the Tanstack Query useMutation hook
-  //? When we call useMutation, the returned object contains several states, such as 'isPending' ('true' while mutationFn is running), 'isSuccess' ('true' if mutation success) or 'isError' ('true' if mutation failure)
-  const isUpdating = updateMutation.isPending;
 
   return (
     <>
@@ -336,7 +334,7 @@ export default function UpdateProfile({ user, setOpenUpdate }) {
 
           <button
             className="close"
-            onClick={() => setOpenUpdate(false)}
+            onClick={() => setIsOpen(false)}
             disabled={isUpdating}
           >
             X

@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 // Component
 import Loader from "../loader/Loader.jsx";
 
-export default function UpdateComment({ comment, setOpenUpdate }) {
+export default function UpdateComment({ comment, setIsOpen }) {
   const [text, setText] = useState(comment.text);
 
   const queryClient = useQueryClient();
@@ -36,12 +36,14 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
       return { previousComments };
     },
 
-    onError: (error, _variables, context) => {
+    onError: (error, _updatedComment, context) => {
+      // if (import.meta.env.DEV) {
+      //   console.error("Error updating comment:", error);
+      // }
       console.error("Error updating comment:", error);
-      toast.error(
-        "Error updating comment: " +
-          (error.response?.data?.message || error.message)
-      );
+
+      toast.error("An error occured while updating comment.");
+
       if (context?.previousComments) {
         queryClient.setQueryData(
           ["comments", comment.postId],
@@ -52,7 +54,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
 
     onSuccess: () => {
       toast.success("Comment updated.");
-      setOpenUpdate(false); // Close the form
+      setIsOpen(false);
     },
 
     onSettled: () => {
@@ -63,19 +65,21 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const trimmedText = text?.trim();
+
     // Check if comment has been modified
-    if (text?.trim() === comment.text?.trim()) {
+    if (trimmedText === comment.text.trimmed()) {
       toast.info("No changes detected.");
       return;
     }
 
     // Check comment length
-    if (text?.trim()?.length === 0) {
+    if (trimmedText?.length === 0) {
       toast.error("You must add a text to your comment.");
       return;
     }
 
-    if (text?.trim()?.length > 500) {
+    if (trimmedText?.length > 500) {
       toast.error("Your comment can't contain more than 500\u00A0characters.");
       return;
     }
@@ -83,7 +87,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
     // Prepare updated data
     const updatedComment = {
       ...comment,
-      text: text.trim(),
+      text: trimmedText,
     };
 
     // Trigger mutation to update database
@@ -126,7 +130,7 @@ export default function UpdateComment({ comment, setOpenUpdate }) {
           <button
             type="button"
             className="close"
-            onClick={() => setOpenUpdate(false)}
+            onClick={() => setIsOpen(false)}
             disabled={isUpdating}
           >
             X

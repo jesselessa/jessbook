@@ -1,5 +1,5 @@
 //***************************** uploadFile.js ********************************
-// Goal : transfer file and provide its name for next step (story creation)
+// Goal: Transfer file and provide its name for next step (story creation)
 //****************************************************************************
 
 import { makeRequest } from "./axios.js";
@@ -10,22 +10,23 @@ export const uploadFile = async (file) => {
 
   try {
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", file); // Creates a FormData object with a key 'file' whose value is the file name
 
-    const res = await makeRequest.post("/uploads", formData); 
-    // If the request succeeds, return the file name string
+    const res = await makeRequest.post("/uploads", formData);
+    // Success: Returns the file name string
     return res.data;
   } catch (error) {
-    // 1 - Log the failure for debugging
-    console.error("File upload failed:", error);
-
-    // 2 - Display an error message
+    if (import.meta.env.DEV) {
+      console.error("File upload failed:", error);
+    }
     const errorMessage =
-      error.response?.data?.message ||
-      "File upload failed. Please check the file size (max 50MB) or format.";
+      "File upload failed. Please, check the file size (max 50MB) or format.";
     toast.error(errorMessage);
 
-    // FIX : 3 - Return null on failure instead of throwing the error
+    // Propagate error to the calling function
+    throw error;
+
+    // Failure: Returns a 'null' value
     return null;
   }
 };

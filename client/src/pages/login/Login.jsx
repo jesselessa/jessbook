@@ -60,7 +60,10 @@ export default function Login() {
       // Navigate to homepage
       navigate("/home");
     } catch (error) {
-      setError(error.response?.data.message || error.message);
+      if (import.meta.env.DEV) {
+        console.log("Error during the login process:", error);
+      }
+      setError("An error occurred during the login process.");
     }
   };
 

@@ -23,10 +23,9 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-export default function Comments({ postId }) {
+export default function Comments({ postId, isOpen, setIsOpen }) {
   const { currentUser } = useContext(AuthContext);
   const [text, setText] = useState("");
-  const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
 
   const queryClient = useQueryClient();
@@ -46,11 +45,10 @@ export default function Comments({ postId }) {
     mutationFn: async (newComment) =>
       await makeRequest.post("/comments", newComment),
 
+    // OnMutate → Cancel ongoing queries and store existing query cached data
     onMutate: async (newComment) => {
       await queryClient.cancelQueries(["comments", postId]);
       const previousComments = queryClient.getQueryData(["comments", postId]);
-
-      const currentDate = new Date().toISOString();
 
       // Create an optimistic comment
       const optimisticComment = {
@@ -58,7 +56,7 @@ export default function Comments({ postId }) {
         userId: currentUser.id,
         text: newComment.text,
         postId: postId,
-        createdAt: moment(currentDate).fromNow(),
+        createdAt: new Date().toISOString(), // YYYY-MM-DDTHH:mm:ss.sssZ
       };
 
       // Optimistically update the post in cache
@@ -71,14 +69,11 @@ export default function Comments({ postId }) {
       return { previousComments };
     },
 
-    // On error → Rollback to previous state
+    // OnError → Rollback to previous state
     onError: (err, _newComment, context) => {
-      if (process.env.NODE_ENV === "development")
-        console.error("Error creating comment:", err);
-      toast.error(
-        "Error creating comment: " +
-          (err.response?.data?.message || err.message)
-      );
+      console.error("Error creating comment:", err);
+      // if (import.meta.env.DEV) console.error("Error creating comment:", err);
+      toast.error("An error occurred while creating comment.");
 
       if (context?.previousComments) {
         queryClient.setQueryData(
@@ -88,12 +83,12 @@ export default function Comments({ postId }) {
       }
     },
 
-    // onSuccess → Display a message
+    // OnSuccess → Display a message
     onSuccess: () => {
       toast.success("Comment published.");
     },
 
-    // onSettled → Refetch data and reset state
+    // OnSettled → Refetch data and reset state
     onSettled: () => {
       queryClient.invalidateQueries(["comments", postId]);
       setText("");
@@ -105,29 +100,23 @@ export default function Comments({ postId }) {
 
     const trimmedText = text.trim();
 
-    try {
-      // Check comment length
-      if (trimmedText?.length === 0) {
-        toast.error("You must add a text to your comment.");
-        return;
-      }
-
-      if (trimmedText?.length > 500) {
-        toast.error(
-          "Your comment can't contain more than 500\u00A0characters."
-        );
-        return;
-      }
-
-      createMutation.mutate({ text: addNonBreakingSpace(trimmedText) });
-    } catch (error) {
-      console.error("Error creating comment:", error);
+    // Check comment length
+    if (trimmedText?.length === 0) {
+      toast.error("Your comment must contain a description.");
+      return;
     }
+
+    if (trimmedText?.length > 500) {
+      toast.error("Your comment can't contain more than 500\u00A0characters.");
+      return;
+    }
+
+    createMutation.mutate({ text: addNonBreakingSpace(trimmedText) });
   };
 
   // Open update form and store selected comment
   const handleUpdate = (comment) => {
-    setOpenUpdate(true);
+    setIsOpen(true);
     setSelectedComment(comment);
   };
 
@@ -143,10 +132,8 @@ export default function Comments({ postId }) {
 
     onError: (error) => {
       console.error("Error deleting comment:", error);
-      toast.error(
-        "Error deleting comment: " +
-          (error.response?.data?.message || error.message)
-      );
+      // if (import.meta.env.DEV) console.error("Error deleting comment:", error);
+      toast.error("An error occurred while deleting comment.");
     },
   });
 
@@ -238,11 +225,8 @@ export default function Comments({ postId }) {
         ))
       )}
 
-      {openUpdate && selectedComment && (
-        <UpdateComment
-          setOpenUpdate={setOpenUpdate}
-          comment={selectedComment}
-        />
+      {isOpen && selectedComment && (
+        <UpdateComment setIsOpen={setIsOpen} comment={selectedComment} />
       )}
     </div>
   );

@@ -12,7 +12,8 @@ export default function Posts({ userId }) {
       const res = await makeRequest.get(`/posts?userId=${userId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching posts:", error);
+      if (import.meta.env.DEV) console.error("Error fetching posts:", error);
+      toast.error("An error occurred while fetching posts.");
     }
   };
 

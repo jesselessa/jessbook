@@ -138,6 +138,20 @@
       }
     }
 
+    .error-msg {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      color: #f75252;
+      background-color: #f8d7da;
+      font-size: 1.6rem;
+      border: 0.1rem solid #f75252;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+
     .close {
       position: absolute;
       top: 1rem;

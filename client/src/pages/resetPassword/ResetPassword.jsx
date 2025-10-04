@@ -51,7 +51,10 @@ export default function ResetPassword() {
         navigate("/"); // Redirect to login page
       }, 3000);
     } catch (error) {
-      setError(error.response?.data.message || error.message);
+      if (import.meta.env.DEV) {
+        console.error("Error resetting user's password:", error);
+      }
+      setError("An error occurred while resetting user's password.");
 
       // Reset form and clear API error message after 5 seconds
       setTimeout(() => {

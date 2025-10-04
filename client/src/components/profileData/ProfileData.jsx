@@ -27,9 +27,9 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function ProfileData() {
   const { currentUser } = useContext(AuthContext);
-  const [openUpdate, setOpenUpdate] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const { userId } = useParams(); // ID of the displayed profile
+  const { userId } = useParams(); // ID of the profile displayed
   const queryClient = useQueryClient();
 
   // Get user's info
@@ -38,11 +38,11 @@ export default function ProfileData() {
       const res = await makeRequest.get(`/users/${userId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching user data:", error);
-      toast.error(
-        "Error fetching user data: " +
-          (error.response?.data?.message || error.message)
-      );
+      //TODO - Uncomment and remove other log
+      if (import.meta.env.DEV) {
+        console.error("Error fetching user data:", error);
+      }
+      toast.error("An error occurred while fetching user's profile.");
     }
   };
 
@@ -63,10 +63,11 @@ export default function ProfileData() {
       );
       return res.data;
     } catch (error) {
-      console.error("Error fetching user's followers:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error fetching user's followers:", error);
+      }
       toast.error(
-        "Error fetching user's followers: " +
-          (error.response?.data?.message || error.message)
+        "An error occurred while fetching the list of user's followers."
       );
     }
   };
@@ -80,7 +81,7 @@ export default function ProfileData() {
     queryFn: () => getFollowers(userId),
   });
 
-  // Get relationships followed by user
+  // Get the list of people followed by user
   const getFollowing = async (userId) => {
     try {
       const res = await makeRequest.get(
@@ -88,10 +89,11 @@ export default function ProfileData() {
       );
       return res.data;
     } catch (error) {
-      console.error("Error fetching user's followed relationships:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error fetching user's followed relationships:", error);
+      }
       toast.error(
-        "Error fetching user's followed relationships: " +
-          (error.response?.data?.message || error.message)
+        "An error occurred while fetching the list of people followed by user."
       );
     }
   };
@@ -123,28 +125,27 @@ export default function ProfileData() {
       // 1A. Cancel any outgoing queries to avoid overwriting our optimistic update
       await queryClient.cancelQueries(["followers", userId]);
 
-      // 1B. Snapshot the previous followers data to revert if mutation fails
-      const previousFollowers = queryClient.getQueryData(["followers", userId]); // Store the current state
+      // 1B. Store the current cached data to revert if mutation fails
+      const previousFollowers = queryClient.getQueryData(["followers", userId]);
 
       // 1C. Optimistically update to the new value
       queryClient.setQueryData(["followers", userId], (oldData) => {
         if (!oldData) return []; // Fallback (our backend expects an array of IDs)
         return isCurrentlyFollowing
-          ? oldData.filter((id) => id !== currentUser.id) // Remove current user from followers if unfollows
-          : [...oldData, currentUser.id]; // Add current user if follows
+          ? oldData.filter((id) => id !== currentUser.id) // Remove current user from followers
+          : [...oldData, currentUser.id]; // Add current user
       });
 
       // Return context with previous data for rollback in case of error
       return { previousFollowers };
     },
 
-    // 2. onError (mutation failure): Rollback the optimistic update
+    // 2. OnError (mutation failure): Rollback the optimistic update
     onError: (error, _newData, context) => {
-      console.error("Error updating followers:", error);
-      toast.error(
-        "Error updating followers: " +
-          (error.response?.data?.message || error.message)
-      );
+      if (import.meta.env.DEV) {
+        console.error("Error updating followers:", error);
+      }
+      toast.error("An error occurred while updating followers.");
 
       // Rollback on error
       if (context?.previousFollowers) {
@@ -242,11 +243,7 @@ export default function ProfileData() {
                 {/* Update button */}
                 {/* Note: 'userId'(param from the URL) is a string, whereas currentUser.id is a number → 2 ≠ types, therefore we have to convert the latter in string */}
                 {userId === String(currentUser?.id) ? (
-                  <button
-                    onClick={() => setOpenUpdate((prevState) => !prevState)}
-                  >
-                    Update
-                  </button>
+                  <button onClick={() => setIsOpen(true)}>Update</button>
                 ) : (
                   <button onClick={handleFollow}>
                     {mutation.isLoading ? (
@@ -273,9 +270,7 @@ export default function ProfileData() {
         </>
       )}
 
-      {openUpdate && (
-        <UpdateProfile user={userData} setOpenUpdate={setOpenUpdate} />
-      )}
+      {isOpen && <UpdateProfile user={userData} setIsOpen={setIsOpen} />}
     </div>
   );
 }

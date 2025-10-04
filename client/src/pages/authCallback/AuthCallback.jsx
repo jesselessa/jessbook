@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import "./authCallback.scss";
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 // Component
 import Loader from "../../components/loader/Loader.jsx";
@@ -34,7 +35,15 @@ export default function AuthCallback() {
         await connectWithToken();
         navigate("/home");
       } catch (error) {
-        console.error("Error connecting with token:", error);
+        if (import.meta.env.DEV) {
+          console.error(
+            "Error retrieving token from authentication provider:",
+            error
+          );
+        }
+        toast.error(
+          "An error occurred while retrieving token from authntication provider."
+        );
         navigate("/"); // Redirect to login page
       } finally {
         setLoading(false);

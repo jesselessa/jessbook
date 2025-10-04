@@ -13,7 +13,7 @@ export const getFollowers = async (req, res) => {
   try {
     const data = await executeQuery(q, [followedUserId]);
 
-    // Return only the followers IDs as an array (*rel = relationship)
+    // Return only the followers IDs as an array (rel = relationship)
     return res.status(200).json(data.map((rel) => rel.followerId));
   } catch (error) {
     return res.status(500).json({
@@ -24,7 +24,7 @@ export const getFollowers = async (req, res) => {
 };
 
 //* ----------------------------
-//* 2. Get following of a user (who does the targeted user follow ?)
+//* 2. Get user's "following" (who is followed by the targeted user ?)
 //* ----------------------------
 // Input  : req.query.followerId = ID of the user who follows
 // Output : Array of IDs of users being followed by the targeted user
@@ -63,7 +63,7 @@ export const addRelationship = async (req, res) => {
 
   try {
     await executeQuery(q, values);
-    return res.status(201).json("User followed");
+    return res.status(201).json({ message: "User followed" });
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while creating relationship.",
@@ -87,7 +87,9 @@ export const deleteRelationship = async (req, res) => {
 
   try {
     const data = await executeQuery(q, [followerUserId, followedUserId]);
-    if (data.affectedRows > 0) return res.status(200).json("User unfollowed");
+    if (data.affectedRows > 0) {
+      return res.status(200).json({ message: "User unfollowed" });
+    }
     return res.status(404).json({ message: "Relationship not found." });
   } catch (error) {
     return res.status(500).json({

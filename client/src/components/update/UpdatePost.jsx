@@ -13,15 +13,13 @@ import Loader from "../../components/loader/Loader.jsx";
 // Icon
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
-export default function UpdatePost({ post, setOpenUpdate, userId }) {
+export default function UpdatePost({ post, userId, setIsOpen }) {
   const [newText, setNewText] = useState(post.text);
   const [newImg, setNewImg] = useState(null);
+  const [error, setError] = useState({ isError: false, message: "" });
   const fileInputRef = useRef(null);
 
   const queryClient = useQueryClient();
-
-  // Generate a temporary   preview URL for selected file and clean up memory automatically
-  const newImgUrl = useCleanUpFileURL(newImg);
 
   // Mutation to handle optimistic update for post
   const updateMutation = useMutation({
@@ -30,10 +28,10 @@ export default function UpdatePost({ post, setOpenUpdate, userId }) {
 
     // OnMutate → Before the request happens
     onMutate: async (updatedPost) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries(["posts", userId]);
+      // Cancel any outgoing refetches on posts
+      await queryClient.cancelQueries(["posts"]);
 
-      // Store current state
+      // Store the current query cached data
       const previousPosts = queryClient.getQueryData(["posts", userId]);
 
       // Optimistically update cache
@@ -52,10 +50,8 @@ export default function UpdatePost({ post, setOpenUpdate, userId }) {
 
     // OnError → Rollback to previous state
     onError: (err, _updatedPost, context) => {
-      console.error("Error updating post:", err);
-      toast.error(
-        "Error updating post: " + (err.response?.data?.message || err.message)
-      );
+      if (import.meta.env.DEV) console.error("Error updating post:", err);
+      toast.error("An error occurred while updating post.");
 
       if (context?.previousPosts) {
         queryClient.setQueryData(["posts", userId], context.previousPosts);
@@ -69,12 +65,13 @@ export default function UpdatePost({ post, setOpenUpdate, userId }) {
 
     // OnSettled → Either mutation succeeds or fails
     onSettled: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries(["posts", userId]);
+      // Invalidate and refetch posts data
+      queryClient.invalidateQueries(["posts"]);
 
       // Reset states
-      setOpenUpdate(false); // Close form
-      setNewImg(null); // Cleanup local state
+      setIsOpen(false); // Close form
+      setNewImg(null); // Cleanup local URL
+      setError({ isError: false, message: "" });
 
       // Reset input value in DOM
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -91,7 +88,7 @@ export default function UpdatePost({ post, setOpenUpdate, userId }) {
 
     // Check if post has been modified
     const trimmedText = newText?.trim();
-    const hasTextChanged = trimmedText !== post.text?.trim();
+    const hasTextChanged = trimmedText !== post.text.trim();
     const hasImageChanged = newImg !== null;
 
     if (!hasTextChanged && !hasImageChanged) {
@@ -101,13 +98,20 @@ export default function UpdatePost({ post, setOpenUpdate, userId }) {
 
     // Check if description is empty
     if (!trimmedText) {
-      toast.error("You must add a description to your post.");
+      setError({
+        isError: true,
+        message: "Your post must contain a description.",
+      });
+
       return;
     }
 
     // Check post length
     if (trimmedText.length > 1000) {
-      toast.error("Your post can't contain more than 1000\u00A0characters.");
+      setError({
+        isError: true,
+        message: "Your post can't contain more than 1000\u00A0characters.",
+      });
       return;
     }
 
@@ -122,17 +126,34 @@ export default function UpdatePost({ post, setOpenUpdate, userId }) {
       try {
         updatedPost.img = await uploadFile(newImg);
       } catch (err) {
-        console.error("Error uploading image:", err);
-        toast.error(
-          "Error uploading image: " + (err.message || "Try again later.")
-        );
-        return; // Stop if image upload fails
+        if (import.meta.env.DEV) console.error("Error uploading image:", err);
+        setError({
+          isError: true,
+          message: "An error occurred while uploading image.",
+        });
+        return;
       }
     }
 
     // Trigger mutation
     updateMutation.mutate(updatedPost);
   };
+
+  // Handle inputs changes
+  const handleInputsChange = (e) => {
+    // Reset previous error message
+    setError({ isError: false, message: "" });
+
+    const { id, value, files } = e.target;
+    if (id === "new-text") {
+      setNewText(value);
+    } else {
+      setNewImg(files[0]);
+    }
+  };
+
+  // Release URL resource to prevent memory leaks
+  const newImgUrl = useCleanUpFileURL(newImg);
 
   return (
     <>
@@ -167,7 +188,7 @@ export default function UpdatePost({ post, setOpenUpdate, userId }) {
                     id="new-file"
                     name="new-file"
                     accept="image/*"
-                    onChange={(e) => setNewImg(e.target.files[0])}
+                    onChange={handleInputsChange}
                     disabled={isUpdating}
                     ref={fileInputRef}
                   />
@@ -182,7 +203,7 @@ export default function UpdatePost({ post, setOpenUpdate, userId }) {
               rows={8}
               placeholder="Write a text..."
               value={newText}
-              onChange={(e) => setNewText(e.target.value)}
+              onChange={handleInputsChange}
               disabled={isUpdating}
             />
 
@@ -199,9 +220,12 @@ export default function UpdatePost({ post, setOpenUpdate, userId }) {
             </button>
           </form>
 
+          {/* Display error message */}
+          {error.isError && <div className="error-msg">{error.message}</div>}
+
           <button
             className="close"
-            onClick={() => setOpenUpdate(false)}
+            onClick={() => setIsOpen(false)}
             disabled={isUpdating}
           >
             X

@@ -51,10 +51,10 @@ export default function CreateStory({ setOpenCreateStory }) {
   const [file, setFile] = useState(null); // File selected (image or video)
   const [text, setText] = useState(""); // Story description
   const [tempFileUrl, setTempFileUrl] = useState(""); // Temporary URL for preview or duration checking
-  const [error, setError] = useState({ isError: false, message: "" });
   const [tempVideoFile, setTempVideoFile] = useState(null); // Temporary video file while duration is checked
   const [isCheckingDuration, setIsCheckingDuration] = useState(false); // Video loading state
   const [videoDuration, setVideoDuration] = useState(null); // Stores final video duration (if valid)
+  const [error, setError] = useState({ isError: false, message: "" });
   // Make the component responsive without depending on global state
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 600);
 
@@ -124,13 +124,17 @@ export default function CreateStory({ setOpenCreateStory }) {
     },
 
     onSettled: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries(["stories", currentUser.id]);
+      // Invalidate and refetch : we want user's stories and those of the people he follows
+      queryClient.invalidateQueries(["stories"]);
 
       // Reset states
-      setOpenCreateStory(false);
       setFile(null);
       setText("");
+      setTempFileUrl("");
+      setTempVideoFile("");
+      setIsCheckingDuration(false);
+      setVideoDuration(null);
+      setError({ isError: false, message: "" });
 
       // Reset input value in DOM
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -170,13 +174,10 @@ export default function CreateStory({ setOpenCreateStory }) {
 
   // Handle file selection
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-
+    // Reset error message
     setError({ isError: false, message: "" });
-    setFile(null);
-    setTempFileUrl("");
-    setVideoDuration(null);
 
+    const selectedFile = e.target.files[0];
     if (selectedFile) {
       const filePath = URL.createObjectURL(selectedFile);
 
@@ -261,9 +262,7 @@ export default function CreateStory({ setOpenCreateStory }) {
       console.error(err);
       setError({
         isError: true,
-        message:
-          err.response?.data?.message ||
-          "An unknown error occurred while creating story.",
+        message: "An error occurred while creating story.",
       });
     }
   };

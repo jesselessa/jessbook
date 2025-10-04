@@ -43,7 +43,10 @@ export default function RecoverAccount() {
       setEmail("");
       setError("");
     } catch (error) {
-      setError(error.response?.data.message || error.message);
+      if (import.meta.env.DEV) {
+        console.error("Error sending reset password link to user:", error);
+      }
+      setError("An error occurred while sending reset password link to user.");
 
       // Clear error message after 5 seconds
       setTimeout(() => {

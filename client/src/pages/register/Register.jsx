@@ -122,7 +122,13 @@ export default function Register() {
       }, 3000);
     } catch (error) {
       // Handle API errors
-      setError(error.response?.data.message || error.message);
+      if (import.meta.env.DEV) {
+        console.error(
+          "An error occurred during the registration process:",
+          error
+        );
+      }
+      setError("An error occurred during the registration process.");
 
       // Clear error message after 5 seconds
       setTimeout(() => {
