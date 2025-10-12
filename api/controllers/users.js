@@ -53,13 +53,13 @@ export const updateUser = async (req, res) => {
   const { firstName, lastName, email, password, profilePic, coverPic, city } =
     req.body;
   const loggedInUserId = req.user.id;
-  const updatedFields = [];
-  const values = [];
 
   // Check validation conditions
+  const updatedFields = [];
+  const values = [];
   let errors = {};
 
-  // Name validation
+  // Name
   if (firstName) {
     if (firstName.trim().length < 2 || firstName.trim().length > 35) {
       errors.firstName = "First name must be between 2 and 35\u00A0characters.";
@@ -78,7 +78,7 @@ export const updateUser = async (req, res) => {
     }
   }
 
-  // Email validation
+  // Email
   if (email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim()) || email.trim().length > 320) {
@@ -89,7 +89,7 @@ export const updateUser = async (req, res) => {
     }
   }
 
-  // Password validation and hashing
+  // Password
   if (password) {
     const passwordRegex =
       /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
@@ -105,6 +105,7 @@ export const updateUser = async (req, res) => {
     }
   }
 
+  // Profile pic
   if (profilePic) {
     if (!isImage(profilePic)) {
       errors.profilePic = "Invalid profile picture format";
@@ -130,18 +131,16 @@ export const updateUser = async (req, res) => {
               oldUserData[0].profilePic
             )
           );
-          console.log("Old profile picture deleted");
         } catch (err) {
           console.error("Error deleting old profile picture:", err);
-          // Do not block update if deletion fails
         }
       }
-
       updatedFields.push("`profilePic` = ?");
       values.push(profilePic);
     }
   }
 
+  // Cover pic
   if (coverPic) {
     if (!isImage(coverPic)) {
       errors.coverPic = "Invalid cover picture format";
@@ -167,13 +166,10 @@ export const updateUser = async (req, res) => {
               oldUserData[0].coverPic
             )
           );
-          console.log("Old cover picture deleted.");
         } catch (err) {
           console.error("Error deleting old cover picture:", err);
-          // Do not block update if deletion fails
         }
       }
-
       updatedFields.push("`coverPic` = ?");
       values.push(coverPic);
     }
@@ -189,11 +185,11 @@ export const updateUser = async (req, res) => {
     }
   }
 
-  // If there are validation errors, return them
+  // Return validation errors
   if (Object.keys(errors).length > 0)
     return res.status(400).json({ validationErrors: errors });
 
-  // If no fields to update
+  // Nothing to update
   if (updatedFields.length === 0)
     return res.status(400).json("No field to update");
 
@@ -208,7 +204,14 @@ export const updateUser = async (req, res) => {
         `;
     const data = await executeQuery(q, values);
 
-    if (data.affectedRows > 0) return res.status(200).json("User data updated");
+    if (data.affectedRows > 0) {
+      return res.status(200).json({
+        data,
+        message: "User data updated",
+      });
+    } else {
+      return res.status(404).json("User not found or unauthorized");
+    }
   } catch (error) {
     return res.status(500).json({
       message: "An unknown error occurred while updating user data.",

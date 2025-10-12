@@ -46,7 +46,7 @@ export const findOrCreateUser = async (
     };
 
     return done(null, newUser);
-  } catch (err) {
-    return done(err);
+  } catch (error) {
+    return done(error);
   }
 };

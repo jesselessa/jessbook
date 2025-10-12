@@ -64,8 +64,8 @@ export const register = async (req, res) => {
       lastName.trim(),
       email.trim(),
       hashedPswd,
-      "No", // Indicates the user is not from a third-party authentication provider
-      "user",
+      "No", // User'account has not been created from a third-party authentication provider (Google or Facebook)
+      "user", // Default role
     ];
 
     const insertData = await executeQuery(insertQuery, values);

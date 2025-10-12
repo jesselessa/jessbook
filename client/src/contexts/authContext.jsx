@@ -9,6 +9,7 @@ export const AuthContextProvider = ({ children }) => {
     storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null
   );
 
+  // Connection with email/password
   const login = async (inputsValues) => {
     try {
       const res = await makeRequest.post(
@@ -18,11 +19,12 @@ export const AuthContextProvider = ({ children }) => {
       // Update 'currentUser' with data fetched from API and store them in localStorage
       setCurrentUser(res.data);
       localStorage.setItem("user", JSON.stringify(res.data));
-    } catch (error) {
+    } catch (error) {      
       throw error; // Propagate error to calling component
     }
   };
 
+  // Connection via authentication provider
   const connectWithToken = async () => {
     try {
       const res = await makeRequest.post(

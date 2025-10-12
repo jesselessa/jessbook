@@ -3,7 +3,7 @@
 // 2. Implements video duration check client-side
 //**************************************************************************
 
-import { useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect } from "react";
 import "./createStory.scss";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -38,15 +38,17 @@ const VideoDurationChecker = ({ fileURL, onDurationCheck }) => {
       onLoadedMetadata={(e) => {
         const duration = e.target.duration;
         const isValid = duration <= MAX_DURATION_SECONDS;
-        onDurationCheck(isValid, duration); // Callback to parent with duration result
+        const isNotValid = duration > MAX_DURATION_SECONDS;
+        onDurationCheck(isValid || isNotValid, duration); // Callback to parent with duration result
+
+        // onDurationCheck(isValid, duration); // Callback to parent with duration result
       }}
     />
   );
 };
 
-export default function CreateStory({ setOpenCreateStory }) {
+export default function CreateStory({ setIsOpen }) {
   const { currentUser } = useContext(AuthContext);
-  const fileInputRef = useRef(null);
 
   const [file, setFile] = useState(null); // File selected (image or video)
   const [text, setText] = useState(""); // Story description
@@ -67,34 +69,33 @@ export default function CreateStory({ setOpenCreateStory }) {
   // Detect window resize to switch between small/large screen UI
   useEffect(() => {
     const handleResize = () => setIsSmallScreen(window.innerWidth < 600);
-
     window.addEventListener("resize", handleResize);
-
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Optimistic mutation for creating a story
   const mutation = useMutation({
-    mutationFn: (newStory) => makeRequest.post("/stories", newStory),
+    mutationFn: ({ file, text }) =>
+      makeRequest.post("/stories", { file, text }),
 
-    onMutate: async (newStory) => {
-      await queryClient.cancelQueries(["stories"]);
+    onMutate: async ({ file, text }) => {
+      await queryClient.cancelQueries(["stories", currentUser.id]);
       const previousStories = queryClient.getQueryData([
         "stories",
         currentUser.id,
       ]);
 
       // Optimistic story object
-      const currentDate = new Date().toISOString();
+      const currentDate = new Date();
+      const twentyFourHoursInMs = 24 * 60 * 60 * 1000; // 24h * 60 min/h * 60 sec/min * 1000 ms/sec
       const expirationDate = new Date(
-        currentDate.getTime() + 24 * 60 * 60 * 1000
-      ); // 24h duration
+        currentDate.getTime() + twentyFourHoursInMs
+      ).toISOString();
 
       const optimisticStory = {
         id: crypto.randomUUID(),
-        userId: currentUser.id,
-        file: newStory.file,
-        text: newStory.text,
+        file,
+        text,
         createdAt: currentDate,
         expiresAt: expirationDate,
       };
@@ -107,37 +108,34 @@ export default function CreateStory({ setOpenCreateStory }) {
       return { previousStories };
     },
 
-    onError: (err, _newStory, context) => {
-      toast.error(
-        "Error creating story: " + (err.response?.data?.message || err.message)
-      );
+    onError: (error, _variables, context) => {
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
 
-      if (context?.previousStories)
+      if (context?.previousStories) {
         queryClient.setQueryData(
           ["stories", currentUser.id],
           context.previousStories
         );
+      }
     },
 
     onSuccess: () => {
       toast.success("Story published.");
+      setIsOpen(false);
     },
 
     onSettled: () => {
-      // Invalidate and refetch : we want user's stories and those of the people he follows
-      queryClient.invalidateQueries(["stories"]);
+      queryClient.invalidateQueries(["stories", currentUser.id]);
 
       // Reset states
       setFile(null);
       setText("");
+      setError({ isError: false, message: "" });
       setTempFileUrl("");
       setTempVideoFile("");
       setIsCheckingDuration(false);
       setVideoDuration(null);
-      setError({ isError: false, message: "" });
-
-      // Reset input value in DOM
-      if (fileInputRef.current) fileInputRef.current.value = "";
     },
   });
 
@@ -150,7 +148,7 @@ export default function CreateStory({ setOpenCreateStory }) {
     // Clean up the temporary URL immediately after metadata is loaded
     if (tempFileUrl) URL.revokeObjectURL(tempFileUrl);
 
-    if (isValid) {
+    if (isValid || isNotValid) {
       // SUCCESS: Store the file in the actual 'file' state and the duration
       setFile(tempVideoFile);
       setVideoDuration(duration);
@@ -163,9 +161,26 @@ export default function CreateStory({ setOpenCreateStory }) {
         )}s) exceeds ${MAX_DURATION_SECONDS}s.`,
       });
       // Clear all file states related to the invalid file
-      setFile(null);
+      setFile(null); // Keep preview if video exceeds limit duration
       setVideoDuration(null);
     }
+
+    // if (isValid) {
+    //   // SUCCESS: Store the file in the actual 'file' state and the duration
+    //   setFile(tempVideoFile);
+    //   setVideoDuration(duration);
+    // } else {
+    //   // ERROR: Show error message
+    //   setError({
+    //     isError: true,
+    //     message: `Video duration (${duration.toFixed(
+    //       1
+    //     )}s) exceeds ${MAX_DURATION_SECONDS}s.`,
+    //   });
+    //   // Clear all file states related to the invalid file
+    //   setFile(null); // Keep preview if video exceeds limit duration
+    //   setVideoDuration(null);
+    // }
 
     // Clear states regardless of outcome
     setTempVideoFile(null);
@@ -187,7 +202,7 @@ export default function CreateStory({ setOpenCreateStory }) {
         setTempVideoFile(selectedFile);
         setTempFileUrl(filePath); // URL used for duration checking
       } else {
-        // IMAGE: Store file and set URL immediately (no du
+        // IMAGE: Store file and set URL immediately
         setFile(selectedFile);
         setTempFileUrl(filePath);
       }
@@ -245,7 +260,7 @@ export default function CreateStory({ setOpenCreateStory }) {
     try {
       // 5 - Upload the valid file to the server
       // Note: uploadedFile is a string ("fileName.extension")
-      const uploadedFile = await uploadFile(file);
+      const uploadedFile = file && (await uploadFile(file));
 
       // 6 - UPLOAD FAILURE : Display error message
       if (!uploadedFile) {
@@ -258,11 +273,11 @@ export default function CreateStory({ setOpenCreateStory }) {
         file: uploadedFile,
         text: text.trim(),
       });
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
       setError({
         isError: true,
-        message: "An error occurred while creating story.",
+        message: error.response?.data || error.message,
       });
     }
   };
@@ -292,7 +307,6 @@ export default function CreateStory({ setOpenCreateStory }) {
               accept="image/*, video/*"
               onChange={handleFileChange}
               disabled={isCheckingDuration || isPublishing}
-              ref={fileInputRef}
             />
             <label className="file-label" htmlFor="story-file">
               Add an image or a&nbsp;video
@@ -379,7 +393,7 @@ export default function CreateStory({ setOpenCreateStory }) {
 
         <button
           className="close"
-          onClick={() => setOpenCreateStory(false)}
+          onClick={() => setIsOpen(false)}
           disabled={isPublishing}
         >
           X

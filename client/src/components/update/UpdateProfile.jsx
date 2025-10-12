@@ -1,4 +1,4 @@
-import { useContext, useState, useRef } from "react";
+import { useContext, useState } from "react";
 import "./updateProfile.scss";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -23,7 +23,6 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function UpdateProfile({ user, setIsOpen }) {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
-  const fileInputRef = useRef(null);
 
   const [cover, setCover] = useState(null); // 'cover' and 'profile' are either null or File object (Blob) when selected
   const [profile, setProfile] = useState(null);
@@ -41,102 +40,18 @@ export default function UpdateProfile({ user, setIsOpen }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // Call our custom hook to generate a preview URL and manage its cleanup automatically
+  // Generate preview URLs and cleanup automatically
   const coverUrl = useCleanUpFileURL(cover);
   const profileUrl = useCleanUpFileURL(profile);
 
   // Handle form fields changes
-  const handleFieldChange = (e) => {
+  const handleInputsChange = (e) => {
     const { name, value } = e.target;
-    setFields((prevFields) => ({ ...prevFields, [name]: value }));
-
-    // Immediate cleanup: The error is cleared as soon as the user starts typing
+    // Immediate cleanup: Reset previous validation errors
     setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+    // Bind inputs value to state
+    setFields((prevFields) => ({ ...prevFields, [name]: value }));
   };
-
-  // Handle image change
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (e.target.id === "selected-cover") setCover(selectedFile);
-    if (e.target.id === "selected-profile") setProfile(selectedFile);
-  };
-
-  // Optimistic mutation for profile update
-  const updateMutation = useMutation({
-    mutationFn: (updatedUser) => makeRequest.put("/users", updatedUser),
-
-    // Optimistic update: Apply changes immediately in cache
-    onMutate: async (updatedUser) => {
-      // Cancel any outgoing refetch
-      await queryClient.cancelQueries(["user", currentUser.id]);
-      await queryClient.cancelQueries(["posts", currentUser.id]);
-
-      // Store the current states
-      const previousUser = queryClient.getQueryData(["user", currentUser.id]);
-      const previousPosts = queryClient.getQueryData(["posts", currentUser.id]);
-
-      // Optimistically update to the new value
-      //? 'setQueryData' is usually used to update data locally before receiving confirmation from server → UI reflects the changes instantly
-      //! ⚠️ Reminder: Don't merge an uncomplete optimistic object (e.g., if we only return 'firstName' and 'lastName', whereas 'users' SQL table also contains other keys), in this case 'updatedProfile',because it will overwrite our existing data => 💡 Only merge with the new one !!!
-      queryClient.setQueryData(["user", currentUser.id], (oldData) => ({
-        ...oldData,
-        ...Object.fromEntries(
-          // Only adds/overwrites new data
-          Object.entries(updatedUser) //? Object.entries(updatedUser) transforms an object into an array with key-value pairs
-            .filter(([_key, value]) => value !== undefined) // We only keep defined values
-        ),
-      }));
-
-      // Update user's profile immediately
-      setCurrentUser((prev) => ({ ...prev, ...updatedUser }));
-
-      // Return context with previous data for rollback in case of error
-      return { previousUser, previousPosts };
-    },
-
-    // Rollback if mutation fails
-    onError: (err, _updatedUser, context) => {
-      if (import.meta.env.DEV) console.error("Error updating profile:", err);
-      toast.error("An error occurred while updating your profile.");
-
-      if (context?.previousUser)
-        queryClient.setQueryData(
-          ["user", currentUser.id],
-          context.previousUser
-        );
-      if (context?.previousPosts)
-        queryClient.setQueryData(
-          ["posts", currentUser.id],
-          context.previousPosts
-        );
-    },
-
-    // On success, display a message and navigate to profile page
-    onSuccess: (_data, updatedUser) => {
-      //? 'updatedUser' is the object that 'mutate' will pass to our 'mutationFn' (new user's data)
-      toast.success("Profile updated.");
-      navigate(`/profile/${updatedUser.id}`);
-    },
-
-    onSettled: () => {
-      // Invalidate and refetch user's query and dependent ones
-      queryClient.invalidateQueries(["user", currentUser.id]);
-      queryClient.invalidateQueries(["posts", currentUser.id]);
-
-      // Reset states
-      setIsOpen(false); // Close form
-      setCover(null);
-      setProfile(null);
-
-      // Reset input value in DOM
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    },
-  });
-
-  // Use 'updateMutation.isPending' for the global loading state
-  const isUpdating = updateMutation.isPending;
-  //? Note: 'isPending 'is a property automatically managed by the Tanstack Query useMutation hook
-  // When we call useMutation, the returned object contains several states, such as 'isPending' ('true' while mutationFn is running), 'isSuccess' ('true' if mutation success) or 'isError' ('true' if mutation failure)
 
   // Clear form validation errors
   const clearValidationErrors = () => {
@@ -146,6 +61,122 @@ export default function UpdateProfile({ user, setIsOpen }) {
       city: "",
     });
   };
+
+  // Handle file selection
+  const handleFileChange = (e) => {
+    clearValidationErrors(); // Delete previous errors
+    const selectedFile = e.target.files[0];
+    if (e.target.id === "selected-cover") setCover(selectedFile);
+    else setProfile(selectedFile);
+  };
+
+  // Optimistic mutation for profile update
+  const updateMutation = useMutation({
+    // 1. mutationFn: Upload files and send PUT request
+    mutationFn: async ({ updatedFields, coverFile, profileFile }) => {
+      const uploadedCover = coverFile
+        ? await uploadFile(coverFile)
+        : user.coverPic;
+      const uploadedProfile = profileFile
+        ? await uploadFile(profileFile)
+        : user.profilePic;
+
+      // Final object for the PUT request
+      const finalUpdate = {
+        ...updatedFields,
+        coverPic: uploadedCover,
+        profilePic: uploadedProfile,
+      };
+
+      await makeRequest.put("/users", finalUpdate);
+      return { userId: user.id, ...finalUpdate };
+      // Note: 'userId' is semantic alias that we chose to make the return value more meaningful and easier to use within other TanStack Query hooks, even if our server simply calls that data 'id'
+    },
+
+    // 2. onMutate (Fast): Optimistic cache update
+    onMutate: async ({ updatedFields, coverFile, profileFile }) => {
+      // Cancel any outgoing refetches for user and posts data
+      await queryClient.cancelQueries(["user", user.id]);
+      await queryClient.cancelQueries(["posts", user.id]);
+
+      // Store the current cached data to revert if mutation fails
+      const previousUser = queryClient.getQueryData(["user", user.id]);
+      const previousPosts = queryClient.getQueryData(["posts", user.id]);
+
+      // Create Blob URLs locally for the optimistic cache update
+      // These URLs will be applied to the main profile page display temporarily
+      const tempCoverUrl = coverFile
+        ? URL.createObjectURL(coverFile)
+        : user.coverPic || defaultCover;
+      const tempProfileUrl = profileFile
+        ? URL.createObjectURL(profileFile)
+        : user.profilePic || defaultProfile;
+
+      // Optimistically update the cache: ProfileData must be able to read this 'blob:' URL
+      //! ⚠️ Merge only updated fields to prevent overwriting other data !!!
+      queryClient.setQueryData(["user", currentUser.id], (oldData) => ({
+        ...oldData,
+        ...updatedFields,
+        // Update with temporary URL if a new file is selected
+        coverPic: coverFile ? tempCoverUrl : oldData.coverPic,
+        profilePic: profileFile ? tempProfileUrl : oldData.profilePic,
+      }));
+
+      // Clear error messages
+      clearValidationErrors();
+
+      return { previousUser, previousPosts, tempCoverUrl, tempProfileUrl };
+    },
+
+    // 3. onError: Rollback on failure
+    onError: (error, _variables, context) => {
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
+
+      if (context?.previousUser) {
+        queryClient.setQueryData(
+          ["user", currentUser.id],
+          context.previousUser
+        );
+      }
+      if (context?.previousPosts) {
+        queryClient.setQueryData(
+          ["posts", currentUser.id],
+          context.previousPosts
+        );
+      }
+
+      // Note: We don't need to revoke hook URLs here, as the hook handles its cleanup
+    },
+
+    // 4. onSuccess: Close form, toast and navigate
+    onSuccess: (_data, variables) => {
+      //? 'updatedUser' is the object that 'mutate' will pass to our 'mutationFn' (updated user's data)
+      toast.success("Profile updated.");
+      clearValidationErrors();
+      setIsOpen(false); // Close form
+      navigate(`/profile/${variables.id}`);
+    },
+
+    // 5. onSettled: Cleanup and refetch
+    onSettled: (_data, _error, _variables, context) => {
+      // Revoke the Blob URLs manually created in onMutate to prevent memory leaks, since the final URL is now fetched from the server
+      if (context?.tempCoverUrl && context.tempCoverUrl.startsWith("blob:"))
+        URL.revokeObjectURL(context.tempCoverUrl);
+      if (context?.tempProfileUrl && context.tempProfileUrl.startsWith("blob:"))
+        URL.revokeObjectURL(context.tempProfileUrl);
+
+      queryClient.invalidateQueries(["user", currentUser.id]);
+      queryClient.invalidateQueries(["posts", currentUser.id]);
+
+      // Clean up local File objects (whereas our hook deals with their URL)
+      setCover(null);
+      setProfile(null);
+    },
+  });
+
+  // Use 'updateMutation.isPending' for the global loading state
+  const isUpdating = updateMutation.isPending;
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -159,14 +190,17 @@ export default function UpdateProfile({ user, setIsOpen }) {
 
     const { firstName, lastName, city } = fields;
 
-    if (firstName?.trim()?.length < 2 || firstName?.trim()?.length > 35)
+    if (firstName?.trim()?.length < 2 || firstName?.trim()?.length > 35) {
       inputsErrors.firstName = "Enter a name between 2 and 35\u00A0characters.";
+    }
 
-    if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35)
+    if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35) {
       inputsErrors.lastName = "Enter a name between 1 and 35\u00A0characters.";
+    }
 
-    if (city && city?.trim()?.length > 85)
-      inputsErrors.city = "Enter a valid city name (up to 85\u00A0characters).";
+    if (city?.trim()?.length > 85) {
+      inputsErrors.city = "Enter a valid city name (max 85\u00A0characters).";
+    }
 
     // Stop process if errors
     //? 'Object.keys(object)' returns an array with the object string-keyed property names
@@ -175,14 +209,10 @@ export default function UpdateProfile({ user, setIsOpen }) {
       return;
     }
 
-    // Ensure to cleanup errors (e.g. previous errors made but corrected before submission)
-    clearValidationErrors();
-
     // Check if form fields or images have been modified
     const isAnyFieldModified = Object.keys(fields).some(
       (field) => fields[field]?.trim() !== (user[field] || "")?.trim()
     );
-
     const isCoverModified = cover !== null;
     const isProfileModified = profile !== null;
 
@@ -191,20 +221,22 @@ export default function UpdateProfile({ user, setIsOpen }) {
       return;
     }
 
-    // Upload new cover and profile pictures if selected
-    const newCover = cover ? await uploadFile(cover) : user.coverPic;
-    const newProfile = profile ? await uploadFile(profile) : user.profilePic;
-
     // Prepare updated data
-    const updatedUser = {
-      ...fields, // Keys-values modified by the form
-      id: currentUser.id, // Ensure ID is included in the PUT request
-      coverPic: newCover,
-      profilePic: newProfile,
+    const newCity =
+      fields.city?.trim().length > 0 ? fields.city.trim() : "Undefined";
+
+    const updatedFields = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      city: newCity,
     };
 
-    // Trigger optimistic mutation
-    updateMutation.mutate(updatedUser);
+    // Trigger mutation immediately
+    updateMutation.mutate({
+      updatedFields,
+      coverFile: cover,
+      profileFile: profile,
+    });
   };
 
   return (
@@ -233,17 +265,16 @@ export default function UpdateProfile({ user, setIsOpen }) {
                     <CloudUploadIcon className="icon" />
                   </label>
                 </div>
-              </div>
 
-              <input
-                type="file"
-                id="selected-cover"
-                name="selected-cover"
-                accept="image/*"
-                onChange={handleFileChange}
-                disabled={isUpdating}
-                ref={fileInputRef}
-              />
+                <input
+                  type="file"
+                  id="selected-cover"
+                  name="selected-cover"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={isUpdating}
+                />
+              </div>
 
               {/* Profile pic */}
               <div className="profile">
@@ -264,26 +295,26 @@ export default function UpdateProfile({ user, setIsOpen }) {
                     <CloudUploadIcon className="icon" />
                   </label>
                 </div>
-              </div>
 
-              <input
-                type="file"
-                id="selected-profile"
-                name="selected-profile"
-                accept="image/*"
-                onChange={handleFileChange}
-                disabled={isUpdating}
-              />
+                <input
+                  type="file"
+                  id="selected-profile"
+                  name="selected-profile"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={isUpdating}
+                />
+              </div>
             </div>
 
-            {/* Other info */}
+            {/* Form fields */}
             <label htmlFor="firstName">First name</label>
             <input
               type="text"
               id="firstName"
               name="firstName"
               value={fields.firstName}
-              onChange={handleFieldChange}
+              onChange={handleInputsChange}
               autoComplete="off"
               disabled={isUpdating}
             />
@@ -297,7 +328,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
               id="lastName"
               name="lastName"
               value={fields.lastName}
-              onChange={handleFieldChange}
+              onChange={handleInputsChange}
               autoComplete="off"
               disabled={isUpdating}
             />
@@ -311,7 +342,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
               id="city"
               name="city"
               value={fields.city}
-              onChange={handleFieldChange}
+              onChange={handleInputsChange}
               autoComplete="off"
               disabled={isUpdating}
             />
@@ -319,6 +350,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
               <span className="error-msg">{validationErrors.city}</span>
             )}
 
+            {/* Update button */}
             <button type="submit" disabled={isUpdating}>
               {updateMutation.isPending ? (
                 <Loader
@@ -333,6 +365,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
           </form>
 
           <button
+            type="button"
             className="close"
             onClick={() => setIsOpen(false)}
             disabled={isUpdating}

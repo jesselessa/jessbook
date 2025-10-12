@@ -53,10 +53,8 @@ export default function Post({ post }) {
       const res = await makeRequest.get(`/likes?postId=${postId}`);
       return res.data;
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error("Error fetching post likes:", error);
-      }
-      toast.error("An error occurred while fetching post likes.");
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
     }
   };
 
@@ -71,7 +69,7 @@ export default function Post({ post }) {
   const commentsCount = comments?.length || 0;
 
   // Optimistic mutation for current user's likes
-  const handleLikeMutation = useMutation({
+  const handlePostLikesMutation = useMutation({
     mutationFn: (isPostLiked) => {
       // If already liked → Remove like
       if (isPostLiked) return makeRequest.delete(`/likes?postId=${post.id}`);
@@ -100,8 +98,8 @@ export default function Post({ post }) {
     },
 
     // If mutation fails → Rollback
-    onError: (err, _isPostLiked, context) => {
-      if (import.meta.env.DEV) console.error("Error updating post likes:", err);
+    onError: (error, _isPostLiked, context) => {
+      console.error("Error updating post likes:", error);
       toast.error("An error occurred while updating post likes.");
 
       if (context?.previousLikes) {
@@ -116,7 +114,7 @@ export default function Post({ post }) {
   });
 
   // Mutation to delete posts
-  const deleteMutation = useMutation({
+  const deletePostMutation = useMutation({
     mutationFn: (postId) => makeRequest.delete(`/posts/${postId}`),
 
     onSuccess: () => {
@@ -126,31 +124,31 @@ export default function Post({ post }) {
     },
 
     onError: (error) => {
-      if (import.meta.env.DEV) console.error("Error deleting post:", error);
-      toast.error("An error occurred while deleting post.");
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
     },
   });
 
   const isPostLiked = postLikes?.includes(currentUser?.id) || false;
 
   // Add a debounce mechanism to prevent excessive API calls if a user clicks multiple times rapidly on "❤️" ("Like" button)
-  const debouncedHandleLike = debounce(() => {
-    handleLikeMutation.mutate(isPostLiked);
+  const debouncedPostLikes = debounce(() => {
+    handlePostLikesMutation.mutate(isPostLiked);
   }, 300);
 
   useEffect(() => {
     // Cleanup: Cancels debounce callbacks if the component is unmounted
     return () => {
-      debouncedHandleLike.cancel();
+      debouncedPostLikes.cancel();
     };
   }, []);
 
-  const handleLike = () => {
-    debouncedHandleLike();
+  const handlePostLikes = () => {
+    debouncedPostLikes();
   };
 
-  const handleDelete = (post) => {
-    deleteMutation.mutate(post.id);
+  const handlePostDeletion = (post) => {
+    deletePostMutation.mutate(post.id);
   };
 
   return (
@@ -184,7 +182,7 @@ export default function Post({ post }) {
             <DeleteOutlineOutlinedIcon
               className="edit-btn"
               fontSize="large"
-              onClick={() => handleDelete(post)}
+              onClick={() => handlePostDeletion(post)}
             />
           </div>
         )}
@@ -200,15 +198,21 @@ export default function Post({ post }) {
       <div className="interactions">
         <div className="item">
           {isPostLiked ? (
-            <FavoriteOutlinedIcon sx={{ color: "red" }} onClick={handleLike} />
+            <FavoriteOutlinedIcon
+              sx={{ color: "red" }}
+              onClick={handlePostLikes}
+            />
           ) : (
-            <FavoriteBorderOutlinedIcon onClick={handleLike} />
+            <FavoriteBorderOutlinedIcon onClick={handlePostLikes} />
           )}
           {likesCount > 0 && likesCount} {""}
           <span>{likesCount > 1 ? " Likes" : "Like"}</span>
         </div>
 
-        <div className="item" onClick={() => setIsCommentsOpen(!isCommentsOpen)}>
+        <div
+          className="item"
+          onClick={() => setIsCommentsOpen(!isCommentsOpen)}
+        >
           <TextsmsOutlinedIcon />
           {commentsCount > 0 && commentsCount} {""}
           <span>{commentsCount > 1 ? "Comments" : "Comment"}</span>

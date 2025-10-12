@@ -28,8 +28,7 @@ export const useCleanUpFileURL = (file) => {
       // If file becomes null, clear the state
       setObjectUrl(null);
     }
-    // Dependency includes 'file', so cleanup runs correctly when a new file is selected
-  }, [file]);
+  }, [file]); // Dependency includes 'file', so cleanup runs correctly when a new file is selected
 
   return objectUrl; // Returns the Blob URL string for use in <img> or <video> src
 };

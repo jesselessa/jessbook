@@ -57,13 +57,10 @@ export default function Login() {
       clearForm();
       setError("");
 
-      // Navigate to homepage
       navigate("/home");
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.log("Error during the login process:", error);
-      }
-      setError("An error occurred during the login process.");
+      console.log(error.response?.data || error.message);
+      setError(error.response?.data || error.message);
     }
   };
 

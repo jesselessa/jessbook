@@ -38,10 +38,8 @@ export default function ProfileData() {
       const res = await makeRequest.get(`/users/${userId}`);
       return res.data;
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error("Error fetching user data:", error);
-      }
-      toast.error("An error occurred while fetching user's profile.");
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
     }
   };
 
@@ -62,12 +60,8 @@ export default function ProfileData() {
       );
       return res.data;
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error("Error fetching user's followers:", error);
-      }
-      toast.error(
-        "An error occurred while fetching the list of user's followers."
-      );
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
     }
   };
 
@@ -88,12 +82,8 @@ export default function ProfileData() {
       );
       return res.data;
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error("Error fetching user's followed relationships:", error);
-      }
-      toast.error(
-        "An error occurred while fetching the list of people followed by user."
-      );
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
     }
   };
 
@@ -140,13 +130,12 @@ export default function ProfileData() {
     },
 
     // 2. OnError (mutation failure): Rollback the optimistic update
-    onError: (error, _newData, context) => {
-      if (import.meta.env.DEV) {
-        console.error("Error updating followers:", error);
-      }
+    onError: (error, _isCurrentlyFollowing, context) => {
+      // 2A. Log errors
+      console.error("Error updating followers:", error);
       toast.error("An error occurred while updating followers.");
 
-      // Rollback on error
+      // 2B. Rollback on error
       if (context?.previousFollowers) {
         queryClient.setQueryData(
           ["followers", userId],
@@ -156,9 +145,7 @@ export default function ProfileData() {
     },
 
     // 3. onSettled (either the mutation succeeds or fails): Refresh data
-    onSettled: () => {
-      queryClient.invalidateQueries(["followers", userId]);
-    },
+    onSettled: () => queryClient.invalidateQueries(["followers", userId]),
   });
 
   const isCurrentlyFollowing = followersData?.includes(currentUser?.id);
@@ -236,7 +223,7 @@ export default function ProfileData() {
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{userData?.city || "Non renseigné"}</span>
+                  <span>{userData?.city}</span>
                 </div>
 
                 {/* Update button */}

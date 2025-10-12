@@ -9,6 +9,7 @@ import Loader from "../loader/Loader.jsx";
 
 export default function UpdateComment({ comment, setIsOpen }) {
   const [text, setText] = useState(comment.text);
+  const [error, setError] = useState({ isError: false, message: "" });
 
   const queryClient = useQueryClient();
 
@@ -36,10 +37,11 @@ export default function UpdateComment({ comment, setIsOpen }) {
     },
 
     onError: (error, _updatedComment, context) => {
-      if (import.meta.env.DEV) {
-        console.error("Error updating comment:", error);
-      }
-      toast.error("An error occured while updating comment.");
+      console.error(error.response?.data || error.message);
+      setError({
+        isError: true,
+        message: error.response?.data || error.message,
+      });
 
       if (context?.previousComments) {
         queryClient.setQueryData(
@@ -51,6 +53,9 @@ export default function UpdateComment({ comment, setIsOpen }) {
 
     onSuccess: () => {
       toast.success("Comment updated.");
+      setText(""); // Reset form
+      setError({ isError: false, message: "" });
+      setIsOpen(false); // Close form
     },
 
     onSettled: () => {
@@ -71,12 +76,18 @@ export default function UpdateComment({ comment, setIsOpen }) {
 
     // Check comment length
     if (trimmedText?.length === 0) {
-      toast.error("You must add a text to your comment.");
+      setError({
+        isError: true,
+        message: "You must add a text to your comment.",
+      });
       return;
     }
 
     if (trimmedText?.length > 500) {
-      toast.error("Your comment can't contain more than 500\u00A0characters.");
+      setError({
+        isError: true,
+        message: "Your comment can't contain more than 500\u00A0characters.",
+      });
       return;
     }
 
@@ -92,6 +103,12 @@ export default function UpdateComment({ comment, setIsOpen }) {
 
   const isUpdating = updateMutation.isPending;
 
+  // Handle inputs changes
+  const handleChange = (e) => {
+    setError({ isError: false, message: "" }); // Reset previous error mesage
+    setText(e.target.value);
+  };
+
   return (
     <>
       <div className="updateComment">
@@ -106,7 +123,7 @@ export default function UpdateComment({ comment, setIsOpen }) {
               rows={5}
               placeholder="Write a text..."
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={handleChange}
               disabled={isUpdating}
             />
 
@@ -122,6 +139,9 @@ export default function UpdateComment({ comment, setIsOpen }) {
               )}
             </button>
           </form>
+
+          {/* Display error message */}
+          {error.isError && <div className="error-msg">{error.message}</div>}
 
           <button
             type="button"

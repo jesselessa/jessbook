@@ -4,7 +4,7 @@
 // 3. Post created displayed, either in Timeline or ProfileData, inside Posts component
 //**************************************************************************
 
-import { useContext, useState, useRef } from "react";
+import { useContext, useState } from "react";
 import "./publish.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -30,7 +30,6 @@ import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
 export default function Publish() {
   const { currentUser } = useContext(AuthContext);
   const { darkMode } = useContext(DarkModeContext);
-  const fileInputRef = useRef(null);
 
   const [text, setText] = useState("");
   const [image, setImage] = useState(null); // Image selected or not
@@ -38,56 +37,55 @@ export default function Publish() {
 
   const queryClient = useQueryClient();
 
+  // Generate a temporary preview URL for selected image file and clean up memory automatically
+  const imagePreviewUrl = useCleanUpFileURL(image);
+
   // Mutation to create a new post (with optimistic update)
   const mutation = useMutation({
-    mutationFn: (newPost) => makeRequest.post("/posts", newPost),
+    mutationFn: ({ text, img }) => makeRequest.post("/posts", { text, img }),
 
-    // OnMutate: Immediately update the cache before the server response
-    onMutate: async (newPost) => {
-      // Cancel any outgoing fetches for posts query to prevent conflicts
-      //? Reminder: cancelQueries(queryKey)
+    // 1. onMutate: Immediately update the cache before the server response
+    onMutate: async ({ text, img }) => {
+      // 1A. Cancel any outgoing fetches for posts query to prevent conflicts
       await queryClient.cancelQueries(["posts"]); // Timeline + ProfileData
 
-      // Store existing query cached data to revert if mutation fails
-      //? Reminder: getQueryData(queryKey)
+      // 1B. Store the current cached data to revert if mutation fails
       const previousPosts = queryClient.getQueryData(["posts", currentUser.id]);
 
-      // Create an optimistic post
-      //! Note: The optimistic object doesn't have to be identical to the SQL table → It just needs to be complete enough for our UI to display the correct state while waiting for the server response
+      // 1C. Create an optimistic post
+      //! ⚠️ The optimistic object doesn't have to be identical to the SQL table → It just needs to be complete enough for our UI to display the correct state while waiting for the server response
       //! When the server responds, Tanstack Query reconciles the real data with the cache
-      const currentDate = new Date().toISOString();
+      const currentDate = new Date();
 
       const optimisticPost = {
-        id: crypto.randomUUID(), // Temporary ID (which will be updated with the real data from server)
-        text: newPost.text,
-        img: newPost.img,
-        createdAt: currentDate, // YYYY-MM-DDTHH:mm:ss.sssZ
+        id: crypto.randomUUID(),
+        text,
+        img,
+        createdAt: currentDate.toISOString(), // YYYY-MM-DDTHH:mm:ss.sssZ
       };
 
-      // Optimistically update user's post in cache
-      //? Reminder: setQueryData(queryKey, newData)
-      //! ⚠️ (oldPost = []) is initialized to an empty array if Tanstack Query has still nothing in cached, otherwise, it could return "undefined" with the error "Cannot read properties of undefined (reading 'Symbol.iterator"
+      // 1D. Optimistically update user's posts in cache
+      //! ⚠️ We must set an empty array as a fallback (oldPost = []), otherwise, if Tanstack Query has still nothing in cached, it will return 'undefined', making our app crash
       queryClient.setQueryData(["posts", currentUser.id], (oldPost = []) => [
         ...oldPost,
         optimisticPost,
       ]);
 
-      // Return context with previous data for rollback in case of error
+      // 1E. Return context with previous data for rollback in case of error
       return { previousPosts };
     },
 
-    // If the mutation fails, rollback the optimistic update
-    onError: (error, _newPost, context) => {
-      if (import.meta.env.DEV) console.error("Error creating post:", error);
-      toast.error("An error occurred while creating post.");
+    // 2. onError (mutation failed), Rollback the optimistic update
+    onError: (error, _variables, context) => {
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
 
       // Rollback on error
-      if (context?.previousPosts) {
+      if (context?.previousPosts)
         queryClient.setQueryData(
           ["posts", currentUser.id],
           context.previousPosts
         );
-      }
     },
 
     // If the mutation is successful, display a message
@@ -100,11 +98,8 @@ export default function Publish() {
       //! Note: No need to refresh comments and postLikes data because they depend on post ID (and not on post content)
 
       // Reset states
-      setImage(null); // Cleanup local URL
       setText("");
-
-      // Reset input value in DOM (additional safety)
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      setImage(null); // Clean up local File object (our custom hook takes care of its URL)
     },
   });
 
@@ -145,6 +140,7 @@ export default function Publish() {
       return;
     }
 
+    // Initialize a new image URL/name
     let newImage = null;
 
     // Upload new image if present
@@ -152,10 +148,10 @@ export default function Publish() {
       newImage = await uploadFile(image);
       try {
       } catch (error) {
-        if (import.meta.env.DEV) console.error("Error uploading image:", error);
+        console.error(error.response?.data || error.message);
         setError({
           isError: true,
-          message: "An error occured while uploading image.",
+          message: error.response?.data || error.message,
         });
 
         // Temporary error message
@@ -187,11 +183,8 @@ export default function Publish() {
     }
   };
 
-  // Generate a temporary preview URL for selected image file and clean up memory automatically
-  const imagePreviewUrl = useCleanUpFileURL(image);
-
   return (
-    <div className="publish">
+    <form className="publish" onSubmit={handleSubmit}>
       <div className="top">
         <div className="left">
           {/* User's profile picture */}
@@ -248,6 +241,7 @@ export default function Publish() {
               />
 
               <button
+                type="button"
                 className="close"
                 onClick={() => setImage(null)}
                 disabled={isPublishing}
@@ -279,7 +273,6 @@ export default function Publish() {
             accept="image/*"
             onChange={handleInputsChange}
             disabled={isPublishing}
-            ref={fileInputRef}
           />
 
           <div className="add-img">
@@ -301,7 +294,8 @@ export default function Publish() {
         </div>
 
         <div className="right">
-          <button type="submit" onClick={handleSubmit} disabled={isPublishing}>
+          <button type="submit" disabled={isPublishing}>
+            {/* <button type="submit" onClick={handleSubmit} disabled={isPublishing}> */}
             {isPublishing ? (
               <Loader
                 width="20px"
@@ -314,6 +308,6 @@ export default function Publish() {
           </button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

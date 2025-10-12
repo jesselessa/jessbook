@@ -19,7 +19,7 @@ export const sendEmail = async (options) => {
     };
 
     await transporter.sendMail(mailOptions);
-  } catch (err) {
-    throw err; // Re-throw error to handle it in calling function
+  } catch (error) {
+    throw error; // Re-throw error to handle it in calling function
   }
 };

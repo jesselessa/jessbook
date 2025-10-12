@@ -22,11 +22,9 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Stories({ userId }) {
   const { currentUser } = useContext(AuthContext);
-  const [openCreateStory, setOpenCreateStory] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
+  const [isOpenCreateStory, setIsOpenCreateStory] = useState(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
-
-  const queryKey = ["stories", userId];
 
   // Get stories data
   const fetchStories = async () => {
@@ -34,7 +32,7 @@ export default function Stories({ userId }) {
       const res = await makeRequest.get(`/stories?userId=${userId}`);
       return res.data;
     } catch (error) {
-      console.error("Error fetching stories:", error);
+      console.error(error.response?.data || error.message);
     }
   };
 
@@ -42,12 +40,12 @@ export default function Stories({ userId }) {
     isLoading,
     error,
     data: stories,
-  } = useQuery({ queryKey: queryKey, queryFn: fetchStories });
+  } = useQuery({ queryKey: ["stories", userId], queryFn: () => fetchStories });
 
   // Handler to open the modal with the selected story
   const handleClick = (story) => {
     setSelectedStory(story);
-    setOpenModal((prevState) => !prevState);
+    setIsOpenModal(!isOpenModal);
   };
 
   return (
@@ -67,9 +65,7 @@ export default function Stories({ userId }) {
               alt="user"
             />
             <div className="add">Create a story</div>
-            <button
-              onClick={() => setOpenCreateStory((prevState) => !prevState)}
-            >
+            <button onClick={() => setIsOpenCreateStory(!isOpenCreateStory)}>
               +
             </button>
           </div>
@@ -132,11 +128,9 @@ export default function Stories({ userId }) {
       </div>
 
       {/* Modals for creation and viewing */}
-      {openCreateStory && (
-        <CreateStory setOpenCreateStory={setOpenCreateStory} />
-      )}
-      {openModal && (
-        <ModalStory story={selectedStory} setOpenModal={setOpenModal} />
+      {isOpenCreateStory && <CreateStory setIsOpen={setIsOpenCreateStory} />}
+      {isOpenModal && (
+        <ModalStory story={selectedStory} setIsOpen={setIsOpenModal} />
       )}
     </>
   );

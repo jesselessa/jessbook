@@ -17,50 +17,48 @@ import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 // Context
 import { AuthContext } from "../../contexts/authContext.jsx";
 
-export default function ModalStory({ story, setOpenModal }) {
+export default function ModalStory({ story, setIsOpen }) {
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
 
-  const queryKey = ["stories", story.userId]; // Uniform key with Stories.jsx
-
   // Mutation to delete a story
   const deleteMutation = useMutation({
-    mutationFn: () => makeRequest.delete(`/stories/${story.id}`),
+    mutationFn: (storyId) => makeRequest.delete(`/stories/${storyId}`),
 
-    onMutate: async (storyId) => {
-      await queryClient.cancelQueries(queryKey);
+    onMutate: async () => {
+      await queryClient.cancelQueries(["stories"]);
+
       const previousStories = queryClient.getQueryData([
         "stories",
-        story.userId,
-        story.userId,
+        currentUser.id,
       ]);
 
       // Remove the story optimistically
-      queryClient.setQueryData(queryKey, (oldStories = []) =>
+      queryClient.setQueryData(["stories", currentUser.id], (oldStories = []) =>
         oldStories.filter((s) => s.id !== storyId)
       );
 
       return { previousStories };
     },
 
-    onError: (err, storyId, context) => {
-      toast.error(
-        "Error deleting story: " + (err.response?.data?.message || err.message)
-      );
+    onError: (error, _story, context) => {
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
+
       if (context?.previousStories) {
-        queryClient.setQueryData(queryKey, context.previousStories); // rollback
+        queryClient.setQueryData(
+          ["stories", currentUser.id],
+          context.previousStories
+        );
       }
     },
 
     onSuccess: () => {
       toast.success("Story deleted.");
+      setIsOpen(false); // Close modal
     },
 
-    onSettled: () => {
-      queryClient.invalidateQueries(queryKey);
-
-      setOpenModal(false); // Close modal after submission
-    },
+    onSettled: () => queryClient.invalidateQueries(["stories"]),
   });
 
   const handleDelete = () => {
@@ -70,7 +68,7 @@ export default function ModalStory({ story, setOpenModal }) {
   return (
     <div className="modalStory">
       <div className="modal-content">
-        <button className="close" onClick={() => setOpenModal(false)}>
+        <button className="close" onClick={() => setIsOpen(false)}>
           X
         </button>
 
@@ -80,8 +78,8 @@ export default function ModalStory({ story, setOpenModal }) {
             <video controls autoPlay>
               <source
                 //! "uploads" is the public web path that is exposed and handled by our web server for static assets
-                src={`/uploads/${story?.file}`}
-                type={getMimeType(story?.file)}
+                src={`/uploads/${story.file}`}
+                type={getMimeType(story.file)}
               />
               Your browser doesn't support video.
             </video>

@@ -113,22 +113,14 @@ export default function Register() {
         inputsValues
       );
       toast.success("Successful registration.");
-
       clearForm();
 
-      // Navigate to Login page
       setTimeout(() => {
-        navigate("/");
+        navigate("/"); // Navigate to Login page
       }, 3000);
     } catch (error) {
-      // Handle API errors
-      if (import.meta.env.DEV) {
-        console.error(
-          "An error occurred during the registration process:",
-          error
-        );
-      }
-      setError("An error occurred during the registration process.");
+      console.error(error.response?.data || error.message);
+      setError(error.response?.data || error.message);
 
       // Clear error message after 5 seconds
       setTimeout(() => {

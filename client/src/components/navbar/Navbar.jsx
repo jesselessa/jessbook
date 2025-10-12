@@ -45,7 +45,7 @@ export default function Navbar() {
       await makeRequest.post("/auth/logout");
       navigate("/"); // Redirect to login page
     } catch (error) {
-      console.error("Error in handleLogout:", error.message);
+      console.error(error.response?.data || error.message);
     }
   };
 

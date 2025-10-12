@@ -25,8 +25,8 @@ import { AuthContext } from "../../contexts/authContext.jsx";
 
 export default function Comments({ postId, isOpen, setIsOpen }) {
   const { currentUser } = useContext(AuthContext);
-  const [text, setText] = useState("");
   const [selectedComment, setSelectedComment] = useState(null);
+  const [text, setText] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -47,18 +47,16 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
 
     // OnMutate → Cancel ongoing queries and store existing query cached data
     onMutate: async (newComment) => {
-      await queryClient.cancelQueries(["comments"]);
+      await queryClient.cancelQueries(["comments", postId]);
       const previousComments = queryClient.getQueryData(["comments", postId]);
 
       // Create an optimistic comment
-      const currentDate = new Date().toISOString();
+      const currentDate = new Date();
 
       const optimisticComment = {
         id: crypto.randomUUID(),
         text: newComment.text,
-        userId: currentUser.id,
-        postId: postId,
-        createdAt: currentDate, // YYYY-MM-DDTHH:mm:ss.sssZ
+        createdAt: currentDate.toISOString(), // YYYY-MM-DDTHH:mm:ss.sssZ
       };
 
       // Optimistically update the post in cache
@@ -72,9 +70,9 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     },
 
     // OnError → Rollback to previous state
-    onError: (err, _newComment, context) => {
-      if (import.meta.env.DEV) console.error("Error creating comment:", err);
-      toast.error("An error occurred while creating comment.");
+    onError: (error, _newComment, context) => {
+      console.error("Error creating comment:", error);
+      toast.error(error.response?.data || error.message);
 
       if (context?.previousComments) {
         queryClient.setQueryData(
@@ -89,12 +87,12 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
       toast.success("Comment published.");
     },
 
-    // OnSettled → Refetch data and reset state
+    // OnSettled → Refetch data and reset form
     onSettled: (_data, _error, newComment) => {
-      queryClient.invalidateQueries(["comments"]);
-      setText("");
+      queryClient.invalidateQueries(["comments", postId]);
 
-      closeUpdate(newComment);
+      setText("");
+      setIsOpen(true); // Keep comments open
     },
   });
 
@@ -126,11 +124,6 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     setSelectedComment(comment);
   };
 
-  const closeUpdate = (comment) => {
-    setSelectedComment(comment);
-    setIsOpen(false);
-  };
-
   // Delete comment
   const deleteMutation = useMutation({
     mutationFn: (commentId) => makeRequest.delete(`/comments/${commentId}`),
@@ -142,9 +135,8 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     },
 
     onError: (error) => {
-      console.error("Error deleting comment:", error);
-      // if (import.meta.env.DEV) console.error("Error deleting comment:", error);
-      toast.error("An error occurred while deleting comment.");
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
     },
   });
 

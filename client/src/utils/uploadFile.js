@@ -16,13 +16,7 @@ export const uploadFile = async (file) => {
     // Success: Returns the file name string
     return res.data;
   } catch (error) {
-    if (import.meta.env.DEV) {
-      console.error("File upload failed:", error);
-    }
-    const errorMessage =
-      "File upload failed. Please, check the file size (max 50MB) or format.";
-    toast.error(errorMessage);
-
+    console.error("File upload failed:", error);
     // Propagate error to the calling function
     throw error;
 

@@ -36,7 +36,7 @@ export const handleAuthSuccess = (req, res, next) => {
       "An unknown error occurred while generating JWT token."
     );
     err.status = 500;
-    err.details = error;
+    err.details = err;
     return next(err);
   }
 

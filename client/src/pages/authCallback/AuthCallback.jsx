@@ -35,16 +35,9 @@ export default function AuthCallback() {
         await connectWithToken();
         navigate("/home");
       } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error(
-            "Error retrieving token from authentication provider:",
-            error
-          );
-        }
-        toast.error(
-          "An error occurred while retrieving token from authntication provider."
-        );
-        navigate("/"); // Redirect to login page
+        console.error(error.response?.data || error.message);
+        toast.error(error.response?.data || error.message);
+        navigate("/"); // Redirect to Login page if unauthenticated
       } finally {
         setLoading(false);
       }

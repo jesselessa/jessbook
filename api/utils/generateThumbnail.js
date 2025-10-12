@@ -74,13 +74,13 @@ export const generateThumbnail = (filename, storyId) => {
         // If successful, resolve the Promise with the final thumbnail filename
         resolve(outputFilename);
       })
-      .on("error", (err) => {
+      .on("error", (error) => {
         // If FFmpeg fails, reject with an error message
         reject(
           new Error(
             `Thumbnail generation failed for ${
               isImage ? "image" : "video"
-            } (FFmpeg): ${err.message}`
+            } (FFmpeg): ${error.message}`
           )
         );
       });

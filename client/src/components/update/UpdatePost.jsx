@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import "./updatePost.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
@@ -15,69 +15,100 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 export default function UpdatePost({ post, userId, setIsOpen }) {
   const [newText, setNewText] = useState(post.text);
-  const [newImg, setNewImg] = useState(null);
+  const [newImg, setNewImg] = useState(null); // Either 'null' or File object when selected
   const [error, setError] = useState({ isError: false, message: "" });
-  const fileInputRef = useRef(null);
 
   const queryClient = useQueryClient();
 
+  // Release URL resource to prevent memory leaks from the standard React state preview (hook used in the image display area)
+  const newImgUrl = useCleanUpFileURL(newImg);
+
   // Mutation to handle optimistic update for post
   const updateMutation = useMutation({
-    mutationFn: (updatedPost) =>
-      makeRequest.put(`/posts/${post.id}`, updatedPost),
+    // 1. mutationFn: Handles file upload (slow part) and API call
+    // The payload must include the text field and the raw file for upload
+    mutationFn: async ({ newText, newImgFile }) => {
+      let uploadedImgPath = post.img; // Default path to existing image
 
-    // OnMutate → Before the request happens
-    onMutate: async (updatedPost) => {
-      // Cancel any outgoing refetches on posts
+      // If a new file is provided, upload it first
+      if (newImgFile) {
+        uploadedImgPath = await uploadFile(newImgFile); // <-- Slow operation
+      }
+
+      // Final object for the PUT request
+      const finalUpdate = {
+        text: newText,
+        img: uploadedImgPath,
+      };
+
+      // Make the actual API call
+      await makeRequest.put(`/posts/${post.id}`, finalUpdate);
+      return { postId: post.id, ...finalUpdate };
+      // Note: 'postId' is semantic alias that we chose to make the return value more meaningful and easier to use within other TanStack Query hooks, even if our server simply calls that data 'id'
+    },
+
+    // 2. onMutate (before the request happens) → Apply text and local image preview instantly (fast part)
+    // The argument structure must match what is passed to 'mutate()'
+    onMutate: async ({ newText, newImgFile }) => {
+      // Cancel any outgoing refetches on posts to prevent conflicts
       await queryClient.cancelQueries(["posts"]);
 
-      // Store the current query cached data
+      // Store the current query cached data for rollback
       const previousPosts = queryClient.getQueryData(["posts", userId]);
 
+      // Initialize a temporary image URL
+      let tempImgUrl = null;
+
+      // Create a temporary Blob URL if a new file is selected
+      if (newImgFile) tempImgUrl = URL.createObjectURL(newImgFile);
+
       // Optimistically update cache
-      //! ⚠️ Reminder: Don't merge an uncomplete optimistic object (e.g., if we only return 'text' and 'img', whereas 'posts' SQL table also contains other keys), in this case 'updatedPost', because it will overwrite our existing data => 💡 Only merge with the new one !!!
+      //! ⚠️ Merge only updated fields to prevent overwriting other data !!!
       queryClient.setQueryData(["posts", userId], (oldPosts = []) => {
         return oldPosts.map((p) =>
           p.id === post.id
-            ? { ...p, text: updatedPost.text, img: updatedPost.img || p.img }
+            ? { ...p, text: newText, img: newImgFile ? tempImgUrl : p.img }
             : p
         );
       });
 
-      // Context for rollback
-      return { previousPosts };
+      // Context for rollback and Blob URL cleanup
+      return { previousPosts, tempImgUrl };
     },
 
-    // OnError → Rollback to previous state
-    onError: (err, _updatedPost, context) => {
-      if (import.meta.env.DEV) console.error("Error updating post:", err);
-      toast.error("An error occurred while updating post.");
+    // 3. onError (mutation failed) → Rollback to previous state
+    onError: (error, _variables, context) => {
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data || error.message);
 
       if (context?.previousPosts) {
         queryClient.setQueryData(["posts", userId], context.previousPosts);
       }
     },
 
-    // OnSuccess → Successful mutation
+    // 4. onSuccess (mutation is successful) → Display a message and reset error messages
     onSuccess: () => {
       toast.success("Post updated.");
+      setError({ isError: false, message: "" });
     },
 
-    // OnSettled → Either mutation succeeds or fails
-    onSettled: () => {
+    // 5. onSettled (either mutation succeeds or fails) → Invalidate query and clean up local states
+    onSettled: (_data, error, _variables, context) => {
+      // Revoke the Blob URL created in onMutate to prevent memory leaks
+      if (context?.tempImgUrl && context.tempImgUrl.startsWith("blob:"))
+        URL.revokeObjectURL(context.tempImgUrl);
+
       // Invalidate and refetch posts data
       queryClient.invalidateQueries(["posts"]);
 
       // Reset states
       setIsOpen(false); // Close form
-      setNewImg(null); // Cleanup local URL
-      setError({ isError: false, message: "" });
-
-      // Reset input value in DOM
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      setNewImg(null); // Clean up local File object
     },
   });
 
+  // Use 'updateMutation.isPending' for the global loading state
+  //? Reminder: 'isPending 'is a property automatically managed by the Tanstack Query useMutation hook
   const isUpdating = updateMutation.isPending;
 
   const handleSubmit = async (e) => {
@@ -115,28 +146,11 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
       return;
     }
 
-    // Prepare updated post object
-    const updatedPost = {
-      ...post,
-      text: newText.trim(),
-    };
-
-    // Upload new image if selected
-    if (hasImageChanged) {
-      try {
-        updatedPost.img = await uploadFile(newImg);
-      } catch (err) {
-        if (import.meta.env.DEV) console.error("Error uploading image:", err);
-        setError({
-          isError: true,
-          message: "An error occurred while uploading image.",
-        });
-        return;
-      }
-    }
-
-    // Trigger mutation
-    updateMutation.mutate(updatedPost);
+    // Trigger mutation: pass text and the raw File object
+    updateMutation.mutate({
+      text: trimmedText,
+      newImgFile: newImg,
+    });
   };
 
   // Handle inputs changes
@@ -151,9 +165,6 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
       setNewImg(files[0]);
     }
   };
-
-  // Release URL resource to prevent memory leaks
-  const newImgUrl = useCleanUpFileURL(newImg);
 
   return (
     <>
@@ -170,7 +181,7 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
                     <LazyLoadImage
                       src={
                         newImgUrl
-                          ? // URL generated by the hook
+                          ? // URL generated by the hook (for local state)
                             newImgUrl
                           : `/uploads/${post.img}` // Existing image
                       }
@@ -190,7 +201,6 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
                     accept="image/*"
                     onChange={handleInputsChange}
                     disabled={isUpdating}
-                    ref={fileInputRef}
                   />
                 </div>
               </div>
