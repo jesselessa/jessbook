@@ -45,7 +45,8 @@ export default function Navbar() {
       await makeRequest.post("/auth/logout");
       navigate("/"); // Redirect to login page
     } catch (error) {
-      console.error(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message);
     }
   };
 

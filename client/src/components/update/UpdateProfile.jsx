@@ -130,8 +130,8 @@ export default function UpdateProfile({ user, setIsOpen }) {
 
     // 3. onError: Rollback on failure
     onError: (error, _variables, context) => {
-      console.error(error.response?.data || error.message);
-      toast.error(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
 
       if (context?.previousUser) {
         queryClient.setQueryData(

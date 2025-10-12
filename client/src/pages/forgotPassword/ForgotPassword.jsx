@@ -43,8 +43,8 @@ export default function RecoverAccount() {
       setEmail("");
       setError("");
     } catch (error) {
-      console.error(error.response?.data || error.message);
-      setError(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      setError(error.response?.data?.message || error.message);
 
       // Clear error message after 5 seconds
       setTimeout(() => {

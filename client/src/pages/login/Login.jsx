@@ -59,8 +59,8 @@ export default function Login() {
 
       navigate("/home");
     } catch (error) {
-      console.log(error.response?.data || error.message);
-      setError(error.response?.data || error.message);
+      console.log(error.response?.data?.message || error.message);
+      setError(error.response?.data?.message || error.message);
     }
   };
 

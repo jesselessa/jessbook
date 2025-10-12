@@ -109,8 +109,8 @@ export default function CreateStory({ setIsOpen }) {
     },
 
     onError: (error, _variables, context) => {
-      console.error(error.response?.data || error.message);
-      toast.error(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
 
       if (context?.previousStories) {
         queryClient.setQueryData(
@@ -277,7 +277,7 @@ export default function CreateStory({ setIsOpen }) {
       console.error(error);
       setError({
         isError: true,
-        message: error.response?.data || error.message,
+        message:error.response?.data?.message || error.message,
       });
     }
   };

@@ -37,10 +37,10 @@ export default function UpdateComment({ comment, setIsOpen }) {
     },
 
     onError: (error, _updatedComment, context) => {
-      console.error(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
       setError({
         isError: true,
-        message: error.response?.data || error.message,
+        message: error.response?.data?.message || error.message,
       });
 
       if (context?.previousComments) {

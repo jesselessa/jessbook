@@ -51,8 +51,8 @@ export default function ResetPassword() {
         navigate("/"); // Redirect to login page
       }, 3000);
     } catch (error) {
-      console.error(error.response?.data || error.message);
-      setError(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      setError(error.response?.data?.message || error.message);
 
       // Reset form and clear API error message after 5 seconds
       setTimeout(() => {

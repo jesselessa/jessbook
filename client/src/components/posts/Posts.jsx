@@ -12,8 +12,8 @@ export default function Posts({ userId }) {
       const res = await makeRequest.get(`/posts?userId=${userId}`);
       return res.data;
     } catch (error) {
-      console.error(error.response?.data || error.message);
-      toast.error(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 

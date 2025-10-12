@@ -77,8 +77,8 @@ export default function Publish() {
 
     // 2. onError (mutation failed), Rollback the optimistic update
     onError: (error, _variables, context) => {
-      console.error(error.response?.data || error.message);
-      toast.error(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
 
       // Rollback on error
       if (context?.previousPosts)
@@ -148,10 +148,10 @@ export default function Publish() {
       newImage = await uploadFile(image);
       try {
       } catch (error) {
-        console.error(error.response?.data || error.message);
+        console.error(error.response?.data?.message || error.message);
         setError({
           isError: true,
-          message: error.response?.data || error.message,
+          message: error.response?.data?.message || error.message,
         });
 
         // Temporary error message

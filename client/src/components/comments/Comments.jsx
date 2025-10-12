@@ -72,7 +72,7 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     // OnError → Rollback to previous state
     onError: (error, _newComment, context) => {
       console.error("Error creating comment:", error);
-      toast.error(error.response?.data || error.message);
+      toast.error(error.response?.data?.message || error.message);
 
       if (context?.previousComments) {
         queryClient.setQueryData(
@@ -135,8 +135,8 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     },
 
     onError: (error) => {
-      console.error(error.response?.data || error.message);
-      toast.error(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     },
   });
 

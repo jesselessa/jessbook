@@ -35,8 +35,8 @@ export default function AuthCallback() {
         await connectWithToken();
         navigate("/home");
       } catch (error) {
-        console.error(error.response?.data || error.message);
-        toast.error(error.response?.data || error.message);
+        console.error(error.response?.data?.message || error.message);
+        toast.error(error.response?.data?.message || error.message);
         navigate("/"); // Redirect to Login page if unauthenticated
       } finally {
         setLoading(false);

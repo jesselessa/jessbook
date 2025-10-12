@@ -38,8 +38,8 @@ export default function ProfileData() {
       const res = await makeRequest.get(`/users/${userId}`);
       return res.data;
     } catch (error) {
-      console.error(error.response?.data || error.message);
-      toast.error(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
@@ -60,8 +60,8 @@ export default function ProfileData() {
       );
       return res.data;
     } catch (error) {
-      console.error(error.response?.data || error.message);
-      toast.error(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 

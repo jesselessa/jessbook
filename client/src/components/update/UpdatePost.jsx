@@ -78,8 +78,8 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
 
     // 3. onError (mutation failed) → Rollback to previous state
     onError: (error, _variables, context) => {
-      console.error(error.response?.data || error.message);
-      toast.error(error.response?.data || error.message);
+      console.error(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
 
       if (context?.previousPosts) {
         queryClient.setQueryData(["posts", userId], context.previousPosts);
