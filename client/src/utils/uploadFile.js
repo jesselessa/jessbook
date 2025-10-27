@@ -1,5 +1,5 @@
 //***************************** uploadFile.js ********************************
-// Goal: Transfer file and provide its name for next step (story creation)
+// Goal: Transfer file and provide its name for next step (post/story creation)
 //****************************************************************************
 
 import { makeRequest } from "./axios.js";

@@ -54,11 +54,10 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
       const currentDate = new Date();
 
       const optimisticComment = {
-        id: crypto.randomUUID(), // Temporary ID for optimistic update
+        id: crypto.randomUUID(),
         userId: currentUser.id,
         text,
-        createdAt: currentDate.toISOString(), // Temporary creation date
-        // Note: We only add essential fields for rendering purposes
+        createdAt: currentDate.toISOString(),
       };
 
       // Optimistically update the post in cache

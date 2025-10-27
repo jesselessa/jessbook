@@ -46,9 +46,8 @@ export default function Publish() {
 
     // 1. onMutate: Immediately update the cache before the server response
     onMutate: async ({ text, img }) => {
-      // 1A. Cancel any outgoing fetches for posts query to prevent conflicts
-      await queryClient.cancelQueries(["posts"]); // Timeline + ProfileData
-
+      // 1A. Cancel any outgoing fetches for current user's posts query to prevent conflicts
+      await queryClient.cancelQueries(["posts", currentUser.id]);
       // 1B. Store the current cached data to revert if mutation fails
       const previousPosts = queryClient.getQueryData(["posts", currentUser.id]);
 
@@ -58,14 +57,16 @@ export default function Publish() {
       const currentDate = new Date();
 
       const optimisticPost = {
-        id: crypto.randomUUID(),
+        id: crypto.randomUUID(), // Temporary ID for optimistic update
         text,
         img,
-        createdAt: currentDate.toISOString(), // YYYY-MM-DDTHH:mm:ss.sssZ
+        userId: currentUser.id, // Author is the current user
+        createdAt: currentDate.toISOString(), // Temporary creation date in ISO format (YYYY-MM-DDTHH:mm:ss.sssZ)
+        // Note: We only add essential fields for rendering purposes
       };
 
       // 1D. Optimistically update user's posts in cache
-      //! ⚠️ We must set an empty array as a fallback (oldPost = []), otherwise, if Tanstack Query has still nothing in cached, it will return 'undefined', making our app crash
+      //! ⚠️ We must set an empty array as a fallback (oldPost = []), otherwise, if Tanstack Query has still nothing in cache, it will return 'undefined', making our app crash
       queryClient.setQueryData(["posts", currentUser.id], (oldPost = []) => [
         ...oldPost,
         optimisticPost,
@@ -93,8 +94,8 @@ export default function Publish() {
 
     // Either the mutation succeeds or fails, refresh data and reset states
     onSettled: () => {
-      // Invalidate queries to refetch fresh
-      queryClient.invalidateQueries(["posts"]);
+      // Invalidate queries to refetch fresh data from the server
+      queryClient.invalidateQueries(["posts", currentUser.id]);
       //! Note: No need to refresh comments and postLikes data because they depend on post ID (and not on post content)
 
       // Reset states
@@ -140,13 +141,13 @@ export default function Publish() {
       return;
     }
 
-    // Initialize a new image URL/name
+    // Initialize a new image name
     let newImage = null;
 
     // Upload new image if present
     if (image) {
-      newImage = await uploadFile(image);
       try {
+        newImage = await uploadFile(image);
       } catch (error) {
         console.error(error.response?.data?.message || error.message);
         setError({
