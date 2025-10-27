@@ -42,11 +42,11 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
 
   // Create a new comment (with optimistic update)
   const createMutation = useMutation({
-    mutationFn: async (newComment) =>
-      await makeRequest.post("/comments", newComment),
+    mutationFn: async ({ text, postId }) =>
+      await makeRequest.post("/comments", { text, postId }),
 
-    // OnMutate → Cancel ongoing queries and store existing query cached data
-    onMutate: async (newComment) => {
+    // 1. OnMutate → Cancel ongoing queries and store existing query cached data
+    onMutate: async ({ text, postId }) => {
       await queryClient.cancelQueries(["comments", postId]);
       const previousComments = queryClient.getQueryData(["comments", postId]);
 
@@ -54,9 +54,11 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
       const currentDate = new Date();
 
       const optimisticComment = {
-        id: crypto.randomUUID(),
-        text: newComment.text,
-        createdAt: currentDate.toISOString(), // YYYY-MM-DDTHH:mm:ss.sssZ
+        id: crypto.randomUUID(), // Temporary ID for optimistic update
+        userId: currentUser.id,
+        text,
+        createdAt: currentDate.toISOString(), // Temporary creation date
+        // Note: We only add essential fields for rendering purposes
       };
 
       // Optimistically update the post in cache
@@ -69,8 +71,8 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
       return { previousComments };
     },
 
-    // OnError → Rollback to previous state
-    onError: (error, _newComment, context) => {
+    // 2. OnError → Rollback to previous state
+    onError: (error, postId, context) => {
       console.error("Error creating comment:", error);
       toast.error(error.response?.data?.message || error.message);
 
@@ -82,16 +84,14 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
       }
     },
 
-    // OnSuccess → Display a message
-    onSuccess: () => {
-      toast.success("Comment published.");
-    },
+    // 3. OnSuccess → Display a message
+    onSuccess: () => toast.success("Comment published."),
 
-    // OnSettled → Refetch data and reset form
-    onSettled: (_data, _error, newComment) => {
+    // 4. OnSettled → Refetch data, reset and close form
+    onSettled: (_data, _error, postId) => {
       queryClient.invalidateQueries(["comments", postId]);
 
-      setText("");
+      setText(""); // Reset form input
       setIsOpen(true); // Keep comments open
     },
   });
@@ -103,7 +103,7 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
 
     // Check comment length
     if (trimmedText?.length === 0) {
-      toast.error("Your comment must contain a description.");
+      toast.error("Your comment comment must contain a description.");
       return;
     }
 
@@ -128,16 +128,44 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
   const deleteMutation = useMutation({
     mutationFn: (commentId) => makeRequest.delete(`/comments/${commentId}`),
 
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries(["comments", postId]);
-      toast.success("Comment deleted.");
+    // 1. onMutate: Optimistically remove the comment from the cache
+    onMutate: async (commentId) => {
+      // Cancel any outgoing refetches on comments to prevent conflicts
+      await queryClient.cancelQueries(["comments", postId]);
+
+      // Store the current query cached data for rollback
+      const previousComments = queryClient.getQueryData(["comments", postId]);
+
+      // Optimistically remove the comment from the cache
+      queryClient.setQueryData(["comments", postId], (oldComments = []) => {
+        return oldComments.filter((c) => c.id !== commentId);
+      });
+
+      // Context for rollback (important: we also need the ID of the comment deleted)
+      return { previousComments, deletedCommentId: commentId };
     },
 
-    onError: (error) => {
+    // 2. onError: Rollback to previous state if API call fails
+    onError: (error, postId, context) => {
       console.error(error.response?.data?.message || error.message);
       toast.error(error.response?.data?.message || error.message);
+
+      if (context?.previousComments) {
+        // Rollback: restore the old list
+        queryClient.setQueryData(
+          ["comments", postId],
+          context.previousComments
+        );
+        toast.error("Rollback successful. Comment deletion failed.");
+      }
     },
+
+    // 3. onSuccess: Display success message and finalize cache sync
+    onSuccess: () => toast.success("Comment deleted."),
+
+    // 4. onSettled: Optional cleanup
+    onSettled: (_data, _error, postId) =>
+      queryClient.invalidateQueries(["comments", postId]),
   });
 
   const handleDelete = (comment) => {

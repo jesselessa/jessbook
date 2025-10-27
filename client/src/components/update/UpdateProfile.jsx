@@ -118,8 +118,8 @@ export default function UpdateProfile({ user, setIsOpen }) {
         ...oldData,
         ...updatedFields,
         // Update with temporary URL if a new file is selected
-        coverPic: coverFile ? tempCoverUrl : oldData.coverPic,
-        profilePic: profileFile ? tempProfileUrl : oldData.profilePic,
+        coverPic: coverFile ? tempCoverUrl : oldData?.coverPic,
+        profilePic: profileFile ? tempProfileUrl : oldData?.profilePic,
       }));
 
       // Clear error messages
@@ -130,9 +130,22 @@ export default function UpdateProfile({ user, setIsOpen }) {
 
     // 3. onError: Rollback on failure
     onError: (error, _variables, context) => {
-      console.error(error.response?.data?.message || error.message);
-      toast.error(error.response?.data?.message || error.message);
+      // Attempt to extract structured validation errors from the backend
+      const errorMessage = error.response?.data?.message || error.message;
+      const backendErrors = error.response?.data?.errors;
 
+      if (backendErrors) {
+        // Display specific validation errors
+        console.error("Validation Errors:", backendErrors);
+        setValidationErrors(backendErrors);
+        toast.error("Please correct the highlighted fields.");
+      } else {
+        // Display generic error
+        console.error(errorMessage);
+        toast.error(errorMessage);
+      }
+
+      // Rollback
       if (context?.previousUser) {
         queryClient.setQueryData(
           ["user", currentUser.id],
@@ -150,24 +163,35 @@ export default function UpdateProfile({ user, setIsOpen }) {
     },
 
     // 4. onSuccess: Close form, toast and navigate
-    onSuccess: (_data, variables) => {
-      //? 'updatedUser' is the object that 'mutate' will pass to our 'mutationFn' (updated user's data)
+    onSuccess: (data, variables) => {
+      //? 'data' is the object that 'mutate' will pass to our 'mutationFn' (updated user's data)
       toast.success("Profile updated.");
       clearValidationErrors();
       setIsOpen(false); // Close form
-      navigate(`/profile/${variables.id}`);
+      // navigate(`/profile/${variables.id}`);
+
+      // We merge new data with existing currentUser object
+      const updatedUserObject = {
+        ...currentUser, // L'ID et le token restent les mêmes
+        firstName: data.firstName,
+        lastName: data.lastName,
+        city: data.city,
+        coverPic: data.coverPic,
+        profilePic: data.profilePic,
+      };
+      setCurrentUser(updatedUserObject); // Update context
     },
 
     // 5. onSettled: Cleanup and refetch
-    onSettled: (_data, _error, _variables, context) => {
+    onSettled: (data, _error, _variables, context) => {
       // Revoke the Blob URLs manually created in onMutate to prevent memory leaks, since the final URL is now fetched from the server
       if (context?.tempCoverUrl && context.tempCoverUrl.startsWith("blob:"))
         URL.revokeObjectURL(context.tempCoverUrl);
       if (context?.tempProfileUrl && context.tempProfileUrl.startsWith("blob:"))
         URL.revokeObjectURL(context.tempProfileUrl);
 
-      queryClient.invalidateQueries(["user", currentUser.id]);
-      queryClient.invalidateQueries(["posts", currentUser.id]);
+      queryClient.invalidateQueries(["user", data.id]);
+      queryClient.invalidateQueries(["posts", data.id]);
 
       // Clean up local File objects (whereas our hook deals with their URL)
       setCover(null);

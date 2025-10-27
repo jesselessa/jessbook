@@ -27,81 +27,81 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
   const updateMutation = useMutation({
     // 1. mutationFn: Handles file upload (slow part) and API call
     // The payload must include the text field and the raw file for upload
-    mutationFn: async ({ newText, newImgFile }) => {
-      let uploadedImgPath = post.img; // Default path to existing image
+    mutationFn: async ({ updatedText, imgFile }) => {
+      // If a new file is present, upload it and get the path.
+      // Otherwise, use the existing image path (post.img) to ensure it is kept (rule: cannot be removed).
+      const uploadedImgPath = imgFile ? await uploadFile(imgFile) : post.img; // Correct: Preserves the existing file name if no new file is selected. // Final object for the PUT request
 
-      // If a new file is provided, upload it first
-      if (newImgFile) {
-        uploadedImgPath = await uploadFile(newImgFile); // <-- Slow operation
-      }
-
-      // Final object for the PUT request
       const finalUpdate = {
-        text: newText,
+        text: updatedText,
         img: uploadedImgPath,
-      };
+      }; // Make the actual API call
 
-      // Make the actual API call
       await makeRequest.put(`/posts/${post.id}`, finalUpdate);
-      return { postId: post.id, ...finalUpdate };
-      // Note: 'postId' is semantic alias that we chose to make the return value more meaningful and easier to use within other TanStack Query hooks, even if our server simply calls that data 'id'
-    },
+      return { postId: post.id, ...finalUpdate }; // Note: 'postId' is semantic alias that we chose to make the return value more meaningful and easier to use within other TanStack Query hooks, even if our server simply calls that data 'id'
+    }, // 2. onMutate (before the request happens) → Apply text and local image preview instantly (fast part) // The argument structure must match what is passed to 'mutate()'
 
-    // 2. onMutate (before the request happens) → Apply text and local image preview instantly (fast part)
-    // The argument structure must match what is passed to 'mutate()'
-    onMutate: async ({ newText, newImgFile }) => {
+    onMutate: async ({ updatedText, imgFile }) => {
       // Cancel any outgoing refetches on posts to prevent conflicts
-      await queryClient.cancelQueries(["posts"]);
+      await queryClient.cancelQueries(["posts"]); // Store the current query cached data for rollback (targeting user's posts)
 
-      // Store the current query cached data for rollback
-      const previousPosts = queryClient.getQueryData(["posts", userId]);
+      const previousPosts = queryClient.getQueryData(["posts", post.userId]); // Use post.userId for specific cache key // Initialize a temporary image URL
 
-      // Initialize a temporary image URL
-      let tempImgUrl = null;
+      let tempImgUrl = null; // Create a temporary Blob URL if a new file is selected
 
-      // Create a temporary Blob URL if a new file is selected
-      if (newImgFile) tempImgUrl = URL.createObjectURL(newImgFile);
+      if (imgFile) tempImgUrl = URL.createObjectURL(imgFile); // Optimistically update cache for the user's posts list
 
-      // Optimistically update cache
-      //! ⚠️ Merge only updated fields to prevent overwriting other data !!!
-      queryClient.setQueryData(["posts", userId], (oldPosts = []) => {
+      //! ⚠️ Merge only updated data to prevent overwriting existing one !!!
+      queryClient.setQueryData(["posts", post.userId], (oldPosts) => {
         return oldPosts.map((p) =>
           p.id === post.id
-            ? { ...p, text: newText, img: newImgFile ? tempImgUrl : p.img }
+            ? {
+                ...p,
+                text: updatedText,
+                // Use temp URL if new file, otherwise keep existing path (p.img)
+                img: imgFile ? tempImgUrl : p.img,
+              }
             : p
         );
       });
 
-      // Context for rollback and Blob URL cleanup
-      return { previousPosts, tempImgUrl };
-    },
+      // Also optimistically update the generic posts list
+      queryClient.setQueryData(["posts"], (oldPosts = []) => {
+        return oldPosts.map((p) =>
+          p.id === post.id
+            ? {
+                ...p,
+                text: updatedText,
+                img: imgFile ? tempImgUrl : p.img,
+              }
+            : p
+        );
+      }); // Context for rollback and Blob URL cleanup
 
-    // 3. onError (mutation failed) → Rollback to previous state
+      return { previousPosts, tempImgUrl };
+    }, // 3. onError (mutation failed) → Rollback to previous state
+
     onError: (error, _variables, context) => {
       console.error(error.response?.data?.message || error.message);
       toast.error(error.response?.data?.message || error.message);
 
       if (context?.previousPosts) {
-        queryClient.setQueryData(["posts", userId], context.previousPosts);
+        queryClient.setQueryData(["posts", post.userId], context.previousPosts); // Use post.userId
       }
-    },
+    }, // 4. onSuccess (mutation is successful) → Display a message and reset error messages
 
-    // 4. onSuccess (mutation is successful) → Display a message and reset error messages
     onSuccess: () => {
       toast.success("Post updated.");
       setError({ isError: false, message: "" });
-    },
+    }, // 5. onSettled (either mutation succeeds or fails) → Invalidate query and clean up local states
 
-    // 5. onSettled (either mutation succeeds or fails) → Invalidate query and clean up local states
     onSettled: (_data, error, _variables, context) => {
       // Revoke the Blob URL created in onMutate to prevent memory leaks
       if (context?.tempImgUrl && context.tempImgUrl.startsWith("blob:"))
-        URL.revokeObjectURL(context.tempImgUrl);
+        URL.revokeObjectURL(context.tempImgUrl); // Invalidate and refetch posts data (Timeline and Profile specific list)
 
-      // Invalidate and refetch posts data
-      queryClient.invalidateQueries(["posts"]);
+      queryClient.invalidateQueries(["posts"]); // Invalidate timeline
 
-      // Reset states
       setIsOpen(false); // Close form
       setNewImg(null); // Clean up local File object
     },

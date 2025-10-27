@@ -33,7 +33,7 @@ export const register = async (req, res) => {
     if (!emailRegex.test(email?.trim()) || email?.trim()?.length > 320)
       errors.email = "Enter a valid email format.";
 
-    // 6 - Validate password using regex
+    // 6 - Validate password using regex (min 6 chars, 1 number, 1 symbol)
     const passwordRegex =
       /(?=.*[0-9])(?=.*[~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%])[a-zA-Z0-9~`!§@#$€%^&*()_\-+={[}\]|\\:;"'«»<,>.?/%]{6,}/;
     if (
@@ -64,14 +64,14 @@ export const register = async (req, res) => {
       lastName.trim(),
       email.trim(),
       hashedPswd,
-      "No", // User'account has not been created from a third-party authentication provider (Google or Facebook)
+      "No", // User's account has not been created from a third-party authentication provider (Google or Facebook)
       "user", // Default role
     ];
 
     const insertData = await executeQuery(insertQuery, values);
     const newUserId = insertData.insertId; // Get the ID of newly created user
 
-    // 11 - Automatically add admin as new user first relationship
+    // 11 - Automatically add admin as new user first relationship (New user follows admin)
     const insertRelationshipQuery =
       "INSERT INTO relationships (followerId, followedId) VALUES (?, ?)";
 
@@ -135,11 +135,11 @@ export const login = async (req, res) => {
       token = jwt.sign({ id: data[0].id, role: "user" }, secretKey, {
         expiresIn: "7d",
       });
-    }
-
+    } 
+    
     // 7 - Remove password field from the response for security
-    const { password: userPassword, ...otherInfo } = data[0];
-
+    const { password: userPassword, ...otherInfo } = data[0]; 
+    
     // 8 - Send JWT token in an HTTP-only cookie for better security
     return res
       .cookie("accessToken", token, {
@@ -160,7 +160,7 @@ export const login = async (req, res) => {
 };
 
 export const connectWithToken = async (req, res) => {
-  const loggedInUserId = req.user.id; // Get user ID from token
+  const loggedInUserId = req.user.id; // Get user ID from token payload (set by authenticateUser middleware)
   try {
     const q = "SELECT * FROM users WHERE id = ?";
     const data = await executeQuery(q, [loggedInUserId]);
@@ -191,12 +191,12 @@ export const logout = (_req, res) => {
 };
 
 export const recoverAccount = async (req, res) => {
-  const { email } = req.body;
-
+  const { email } = req.body; 
+  
   // 1 - Check if email is provided
   if (!email?.trim()?.length)
-    return res.status(400).json({ message: "Please, provide an email." });
-
+    return res.status(400).json({ message: "Please, provide an email." }); 
+  
   // 2 - Validate email format with regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email.trim()) || email.trim().length > 320)
@@ -211,32 +211,32 @@ export const recoverAccount = async (req, res) => {
       return res.status(404).json({
         message: "There is no account associated with this email address.",
       });
-    }
-
+    } 
+    
     // 4 - Generate a JWT token for password reset (expires in 1h)
     const secretKey = process.env.JWT_SECRET;
-    const token = jwt.sign({ id: data[0].id }, secretKey, { expiresIn: "1h" });
-
+    const token = jwt.sign({ id: data[0].id }, secretKey, { expiresIn: "1h" }); 
+    
     // 5 - Build reset password link
-    const resetLink = `${process.env.CLIENT_URL}/reset-password`;
-
+    const resetLink = `${process.env.CLIENT_URL}/reset-password`; 
+    
     // 6 - Send email for password reset
     await sendEmail({
       to: email,
       subject: "Jessbook - Reset your password",
       html: `
-        <div style="font-family: Arial, sans-serif; padding: 10px;">
-          <h2 style="font-weight: bold;">Reset your Jessbook password</h2>
-          <a href="${resetLink}" target="_blank" style="font-size: 16px; font-weight: bold; color: #008080">
-            Click here to change your password
-          </a>
-          <p style="font-size: 16px; margin-top: 15px;">
-            This link will expire in 1 hour.
-          </p>
-        </div>
-      `,
-    });
-
+        <div style="font-family: Arial, sans-serif; padding: 10px;">
+          <h2 style="font-weight: bold;">Reset your Jessbook password</h2>
+          <a href="${resetLink}" target="_blank" style="font-size: 16px; font-weight: bold; color: #008080">
+            Click here to change your password
+          </a>
+          <p style="font-size: 16px; margin-top: 15px;">
+            This link will expire in 1 hour.
+          </p>
+        </div>
+      `,
+    }); 
+    
     // 7 - Set a secure cookie with the token
     return res
       .cookie("resetToken", token, {
@@ -263,8 +263,8 @@ export const resetPassword = async (req, res) => {
   const { password, confirmPswd } = req.body;
   const token = req.cookies.resetToken; // Get token from cookie
 
-  console.log("ResetPassword called. Token received:", token);
-
+  console.log("ResetPassword called. Token received:", token); 
+  
   // 1 - Validate password fields
   if (!password?.trim() || !confirmPswd?.trim()) {
     console.log("Validation error: Missing fields");
@@ -300,17 +300,17 @@ export const resetPassword = async (req, res) => {
   try {
     // 2 - Verify token
     const decoded = jwt.verify(token, secretKey);
-    console.log("Token verified. User ID:", decoded.id);
-
+    console.log("Token verified. User ID:", decoded.id); 
+    
     // 3 - Hash password
     const salt = bcrypt.genSaltSync(10);
-    const hashedPswd = bcrypt.hashSync(password.trim(), salt);
-
+    const hashedPswd = bcrypt.hashSync(password.trim(), salt); 
+    
     // 4 - Update database
     const q = "UPDATE users SET password = ? WHERE id = ?";
     await executeQuery(q, [hashedPswd, decoded.id]);
-    console.log("Password updated in DB");
-
+    console.log("Password updated in DB"); 
+    
     // 5 - Clear cookie only after successful update
     res.clearCookie("resetToken", {
       httpOnly: true,

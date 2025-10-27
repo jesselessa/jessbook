@@ -40,9 +40,8 @@ app.use(
     useDefaults: true, // Use the default CSP directives
     directives: {
       // Allow images (previews) from the same origin, HTTPS, data, AND blob: URIs
-      "img-src": ["'self'", "https:", "data:", "blob:"],
+      "img-src": ["'self'", "https:", "data:", "blob:"], // Allow media (videos/sounds) from the same domain AND blob: URLs
 
-      // Allow media (videos/sounds) from the same domain AND blob: URLs
       "media-src": ["'self'", "blob:"],
     },
   })
@@ -66,8 +65,8 @@ app.use(cookieParser()); //! Cookies content accessible via 'req.cookies' and 'r
 
 // Initialize Passport
 app.use(passport.initialize());
-connectWithGoogle();
-connectWithFacebook();
+connectWithGoogle(); // Configure Google OAuth strategy
+connectWithFacebook(); // Configure Facebook OAuth strategy
 
 // API ROUTES
 app.use("/api/auth", authRoute);
@@ -89,13 +88,15 @@ app.use(
   express.static(path.join(__dirname, "../client/public/uploads"))
 );
 
-// Production setup for static files
+// Production setup for static files (SPA handling)
 if (process.env.NODE_ENV === "production") {
-  // Serve static files from React/Vite
+  // 1. SPA Fallback: Unknown routes (non-API) must be redirected to index.html
+  // This MUST be placed BEFORE serving static files, so the history middleware
+  // Can catch routes like /home or /login/auth-provider/callback that are client-side routes
+  app.use(history({ verbose: true })); 
+  
+  // 2. Serve static files from React/Vite build (including index.html) // The history middleware will redirect the request to index.html, // which will then be served by express.static
   app.use(express.static(path.join(__dirname, "../client/dist")));
-
-  // SPA Fallback: Unknown routes directed to index.html
-  app.use(history({ verbose: true }));
 }
 
 // Global error handler
@@ -111,7 +112,7 @@ app.use((err, req, res, next) => {
 // Start server
 const startServer = async () => {
   try {
-    await connectDB();
+    await connectDB(); // Connect to the database
     app.listen(PORT, () => {
       console.log(`✅ Server is listening on port ${PORT}`);
     });
