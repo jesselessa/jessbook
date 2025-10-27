@@ -104,7 +104,7 @@ export default function Publish() {
     },
   });
 
-  // Access the publication state using 'isPending' property from useMutation
+  // Access the publication global loading state using 'isPending' property from useMutation
   const isPublishing = mutation.isPending;
 
   const handleSubmit = async (e) => {

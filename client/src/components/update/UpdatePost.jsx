@@ -20,7 +20,7 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
 
   const queryClient = useQueryClient();
 
-  // Release URL resource to prevent memory leaks from the standard React state preview (hook used in the image display area)
+  // Release URL resource to prevent memory leaks (hook used in the image display area)
   const newImgUrl = useCleanUpFileURL(newImg);
 
   // Mutation to handle optimistic update for post
@@ -28,87 +28,88 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
     // 1. mutationFn: Handles file upload (slow part) and API call
     // The payload must include the text field and the raw file for upload
     mutationFn: async ({ updatedText, imgFile }) => {
-      // If a new file is present, upload it and get the path.
-      // Otherwise, use the existing image path (post.img) to ensure it is kept (rule: cannot be removed).
-      const uploadedImgPath = imgFile ? await uploadFile(imgFile) : post.img; // Correct: Preserves the existing file name if no new file is selected. // Final object for the PUT request
+      // If a new file is present, upload it and get the path. Otherwise, use the existing image path (post.img) to ensure it is kept (rule: cannot be removed)
+      const uploadedImgPath = imgFile ? await uploadFile(imgFile) : post.img;
 
       const finalUpdate = {
         text: updatedText,
         img: uploadedImgPath,
-      }; // Make the actual API call
+      };
 
+      // Make the actual API call
       await makeRequest.put(`/posts/${post.id}`, finalUpdate);
-      return { postId: post.id, ...finalUpdate }; // Note: 'postId' is semantic alias that we chose to make the return value more meaningful and easier to use within other TanStack Query hooks, even if our server simply calls that data 'id'
-    }, // 2. onMutate (before the request happens) → Apply text and local image preview instantly (fast part) // The argument structure must match what is passed to 'mutate()'
 
+      // Return the final data to be used in 'onSuccess' (if needed)
+      return { postId: post.id, ...finalUpdate };
+    },
+
+    // 2. onMutate (before the request happens) → Apply text and local image preview instantly (fast part)
+    // The argument structure must match what is passed to 'mutate()'
     onMutate: async ({ updatedText, imgFile }) => {
-      // Cancel any outgoing refetches on posts to prevent conflicts
-      await queryClient.cancelQueries(["posts"]); // Store the current query cached data for rollback (targeting user's posts)
+      // Cancel any outgoing refetches for posts to prevent conflicts (target current user's posts)
+      await queryClient.cancelQueries(["posts", post.userId]);
 
-      const previousPosts = queryClient.getQueryData(["posts", post.userId]); // Use post.userId for specific cache key // Initialize a temporary image URL
+      // Store the current query cached data for rollback if mutation fails
+      const previousPosts = queryClient.getQueryData(["posts", post.userId]);
 
-      let tempImgUrl = null; // Create a temporary Blob URL if a new file is selected
+      // Initialize the optimistic image path
+      let optimisticImg = post.img;
 
-      if (imgFile) tempImgUrl = URL.createObjectURL(imgFile); // Optimistically update cache for the user's posts list
+      // If a new file is selected, use a temporary Blob URL for instant preview
+      if (imgFile) optimisticImg = URL.createObjectURL(imgFile);
 
-      //! ⚠️ Merge only updated data to prevent overwriting existing one !!!
-      queryClient.setQueryData(["posts", post.userId], (oldPosts) => {
+      // Optimistically update cache for the current user's posts
+      // ⚠️ Merge only updated data to prevent overwriting existing one !!!
+      queryClient.setQueryData(["posts", post.userId], (oldPosts = []) => {
         return oldPosts.map((p) =>
           p.id === post.id
             ? {
                 ...p,
                 text: updatedText,
-                // Use temp URL if new file, otherwise keep existing path (p.img)
-                img: imgFile ? tempImgUrl : p.img,
+                img: optimisticImg,
               }
             : p
         );
       });
 
-      // Also optimistically update the generic posts list
-      queryClient.setQueryData(["posts"], (oldPosts = []) => {
-        return oldPosts.map((p) =>
-          p.id === post.id
-            ? {
-                ...p,
-                text: updatedText,
-                img: imgFile ? tempImgUrl : p.img,
-              }
-            : p
-        );
-      }); // Context for rollback and Blob URL cleanup
+      // Context for rollback and Blob URL cleanup
+      return { previousPosts, tempImgUrl: imgFile ? optimisticImg : null };
+    },
 
-      return { previousPosts, tempImgUrl };
-    }, // 3. onError (mutation failed) → Rollback to previous state
-
+    // 3. onError (mutation failed) → Rollback to previous state
     onError: (error, _variables, context) => {
       console.error(error.response?.data?.message || error.message);
       toast.error(error.response?.data?.message || error.message);
 
       if (context?.previousPosts) {
-        queryClient.setQueryData(["posts", post.userId], context.previousPosts); // Use post.userId
+        // Rollback to previous posts list
+        queryClient.setQueryData(["posts", post.userId], context.previousPosts);
       }
-    }, // 4. onSuccess (mutation is successful) → Display a message and reset error messages
+    },
 
+    // 4. onSuccess (mutation is successful) → Display a message and reset error messages
     onSuccess: () => {
       toast.success("Post updated.");
       setError({ isError: false, message: "" });
-    }, // 5. onSettled (either mutation succeeds or fails) → Invalidate query and clean up local states
+    },
 
+    // 5. onSettled (either mutation succeeds or fails) → Invalidate query and clean up local states
     onSettled: (_data, error, _variables, context) => {
       // Revoke the Blob URL created in onMutate to prevent memory leaks
       if (context?.tempImgUrl && context.tempImgUrl.startsWith("blob:"))
-        URL.revokeObjectURL(context.tempImgUrl); // Invalidate and refetch posts data (Timeline and Profile specific list)
+        URL.revokeObjectURL(context.tempImgUrl);
 
-      queryClient.invalidateQueries(["posts"]); // Invalidate timeline
+      // Invalidate user's specific post list (Profile)
+      queryClient.invalidateQueries(["posts", post.userId]);
+
+      // Invalidate generic post list (Timeline/Home)
+      queryClient.invalidateQueries(["posts"]);
 
       setIsOpen(false); // Close form
       setNewImg(null); // Clean up local File object
     },
   });
 
-  // Use 'updateMutation.isPending' for the global loading state
-  //? Reminder: 'isPending 'is a property automatically managed by the Tanstack Query useMutation hook
   const isUpdating = updateMutation.isPending;
 
   const handleSubmit = async (e) => {
@@ -117,10 +118,13 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
     // Prevent multiple submissions
     if (isUpdating) return;
 
-    // Check if post has been modified
+    // Use the state variable (newText) to compare changes
     const trimmedText = newText?.trim();
-    const hasTextChanged = trimmedText !== post.text.trim();
-    const hasImageChanged = newImg !== null;
+    const originalTextTrimmed = post.text.trim();
+
+    // Check for changes
+    const hasTextChanged = trimmedText !== originalTextTrimmed;
+    const hasImageChanged = newImg !== null; // newImg is a File object if changed
 
     if (!hasTextChanged && !hasImageChanged) {
       toast.info("No changes detected.");
@@ -146,10 +150,10 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
       return;
     }
 
-    // Trigger mutation: pass text and the raw File object
+    // Trigger mutation: pass text and the raw File object (or null)
     updateMutation.mutate({
-      text: trimmedText,
-      newImgFile: newImg,
+      updatedText: trimmedText,
+      imgFile: newImg,
     });
   };
 
@@ -195,7 +199,7 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
                   </label>
                   <input
                     type="file"
-                    //! 'id' must be different from input in Publish to prevent conflicts when displaying image
+                    // 'id' must be different from input in Publish to prevent conflicts when displaying image
                     id="new-file"
                     name="new-file"
                     accept="image/*"
