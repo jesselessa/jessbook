@@ -19,14 +19,14 @@ export default function UpdateComment({ comment, setIsOpen }) {
       makeRequest.put(`/comments/${comment.id}`, updatedComment),
 
     onMutate: async (updatedComment) => {
-      await queryClient.cancelQueries(["comments"]);
+      await queryClient.cancelQueries(["comments", comment.postId]);
       const previousComments = queryClient.getQueryData([
         "comments",
         comment.postId,
       ]);
 
       // Optimistic update: replace the old comment with the new one
-      //! ⚠️ Reminder: Don't merge an uncomplete optimistic object (e.g., if we only return 'text', whereas 'comments' SQL table also contains other keys), in this case 'updatedComment', because it will overwrite our existing data => 💡 Only merge with the new one !!!
+      //! ⚠️ Reminder: Don't merge an uncomplete optimistic object (e.g., if we only return 'text', whereas 'comments' SQL table also contains other keys), because it will overwrite our existing data => 💡 Only merge with the new one !!!
       queryClient.setQueryData(["comments", comment.postId], (oldData) =>
         oldData?.map((c) =>
           c.id === comment.id ? { ...c, text: updatedComment.text } : c
@@ -59,7 +59,7 @@ export default function UpdateComment({ comment, setIsOpen }) {
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries(["comments"]);
+      queryClient.invalidateQueries(["comments", comment.postId]);
     },
   });
 
