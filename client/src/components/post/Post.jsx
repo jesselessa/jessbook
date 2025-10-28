@@ -120,7 +120,7 @@ export default function Post({ post }) {
     // 1. onMutate: Optimistically remove the post from the cache
     onMutate: async (postId) => {
       // Cancel outgoing fetches for all posts and store the previous state
-      await queryClient.cancelQueries(["posts", post.userId]);
+      await queryClient.cancelQueries(["posts"]);
       const previousPosts = queryClient.getQueryData(["posts", post.userId]); // Only target current user's posts
 
       // Update current user's posts optimistically
@@ -146,8 +146,8 @@ export default function Post({ post }) {
     // 3. onSuccess: Display a message (the UI is already updated)
     onSuccess: () => toast.success("Post deleted."),
 
-    // 4. onSettled: Invalidate and refetch all posts lists (for both Home and Profile)
-    onSettled: () => queryClient.invalidateQueries(["posts", post.userId]),
+    // 4. onSettled: Invalidate and refetch all posts
+    onSettled: () => queryClient.invalidateQueries(["posts"]),
   });
 
   const isPostLiked = postLikes?.includes(currentUser?.id) || false;

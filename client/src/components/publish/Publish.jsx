@@ -46,8 +46,9 @@ export default function Publish() {
 
     // 1. onMutate: Immediately update the cache before the server response
     onMutate: async ({ text, img }) => {
-      // 1A. Cancel any outgoing fetches for current user's posts query to prevent conflicts
-      await queryClient.cancelQueries(["posts", currentUser.id]);
+      // 1A. Cancel any outgoing fetches for all posts and for all users to prevent conflicts
+      await queryClient.cancelQueries(["posts"]);
+
       // 1B. Store the current cached data to revert if mutation fails
       const previousPosts = queryClient.getQueryData(["posts", currentUser.id]);
 
@@ -94,8 +95,8 @@ export default function Publish() {
 
     // Either the mutation succeeds or fails, refresh data and reset states
     onSettled: () => {
-      // Invalidate queries to refetch fresh data from the server
-      queryClient.invalidateQueries(["posts", currentUser.id]);
+      // Invalidate queries to refetch all posts from the server
+      queryClient.invalidateQueries(["posts"]);
       //! Note: No need to refresh comments and postLikes data because they depend on post ID (and not on post content)
 
       // Reset states
