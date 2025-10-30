@@ -36,7 +36,7 @@ export default function UpdateComment({ comment, setIsOpen }) {
       return { previousComments };
     },
 
-    onError: (error, _updatedComment, context) => {
+    onError: (error, variables, context) => {
       console.error(error.response?.data?.message || error.message);
       setError({
         isError: true,
@@ -45,7 +45,7 @@ export default function UpdateComment({ comment, setIsOpen }) {
 
       if (context?.previousComments) {
         queryClient.setQueryData(
-          ["comments", comment.postId],
+          ["comments", variables.postId],
           context.previousComments
         );
       }
@@ -58,8 +58,9 @@ export default function UpdateComment({ comment, setIsOpen }) {
       setIsOpen(false); // Close form
     },
 
-    onSettled: () => {
-      queryClient.invalidateQueries(["comments", comment.postId]);
+    onSettled: (_data, _error, variables) => {
+      queryClient.invalidateQueries(["comments", variables.postId]);
+      queryClient.invalidateQueries(["user", variables.userId]); // Refetch user data to update profile picture if needed
     },
   });
 

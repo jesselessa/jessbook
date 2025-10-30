@@ -7,7 +7,7 @@ import { uploadFile } from "../../utils/uploadFile.js";
 import { useCleanUpFileURL } from "../../hooks/useCleanUpFileURL.js";
 import { toast } from "react-toastify";
 
-// Component
+// Components
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 import Loader from "../loader/Loader.jsx";
 
@@ -40,7 +40,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // Generate preview URLs and cleanup automatically
+  // Generate and cleanup preview URLs automatically
   const coverUrl = useCleanUpFileURL(cover);
   const profileUrl = useCleanUpFileURL(profile);
 
@@ -65,6 +65,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
   // Handle file selection
   const handleFileChange = (e) => {
     clearValidationErrors(); // Delete previous errors
+
     const selectedFile = e.target.files[0];
     if (e.target.id === "selected-cover") setCover(selectedFile);
     else setProfile(selectedFile);
@@ -74,6 +75,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
   const updateMutation = useMutation({
     // 1. mutationFn: Upload files and send PUT request
     mutationFn: async ({ updatedFields, coverFile, profileFile }) => {
+      // If new file is present, upload it. Otherwise, keep the existing path (user.coverPic)
       const uploadedCover = coverFile
         ? await uploadFile(coverFile)
         : user.coverPic;
@@ -90,36 +92,39 @@ export default function UpdateProfile({ user, setIsOpen }) {
 
       await makeRequest.put("/users", finalUpdate);
       return { userId: user.id, ...finalUpdate };
-      // Note: 'userId' is semantic alias that we chose to make the return value more meaningful and easier to use within other TanStack Query hooks, even if our server simply calls that data 'id'
     },
 
     // 2. onMutate (Fast): Optimistic cache update
     onMutate: async ({ updatedFields, coverFile, profileFile }) => {
+      // FIX: Convert ID to string to match the key read by ProfileData (from useParams)
+      const currentUserIdString = String(user.id);
+
       // Cancel any outgoing refetches for user and posts data
-      await queryClient.cancelQueries(["user", user.id]);
-      await queryClient.cancelQueries(["posts", user.id]);
+      await queryClient.cancelQueries(["user", currentUserIdString]);
+      await queryClient.cancelQueries(["posts"]);
 
       // Store the current cached data to revert if mutation fails
-      const previousUser = queryClient.getQueryData(["user", user.id]);
-      const previousPosts = queryClient.getQueryData(["posts", user.id]);
+      const previousUser = queryClient.getQueryData([
+        "user",
+        currentUserIdString,
+      ]);
+      const previousPosts = queryClient.getQueryData(["posts"]);
 
-      // Create Blob URLs locally for the optimistic cache update
-      // These URLs will be applied to the main profile page display temporarily
+      // Determine optimistic URLs/Paths
+      // If new file, create Blob URL, otherwise, use existing DB path
       const tempCoverUrl = coverFile
         ? URL.createObjectURL(coverFile)
-        : user.coverPic || defaultCover;
+        : user.coverPic;
       const tempProfileUrl = profileFile
         ? URL.createObjectURL(profileFile)
-        : user.profilePic || defaultProfile;
+        : user.profilePic;
 
-      // Optimistically update the cache: ProfileData must be able to read this 'blob:' URL
-      //! ⚠️ Merge only updated fields to prevent overwriting other data !!!
-      queryClient.setQueryData(["user", currentUser.id], (oldData) => ({
+      // Optimistically update the cache for the profile page display
+      queryClient.setQueryData(["user", currentUserIdString], (oldData) => ({
         ...oldData,
         ...updatedFields,
-        // Update with temporary URL if a new file is selected
-        coverPic: coverFile ? tempCoverUrl : oldData?.coverPic,
-        profilePic: profileFile ? tempProfileUrl : oldData?.profilePic,
+        coverPic: tempCoverUrl,
+        profilePic: tempProfileUrl,
       }));
 
       // Clear error messages
@@ -129,7 +134,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
     },
 
     // 3. onError: Rollback on failure
-    onError: (error, _variables, context) => {
+    onError: (error, variables, context) => {
       // Attempt to extract structured validation errors from the backend
       const errorMessage = error.response?.data?.message || error.message;
       const backendErrors = error.response?.data?.errors;
@@ -146,33 +151,28 @@ export default function UpdateProfile({ user, setIsOpen }) {
       }
 
       // Rollback
+      const currentUserIdString = String(variables.id);
+
       if (context?.previousUser) {
         queryClient.setQueryData(
-          ["user", currentUser.id],
+          ["user", currentUserIdString],
           context.previousUser
         );
       }
       if (context?.previousPosts) {
-        queryClient.setQueryData(
-          ["posts", currentUser.id],
-          context.previousPosts
-        );
+        queryClient.setQueryData(["posts"], context.previousPosts);
       }
-
-      // Note: We don't need to revoke hook URLs here, as the hook handles its cleanup
     },
 
     // 4. onSuccess: Close form, toast and navigate
     onSuccess: (data, variables) => {
-      //? 'data' is the object that 'mutate' will pass to our 'mutationFn' (updated user's data)
       toast.success("Profile updated.");
       clearValidationErrors();
       setIsOpen(false); // Close form
-      // navigate(`/profile/${variables.id}`);
 
-      // We merge new data with existing currentUser object
+      // Update AuthContext with new user data
       const updatedUserObject = {
-        ...currentUser, // L'ID et le token restent les mêmes
+        ...currentUser,
         firstName: data.firstName,
         lastName: data.lastName,
         city: data.city,
@@ -184,16 +184,19 @@ export default function UpdateProfile({ user, setIsOpen }) {
 
     // 5. onSettled: Cleanup and refetch
     onSettled: (data, _error, _variables, context) => {
-      // Revoke the Blob URLs manually created in onMutate to prevent memory leaks, since the final URL is now fetched from the server
+      // Revoke the Blob URLs manually created in onMutate to prevent memory leaks
       if (context?.tempCoverUrl && context.tempCoverUrl.startsWith("blob:"))
         URL.revokeObjectURL(context.tempCoverUrl);
       if (context?.tempProfileUrl && context.tempProfileUrl.startsWith("blob:"))
         URL.revokeObjectURL(context.tempProfileUrl);
 
-      queryClient.invalidateQueries(["user", data.id]);
-      queryClient.invalidateQueries(["posts", data.id]);
+      // Invalidate and refetch data from server
+      const currentUserIdString = String(data.id);
 
-      // Clean up local File objects (whereas our hook deals with their URL)
+      queryClient.invalidateQueries(["user", currentUserIdString]);
+      queryClient.invalidateQueries(["posts"]);
+
+      // Clean up local File objects
       setCover(null);
       setProfile(null);
     },
@@ -227,7 +230,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
     }
 
     // Stop process if errors
-    //? 'Object.keys(object)' returns an array with the object string-keyed property names
+    // 'Object.keys(object)' returns an array with the object string-keyed property names
     if (Object.keys(inputsErrors).length > 0) {
       setValidationErrors(inputsErrors);
       return;
@@ -283,6 +286,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
                         ? `/uploads/${user.coverPic}`
                         : defaultCover // 3. Default image
                     }
+                    className="cover"
                     alt="cover"
                   />
                   <label htmlFor="selected-cover">
@@ -313,6 +317,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
                         ? `/uploads/${user.profilePic}`
                         : defaultProfile
                     }
+                    className="profile-pic"
                     alt="profile"
                   />
                   <label htmlFor="selected-profile">

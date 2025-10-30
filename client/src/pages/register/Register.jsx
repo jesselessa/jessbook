@@ -3,6 +3,7 @@ import "./register.scss";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query";
 
 export default function Register() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -21,8 +22,6 @@ export default function Register() {
     password: "",
     confirmPswd: "",
   });
-  // Errors from API
-  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
@@ -61,10 +60,39 @@ export default function Register() {
     const { name, value } = e.target;
     setInputsValues((prev) => ({ ...prev, [name]: value })); // Update values
     clearValidationErrors(); // Clear form errors
-    setError(""); // Clear API error
+    // Clear API error display when user types again
+    if (mutation.isError) mutation.reset();
   };
 
-  // Registration feature
+  // Create a new user (registration) mutation
+  const mutation = useMutation({
+    // 1. mutationFn: The actual API call
+    mutationFn: (newUserData) => {
+      // Use the newUserData passed from mutation.mutate()
+      return axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/register`,
+        newUserData
+      );
+    },
+
+    // 2. onSuccess: Registration successful
+    onSuccess: () => {
+      toast.success("Successful registration.");
+      clearForm();
+
+      setTimeout(() => {
+        navigate("/"); // Navigate to Login page
+      }, 1500);
+    },
+
+    // 3. onError: Registration failed
+    onError: (error) => {
+      console.error(error.response?.data?.message || "Registration failed.");
+      toast.error(error.response?.data?.message || "Registration failed.");
+    },
+  });
+
+  // Registration feature (triggers the mutation)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -106,28 +134,13 @@ export default function Register() {
       return;
     }
 
-    // 2 - If successful validation, continue process and call API
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/register`,
-        inputsValues
-      );
-      toast.success("Successful registration.");
-      clearForm();
-
-      setTimeout(() => {
-        navigate("/"); // Navigate to Login page
-      }, 3000);
-    } catch (error) {
-      console.error(error.response?.data?.message || error.message);
-      setError(error.response?.data?.message || error.message);
-
-      // Clear error message after 5 seconds
-      setTimeout(() => {
-        setError("");
-      }, 5000);
-    }
+    // 2 - If successful validation, continue process and trigger mutation
+    mutation.mutate(inputsValues);
   };
+
+  // Get the API error message from the mutation object
+  const apiError =
+    mutation.error?.response?.data?.message || mutation.error?.message;
 
   return (
     <div className="register">
@@ -144,6 +157,8 @@ export default function Register() {
               value={inputsValues.firstName}
               autoComplete="off"
               onChange={handleChange}
+              // Disable form while loading
+              disabled={mutation.isPending}
             />
             {validationErrors.firstName && (
               <span className="error-msg">{validationErrors.firstName}</span>
@@ -157,6 +172,7 @@ export default function Register() {
               value={inputsValues.lastName}
               autoComplete="off"
               onChange={handleChange}
+              disabled={mutation.isPending}
             />
             {validationErrors.lastName && (
               <span className="error-msg">{validationErrors.lastName}</span>
@@ -170,6 +186,7 @@ export default function Register() {
               value={inputsValues.email}
               autoComplete="off"
               onChange={handleChange}
+              disabled={mutation.isPending}
             />
             {validationErrors.email && (
               <span className="error-msg">{validationErrors.email}</span>
@@ -183,6 +200,7 @@ export default function Register() {
               value={inputsValues.password}
               autoComplete="off"
               onChange={handleChange}
+              disabled={mutation.isPending}
             />
             {validationErrors.password && (
               <span className="error-msg">{validationErrors.password}</span>
@@ -196,16 +214,21 @@ export default function Register() {
               value={inputsValues.confirmPswd}
               autoComplete="off"
               onChange={handleChange}
+              disabled={mutation.isPending}
             />
             {validationErrors.confirmPswd && (
               <span className="error-msg">{validationErrors.confirmPswd}</span>
             )}
 
             {/* API Error */}
-            {error && <span className="error-msg api">{error}</span>}
+            {mutation.isError && apiError && (
+              <span className="error-msg api">{apiError}</span>
+            )}
 
             {/* Submit button */}
-            <button type="submit">Sign up</button>
+            <button type="submit" disabled={mutation.isPending}>
+              {mutation.isPending ? "Signing up..." : "Sign up"}
+            </button>
 
             {windowWidth <= 1150 && (
               <p className="login-msg">

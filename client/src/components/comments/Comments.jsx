@@ -71,13 +71,13 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     },
 
     // 2. OnError → Rollback to previous state
-    onError: (error, postId, context) => {
+    onError: (error, variables, context) => {
       console.error("Error creating comment:", error);
       toast.error(error.response?.data?.message || error.message);
 
       if (context?.previousComments) {
         queryClient.setQueryData(
-          ["comments", postId],
+          ["comments", variables.postId],
           context.previousComments
         );
       }
@@ -87,8 +87,9 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     onSuccess: () => toast.success("Comment published."),
 
     // 4. OnSettled → Refetch data, reset and close form
-    onSettled: (_data, _error, postId) => {
-      queryClient.invalidateQueries(["comments", postId]);
+    onSettled: (_data, _error, variables) => {
+      queryClient.invalidateQueries(["comments", variables.postId]);
+      queryClient.invalidateQueries(["user", variables.userId]); // Refetch user data to update profile picture if needed
 
       setText(""); // Reset form input
       setIsOpen(true); // Keep comments open

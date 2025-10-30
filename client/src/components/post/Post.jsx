@@ -133,13 +133,16 @@ export default function Post({ post }) {
     },
 
     // 2. onError: Rollback to previous state
-    onError: (error, _variables, context) => {
+    onError: (error, variables, context) => {
       console.error(error.response?.data?.message || error.message);
       toast.error(error.response?.data?.message || error.message);
 
       if (context?.previousPosts) {
         // Rollback: restore the old list
-        queryClient.setQueryData(["posts", post.userId], context.previousPosts);
+        queryClient.setQueryData(
+          ["posts", variables.userId],
+          context.previousPosts
+        );
       }
     },
 
