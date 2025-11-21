@@ -20,7 +20,7 @@ import flag from "../../assets/images/leftBar/flag.png";
 import tutorials from "../../assets/images/leftBar/tutorials.png";
 
 // Context
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 export default function LeftBar() {
   const { currentUser } = useContext(AuthContext);

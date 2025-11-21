@@ -25,12 +25,12 @@ import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOu
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 
 // Contexts
-import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { DarkModeContext } from "../../contexts/DarkModeContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 export default function Navbar() {
+  const { currentUser, logout } = useContext(AuthContext);
   const { darkMode, toggleTheme } = useContext(DarkModeContext);
-  const { currentUser } = useContext(AuthContext);
   const [burgerClicked, setBurgerClicked] = useState(false);
 
   const navigate = useNavigate();
@@ -42,11 +42,10 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await makeRequest.post("/auth/logout");
+      await logout();
       navigate("/"); // Redirect to login page
     } catch (error) {
-      console.error(error.response?.data?.message || error.message);
-      toast.error(error.response?.data?.message);
+      console.error("Logout failed:", error);
     }
   };
 

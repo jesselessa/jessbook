@@ -5,6 +5,9 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 
+// Component
+import Loader from "../../components/loader/Loader.jsx";
+
 export default function Register() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [inputsValues, setInputsValues] = useState({
@@ -58,13 +61,15 @@ export default function Register() {
   // Handle inputs change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setInputsValues((prev) => ({ ...prev, [name]: value })); // Update values
-    clearValidationErrors(); // Clear form errors
+    // Update state values
+    setInputsValues((prev) => ({ ...prev, [name]: value }));
+    // Clear form errors
+    clearValidationErrors();
     // Clear API error display when user types again
     if (mutation.isError) mutation.reset();
   };
 
-  // Create a new user (registration) mutation
+  // Create a new user (registration mutation)
   const mutation = useMutation({
     // 1. mutationFn: The actual API call
     mutationFn: (newUserData) => {
@@ -87,12 +92,16 @@ export default function Register() {
 
     // 3. onError: Registration failed
     onError: (error) => {
-      console.error(error.response?.data?.message || "Registration failed.");
-      toast.error(error.response?.data?.message || "Registration failed.");
+      console.error("Error creating user:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message
+      );
     },
   });
 
-  // Registration feature (triggers the mutation)
+  // Trigger registration process
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -227,7 +236,15 @@ export default function Register() {
 
             {/* Submit button */}
             <button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? "Signing up..." : "Sign up"}
+              {mutation.isPending ? (
+                <Loader
+                  width="24px"
+                  height="24px"
+                  border="3px solid rgba(0, 0, 0, 0.1)"
+                />
+              ) : (
+                "Sign up"
+              )}
             </button>
 
             {windowWidth <= 1150 && (

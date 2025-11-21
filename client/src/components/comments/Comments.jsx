@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import "./comments.scss";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
-import { fetchPostComments } from "../../utils/fetchPostComments.js";
+import { fetchPostComments } from "../../utils/queries.js";
 import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import { toast } from "react-toastify";
 import moment from "moment";
@@ -21,7 +21,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 // Context
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 export default function Comments({ postId, isOpen, setIsOpen }) {
   const { currentUser } = useContext(AuthContext);
@@ -40,7 +40,7 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     queryFn: () => fetchPostComments(postId),
   });
 
-  // Create a new comment (with optimistic update)
+  // Mutation to create a new comment (with optimistic update)
   const createMutation = useMutation({
     mutationFn: async ({ text, postId }) =>
       await makeRequest.post("/comments", { text, postId }),
@@ -50,17 +50,22 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
       await queryClient.cancelQueries(["comments", postId]);
       const previousComments = queryClient.getQueryData(["comments", postId]);
 
-      // Create an optimistic comment
+      // Create an optimistic comment (with the same keys as in the backend)
       const currentDate = new Date();
 
       const optimisticComment = {
-        id: crypto.randomUUID(),
-        userId: currentUser.id,
+        id: crypto.randomUUID(), // Temporary ID
+        postId,
         text,
-        createdAt: currentDate.toISOString(),
+        createdAt: new Date().toISOString(), // Temporary creation date
+        // Current user data added for correct optimistic display
+        userId: currentUser.id,
+        firstName: currentUser.firstName,
+        lastName: currentUser.lastName,
+        profilePic: currentUser.profilePic,
       };
 
-      // Optimistically update the post in cache
+      // Optimistically update post comments in cache
       queryClient.setQueryData(["comments", postId], (oldComment = []) => [
         ...oldComment,
         optimisticComment,
@@ -71,13 +76,13 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     },
 
     // 2. OnError → Rollback to previous state
-    onError: (error, variables, context) => {
+    onError: (error, _variables, context) => {
       console.error("Error creating comment:", error);
       toast.error(error.response?.data?.message || error.message);
 
       if (context?.previousComments) {
         queryClient.setQueryData(
-          ["comments", variables.postId],
+          ["comments", postId],
           context.previousComments
         );
       }
@@ -87,11 +92,10 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
     onSuccess: () => toast.success("Comment published."),
 
     // 4. OnSettled → Refetch data, reset and close form
-    onSettled: (_data, _error, variables) => {
-      queryClient.invalidateQueries(["comments", variables.postId]);
-      queryClient.invalidateQueries(["user", variables.userId]); // Refetch user data to update profile picture if needed
+    onSettled: () => {
+      queryClient.invalidateQueries(["comments", postId]);
 
-      setText(""); // Reset form input
+      setText(""); // Reset form
       setIsOpen(true); // Keep comments open
     },
   });
@@ -128,44 +132,33 @@ export default function Comments({ postId, isOpen, setIsOpen }) {
   const deleteMutation = useMutation({
     mutationFn: (commentId) => makeRequest.delete(`/comments/${commentId}`),
 
-    // 1. onMutate: Optimistically remove the comment from the cache
     onMutate: async (commentId) => {
-      // Cancel any outgoing refetches on comments to prevent conflicts
       await queryClient.cancelQueries(["comments", postId]);
-
-      // Store the current query cached data for rollback
       const previousComments = queryClient.getQueryData(["comments", postId]);
 
-      // Optimistically remove the comment from the cache
       queryClient.setQueryData(["comments", postId], (oldComments = []) => {
         return oldComments.filter((c) => c.id !== commentId);
       });
 
-      // Context for rollback (important: we also need the ID of the comment deleted)
-      return { previousComments, deletedCommentId: commentId };
+      return { previousComments };
     },
 
-    // 2. onError: Rollback to previous state if API call fails
-    onError: (error, postId, context) => {
-      console.error(error.response?.data?.message || error.message);
+    onError: (error, _variables, context) => {
+      console.error(error);
       toast.error(error.response?.data?.message || error.message);
 
       if (context?.previousComments) {
-        // Rollback: restore the old list
         queryClient.setQueryData(
           ["comments", postId],
           context.previousComments
         );
-        toast.error("Rollback successful. Comment deletion failed.");
       }
     },
 
-    // 3. onSuccess: Display success message and finalize cache sync
     onSuccess: () => toast.success("Comment deleted."),
 
     // 4. onSettled: Optional cleanup
-    onSettled: (_data, _error, postId) =>
-      queryClient.invalidateQueries(["comments", postId]),
+    onSettled: () => queryClient.invalidateQueries(["comments", postId]),
   });
 
   const handleDelete = (comment) => {

@@ -15,7 +15,7 @@ import moment from "moment";
 import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 
 // Context
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 export default function ModalStory({ story, setIsOpen }) {
   const { currentUser } = useContext(AuthContext);

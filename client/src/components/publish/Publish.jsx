@@ -24,8 +24,8 @@ import map from "../../assets/images/publish/map.png";
 import friends from "../../assets/images/publish/friends.png";
 
 // Contexts
-import { AuthContext } from "../../contexts/authContext.jsx";
-import { DarkModeContext } from "../../contexts/darkModeContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
+import { DarkModeContext } from "../../contexts/DarkModeContext.jsx";
 
 export default function Publish() {
   const { currentUser } = useContext(AuthContext);
@@ -42,52 +42,69 @@ export default function Publish() {
 
   // Mutation to create a new post (with optimistic update)
   const mutation = useMutation({
-    mutationFn: ({ text, img }) => makeRequest.post("/posts", { text, img }),
+    mutationFn: async ({ text, img }) => {
+      const res = await makeRequest.post("/posts", { text, img });
+      return res.data;
+    },
 
     // 1. onMutate: Immediately update the cache before the server response
     onMutate: async ({ text, img }) => {
-      // 1A. Cancel any outgoing fetches for all posts and for all users to prevent conflicts
-      await queryClient.cancelQueries(["posts"]);
+      // 1A. Cancel any outgoing queries for posts
+      await queryClient.cancelQueries({ queryKey: ["posts"] });
+      await queryClient.cancelQueries({ queryKey: ["posts", currentUser.id] });
 
-      // 1B. Store the current cached data to revert if mutation fails
-      const previousPosts = queryClient.getQueryData(["posts", currentUser.id]);
+      // 1B. Store current cached data for rollback if mutation fails
+      const previousPostsGlobal = queryClient.getQueryData(["posts"]) || [];
+      const previousPostsUser =
+        queryClient.getQueryData(["posts", currentUser.id]) || [];
 
-      // 1C. Create an optimistic post
+      // 1C. Create a temporary optimistic post
       //! ⚠️ The optimistic object doesn't have to be identical to the SQL table → It just needs to be complete enough for our UI to display the correct state while waiting for the server response
       //! When the server responds, Tanstack Query reconciles the real data with the cache
       const currentDate = new Date();
 
       const optimisticPost = {
-        id: crypto.randomUUID(), // Temporary ID for optimistic update
+        id: crypto.randomUUID(), // Temporary ID
         text,
         img,
-        userId: currentUser.id, // Author is the current user
-        createdAt: currentDate.toISOString(), // Temporary creation date in ISO format (YYYY-MM-DDTHH:mm:ss.sssZ)
-        // Note: We only add essential fields for rendering purposes
+        createdAt: currentDate.toISOString(), // YYYY-MM-DDTHH:mm:ss.sssZ
+        // We add the current user data retrieved server side via a SQL JOIN combining 'posts' and 'users' tables
+        userId: currentUser.id,
+        firstName: currentUser.firstName,
+        lastName: currentUser.lastName,
+        profilePic: currentUser.profilePic,
       };
 
-      // 1D. Optimistically update user's posts in cache
+      // 1D. Optimistically remove the post from both global and user's caches
       //! ⚠️ We must set an empty array as a fallback (oldPost = []), otherwise, if Tanstack Query has still nothing in cache, it will return 'undefined', making our app crash
+      queryClient.setQueryData(["posts"], (oldPost = []) => [
+        ...oldPost,
+        optimisticPost,
+      ]);
       queryClient.setQueryData(["posts", currentUser.id], (oldPost = []) => [
         ...oldPost,
         optimisticPost,
       ]);
 
       // 1E. Return context with previous data for rollback in case of error
-      return { previousPosts };
+      return { previousPostsGlobal, previousPostsUser };
     },
 
     // 2. onError (mutation failed), Rollback the optimistic update
     onError: (error, _variables, context) => {
-      console.error(error.response?.data?.message || error.message);
+      console.error(error);
       toast.error(error.response?.data?.message || error.message);
 
       // Rollback on error
-      if (context?.previousPosts)
+      if (context?.previousPostsGlobal) {
+        queryClient.setQueryData(["posts"], context.previousPostsGlobal);
+      }
+      if (context?.previousPostsUser) {
         queryClient.setQueryData(
           ["posts", currentUser.id],
-          context.previousPosts
+          context.previousPostsUser
         );
+      }
     },
 
     // If the mutation is successful, display a message
@@ -97,11 +114,11 @@ export default function Publish() {
     onSettled: () => {
       // Invalidate queries to refetch all posts from the server
       queryClient.invalidateQueries(["posts"]);
-      //! Note: No need to refresh comments and postLikes data because they depend on post ID (and not on post content)
+      queryClient.invalidateQueries(["posts", currentUser.id]); //! Note: No need to refresh comments and postLikes data because they depend on post ID (and not on post content)
 
       // Reset states
       setText("");
-      setImage(null); // Clean up local File object (our custom hook takes care of its URL)
+      setImage(null);
     },
   });
 

@@ -20,15 +20,13 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
 
   const queryClient = useQueryClient();
 
-  // Release URL resource to prevent memory leaks (hook used in the image display area)
+  // Generate a cleaned-up URL for the new image (if any)
   const newImgUrl = useCleanUpFileURL(newImg);
 
   // Mutation to handle optimistic update for post
   const updateMutation = useMutation({
-    // 1. mutationFn: Handles file upload (slow part) and API call
-    // The payload must include the text field and the raw file for upload
     mutationFn: async ({ updatedText, imgFile }) => {
-      // If a new file is present, upload it and get the path. Otherwise, use the existing image path (post.img) to ensure it is kept (rule: cannot be removed)
+      // Upload new image if any, otherwise keep existing image path
       const uploadedImgPath = imgFile ? await uploadFile(imgFile) : post.img;
 
       const finalUpdate = {
@@ -37,53 +35,62 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
       };
 
       // Make the actual API call
-      await makeRequest.put(`/posts/${post.id}`, finalUpdate);
-
-      // Return the final data to be used in 'onSuccess' (if needed)
-      return { postId: post.id, ...finalUpdate };
+      const res = await makeRequest.put(`/posts/${post.id}`, finalUpdate);
+      return res.data;
     },
 
     // 2. onMutate (before the request happens) → Apply text and local image preview instantly (fast part)
-    // The argument structure must match what is passed to 'mutate()'
     onMutate: async ({ updatedText, imgFile }) => {
-      // Cancel any outgoing refetches for posts to prevent conflicts (target current user's posts)
+      // Cancel any outgoing refetches for posts to prevent conflicts
+      await queryClient.cancelQueries(["posts"]);
       await queryClient.cancelQueries(["posts", post.userId]);
 
       // Store the current query cached data for rollback if mutation fails
-      const previousPosts = queryClient.getQueryData(["posts", post.userId]);
+      const previousGlobalPosts = queryClient.getQueryData(["posts"]) || [];
+      const previousUserPosts =
+        queryClient.getQueryData(["posts", post.userId]) || [];
 
-      // Initialize the optimistic image path
-      let optimisticImg = post.img;
+      // Initialize the optimistic image path (defaulting to the existing image)
+      let optimisticCacheImg = post.img;
+      let tempImgUrlToRevoke = null;
 
-      // If a new file is selected, use a temporary Blob URL for instant preview
-      if (imgFile) optimisticImg = URL.createObjectURL(imgFile);
+      if (imgFile) {
+        // 1. Create a Blob URL for instant local display (this is NOT the final path)
+        optimisticCacheImg = URL.createObjectURL(imgFile);
+        tempImgUrlToRevoke = optimisticCacheImg; // Store the URL for cleanup in onSettled
+      }   
+      // 2. If imgFile is null, optimisticCacheImg remains post.img (the existing image path)
 
-      // Optimistically update cache for the current user's posts
-      // ⚠️ Merge only updated data to prevent overwriting existing one !!!
-      queryClient.setQueryData(["posts", post.userId], (oldPosts = []) => {
-        return oldPosts.map((p) =>
+      // Optimistically update both global and user's posts caches
+      const applyOptimisticUpdate = (oldPosts = []) =>
+        oldPosts.map((p) =>
+          // Use optimisticCacheImg which is either the Blob URL or the existing path
           p.id === post.id
-            ? {
-                ...p,
-                text: updatedText,
-                img: optimisticImg,
-              }
+            ? { ...p, text: updatedText, img: optimisticCacheImg }
             : p
         );
-      });
+
+      queryClient.setQueryData(["posts"], applyOptimisticUpdate);
+      queryClient.setQueryData(["posts", post.userId], applyOptimisticUpdate);
 
       // Context for rollback and Blob URL cleanup
-      return { previousPosts, tempImgUrl: imgFile ? optimisticImg : null };
+      return {
+        previousGlobalPosts,
+        previousUserPosts,
+        tempImgUrl: tempImgUrlToRevoke,
+      };
     },
 
     // 3. onError (mutation failed) → Rollback to previous state
     onError: (error, _variables, context) => {
-      console.error(error.response?.data?.message || error.message);
+      console.error("Error updating post:", error);
       toast.error(error.response?.data?.message || error.message);
 
-      if (context?.previousPosts) {
-        // Rollback to previous posts list
-        queryClient.setQueryData(["posts", post.userId], context.previousPosts);
+      if (context?.previousGlobalPosts) {
+        queryClient.setQueryData(["posts"], context.previousGlobalPosts);
+      }
+      if (context?.previousUserPosts) {
+        queryClient.setQueryData(["posts", post.userId], context.previousUserPosts);
       }
     },
 
@@ -94,16 +101,15 @@ export default function UpdatePost({ post, userId, setIsOpen }) {
     },
 
     // 5. onSettled (either mutation succeeds or fails) → Invalidate query and clean up local states
-    onSettled: (_data, error, _variables, context) => {
+    onSettled: (_data, _error, _variables, context) => {
       // Revoke the Blob URL created in onMutate to prevent memory leaks
-      if (context?.tempImgUrl && context.tempImgUrl.startsWith("blob:"))
+      if (context?.tempImgUrl && context.tempImgUrl.startsWith("blob:")) {
         URL.revokeObjectURL(context.tempImgUrl);
+      }
 
-      // Invalidate user's specific post list (Profile)
-      queryClient.invalidateQueries(["posts", post.userId]);
-
-      // Invalidate generic post list (Timeline/Home)
+      // Invalidate and refetch posts on Profile page and Home feed
       queryClient.invalidateQueries(["posts"]);
+      queryClient.invalidateQueries(["posts", post.userId]);
 
       setIsOpen(false); // Close form
       setNewImg(null); // Clean up local File object

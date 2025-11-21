@@ -10,11 +10,13 @@ export const DarkModeContextProvider = ({ children }) => {
 
   const toggleTheme = () => setDarkMode(!darkMode);
 
-  const values = { darkMode, toggleTheme };
-
+  // Sync darkMode state with localStorage on app load and when it changes
   useEffect(() => {
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
+
+  // Values provided by DarkModeContext to App
+  const values = { darkMode, toggleTheme };
 
   return (
     <DarkModeContext.Provider value={values}>

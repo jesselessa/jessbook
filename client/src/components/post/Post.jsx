@@ -3,7 +3,7 @@ import "./post.scss";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../utils/axios.js";
-import { fetchPostComments } from "../../utils/fetchPostComments.js";
+import { fetchPostComments } from "../../utils/queries.js";
 import { addNonBreakingSpace } from "../../utils/addNonBreakingSpace.js";
 import moment from "moment";
 import { toast } from "react-toastify";
@@ -26,7 +26,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 // Context
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 export default function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
@@ -53,7 +53,7 @@ export default function Post({ post }) {
       const res = await makeRequest.get(`/likes?postId=${postId}`);
       return res.data;
     } catch (error) {
-      console.error(error.response?.data?.message || error.message);
+      console.error("Error fetching post likes:", error);
       toast.error(error.response?.data?.message || error.message);
     }
   };
@@ -77,14 +77,14 @@ export default function Post({ post }) {
       return makeRequest.post("/likes", { postId: post.id });
     },
 
-    // Before the request (mutationFn), cancel ongoing fetches and store query cached data
+    // Before the request (mutationFn), cancel ongoing fetches and store existing query cached data
     onMutate: async (isPostLiked) => {
       await queryClient.cancelQueries(["likes", post.id]);
       const previousLikes = queryClient.getQueryData(["likes", post.id]);
 
-      // Optimistically update cache
+      // Optimistically update query cached data
       queryClient.setQueryData(["likes", post.id], (oldData = []) => {
-        //* oldData = [] : if oldPosts is undefined, it becomes an empty array that can be used without any problem
+        //! ⚠️ oldData = [] : Set an empty array as a default value, otherwise, it would return 'undefined' making our app crash
         if (isPostLiked) {
           // If user had liked → Remove their ID
           return oldData.filter((id) => id !== currentUser.id);
@@ -94,7 +94,8 @@ export default function Post({ post }) {
         }
       });
 
-      return { previousLikes }; // Context for rollback
+      // Context for rollback
+      return { previousLikes };
     },
 
     // If mutation fails → Rollback
@@ -119,29 +120,40 @@ export default function Post({ post }) {
 
     // 1. onMutate: Optimistically remove the post from the cache
     onMutate: async (postId) => {
-      // Cancel outgoing fetches for all posts and store the previous state
-      await queryClient.cancelQueries(["posts"]);
-      const previousPosts = queryClient.getQueryData(["posts", post.userId]); // Only target current user's posts
+      // Cancel outgoing fetches for both global feed and user profile posts
+      await queryClient.cancelQueries({ queryKey: ["posts"] });
+      await queryClient.cancelQueries({ queryKey: ["posts", currentUser.id] });
 
-      // Update current user's posts optimistically
-      queryClient.setQueryData(["posts", post.userId], (oldPosts = []) => {
+      // Store current cached data for rollback
+      const previousPostsGlobal = queryClient.getQueryData(["posts"]) || [];
+      const previousPostsUser =
+        queryClient.getQueryData(["posts", currentUser.id]) || [];
+
+      // Optimistically remove post from both global and user's profile posts caches
+      queryClient.setQueryData(["posts", postId], (oldPosts = []) => {
+        return oldPosts.filter((p) => p.id !== postId);
+      });
+      queryClient.setQueryData(["posts", currentUser.id], (oldPosts = []) => {
         return oldPosts.filter((p) => p.id !== postId);
       });
 
       // Context for rollback
-      return { previousPosts };
+      return { previousPostsGlobal, previousPostsUser };
     },
 
     // 2. onError: Rollback to previous state
-    onError: (error, variables, context) => {
-      console.error(error.response?.data?.message || error.message);
+    onError: (error, _postId, context) => {
+      console.error("Error deleting post:", error);
       toast.error(error.response?.data?.message || error.message);
 
-      if (context?.previousPosts) {
-        // Rollback: restore the old list
+      // Rollback both global and user's profile caches
+      if (context?.previousPostsGlobal) {
+        queryClient.setQueryData(["posts"], context.previousPostsGlobal);
+      }
+      if (context?.previousPostsUser) {
         queryClient.setQueryData(
-          ["posts", variables.userId],
-          context.previousPosts
+          ["posts", currentUser.id],
+          context.previousPostsUser
         );
       }
     },
@@ -150,7 +162,10 @@ export default function Post({ post }) {
     onSuccess: () => toast.success("Post deleted."),
 
     // 4. onSettled: Invalidate and refetch all posts
-    onSettled: () => queryClient.invalidateQueries(["posts"]),
+    onSettled: () => {
+      queryClient.invalidateQueries(["posts"]);
+      queryClient.invalidateQueries(["posts", currentUser.id]);
+    },
   });
 
   const isPostLiked = postLikes?.includes(currentUser?.id) || false;
@@ -161,7 +176,7 @@ export default function Post({ post }) {
   }, 300);
 
   useEffect(() => {
-    // Cleanup: Cancels debounce callbacks if the component is unmounted
+    // Cleanup: Cancel debounce callbacks if the component is unmounted
     return () => {
       debouncedPostLikes.cancel();
     };

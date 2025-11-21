@@ -3,6 +3,7 @@ import "./profileData.scss";
 import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { fetchUserData } from "../../utils/queries.js";
 import { makeRequest } from "../../utils/axios.js";
 
 // Components
@@ -23,33 +24,30 @@ import defaultCover from "../../assets/images/users/defaultCover.jpeg";
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Context
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 export default function ProfileData() {
   const { currentUser } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
 
-  const { userId } = useParams(); // ID of the profile displayed
+  // Get ID of displayed profile from URL params
+  const { userId } = useParams();
+
+  // Determine if the profile being viewed is the logged-in user's profile
+  const isOwnProfile = String(currentUser?.id) === userId;
+
+  // Access TQ client
   const queryClient = useQueryClient();
 
-  // Get user's info
-  const fetchUserData = async (userId) => {
-    try {
-      const res = await makeRequest.get(`/users/${userId}`);
-      return res.data;
-    } catch (error) {
-      console.error(error.response?.data?.message || error.message);
-      toast.error(error.response?.data?.message || error.message);
-    }
-  };
-
+  // Fetch user data of displayed profile
   const {
-    isLoading,
-    error,
-    data: userData,
+    isLoading: isProfileLoading,
+    error: profileError,
+    data: profileData,
   } = useQuery({
     queryKey: ["user", userId],
     queryFn: () => fetchUserData(userId),
+    enabled: !!userId, // Only fetch if userId is defined
   });
 
   // Get user's followers
@@ -60,14 +58,14 @@ export default function ProfileData() {
       );
       return res.data;
     } catch (error) {
-      console.error(error.response?.data?.message || error.message);
-      toast.error(error.response?.data?.message || error.message);
+      console.error("Error fetching followers:", error);
+      throw error;
     }
   };
 
   const {
     isLoading: isFollowersLoading,
-    error: isFollowersError,
+    error: followersError,
     data: followersData,
   } = useQuery({
     queryKey: ["followers", userId],
@@ -82,14 +80,14 @@ export default function ProfileData() {
       );
       return res.data;
     } catch (error) {
-      console.error(error.response?.data || error.message);
-      toast.error(error.response?.data || error.message);
+      console.error("Error fetching following:", error);
+      throw error;
     }
   };
 
   const {
     isLoading: isFollowingLoading,
-    error: isFollowingError,
+    error: followingError,
     data: followingData,
   } = useQuery({
     queryKey: ["following", userId],
@@ -131,9 +129,8 @@ export default function ProfileData() {
 
     // 2. OnError (mutation failure): Rollback the optimistic update
     onError: (error, _isCurrentlyFollowing, context) => {
-      // 2A. Log errors
+      // 2A. Log error
       console.error("Error updating followers:", error);
-      toast.error("An error occurred while updating followers.");
 
       // 2B. Rollback on error
       if (context?.previousFollowers) {
@@ -155,9 +152,9 @@ export default function ProfileData() {
 
   return (
     <div className="profileData">
-      {error ? (
+      {profileError ? (
         "Something wrong."
-      ) : isLoading ? (
+      ) : isProfileLoading ? (
         <Loader />
       ) : (
         <>
@@ -167,8 +164,8 @@ export default function ProfileData() {
               <LazyLoadImage
                 src={
                   // Image uploaded on server or default image
-                  userData?.coverPic
-                    ? `/uploads/${userData?.coverPic} `
+                  profileData?.coverPic
+                    ? `/uploads/${profileData?.coverPic} `
                     : defaultCover
                 }
                 className="cover"
@@ -179,8 +176,8 @@ export default function ProfileData() {
               <div className="img-container">
                 <LazyLoadImage
                   src={
-                    userData?.profilePic
-                      ? `/uploads/${userData?.profilePic}`
+                    profileData?.profilePic
+                      ? `/uploads/${profileData?.profilePic}`
                       : defaultProfile
                   }
                   className="profile-pic"
@@ -196,7 +193,7 @@ export default function ProfileData() {
                   <PeopleAltOutlinedIcon fontSize="large" />
                   <div className="followers">
                     <span className="count">
-                      {isFollowersError ? (
+                      {followersError ? (
                         <span className="error-count">Error</span>
                       ) : isFollowersLoading ? (
                         "..."
@@ -206,6 +203,16 @@ export default function ProfileData() {
                         }`
                       )}
                     </span>
+
+                    {/* <span className="count">
+                      {followingError ? (
+                        <span className="error-count">Error</span>
+                      ) : isFollowingLoading ? (
+                        "..."
+                      ) : (
+                        `${followingCount.toString()} Following`
+                      )}
+                    </span> */}
                   </div>
                 </div>
 
@@ -218,17 +225,16 @@ export default function ProfileData() {
               {/* User's main info */}
               <div className="main-info">
                 <h2>
-                  {userData?.firstName} {userData?.lastName}
+                  {profileData?.firstName} {profileData?.lastName}
                 </h2>
 
                 <div className="location">
                   <PlaceIcon />
-                  <span>{userData?.city}</span>
+                  <span>{profileData?.city}</span>
                 </div>
 
                 {/* Update button */}
-                {/* Note: 'userId'(param from the URL) is a string, whereas currentUser.id is a number → 2 ≠ types, therefore we have to convert the latter in string */}
-                {userId === String(currentUser?.id) ? (
+                {isOwnProfile ? (
                   <button onClick={() => setIsOpen(true)}>Update</button>
                 ) : (
                   <button onClick={handleFollow}>
@@ -249,14 +255,14 @@ export default function ProfileData() {
             </div>
           </div>
 
-          {userId === String(currentUser?.id) && <Publish />}
+          {isOwnProfile && <Publish />}
 
-          {/* Cf. posts controllers backend: Posts has a prop userId which is defined (!== undefined) → Shows posts of user whose profile page is displayed  */}
+          {/* Cf. posts controllers backend (userId !== undefined) → Only shows posts of user whose profile page is displayed  */}
           <Posts userId={userId} />
         </>
       )}
 
-      {isOpen && <UpdateProfile user={userData} setIsOpen={setIsOpen} />}
+      {isOpen && <UpdateProfile user={profileData} setIsOpen={setIsOpen} />}
     </div>
   );
 }

@@ -1,59 +1,60 @@
+//************************** AuthCallback.jsx *****************************
+// Handles OAuth callback redirection
+// Uses connectWithToken() from AuthContext to finalize authentication
+//*************************************************************************
+
 import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./authCallback.scss";
-import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 // Component
 import Loader from "../../components/loader/Loader.jsx";
 
 // Context
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 export default function AuthCallback() {
   const { connectWithToken } = useContext(AuthContext);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [loading, setLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(true);
 
   const navigate = useNavigate();
 
-  // Check window object width for responsive design
+  // Handle responsive
   useEffect(() => {
-    window.addEventListener("resize", changeWindowWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener("resize", changeWindowWidth);
+      window.removeEventListener("resize", handleResize);
     };
-  }, [windowWidth]);
+  }, []);
 
-  const changeWindowWidth = () => setWindowWidth(window.innerWidth);
-
-  // Handle redirection after authentication
+  // Handle OAuth redirection
   useEffect(() => {
-    const handleRedirectionAfterAuth = async () => {
-      setLoading(true);
-
+    const redirectAfterAuth = async () => {
       try {
         await connectWithToken();
-        navigate("/home");
+        navigate("/home", { replace: true });
       } catch (error) {
-        console.error(error.response?.data?.message || error.message);
-        toast.error(error.response?.data?.message || error.message);
-        navigate("/"); // Redirect to Login page if unauthenticated
+        navigate("/", { replace: true });
+        toast.error(
+          error.response?.data?.message ||
+            error.response?.data?.error ||
+            error.message
+        );
       } finally {
-        setLoading(false);
+        setIsRedirecting(false);
       }
     };
 
-    handleRedirectionAfterAuth();
-  }, [navigate, connectWithToken]);
+    redirectAfterAuth();
+  }, []);
 
   return (
     <div className="authCallback">
-      {/* Logo - Back to Login page */}
-      <Link to="/">
-        <span className="logo">{windowWidth <= 425 ? "j" : "jessbook"}</span>
-      </Link>
-
-      {loading && <Loader />}
+      <span className="logo">{windowWidth <= 425 ? "j" : "jessbook"}</span>
+      {isRedirecting && <Loader />}
     </div>
   );
 }

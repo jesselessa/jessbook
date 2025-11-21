@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import "./updateProfile.scss";
-import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { makeRequest } from "../../utils/axios.js";
 import { uploadFile } from "../../utils/uploadFile.js";
 import { useCleanUpFileURL } from "../../hooks/useCleanUpFileURL.js";
@@ -19,12 +19,12 @@ import defaultCover from "../../assets/images/users/defaultCover.jpeg";
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Context
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 export default function UpdateProfile({ user, setIsOpen }) {
-  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const { setCurrentUser } = useContext(AuthContext);
 
-  const [cover, setCover] = useState(null); // 'cover' and 'profile' are either null or File object (Blob) when selected
+  const [cover, setCover] = useState(null);
   const [profile, setProfile] = useState(null);
   const [fields, setFields] = useState({
     firstName: user.firstName,
@@ -40,161 +40,166 @@ export default function UpdateProfile({ user, setIsOpen }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // Generate and cleanup preview URLs automatically
   const coverUrl = useCleanUpFileURL(cover);
   const profileUrl = useCleanUpFileURL(profile);
 
-  // Handle form fields changes
   const handleInputsChange = (e) => {
     const { name, value } = e.target;
-    // Immediate cleanup: Reset previous validation errors
     setValidationErrors((prev) => ({ ...prev, [name]: "" }));
-    // Bind inputs value to state
     setFields((prevFields) => ({ ...prevFields, [name]: value }));
   };
 
-  // Clear form validation errors
   const clearValidationErrors = () => {
-    setValidationErrors({
-      firstName: "",
-      lastName: "",
-      city: "",
-    });
+    setValidationErrors({ firstName: "", lastName: "", city: "" });
   };
 
-  // Handle file selection
   const handleFileChange = (e) => {
-    clearValidationErrors(); // Delete previous errors
-
+    clearValidationErrors();
     const selectedFile = e.target.files[0];
     if (e.target.id === "selected-cover") setCover(selectedFile);
     else setProfile(selectedFile);
   };
 
-  // Optimistic mutation for profile update
   const updateMutation = useMutation({
-    // 1. mutationFn: Upload files and send PUT request
     mutationFn: async ({ updatedFields, coverFile, profileFile }) => {
-      // If new file is present, upload it. Otherwise, keep the existing path (user.coverPic)
       const uploadedCover = coverFile
         ? await uploadFile(coverFile)
-        : user.coverPic;
+        : user.coverPic
+        ? user.coverPic
+        : null;
       const uploadedProfile = profileFile
         ? await uploadFile(profileFile)
-        : user.profilePic;
+        : user.profilePic
+        ? user.profilePic
+        : null;
 
-      // Final object for the PUT request
       const finalUpdate = {
         ...updatedFields,
         coverPic: uploadedCover,
         profilePic: uploadedProfile,
       };
 
-      await makeRequest.put("/users", finalUpdate);
-      return { userId: user.id, ...finalUpdate };
+      const res = await makeRequest.put("/users", finalUpdate);
+      return res.data;
     },
 
-    // 2. onMutate (Fast): Optimistic cache update
     onMutate: async ({ updatedFields, coverFile, profileFile }) => {
-      // FIX: Convert ID to string to match the key read by ProfileData (from useParams)
-      const currentUserIdString = String(user.id);
+      const userId = String(user.id);
 
-      // Cancel any outgoing refetches for user and posts data
-      await queryClient.cancelQueries(["user", currentUserIdString]);
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries(["user", userId]);
+      await queryClient.cancelQueries(["posts", userId]);
       await queryClient.cancelQueries(["posts"]);
+      await queryClient.cancelQueries(["stories", userId]);
 
-      // Store the current cached data to revert if mutation fails
-      const previousUser = queryClient.getQueryData([
-        "user",
-        currentUserIdString,
-      ]);
-      const previousPosts = queryClient.getQueryData(["posts"]);
+      // Store current states to rollback if needed
+      const previousUser = queryClient.getQueryData(["user", userId]);
+      const previousUserPosts = queryClient.getQueryData(["posts", userId]);
+      const previousGlobalPosts = queryClient.getQueryData(["posts"]);
+      const previousStories = queryClient.getQueryData(["stories", userId]);
 
-      // Determine optimistic URLs/Paths
-      // If new file, create Blob URL, otherwise, use existing DB path
+      // Generate temporary URLs for optimistic update
       const tempCoverUrl = coverFile
-        ? URL.createObjectURL(coverFile)
-        : user.coverPic;
+        ? URL.createObjectURL(coverFile) // New image
+        : user.coverPic
+        ? user.coverPic // Old image
+        : null; // User has never set a cover pic before
       const tempProfileUrl = profileFile
         ? URL.createObjectURL(profileFile)
-        : user.profilePic;
+        : user.profilePic
+        ? user.profilePic
+        : null;
 
-      // Optimistically update the cache for the profile page display
-      queryClient.setQueryData(["user", currentUserIdString], (oldData) => ({
-        ...oldData,
+      // Create an optimistic user
+      const optimisticUser = {
+        ...user,
         ...updatedFields,
-        coverPic: tempCoverUrl,
         profilePic: tempProfileUrl,
-      }));
+        coverPic: tempCoverUrl,
+      };
 
-      // Clear error messages
-      clearValidationErrors();
+      // Optimistically update localStorage and TQ cache immediately
+      setCurrentUser(optimisticUser);
+      queryClient.setQueryData(["user", userId], optimisticUser);
 
-      return { previousUser, previousPosts, tempCoverUrl, tempProfileUrl };
+      // Update posts with optimistic user data
+      const applyOptimisticUpdate = (old = []) =>
+        old.map((p) =>
+          p.userId === user.id
+            ? {
+                ...p,
+                firstName: optimisticUser.firstName,
+                lastName: optimisticUser.lastName,
+                profilePic: optimisticUser.profilePic,
+              }
+            : p
+        );
+
+      queryClient.setQueryData(["posts", userId], applyOptimisticUpdate);
+      queryClient.setQueryData(["posts"], applyOptimisticUpdate);
+
+      return {
+        previousUser,
+        previousUserPosts,
+        previousGlobalPosts,
+        previousStories,
+        tempCoverUrl,
+        tempProfileUrl,
+      };
     },
 
-    // 3. onError: Rollback on failure
-    onError: (error, variables, context) => {
-      // Attempt to extract structured validation errors from the backend
-      const errorMessage = error.response?.data?.message || error.message;
-      const backendErrors = error.response?.data?.errors;
+    // --- ROLLBACK ---
+    onError: (error, _variables, context) => {
+      console.error("Error updating profile:", error);
+      toast.error(error.response?.data?.message || error.message);
 
-      if (backendErrors) {
-        // Display specific validation errors
-        console.error("Validation Errors:", backendErrors);
-        setValidationErrors(backendErrors);
-        toast.error("Please correct the highlighted fields.");
-      } else {
-        // Display generic error
-        console.error(errorMessage);
-        toast.error(errorMessage);
-      }
-
-      // Rollback
-      const currentUserIdString = String(variables.id);
+      const userId = String(user.id);
 
       if (context?.previousUser) {
-        queryClient.setQueryData(
-          ["user", currentUserIdString],
-          context.previousUser
-        );
+        queryClient.setQueryData(["user", userId], context.previousUser);
       }
-      if (context?.previousPosts) {
-        queryClient.setQueryData(["posts"], context.previousPosts);
+      if (context?.previousUserPosts) {
+        queryClient.setQueryData(["posts", userId], context.previousUserPosts);
+      }
+      if (context?.previousGlobalPosts) {
+        queryClient.setQueryData(["posts"], context.previousGlobalPosts);
+      }
+      if (context?.previousStories) {
+        queryClient.setQueryData(["stories", userId], context.previousStories);
       }
     },
 
-    // 4. onSuccess: Close form, toast and navigate
-    onSuccess: (data, variables) => {
-      toast.success("Profile updated.");
-      clearValidationErrors();
-      setIsOpen(false); // Close form
+    // --- SUCCESS ---
+    onSuccess: (data) => {
+      const userId = String(data.id);
 
-      // Update AuthContext with new user data
-      const updatedUserObject = {
-        ...currentUser,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        city: data.city,
-        coverPic: data.coverPic,
-        profilePic: data.profilePic,
+      toast.success("Profile updated successfully.");
+      setIsOpen(false);
+
+      // Update local state and TQ cache immediately with final server response
+      const updatedUserData = {
+        ...user,
+        ...data,
       };
-      setCurrentUser(updatedUserObject); // Update context
+
+      setCurrentUser(updatedUserData);
+
+      // Invalidate and refetch user and other related queries
+      queryClient.invalidateQueries(["user", userId]);
+      queryClient.invalidateQueries(["posts", userId]);
+      queryClient.invalidateQueries(["posts"]);
+      queryClient.invalidateQueries(["stories", userId]);
     },
 
-    // 5. onSettled: Cleanup and refetch
-    onSettled: (data, _error, _variables, context) => {
+    // --- CLEANUP ---
+    onSettled: (_data, _error, _variables, context) => {
       // Revoke the Blob URLs manually created in onMutate to prevent memory leaks
-      if (context?.tempCoverUrl && context.tempCoverUrl.startsWith("blob:"))
+      if (context?.tempCoverUrl?.startsWith("blob:")) {
         URL.revokeObjectURL(context.tempCoverUrl);
-      if (context?.tempProfileUrl && context.tempProfileUrl.startsWith("blob:"))
+      }
+      if (context?.tempProfileUrl?.startsWith("blob:")) {
         URL.revokeObjectURL(context.tempProfileUrl);
-
-      // Invalidate and refetch data from server
-      const currentUserIdString = String(data.id);
-
-      queryClient.invalidateQueries(["user", currentUserIdString]);
-      queryClient.invalidateQueries(["posts"]);
+      }
 
       // Clean up local File objects
       setCover(null);
@@ -202,63 +207,47 @@ export default function UpdateProfile({ user, setIsOpen }) {
     },
   });
 
-  // Use 'updateMutation.isPending' for the global loading state
   const isUpdating = updateMutation.isPending;
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Prevent multiple submissions
     if (isUpdating) return;
 
-    // Handle validation errors
     let inputsErrors = {};
-
     const { firstName, lastName, city } = fields;
 
-    if (firstName?.trim()?.length < 2 || firstName?.trim()?.length > 35) {
-      inputsErrors.firstName = "Enter a name between 2 and 35\u00A0characters.";
-    }
+    if (firstName?.trim()?.length < 2 || firstName?.trim()?.length > 35)
+      inputsErrors.firstName = "Enter a name between 2 and 35 characters.";
+    if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35)
+      inputsErrors.lastName = "Enter a name between 1 and 35 characters.";
+    if (city?.trim()?.length > 85)
+      inputsErrors.city = "Enter a valid city name (max 85 characters).";
 
-    if (lastName?.trim()?.length < 1 || lastName?.trim()?.length > 35) {
-      inputsErrors.lastName = "Enter a name between 1 and 35\u00A0characters.";
-    }
-
-    if (city?.trim()?.length > 85) {
-      inputsErrors.city = "Enter a valid city name (max 85\u00A0characters).";
-    }
-
-    // Stop process if errors
-    // 'Object.keys(object)' returns an array with the object string-keyed property names
     if (Object.keys(inputsErrors).length > 0) {
       setValidationErrors(inputsErrors);
       return;
     }
 
-    // Check if form fields or images have been modified
     const isAnyFieldModified = Object.keys(fields).some(
       (field) => fields[field]?.trim() !== (user[field] || "")?.trim()
     );
-    const isCoverModified = cover !== null;
-    const isProfileModified = profile !== null;
+    const isCoverModified = !!cover;
+    const isProfileModified = !!profile;
 
     if (!isAnyFieldModified && !isCoverModified && !isProfileModified) {
       toast.info("No changes detected.");
       return;
     }
 
-    // Prepare updated data
     const newCity =
       fields.city?.trim().length > 0 ? fields.city.trim() : "Undefined";
 
     const updatedFields = {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
+      firstName: fields.firstName.trim(),
+      lastName: fields.lastName.trim(),
       city: newCity,
     };
 
-    // Trigger mutation immediately
     updateMutation.mutate({
       updatedFields,
       coverFile: cover,
@@ -267,142 +256,131 @@ export default function UpdateProfile({ user, setIsOpen }) {
   };
 
   return (
-    <>
-      <div className="update">
-        <div className="wrapper">
-          <h1>Update Your Profile</h1>
+    <div className="update">
+      <div className="wrapper">
+        <h1>Update Your Profile</h1>
 
-          <form name="update-profile-form" onSubmit={handleSubmit}>
-            <div className="files">
-              {/* Cover pic */}
-              <div className="cover">
-                <span>Cover Picture</span>
-                <div className="img-container">
-                  <LazyLoadImage
-                    src={
-                      coverUrl
-                        ? coverUrl // 1. Preview URL when file is selected
-                        : user.coverPic // 2. Existing image in DB
-                        ? `/uploads/${user.coverPic}`
-                        : defaultCover // 3. Default image
-                    }
-                    className="cover"
-                    alt="cover"
-                  />
-                  <label htmlFor="selected-cover">
-                    <CloudUploadIcon className="icon" />
-                  </label>
-                </div>
-
-                <input
-                  type="file"
-                  id="selected-cover"
-                  name="selected-cover"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  disabled={isUpdating}
+        <form onSubmit={handleSubmit}>
+          <div className="files">
+            {/* Cover */}
+            <div className="cover">
+              <span>Cover Picture</span>
+              <div className="img-container">
+                <LazyLoadImage
+                  src={
+                    coverUrl
+                      ? coverUrl
+                      : user.coverPic
+                      ? `/uploads/${user.coverPic}`
+                      : defaultCover
+                  }
+                  className="cover"
+                  alt="cover"
                 />
+                <label htmlFor="selected-cover">
+                  <CloudUploadIcon className="icon" />
+                </label>
               </div>
-
-              {/* Profile pic */}
-              <div className="profile">
-                <span>Profile Picture</span>
-
-                <div className="img-container">
-                  <LazyLoadImage
-                    src={
-                      profileUrl
-                        ? profileUrl
-                        : user.profilePic
-                        ? `/uploads/${user.profilePic}`
-                        : defaultProfile
-                    }
-                    className="profile-pic"
-                    alt="profile"
-                  />
-                  <label htmlFor="selected-profile">
-                    <CloudUploadIcon className="icon" />
-                  </label>
-                </div>
-
-                <input
-                  type="file"
-                  id="selected-profile"
-                  name="selected-profile"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  disabled={isUpdating}
-                />
-              </div>
+              <input
+                type="file"
+                id="selected-cover"
+                accept="image/*"
+                onChange={handleFileChange}
+                disabled={isUpdating}
+              />
             </div>
 
-            {/* Form fields */}
-            <label htmlFor="firstName">First name</label>
-            <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              value={fields.firstName}
-              onChange={handleInputsChange}
-              autoComplete="off"
-              disabled={isUpdating}
-            />
-            {validationErrors.firstName && (
-              <span className="error-msg">{validationErrors.firstName}</span>
-            )}
-
-            <label htmlFor="lastName">Last name</label>
-            <input
-              type="text"
-              id="lastName"
-              name="lastName"
-              value={fields.lastName}
-              onChange={handleInputsChange}
-              autoComplete="off"
-              disabled={isUpdating}
-            />
-            {validationErrors.lastName && (
-              <span className="error-msg">{validationErrors.lastName}</span>
-            )}
-
-            <label htmlFor="city">City</label>
-            <input
-              type="text"
-              id="city"
-              name="city"
-              value={fields.city}
-              onChange={handleInputsChange}
-              autoComplete="off"
-              disabled={isUpdating}
-            />
-            {validationErrors.city && (
-              <span className="error-msg">{validationErrors.city}</span>
-            )}
-
-            {/* Update button */}
-            <button type="submit" disabled={isUpdating}>
-              {updateMutation.isPending ? (
-                <Loader
-                  width="24px"
-                  height="24px"
-                  border="3px solid rgba(0, 0, 0, 0.1)"
+            {/* Profile */}
+            <div className="profile">
+              <span>Profile Picture</span>
+              <div className="img-container">
+                <LazyLoadImage
+                  src={
+                    profileUrl
+                      ? profileUrl
+                      : user.profilePic
+                      ? `/uploads/${user.profilePic}`
+                      : defaultProfile
+                  }
+                  className="profile-pic"
+                  alt="profile"
                 />
-              ) : (
-                "Update"
-              )}
-            </button>
-          </form>
+                <label htmlFor="selected-profile">
+                  <CloudUploadIcon className="icon" />
+                </label>
+              </div>
+              <input
+                type="file"
+                id="selected-profile"
+                accept="image/*"
+                onChange={handleFileChange}
+                disabled={isUpdating}
+              />
+            </div>
+          </div>
 
-          <button
-            type="button"
-            className="close"
-            onClick={() => setIsOpen(false)}
+          {/* Fields */}
+          <label htmlFor="firstName">First name</label>
+          <input
+            id="firstName"
+            name="firstName"
+            value={fields.firstName}
+            onChange={handleInputsChange}
+            autoComplete="off"
             disabled={isUpdating}
-          >
-            X
+          />
+          {validationErrors.firstName && (
+            <span className="error-msg">{validationErrors.firstName}</span>
+          )}
+
+          <label htmlFor="lastName">Last name</label>
+          <input
+            id="lastName"
+            name="lastName"
+            value={fields.lastName}
+            onChange={handleInputsChange}
+            autoComplete="off"
+            disabled={isUpdating}
+          />
+          {validationErrors.lastName && (
+            <span className="error-msg">{validationErrors.lastName}</span>
+          )}
+
+          <label htmlFor="city">City</label>
+          <input
+            id="city"
+            name="city"
+            value={fields.city}
+            onChange={handleInputsChange}
+            autoComplete="off"
+            disabled={isUpdating}
+          />
+          {validationErrors.city && (
+            <span className="error-msg">{validationErrors.city}</span>
+          )}
+
+          <button type="submit" disabled={isUpdating}>
+            {isUpdating ? (
+              <Loader
+                width="24px"
+                height="24px"
+                border="3px solid rgba(0, 0, 0, 0.1)"
+              />
+            ) : (
+              "Update"
+            )}
           </button>
-        </div>
+        </form>
+
+        <button
+          type="button"
+          className="close"
+          onClick={() => setIsOpen(false)}
+          disabled={isUpdating}
+        >
+          X
+        </button>
       </div>
-    </>
+    </div>
   );
 }

@@ -12,22 +12,24 @@ export const handleAuthSuccess = (req, res, next) => {
     return next(error);
   }
 
-  // Generate a secret key
-  const secretKey = process.env.JWT_SECRET;
-  if (!secretKey) {
-    // Server configuration error (must be handled as 500)
-    const error = new Error("Missing JWT secret key on server.");
-    error.status = 500;
-    return next(error);
-  } //! Error 500 because server-side configuration problem
-
-  // Set JWT token payload depending on user role
+  // Generate a JWT token for the authenticated user
   let token;
+  const secretKey = process.env.JWT_SECRET;
 
+  if (!secretKey) {
+    const error = new Error("Missing JWT secret key on server.");
+    error.status = 500; // Server configuration error (must be handled as 500)
+    return next(error);
+  }
+
+  // Sign JWT token with user ID and role
   try {
-    const role = req.user.role === "admin" ? "admin" : "user";
+    const payload = {
+      id: req.user.id,
+      role: req.user.role === "admin" ? "admin" : "user",
+    };
 
-    token = jwt.sign({ id: req.user.id, role: role }, secretKey, {
+    token = jwt.sign(payload, secretKey, {
       expiresIn: "7d",
     });
   } catch (error) {
@@ -40,11 +42,12 @@ export const handleAuthSuccess = (req, res, next) => {
     return next(err);
   }
 
+  // Set JWT token in HTTP-only cookie and redirect to frontend
   res
     .cookie("accessToken", token, {
       httpOnly: true,
       secure: true, // Ensures HTTPS in production
-      sameSite: "none", // Allows sharing between API and Client on different domains
+      sameSite: "none", // Allows sharing between API and client on different domains
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
     .status(201)

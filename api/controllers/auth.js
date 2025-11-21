@@ -56,7 +56,7 @@ export const register = async (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPswd = bcrypt.hashSync(password?.trim(), salt);
 
-    // 10 - Insert new user into the database with default role = "user"
+    // 10 - Insert new user into the database with default role as "user"
     const insertQuery =
       "INSERT INTO users (`firstName`, `lastName`, `email`, `password`, `fromAuthProvider`,`role`) VALUES (?, ?, ?, ?, ?, ?)";
     const values = [
@@ -122,25 +122,24 @@ export const login = async (req, res) => {
     if (!checkPswd)
       return res.status(401).json({ message: "Invalid email or password" });
 
-    // 5 - If password is correct, generate a JWT token
-    const secretKey = process.env.JWT_SECRET;
+    // 5 - If password is correct, generate a JWT token for the user
     let token;
+    const secretKey = process.env.JWT_SECRET;
 
-    // 6 - Set token payload based on user role (admin or regular user)
-    if (data[0].role === "admin") {
-      token = jwt.sign({ id: data[0].id, role: "admin" }, secretKey, {
-        expiresIn: "7d", // Token expires in 7 days
-      });
-    } else {
-      token = jwt.sign({ id: data[0].id, role: "user" }, secretKey, {
-        expiresIn: "7d",
-      });
-    } 
-    
-    // 7 - Remove password field from the response for security
-    const { password: userPassword, ...otherInfo } = data[0]; 
-    
-    // 8 - Send JWT token in an HTTP-only cookie for better security
+    // Sign JWT token with user ID and role
+    const payload = {
+      id: data[0].id,
+      role: data[0].role === "admin" ? "admin" : "user",
+    };
+
+    token = jwt.sign(payload, secretKey, {
+      expiresIn: "7d",
+    });
+
+    // 6 - Remove password field from the response for security
+    const { password: userPassword, ...otherInfo } = data[0];
+
+    // 7 - Send JWT token in an HTTP-only cookie for better security
     return res
       .cookie("accessToken", token, {
         httpOnly: true, // Prevent client-side JavaScript access
@@ -191,12 +190,12 @@ export const logout = (_req, res) => {
 };
 
 export const recoverAccount = async (req, res) => {
-  const { email } = req.body; 
-  
+  const { email } = req.body;
+
   // 1 - Check if email is provided
   if (!email?.trim()?.length)
-    return res.status(400).json({ message: "Please, provide an email." }); 
-  
+    return res.status(400).json({ message: "Please, provide an email." });
+
   // 2 - Validate email format with regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email.trim()) || email.trim().length > 320)
@@ -211,15 +210,15 @@ export const recoverAccount = async (req, res) => {
       return res.status(404).json({
         message: "There is no account associated with this email address.",
       });
-    } 
-    
+    }
+
     // 4 - Generate a JWT token for password reset (expires in 1h)
     const secretKey = process.env.JWT_SECRET;
-    const token = jwt.sign({ id: data[0].id }, secretKey, { expiresIn: "1h" }); 
-    
+    const token = jwt.sign({ id: data[0].id }, secretKey, { expiresIn: "1h" });
+
     // 5 - Build reset password link
-    const resetLink = `${process.env.CLIENT_URL}/reset-password`; 
-    
+    const resetLink = `${process.env.CLIENT_URL}/reset-password`;
+
     // 6 - Send email for password reset
     await sendEmail({
       to: email,
@@ -235,8 +234,8 @@ export const recoverAccount = async (req, res) => {
           </p>
         </div>
       `,
-    }); 
-    
+    });
+
     // 7 - Set a secure cookie with the token
     return res
       .cookie("resetToken", token, {
@@ -263,8 +262,8 @@ export const resetPassword = async (req, res) => {
   const { password, confirmPswd } = req.body;
   const token = req.cookies.resetToken; // Get token from cookie
 
-  console.log("ResetPassword called. Token received:", token); 
-  
+  console.log("ResetPassword called. Token received:", token);
+
   // 1 - Validate password fields
   if (!password?.trim() || !confirmPswd?.trim()) {
     console.log("Validation error: Missing fields");
@@ -300,17 +299,17 @@ export const resetPassword = async (req, res) => {
   try {
     // 2 - Verify token
     const decoded = jwt.verify(token, secretKey);
-    console.log("Token verified. User ID:", decoded.id); 
-    
+    console.log("Token verified. User ID:", decoded.id);
+
     // 3 - Hash password
     const salt = bcrypt.genSaltSync(10);
-    const hashedPswd = bcrypt.hashSync(password.trim(), salt); 
-    
+    const hashedPswd = bcrypt.hashSync(password.trim(), salt);
+
     // 4 - Update database
     const q = "UPDATE users SET password = ? WHERE id = ?";
     await executeQuery(q, [hashedPswd, decoded.id]);
-    console.log("Password updated in DB"); 
-    
+    console.log("Password updated in DB");
+
     // 5 - Clear cookie only after successful update
     res.clearCookie("resetToken", {
       httpOnly: true,

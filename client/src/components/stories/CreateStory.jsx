@@ -16,7 +16,7 @@ import LazyLoadImage from "../lazyLoadImage/LazyLoadImage.jsx";
 import Loader from "../loader/Loader.jsx";
 
 // Context
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 // Maximum allowed video duration in seconds (must match backend validation)
 const MAX_DURATION_SECONDS = 60;
@@ -277,7 +277,7 @@ export default function CreateStory({ setIsOpen }) {
       console.error(error);
       setError({
         isError: true,
-        message:error.response?.data?.message || error.message,
+        message: error.response?.data?.message || error.message,
       });
     }
   };

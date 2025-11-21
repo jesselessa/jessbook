@@ -18,7 +18,7 @@ import Loader from "../loader/Loader.jsx";
 import defaultProfile from "../../assets/images/users/defaultProfile.jpg";
 
 // Context
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 export default function Stories({ userId }) {
   const { currentUser } = useContext(AuthContext);

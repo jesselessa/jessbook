@@ -2,19 +2,23 @@ import { useEffect, useContext, useState } from "react";
 import "./login.scss";
 import { Link, useNavigate } from "react-router-dom";
 
-// Component
+// Components
 import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage.jsx";
+import Loader from "../../components/loader/Loader.jsx";
 
 // Images
 import google from "../../assets/images/auth/google.png";
 import facebook from "../../assets/images/auth/facebook.png";
 
 // Context
-import { AuthContext } from "../../contexts/authContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 export default function Login() {
-  const { login } = useContext(AuthContext);
+  const { login, connectWithToken, clearSession } = useContext(AuthContext);
+
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [authChecking, setAuthChecking] = useState(true); // Initial auth check on page load
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [inputsValues, setInputsValues] = useState({
     email: "",
     password: "",
@@ -23,13 +27,38 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  // Check window object width when loading page (for responsive)
+  // Auto-login if user is already authenticated
+  useEffect(() => {
+    const autoLogin = async () => {
+      const stored = localStorage.getItem("user");
+
+      // Skip auto-login if no stored user
+      if (!stored) {
+        setAuthChecking(false);
+        return;
+      }
+
+      try {
+        await connectWithToken();
+        navigate("/home", { replace: true });
+      } catch (error) {
+        console.error("Auto-login failed:", error);
+        clearSession();
+      } finally {
+        setAuthChecking(false);
+      }
+    };
+
+    autoLogin();
+  }, []);
+
+  // Handle responsive
   useEffect(() => {
     window.addEventListener("resize", changeWindowWidth);
     return () => {
       window.removeEventListener("resize", changeWindowWidth);
     };
-  }, [windowWidth]);
+  }, []);
 
   const changeWindowWidth = () => setWindowWidth(window.innerWidth);
 
@@ -37,7 +66,6 @@ export default function Login() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInputsValues((prev) => ({ ...prev, [name]: value }));
-    setError("");
   };
 
   const clearForm = () =>
@@ -46,21 +74,24 @@ export default function Login() {
       password: "",
     });
 
-  // Login feature
+  // Submit login form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError("");
 
     try {
       await login(inputsValues);
-
-      // Clear form and API error message
       clearForm();
-      setError("");
-
-      navigate("/home");
+      navigate("/home", { replace: true });
     } catch (error) {
-      console.log(error.response?.data?.message || error.message);
-      setError(error.response?.data?.message || error.message);
+      const msg =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message;
+      setError(msg);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -96,8 +127,9 @@ export default function Login() {
           )}
 
           <form name="login-form" onSubmit={handleSubmit}>
-            {/* Handle error from API */}
+            {/* Display general API error message */}
             {error && <span className="error-msg">{error}</span>}
+
             <input
               type="email"
               id="email"
@@ -117,11 +149,13 @@ export default function Login() {
               autoComplete="off"
               onChange={handleChange}
             />
-            {/* Buttons to connect to the app */}
-            <button type="submit" className="submit">
-              Sign in
+
+            {/* Login button */}
+            <button type="submit" className="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Signing in..." : "Sign in"}
             </button>
 
+            {/* Connect with Google */}
             <button
               type="button"
               className="google"
@@ -140,8 +174,7 @@ export default function Login() {
               )}
             </button>
 
-            {/* Facebook button - Uncomment later */}
-
+            {/* Connect with Facebook */}
             {/* <button
               type="button"
               className="facebook"

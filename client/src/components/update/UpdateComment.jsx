@@ -15,29 +15,31 @@ export default function UpdateComment({ comment, setIsOpen }) {
 
   // Optimistic mutation to update a comment
   const updateMutation = useMutation({
-    mutationFn: (updatedComment) =>
-      makeRequest.put(`/comments/${comment.id}`, updatedComment),
+    mutationFn: async ({ text }) =>
+      await makeRequest.put(`/comments/${comment.id}`, { text }),
 
-    onMutate: async (updatedComment) => {
+    onMutate: async ({ text }) => {
       await queryClient.cancelQueries(["comments", comment.postId]);
-      const previousComments = queryClient.getQueryData([
-        "comments",
-        comment.postId,
-      ]);
 
-      // Optimistic update: replace the old comment with the new one
-      //! ⚠️ Reminder: Don't merge an uncomplete optimistic object (e.g., if we only return 'text', whereas 'comments' SQL table also contains other keys), because it will overwrite our existing data => 💡 Only merge with the new one !!!
-      queryClient.setQueryData(["comments", comment.postId], (oldData) =>
-        oldData?.map((c) =>
-          c.id === comment.id ? { ...c, text: updatedComment.text } : c
-        )
+      const previousComments =
+        queryClient.getQueryData(["comments", comment.postId]) || [];
+
+      const optimisticComment = {
+        ...comment,
+        text,
+      };
+
+      queryClient.setQueryData(
+        ["comments", comment.postId],
+        (oldComments = []) =>
+          oldComments?.map((c) => (c.id === comment.id ? optimisticComment : c))
       );
 
       return { previousComments };
     },
 
-    onError: (error, variables, context) => {
-      console.error(error.response?.data?.message || error.message);
+    onError: (error, _variables, context) => {
+      console.error(error);
       setError({
         isError: true,
         message: error.response?.data?.message || error.message,
@@ -45,7 +47,7 @@ export default function UpdateComment({ comment, setIsOpen }) {
 
       if (context?.previousComments) {
         queryClient.setQueryData(
-          ["comments", variables.postId],
+          ["comments", comment.postId],
           context.previousComments
         );
       }
@@ -53,15 +55,12 @@ export default function UpdateComment({ comment, setIsOpen }) {
 
     onSuccess: () => {
       toast.success("Comment updated.");
-      setText(""); // Reset form
       setError({ isError: false, message: "" });
-      setIsOpen(false); // Close form
+      setIsOpen(false);
     },
 
-    onSettled: (_data, _error, variables) => {
-      queryClient.invalidateQueries(["comments", variables.postId]);
-      queryClient.invalidateQueries(["user", variables.userId]); // Refetch user data to update profile picture if needed
-    },
+    onSettled: () =>
+      queryClient.invalidateQueries(["comments", comment.postId]),
   });
 
   const handleSubmit = async (e) => {
@@ -94,7 +93,6 @@ export default function UpdateComment({ comment, setIsOpen }) {
 
     // Prepare updated data
     const updatedComment = {
-      ...comment,
       text: trimmedText,
     };
 

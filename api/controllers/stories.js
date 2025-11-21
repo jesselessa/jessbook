@@ -28,7 +28,7 @@ export const getStories = async (req, res) => {
   const targetUserId = req.query.userId;
   const loggedInUserId = req.user.id;
 
-  // const isFetchingProfileStories = targetUserId && targetUserId !== "undefined";
+  const isFetchingProfileStories = targetUserId && targetUserId !== "undefined";
 
   try {
     // 1 - Delete former stories even non expired before getting new ones
@@ -38,12 +38,12 @@ export const getStories = async (req, res) => {
 
     // 2 - Prepare the SQL query
 
-    // // Query for a specific user's profile
-    // const profileQuery = `SELECT s.*, u.id AS userId, firstName, lastName
-    //                       FROM stories AS s
-    //                       JOIN users AS u ON (u.id = s.userId)
-    //                       WHERE s.userId = ?
-    //                       ORDER BY s.createdAt DESC`;
+    // Query for a specific user's profile
+    const profileQuery = `SELECT s.*, u.id AS userId, firstName, lastName
+                          FROM stories AS s
+                          JOIN users AS u ON (u.id = s.userId)
+                          WHERE s.userId = ?
+                          ORDER BY s.createdAt DESC`;
 
     // Query for the logged-in user's feed (user's own story + those of the people he follows)
     const feedQuery = `
@@ -57,22 +57,19 @@ export const getStories = async (req, res) => {
           CASE WHEN s.userId = ? THEN 0 ELSE 1 END,
           s.createdAt DESC`; // Logged-in user story displayed first, then most recent followed users' stories
 
-    // const cleanedProfileQuery = profileQuery.replace(/\s+/g, " ").trim();
+    const cleanedProfileQuery = profileQuery.replace(/\s+/g, " ").trim();
     const cleanedFeedQuery = feedQuery.replace(/\s+/g, " ").trim();
 
-    // const selectQuery = isFetchingProfileStories
-    //   ? cleanedProfileQuery
-    //   : cleanedFeedQuery;
+    const selectQuery = isFetchingProfileStories
+      ? cleanedProfileQuery
+      : cleanedFeedQuery;
 
-    // const values = isFetchingProfileStories
-    //   ? [targetUserId]
-    //   : [loggedInUserId, loggedInUserId, loggedInUserId];
-
-    const values = [loggedInUserId, loggedInUserId, loggedInUserId];
+    const values = isFetchingProfileStories
+      ? [targetUserId]
+      : [loggedInUserId, loggedInUserId, loggedInUserId];
 
     // 3 - Execute the query
-    const data = await executeQuery(cleanedFeedQuery, values);
-    // const data = await executeQuery(selectQuery, values);
+    const data = await executeQuery(selectQuery, values);
     return res.status(200).json(data);
   } catch (error) {
     console.error("Error fetching stories:", error);

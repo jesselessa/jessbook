@@ -1,6 +1,9 @@
-import { useContext, useEffect } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useContext } from "react";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 
@@ -15,22 +18,48 @@ import ResetPassword from "./pages/resetPassword/ResetPassword.jsx";
 import Privacy from "./pages/privacy/Privacy.jsx";
 import TermsOfUse from "./pages/termsOfUse/TermsOfUse.jsx";
 
-// Component
-import Overlay from "./components/overlay/Overlay.jsx";
-
 // Context
-import { AuthContext } from "./contexts/authContext.jsx";
+import { AuthContext } from "./contexts/AuthContext.jsx";
+
+// Custom component to protect routes
+const ProtectedRoute = ({ children }) => {
+  const { currentUser } = useContext(AuthContext);
+  return currentUser ? children : <Navigate to="/" replace />;
+};
 
 function App() {
-  const { currentUser } = useContext(AuthContext);
-
-  // Handle navigation
-  const ProtectedRoute = ({ children }) => {
-    if (!currentUser) return <Login />;
-    return children;
-  };
-
   const router = createBrowserRouter([
+    // Public routes (no authentication required)
+    {
+      path: "/",
+      element: <Login />,
+    },
+    {
+      path: "/register",
+      element: <Register />,
+    },
+    {
+      path: "/login/auth-provider/callback",
+      element: <AuthCallback />,
+    },
+    {
+      path: "/forgot-password",
+      element: <ForgotPassword />,
+    },
+    {
+      path: "/reset-password",
+      element: <ResetPassword />,
+    },
+    {
+      path: "/privacy",
+      element: <Privacy />,
+    },
+    {
+      path: "/terms-of-use",
+      element: <TermsOfUse />,
+    },
+
+    // Authenticated user routes
     {
       path: "/home",
       element: (
@@ -47,50 +76,18 @@ function App() {
         </ProtectedRoute>
       ),
     },
-    {
-      path: "/",
-      element: <Login />,
-    },
-    {
-      path: "/login/auth-provider/callback",
-      element: <AuthCallback />,
-    },
-    {
-      path: "/forgot-password",
-      element: <ForgotPassword />,
-    },
-    {
-      path: "/reset-password",
-      element: <ResetPassword />,
-    },
-    {
-      path: "/register",
-      element: <Register />,
-    },
-    {
-      path: "/privacy",
-      element: <Privacy />,
-    },
-    {
-      path: "/terms-of-use",
-      element: <TermsOfUse />,
-    },
+
+    // Fallback route for undefined paths
     {
       path: "*",
       element: <Login />,
     },
   ]);
 
-  const queryClient = new QueryClient();
-
   return (
     <div className="App">
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-        <ToastContainer autoClose={1500} style={{ fontSize: "1.6rem" }} />
-      </QueryClientProvider>
-
-      <Overlay />
+      <RouterProvider router={router} />
+      <ToastContainer autoClose={1500} style={{ fontSize: "1.6rem" }} />
     </div>
   );
 }
