@@ -1,45 +1,29 @@
 import { useState, useEffect } from "react";
 import "./overlay.scss";
 
-// Set max-width boundary for required portrait mode
-const MAX_WIDTH_PORTRAIT_REQUIRED = 600;
+const MAX_WIDTH_PORTRAIT_REQUIRED = 767; // px
 
 export default function Overlay() {
   const [showOverlay, setShowOverlay] = useState(false);
 
-  // Checks device orientation and screen size
+  // Function reused for both initial check and resize listener
+  const evaluateOrientation = () => {
+    const isLandscape = window.innerWidth > window.innerHeight;
+    const isSmallScreen = window.innerWidth <= MAX_WIDTH_PORTRAIT_REQUIRED;
+    setShowOverlay(isLandscape && isSmallScreen);
+  };
+
   useEffect(() => {
-    const handleOrientationChange = () => {
-      // Check if the device is currently in landscape mode
-      const isLandscape = window.matchMedia("(orientation: landscape)").matches;
-      // Check if the screen width is within the small screen boundary (<= 600px)
-      const isSmallScreen = window.innerWidth <= MAX_WIDTH_PORTRAIT_REQUIRED;
+    // Initial evaluation
+    evaluateOrientation();
 
-      // Show overlay if it's a small screen AND in landscape mode
-      setShowOverlay(isLandscape && isSmallScreen);
-    };
+    // Only one listener needed: resize covers rotation events on most devices
+    window.addEventListener("resize", evaluateOrientation);
 
-    handleOrientationChange(); // Initial check on component mount
-
-    // Use "resize" and "orientationchange" to handle window resizing and device rotation
-    window.addEventListener("orientationchange", handleOrientationChange);
-    window.addEventListener("resize", handleOrientationChange);
-
-    // Cleanup on unmounting
     return () => {
-      window.removeEventListener("orientationchange", handleOrientationChange);
-      window.removeEventListener("resize", handleOrientationChange);
+      window.removeEventListener("resize", evaluateOrientation);
     };
   }, []);
-
-  // Add a class to body in order to hide the app
-  useEffect(() => {
-    if (showOverlay) {
-      document.body.classList.add("overlay-active");
-    } else {
-      document.body.classList.remove("overlay-active");
-    }
-  }, [showOverlay]);
 
   return (
     <>
