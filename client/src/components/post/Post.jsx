@@ -120,17 +120,17 @@ export default function Post({ post }) {
 
     // 1. onMutate: Optimistically remove the post from the cache
     onMutate: async (postId) => {
-      // Cancel outgoing fetches for both global feed and user profile posts
-      await queryClient.cancelQueries({ queryKey: ["posts"] });
+      // Cancel outgoing fetches for both feed and profile posts
+      await queryClient.cancelQueries({ queryKey: ["posts", "feed"] });
       await queryClient.cancelQueries({ queryKey: ["posts", currentUser.id] });
 
       // Store current cached data for rollback
-      const previousPostsGlobal = queryClient.getQueryData(["posts"]) || [];
-      const previousPostsUser =
+      const previousFeedPosts = queryClient.getQueryData(["posts", "feed"]) || [];
+      const previousUserPosts =
         queryClient.getQueryData(["posts", currentUser.id]) || [];
 
-      // Optimistically remove post from both global and user's profile posts caches
-      queryClient.setQueryData(["posts", postId], (oldPosts = []) => {
+      // Optimistically remove post from both feed and profile posts caches
+      queryClient.setQueryData(["posts", "feed"], (oldPosts = []) => {
         return oldPosts.filter((p) => p.id !== postId);
       });
       queryClient.setQueryData(["posts", currentUser.id], (oldPosts = []) => {
@@ -138,7 +138,7 @@ export default function Post({ post }) {
       });
 
       // Context for rollback
-      return { previousPostsGlobal, previousPostsUser };
+      return { previousFeedPosts, previousUserPosts };
     },
 
     // 2. onError: Rollback to previous state
@@ -146,14 +146,14 @@ export default function Post({ post }) {
       console.error("Error deleting post:", error);
       toast.error(error.response?.data?.message || error.message);
 
-      // Rollback both global and user's profile caches
-      if (context?.previousPostsGlobal) {
-        queryClient.setQueryData(["posts"], context.previousPostsGlobal);
+      // Rollback both feed and profile caches
+      if (context?.previousFeedPosts) {
+        queryClient.setQueryData(["posts", "feed"], context.previousFeedPosts);
       }
-      if (context?.previousPostsUser) {
+      if (context?.previousUserPosts) {
         queryClient.setQueryData(
           ["posts", currentUser.id],
-          context.previousPostsUser
+          context.previousUserPosts
         );
       }
     },
@@ -163,7 +163,7 @@ export default function Post({ post }) {
 
     // 4. onSettled: Invalidate and refetch all posts
     onSettled: () => {
-      queryClient.invalidateQueries(["posts"]);
+      queryClient.invalidateQueries(["posts", "feed"]);
       queryClient.invalidateQueries(["posts", currentUser.id]);
     },
   });

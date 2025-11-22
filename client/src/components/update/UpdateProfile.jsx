@@ -65,13 +65,13 @@ export default function UpdateProfile({ user, setIsOpen }) {
       const uploadedCover = coverFile
         ? await uploadFile(coverFile)
         : user.coverPic
-        ? user.coverPic
-        : null;
+          ? user.coverPic
+          : null;
       const uploadedProfile = profileFile
         ? await uploadFile(profileFile)
         : user.profilePic
-        ? user.profilePic
-        : null;
+          ? user.profilePic
+          : null;
 
       const finalUpdate = {
         ...updatedFields,
@@ -102,13 +102,13 @@ export default function UpdateProfile({ user, setIsOpen }) {
       const tempCoverUrl = coverFile
         ? URL.createObjectURL(coverFile) // New image
         : user.coverPic
-        ? user.coverPic // Old image
-        : null; // User has never set a cover pic before
+          ? user.coverPic // Old image
+          : null; // User has never set a cover pic before
       const tempProfileUrl = profileFile
         ? URL.createObjectURL(profileFile)
         : user.profilePic
-        ? user.profilePic
-        : null;
+          ? user.profilePic
+          : null;
 
       // Create an optimistic user
       const optimisticUser = {
@@ -127,11 +127,11 @@ export default function UpdateProfile({ user, setIsOpen }) {
         old.map((p) =>
           p.userId === user.id
             ? {
-                ...p,
-                firstName: optimisticUser.firstName,
-                lastName: optimisticUser.lastName,
-                profilePic: optimisticUser.profilePic,
-              }
+              ...p,
+              firstName: optimisticUser.firstName,
+              lastName: optimisticUser.lastName,
+              profilePic: optimisticUser.profilePic,
+            }
             : p
         );
 
@@ -173,7 +173,7 @@ export default function UpdateProfile({ user, setIsOpen }) {
     onSuccess: (data) => {
       const userId = String(data.id);
 
-      toast.success("Profile updated successfully.");
+      toast.success("Profile updated.");
       setIsOpen(false);
 
       // Update local state and TQ cache immediately with final server response
@@ -271,8 +271,8 @@ export default function UpdateProfile({ user, setIsOpen }) {
                     coverUrl
                       ? coverUrl
                       : user.coverPic
-                      ? `/uploads/${user.coverPic}`
-                      : defaultCover
+                        ? `/uploads/${user.coverPic}`
+                        : defaultCover
                   }
                   className="cover"
                   alt="cover"
@@ -299,8 +299,8 @@ export default function UpdateProfile({ user, setIsOpen }) {
                     profileUrl
                       ? profileUrl
                       : user.profilePic
-                      ? `/uploads/${user.profilePic}`
-                      : defaultProfile
+                        ? `/uploads/${user.profilePic}`
+                        : defaultProfile
                   }
                   className="profile-pic"
                   alt="profile"

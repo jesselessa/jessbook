@@ -32,11 +32,11 @@ export const getStories = async (req, res) => {
 
   try {
     // 1 - Delete former stories even non expired before getting new ones
-    // Note: In large-scale projects, better use a cron job to reduce the loading time of a SQL query
+    //! Note: In large-scale projects, better use a cron job to reduce the loading time of a SQL query
     const deleteQuery = "DELETE FROM stories WHERE expiresAt <= NOW()";
     await executeQuery(deleteQuery);
 
-    // 2 - Prepare the SQL query
+    // 2 - Prepare the SQL queries
 
     // Query for a specific user's profile
     const profileQuery = `SELECT s.*, u.id AS userId, firstName, lastName

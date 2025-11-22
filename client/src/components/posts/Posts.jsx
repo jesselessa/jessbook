@@ -22,7 +22,7 @@ export default function Posts({ userId }) {
     error,
     data: posts,
   } = useQuery({
-    queryKey: ["posts", userId],
+    queryKey: userId ? ["posts", userId] : ["posts", "feed"],
     queryFn: () => getPosts(userId),
   });
 

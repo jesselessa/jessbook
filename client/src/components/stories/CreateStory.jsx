@@ -79,8 +79,11 @@ export default function CreateStory({ setIsOpen }) {
       makeRequest.post("/stories", { file, text }),
 
     onMutate: async ({ file, text }) => {
+      await queryClient.cancelQueries(["stories", "feed"]);
       await queryClient.cancelQueries(["stories", currentUser.id]);
-      const previousStories = queryClient.getQueryData([
+
+      const previousFeedStories = queryClient.getQueryData(["stories", "feed"]);
+      const previousUserStories = queryClient.getQueryData([
         "stories",
         currentUser.id,
       ]);
@@ -105,17 +108,24 @@ export default function CreateStory({ setIsOpen }) {
         optimisticStory,
       ]);
 
-      return { previousStories };
+      return { previousFeedStories, previousUserStories };
     },
 
     onError: (error, _variables, context) => {
       console.error(error.response?.data?.message || error.message);
       toast.error(error.response?.data?.message || error.message);
 
-      if (context?.previousStories) {
+      if (context?.previousFeedStories) {
+        queryClient.setQueryData(
+          ["stories", "feed"],
+          context.previousFeedStories
+        );
+      }
+
+      if (context?.previousUserStories) {
         queryClient.setQueryData(
           ["stories", currentUser.id],
-          context.previousStories
+          context.previousUserStories
         );
       }
     },
@@ -126,6 +136,7 @@ export default function CreateStory({ setIsOpen }) {
     },
 
     onSettled: () => {
+      queryClient.invalidateQueries(["stories", "feed"]);
       queryClient.invalidateQueries(["stories", currentUser.id]);
 
       // Reset states
@@ -326,37 +337,37 @@ export default function CreateStory({ setIsOpen }) {
                     />
                   </div>
                 ) : // STATE 2: Valid video selected
-                isVideo(file?.name) ? (
-                  // Small screen
-                  isSmallScreen ? (
-                    <div className="video-placeholder">
-                      <p>
-                        ✅ Video Selected ({videoDuration?.toFixed(1)}s)
-                        <br />
-                        <span>(Preview unavailable)</span>
-                      </p>
-                    </div>
+                  isVideo(file?.name) ? (
+                    // Small screen
+                    isSmallScreen ? (
+                      <div className="video-placeholder">
+                        <p>
+                          ✅ Video Selected ({videoDuration?.toFixed(1)}s)
+                          <br />
+                          <span>(Preview unavailable)</span>
+                        </p>
+                      </div>
+                    ) : (
+                      // Larger screen
+                      <div className="video-container">
+                        <video controls autoPlay muted>
+                          <source
+                            src={currentPreviewUrl}
+                            type={getMimeType(file.name)}
+                          />
+                          Your browser doesn't support video preview.
+                        </video>
+                      </div>
+                    )
                   ) : (
-                    // Larger screen
-                    <div className="video-container">
-                      <video controls autoPlay muted>
-                        <source
-                          src={currentPreviewUrl}
-                          type={getMimeType(file.name)}
-                        />
-                        Your browser doesn't support video preview.
-                      </video>
+                    // STATE 3: Valid image selected
+                    <div className="img-container">
+                      <LazyLoadImage
+                        src={currentPreviewUrl}
+                        alt="story preview"
+                      />
                     </div>
-                  )
-                ) : (
-                  // STATE 3: Valid image selected
-                  <div className="img-container">
-                    <LazyLoadImage
-                      src={currentPreviewUrl}
-                      alt="story preview"
-                    />
-                  </div>
-                )}
+                  )}
               </div>
             )}
           </div>

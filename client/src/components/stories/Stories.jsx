@@ -37,10 +37,14 @@ export default function Stories({ userId }) {
   };
 
   const {
+    data: stories,
     isLoading,
     error,
-    data: stories,
-  } = useQuery({ queryKey: ["stories", userId], queryFn: () => fetchStories });
+  } = useQuery({
+    queryKey: userId ? ["stories", userId] : ["stories", "feed"],
+    queryFn: fetchStories,
+  });
+
 
   // Handler to open the modal with the selected story
   const handleClick = (story) => {
@@ -59,7 +63,7 @@ export default function Stories({ userId }) {
               src={
                 currentUser?.profilePic
                   ? //! "uploads" is the public web path that is exposed and handled by our web server for static assets
-                    `/uploads/${currentUser.profilePic}`
+                  `/uploads/${currentUser.profilePic}`
                   : defaultProfile
               }
               alt="user"

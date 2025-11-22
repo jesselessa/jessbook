@@ -50,12 +50,12 @@ export default function Publish() {
     // 1. onMutate: Immediately update the cache before the server response
     onMutate: async ({ text, img }) => {
       // 1A. Cancel any outgoing queries for posts
-      await queryClient.cancelQueries({ queryKey: ["posts"] });
+      await queryClient.cancelQueries({ queryKey: ["posts", "feed"] });
       await queryClient.cancelQueries({ queryKey: ["posts", currentUser.id] });
 
       // 1B. Store current cached data for rollback if mutation fails
-      const previousPostsGlobal = queryClient.getQueryData(["posts"]) || [];
-      const previousPostsUser =
+      const previousFeedPosts = queryClient.getQueryData(["posts", "feed"]) || [];
+      const previousUserPosts =
         queryClient.getQueryData(["posts", currentUser.id]) || [];
 
       // 1C. Create a temporary optimistic post
@@ -77,7 +77,7 @@ export default function Publish() {
 
       // 1D. Optimistically remove the post from both global and user's caches
       //! ⚠️ We must set an empty array as a fallback (oldPost = []), otherwise, if Tanstack Query has still nothing in cache, it will return 'undefined', making our app crash
-      queryClient.setQueryData(["posts"], (oldPost = []) => [
+      queryClient.setQueryData(["posts", "feed"], (oldPost = []) => [
         ...oldPost,
         optimisticPost,
       ]);
@@ -87,7 +87,7 @@ export default function Publish() {
       ]);
 
       // 1E. Return context with previous data for rollback in case of error
-      return { previousPostsGlobal, previousPostsUser };
+      return { previousFeedPosts, previousUserPosts };
     },
 
     // 2. onError (mutation failed), Rollback the optimistic update
@@ -96,13 +96,13 @@ export default function Publish() {
       toast.error(error.response?.data?.message || error.message);
 
       // Rollback on error
-      if (context?.previousPostsGlobal) {
-        queryClient.setQueryData(["posts"], context.previousPostsGlobal);
+      if (context?.previousFeedPosts) {
+        queryClient.setQueryData(["posts", "feed"], context.previousFeedPosts);
       }
-      if (context?.previousPostsUser) {
+      if (context?.previousUserPosts) {
         queryClient.setQueryData(
           ["posts", currentUser.id],
-          context.previousPostsUser
+          context.previousUserPosts
         );
       }
     },
@@ -113,8 +113,9 @@ export default function Publish() {
     // Either the mutation succeeds or fails, refresh data and reset states
     onSettled: () => {
       // Invalidate queries to refetch all posts from the server
-      queryClient.invalidateQueries(["posts"]);
-      queryClient.invalidateQueries(["posts", currentUser.id]); //! Note: No need to refresh comments and postLikes data because they depend on post ID (and not on post content)
+      queryClient.invalidateQueries(["posts", "feed"]);
+      queryClient.invalidateQueries(["posts", currentUser.id]); 
+      //! Note: No need to refresh comments and postLikes data because they depend on post ID (and not on post content)
 
       // Reset states
       setText("");
