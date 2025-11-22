@@ -38,10 +38,7 @@ const VideoDurationChecker = ({ fileURL, onDurationCheck }) => {
       onLoadedMetadata={(e) => {
         const duration = e.target.duration;
         const isValid = duration <= MAX_DURATION_SECONDS;
-        const isNotValid = duration > MAX_DURATION_SECONDS;
-        onDurationCheck(isValid || isNotValid, duration); // Callback to parent with duration result
-
-        // onDurationCheck(isValid, duration); // Callback to parent with duration result
+        onDurationCheck(isValid, duration); // Callback to parent with duration result
       }}
     />
   );
@@ -159,7 +156,7 @@ export default function CreateStory({ setIsOpen }) {
     // Clean up the temporary URL immediately after metadata is loaded
     if (tempFileUrl) URL.revokeObjectURL(tempFileUrl);
 
-    if (isValid || isNotValid) {
+    if (isValid) {
       // SUCCESS: Store the file in the actual 'file' state and the duration
       setFile(tempVideoFile);
       setVideoDuration(duration);
@@ -172,26 +169,9 @@ export default function CreateStory({ setIsOpen }) {
         )}s) exceeds ${MAX_DURATION_SECONDS}s.`,
       });
       // Clear all file states related to the invalid file
-      setFile(null); // Keep preview if video exceeds limit duration
+      setFile(null);
       setVideoDuration(null);
     }
-
-    // if (isValid) {
-    //   // SUCCESS: Store the file in the actual 'file' state and the duration
-    //   setFile(tempVideoFile);
-    //   setVideoDuration(duration);
-    // } else {
-    //   // ERROR: Show error message
-    //   setError({
-    //     isError: true,
-    //     message: `Video duration (${duration.toFixed(
-    //       1
-    //     )}s) exceeds ${MAX_DURATION_SECONDS}s.`,
-    //   });
-    //   // Clear all file states related to the invalid file
-    //   setFile(null); // Keep preview if video exceeds limit duration
-    //   setVideoDuration(null);
-    // }
 
     // Clear states regardless of outcome
     setTempVideoFile(null);
@@ -329,7 +309,7 @@ export default function CreateStory({ setIsOpen }) {
                 {isCheckingDuration ? (
                   // STATE 1: Loading while checking video duration
                   <div className="video-placeholder">
-                    <p>⏳ Checking video duration</p>
+                    <p>⏳ Checking video duration...</p>
                     <Loader
                       width="20px"
                       height="20px"
@@ -386,7 +366,7 @@ export default function CreateStory({ setIsOpen }) {
             disabled={isPublishing}
           />
 
-          <button disabled={isPublishing}>
+          <button type="submit" disabled={isPublishing}>
             {isPublishing ? (
               <Loader
                 width="24px"
