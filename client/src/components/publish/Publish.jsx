@@ -114,7 +114,7 @@ export default function Publish() {
     onSettled: () => {
       // Invalidate queries to refetch all posts from the server
       queryClient.invalidateQueries(["posts", "feed"]);
-      queryClient.invalidateQueries(["posts", currentUser.id]); 
+      queryClient.invalidateQueries(["posts", currentUser.id]);
       //! Note: No need to refresh comments and postLikes data because they depend on post ID (and not on post content)
 
       // Reset states
@@ -124,6 +124,7 @@ export default function Publish() {
   });
 
   // Access the publication global loading state using 'isPending' property from useMutation
+  //! ⚠️ With Tanstack Query v5, you can't use 'isLoading' property anymore
   const isPublishing = mutation.isPending;
 
   const handleSubmit = async (e) => {

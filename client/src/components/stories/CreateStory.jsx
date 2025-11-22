@@ -264,6 +264,7 @@ export default function CreateStory({ setIsOpen }) {
         file: uploadedFile,
         text: text.trim(),
       });
+
     } catch (error) {
       console.error(error);
       setError({
@@ -273,6 +274,7 @@ export default function CreateStory({ setIsOpen }) {
     }
   };
 
+  // Determine which URL to use for preview
   const currentPreviewUrl = file ? previewUrl : tempFileUrl;
 
   return (
