@@ -25,29 +25,29 @@ export default function ModalStory({ story, setIsOpen }) {
   const deleteMutation = useMutation({
     mutationFn: (storyId) => makeRequest.delete(`/stories/${storyId}`),
 
-    onMutate: async () => {
-      await queryClient.cancelQueries(["stories"]);
+    onMutate: async (storyId) => {
+      await queryClient.cancelQueries(["stories", "feed"]);
 
       const previousStories = queryClient.getQueryData([
         "stories",
-        currentUser.id,
+        "feed",
       ]);
 
       // Remove the story optimistically
-      queryClient.setQueryData(["stories", currentUser.id], (oldStories = []) =>
+      queryClient.setQueryData(["stories", "feed"], (oldStories = []) =>
         oldStories.filter((s) => s.id !== storyId)
       );
 
       return { previousStories };
     },
 
-    onError: (error, _story, context) => {
+    onError: (error, _storyId, context) => {
       console.error(error.response?.data || error.message);
       toast.error(error.response?.data || error.message);
 
       if (context?.previousStories) {
         queryClient.setQueryData(
-          ["stories", currentUser.id],
+          ["stories", "feed"],
           context.previousStories
         );
       }
@@ -58,7 +58,7 @@ export default function ModalStory({ story, setIsOpen }) {
       setIsOpen(false); // Close modal
     },
 
-    onSettled: () => queryClient.invalidateQueries(["stories"]),
+    onSettled: () => queryClient.invalidateQueries(["stories", "feed"]),
   });
 
   const handleDelete = () => {
