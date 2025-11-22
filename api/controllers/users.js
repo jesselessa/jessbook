@@ -195,26 +195,38 @@ export const updateUser = async (req, res) => {
 
   values.push(loggedInUserId);
 
-  try {
-    // Update database
-    const q = `
+  // Update the database
+  const q = `
           UPDATE users
           SET ${updatedFields.join(", ")}
           WHERE id = ?
         `;
-    const data = await executeQuery(q, values);
 
-    if (data.affectedRows > 0) {
-      return res.status(200).json({
-        data,
-        message: "User data updated",
-      });
-    } else {
-      return res.status(404).json("User not found or unauthorized");
+  const data = await executeQuery(q, values);
+
+  // If no row updated → either user doesn't exist or not authorized
+  if (data.affectedRows === 0) {
+    return res.status(404).json("User not found or unauthorized");
+  }
+
+  try {
+    // Fetch the freshly updated user (without password)
+    const selectQuery =
+      "SELECT id, firstName, lastName, email, profilePic, coverPic, city, fromAuthProvider, role FROM users WHERE id = ?";
+
+    const updatedRows = await executeQuery(selectQuery, [loggedInUserId]);
+
+    if (updatedRows.length === 0) {
+      return res.status(404).json({ message: "User not found after update" });
     }
+
+    const updatedUser = updatedRows[0];
+
+    // Return clean updated user object
+    return res.status(200).json(updatedUser);
   } catch (error) {
     return res.status(500).json({
-      message: "An unknown error occurred while updating user data.",
+      message: "An unknown error occurred while fetching updated user data.",
       error: error.message,
     });
   }

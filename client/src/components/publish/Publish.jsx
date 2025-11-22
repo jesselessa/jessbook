@@ -1,4 +1,4 @@
-//*************************** Publish.jsx ******************************
+//*************************** Publish.jsx *********************************
 // 1. Creates a Post → Only authenticated user (token retrieved from backend)
 // 2. Located on 2 places : Timeline (child of Home) and ProfileData (child of Profile)
 // 3. Post created displayed, either in Timeline or ProfileData, inside Posts component
