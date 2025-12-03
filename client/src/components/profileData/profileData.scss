@@ -111,9 +111,17 @@
               gap: 0.5rem;
               margin-left: 0.5rem;
 
+              .count-mob {
+                font-weight: 600;
+              }
+
               .followers {
                 .count {
                   font-weight: 600;
+
+                  @media (max-width: 550px) {
+                    display: none;
+                  }
 
                   .error-count {
                     font-weight: 600;

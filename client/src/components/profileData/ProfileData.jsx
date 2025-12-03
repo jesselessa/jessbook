@@ -198,19 +198,19 @@ export default function ProfileData() {
                       ) : isFollowersLoading ? (
                         "..."
                       ) : (
-                        `${followersCount.toString()} ${
-                          followersData?.length > 1 ? "Followers" : "Follower"
+                        `${followersCount} ${followersData?.length > 1 ? "Followers" : "Follower"
                         }`
                       )}
                     </span>
 
+                    {/* <PeopleAltOutlinedIcon fontSize="large" /> */}
                     {/* <span className="count">
                       {followingError ? (
                         <span className="error-count">Error</span>
                       ) : isFollowingLoading ? (
                         "..."
                       ) : (
-                        `${followingCount.toString()} Following`
+                        `${followingCount} Following`
                       )}
                     </span> */}
                   </div>
