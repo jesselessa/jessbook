@@ -32,6 +32,9 @@ export const __dirname = path.dirname(__filename);
 // Create server with Express
 const app = express();
 
+// Set 'trust proxy' to 1 if the app is behind a proxy (e.g., Nginx) to ensure secure cookies work correctly
+app.set("trust proxy", 1);
+
 // Use Helmet defaults to set a variety of security headers
 app.use(helmet());
 // Override the default Content Security Policy (CSP) with a custom configuration
