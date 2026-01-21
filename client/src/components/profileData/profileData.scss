@@ -11,7 +11,7 @@
     color: style.themed("textColor");
     background-color: style.themed("bgSoft");
     overflow-y: auto;
-    padding: 0 1rem 2rem 1rem;
+    padding: 2rem;
 
     @include style.medium {
       width: 80vw;
@@ -23,6 +23,7 @@
 
     @include style.small {
       font-size: 1.5rem;
+      padding: 1rem 1rem 2rem;
     }
 
     .profile-container {
@@ -202,7 +203,9 @@
             border: none;
             border-radius: 0.5rem;
             padding: 0.5rem 0.8rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition:
+              background-color 0.3s ease,
+              transform 0.2s ease;
             cursor: pointer;
             &:hover {
               background-color: color.scale(#ffd670, $lightness: -10%);

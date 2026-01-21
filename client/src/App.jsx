@@ -3,6 +3,7 @@ import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
+  Outlet,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
@@ -22,9 +23,11 @@ import TermsOfUse from "./pages/termsOfUse/TermsOfUse.jsx";
 import { AuthContext } from "./contexts/AuthContext.jsx";
 
 // Custom component to protect routes
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = () => {
   const { currentUser } = useContext(AuthContext);
-  return currentUser ? children : <Navigate to="/" replace />;
+
+  // If user is authenticated, render child routes; otherwise, redirect to login
+  return currentUser ? <Outlet /> : <Navigate to="/" replace />;
 };
 
 function App() {
@@ -59,22 +62,26 @@ function App() {
       element: <TermsOfUse />,
     },
 
-    // Authenticated user routes
+    // Protected routes
     {
-      path: "/home",
-      element: (
-        <ProtectedRoute>
-          <Home />
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: "/profile/:userId",
-      element: (
-        <ProtectedRoute>
-          <Profile />
-        </ProtectedRoute>
-      ),
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: "/home",
+          element: <Home />,
+        },
+        {
+          path: "/profile/:userId",
+          element: <Profile />,
+        },
+        // Handle case where profile ID is not provided
+        {
+          path: "/profile",
+          element: <Navigate to="/home" replace />,
+        },
+
+        //! Note:  If we add more authenticated routes in the future, they will be automatically protected
+      ],
     },
 
     // Fallback route for undefined paths

@@ -1,6 +1,6 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import "./profileData.scss";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { fetchUserData } from "../../utils/queries.js";
@@ -29,17 +29,18 @@ import { AuthContext } from "../../contexts/AuthContext.jsx";
 export default function ProfileData() {
   const { currentUser } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Get ID of displayed profile from URL params
   const { userId } = useParams();
 
-  // Determine if the profile being viewed is the logged-in user's profile
+  // Determine if the viewed profile belongs to the logged-in user
   const isOwnProfile = String(currentUser?.id) === userId;
 
   // Access TQ client
   const queryClient = useQueryClient();
 
-  // Fetch user data of displayed profile
+  // Fetch data for the profile being displayed
   const {
     isLoading: isProfileLoading,
     error: profileError,
@@ -48,9 +49,25 @@ export default function ProfileData() {
     queryKey: ["user", userId],
     queryFn: () => fetchUserData(userId),
     enabled: !!userId, // Only fetch if userId is defined
+    retry: false, // Do not retry if the ID is likely invalid
   });
 
-  // Get user's followers
+  // Handle automatic redirection if profile does not exist or URL is malformed
+  useEffect(() => {
+    if (profileError) {
+      // Redirect to homepage if logged in, otherwise to login page
+      const destination = currentUser ? "/home" : "/";
+
+      // Delay to allow user to see the error message or toast
+      const timeout = setTimeout(() => {
+        navigate(destination, { replace: true });
+      }, 2000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [profileError, currentUser, navigate]);
+
+  // Get the list of user's followers
   const getFollowers = async (userId) => {
     try {
       const res = await makeRequest.get(
@@ -63,6 +80,7 @@ export default function ProfileData() {
     }
   };
 
+  // Handle followers data fetching
   const {
     isLoading: isFollowersLoading,
     error: followersError,
@@ -70,6 +88,7 @@ export default function ProfileData() {
   } = useQuery({
     queryKey: ["followers", userId],
     queryFn: () => getFollowers(userId),
+    enabled: !!userId && !profileError, // Only fetch if userId is defined and profile exists
   });
 
   // Get the list of people followed by user
@@ -85,6 +104,7 @@ export default function ProfileData() {
     }
   };
 
+  // Handle following data fetching
   const {
     isLoading: isFollowingLoading,
     error: followingError,
@@ -92,6 +112,7 @@ export default function ProfileData() {
   } = useQuery({
     queryKey: ["following", userId],
     queryFn: () => getFollowing(userId),
+    enabled: !!userId && !profileError,
   });
 
   // Get number of followers/following
@@ -153,7 +174,7 @@ export default function ProfileData() {
   return (
     <div className="profileData">
       {profileError ? (
-        "Something wrong."
+        "An error occurred. Redirecting..."
       ) : isProfileLoading ? (
         <Loader />
       ) : (
