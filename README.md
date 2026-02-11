@@ -12,7 +12,6 @@ Jessbook is a social media application inspired from Facebook and Twitter that a
 - [Main features](#main-features)
 - [Setting up the database](#setting-up-the-database)
 - [Run the project locally](#run-the-project-locally)
-- [Getting started with Vite](#getting-started-with-vite)
 - [Contributing](#contributing)
 - [Stay Updated](#stay-updated)
 - [Contact](#contact)
@@ -77,14 +76,6 @@ Now that the database is set up, you can run the project locally by following th
 
 Make sure to complete the values of the **environment variables** necessary to the project in a `.env` file in order to make it work.
 
-## Getting Started with Vite
-
-[Vite](https://vitejs.dev/) is a fast development tool for modern web applications. To get started with Vite, follow these simple steps :
-
-### 1. Install Node.js and npm
-
-Ensure you have Node.js and npm installed on your system. You can download and install them from the [official Node.js website](https://nodejs.org/en).
-
 ### 2. Initialize the project
 
 If you have not already created a project, you can initialize a new project using the following command in your terminal : `npm init vite@latest my-project --template react`.
@@ -132,3 +123,4 @@ For inquiries, you can contact me via [LinkedIn](https://www.linkedin.com/in/jes
 ---
 
 &copy; 2024, Jessica ELESSA - All rights reserved
+
