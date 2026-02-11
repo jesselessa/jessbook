@@ -100,7 +100,7 @@ This will generate a production-ready version of your application in the `dist` 
 
 ## Contributing
 
-Feel free to make improvements, fix bugs, or suggest new features. Contributions are welcomed !
+Feel free to make improvements, fix bugs, or suggest new features. Contributions are welcome !
 
 - Fork the repository and clone it to your local machine : `git clone https://github.com/jesselessa/jessbook.git`.
 - Navigate to the project directory : `cd jessbook`.
@@ -123,4 +123,5 @@ For inquiries, you can contact me via [LinkedIn](https://www.linkedin.com/in/jes
 ---
 
 &copy; 2024, Jessica ELESSA - All rights reserved
+
 
