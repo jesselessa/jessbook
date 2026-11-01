@@ -23,7 +23,7 @@
     "moment": "^2.31.0",
     "multer": "^2.4.0",
     "mysql2": "^3.23.1",
-    "nodemailer": "^10.0.9",
+    "nodemailer": "^10.1.4",
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
